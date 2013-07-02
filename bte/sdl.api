@@ -1,0 +1,6 @@
+sdl.Flip(sdl_surface);
+sdl.Init(flag, ...);
+sdl.SetVideoMode(w, h, d, flag, ...);
+sdl.NewRect(x, y, w, h);
+
+sdl.BlitSurface(sdl_surface, {sdl_rect|nil|x,y,w,h}, sdl_surface, {sdl_rect|nil|x,y,w,h});

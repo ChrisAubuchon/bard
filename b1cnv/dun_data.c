@@ -1,0 +1,25 @@
+#include <b1lib.h>
+#include <dun.h>
+
+b1levData_t b1dungeons[] = {
+  { "cellars", 4, { 0, 1, 2, 3, -1 }},
+  { "catacombs", 3, {4, 5, 6 , -1, -1}},
+  { "castle", 3, {7, 8, 9, -1, -1 }},
+  { "kylr", 1, {10, -1, -1, -1, -1 }},
+  { "mangar", 5, {11, 12, 13, 14, 15 }}
+};
+
+uint8_t b1dun_randomMask[] = {
+	15, 15, 31, 31,
+	31, 31, 31, 31
+};
+
+uint8_t b1dun_randomOffset[] = {
+	0, 8, 8, 16,
+	32, 48, 64, 81
+};
+
+uint8_t b1dun_poisonDamage[] = {
+	1,2,4,6,
+	8,10,16,20
+};

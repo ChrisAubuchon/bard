@@ -1,0 +1,289 @@
+review = {}
+local funcs = {}
+
+function funcs.nightCheck()
+	if (globals.isNight) then
+		text_cdprint(true, false, "The review Board is closed for the evening.")
+		text_cdprint(false, true, " The guild leaders will meet with you in the morning.\n\n")
+		return true
+	end
+
+	return false
+end
+
+function funcs.setReviewBigpic()
+	bigpic.drawBigpic("PIC_REVINT")
+	bigpic.setTitle("Review board")
+end
+
+function funcs.advanceRandomStat(char)
+	local canAdvance = {}
+	local rndStat
+
+	if (char.st < 18) then table.insert(canAdvance, "st") end
+	if (char.iq < 18) then table.insert(canAdvance, "iq") end
+	if (char.dx < 18) then table.insert(canAdvance, "dx") end
+	if (char.cn < 18) then table.insert(canAdvance, "cn") end
+	if (char.lk < 18) then table.insert(canAdvance, "lk") end
+
+	if (#canAdvance > 0) then
+		rndStat = (rnd() % #canAdvance) + 1
+		char[canAdvance[rndStat]] = char[canAdvance[rndStat]] + 1
+		text_print("\n+1 to ")
+		if (canAdvance[rndStat] == "st") then text_print("strength.") end
+		if (canAdvance[rndStat] == "iq") then text_print("I.Q..") end
+		if (canAdvance[rndStat] == "dx") then text_print("dexterity.") end
+		if (canAdvance[rndStat] == "cn") then text_print("constitution.") end
+		if (canAdvance[rndStat] == "lk") then text_print("luck.") end
+	end
+end
+
+function funcs.doAdvancement()
+	local char
+	local xpRequired
+
+	text_cdprint(true, false, "The Guild leaders prepare to weigh thy merits.\n\n")
+	text_print("Who shall be reviewed?")
+
+	char = party:readSlot()
+	if (not char) then
+		return
+	end
+	text_cdprint(true, false, "The guild leaders deem that " .. char.name)
+	xpRequired = classes.getXpForLevel(char.class, char.cur_level + 1)
+	if (char.xp < xpRequired) then
+		text_cdprint(false, true, " still needeth %d experience points prior to advancement...\n", xpRequired - char.xp)
+		return
+	end
+
+	text_print(" hath earned a level of advancement...")
+	char.cur_level = char.cur_level + 1
+	char.max_level = char.cur_level
+
+	char.cur_hp = char.cur_hp + (rnd() % classes.get(char.class, "hpDice"))
+	if (char.cn > 14) then
+		char.cur_hp = char.cur_hp + (char.cn - 14)
+	end
+	char.cur_hp = char.cur_hp + 1
+	char.max_hp = char.cur_hp
+
+	if (char.class == "Rogue") then
+		char.rogu_level = char.rogu_level + (rnd() % 7)
+		if (char.dx > 14) then
+			char.rogu_level = char.rogu_level + (char.dx - 14)
+		end
+		char.rogu_level = char.rogu_level + 1
+		if (char.rogu_level > 255) then
+			char.rogu_level = 255
+		end
+	elseif (char.class == "Hunter") then
+		char.hunt_level = char.hunt_level + (rnd() % 31)
+		if (char.dx > 14) then
+			char.hunt_level = char.hunt_level + (char.dx - 14)
+		end
+		char.hunt_level = char.hunt_level + 1
+		if (char.hunt_level > 255) then
+			char.hunt_level = 255
+		end
+	elseif ((char.class == "Paladin") or (char.class == "Warrior") or
+		(char.class == "Monk")) then
+		char.num_attacks = math.floor(char.cur_level / 4) + 1
+		if (char.num_attacks > 8) then
+			char.num_attacks = 8
+		end
+	elseif (char.getSpellLevel()) then
+		char.cur_sppt = char.cur_sppt + (rnd() % 3)
+		if (char.iq > 14) then
+			char.cur_sppt = char.cur_sppt + (char.iq - 14)
+		end
+		char.cur_sppt = char.cur_sppt + 1
+		char.max_sppt = char.cur_sppt
+	end
+	funcs.advanceRandomStat(char)
+	party:display()
+	printContinue()
+	getkey()
+end
+
+function funcs.doClassChange()
+	local char
+	local options = {}
+	local numAvailable = 0
+	local inkey
+
+	text_cdprint(true, false, "Which mage seeks to change his class?")
+	char = party:readSlot()
+	if (not char) then
+		return
+	end
+	if (not char.getSpellLevel()) then
+		text_cdprint(true, true, "\n\nThou are not a spell caster!\n")
+		return
+	end
+
+	if (char.getSpellLevel() < 3) then
+		text_cdprint(false, true, "\nThou must know at least 3 spell levels in your present art first.")
+		return
+	end
+
+	text_cdprint(true, false, char.name .. "\n\n")
+	if (char.conj_level == 0) then 
+		text_print("\nConjurer")
+		options["C"] = true
+		numAvailable = numAvailable + 1
+	end
+	if (char.magi_level == 0) then 
+		text_print("\nMagician")
+		options["M"] = true
+		numAvailable = numAvailable + 1
+	end
+	if (char.sorc_level == 0) then 
+		text_print("\nSorcerer")
+		options["S"] = true
+		numAvailable = numAvailable + 1
+	end
+	if (char.wiza_level == 0) then 
+		-- Must have two classes to level 3 to be a wizard
+		if (numAvailable < 2) then
+			text_print("\nWizard")
+			options["W"] = true
+			numAvailable = numAvailable + 1
+		end
+	end
+
+	if (numAvailable == 0) then
+		text_cdprint(false, true, "\n\nThou cannot change to an old class!\n")
+		return
+	end
+
+	repeat
+		printExit()
+		inkey = getkey()
+		if (options[inkey] ~= nil) then
+			if (inkey == "C") then
+				char.class = "Conjurer"
+				char.conj_level = 1
+			elseif (inkey == "M") then
+				char.class = "Magician"
+				char.magi_level = 1
+			elseif (inkey == "S") then
+				char.class = "Sorcerer"
+				char.sorc_level = 1
+			elseif (inkey == "W") then
+				char.class = "Wizard"
+				char.wiza_level = 1
+			else
+				error("Invalid class option: "..tostring(inkey))
+			end
+			char.cur_level = 1
+			char.max_level = 1
+			char.xp = 0
+			party:display()
+			text_cdprint(true, true, "\n\nDone!")
+			return
+		end
+	until (inkey == "E")
+end
+
+funcs.spellLevelCost = {
+	[1] = 1000, 
+	[2] = 2000, 
+	[3] = 4000, 
+	[4] = 7000, 
+	[5] = 10000, 
+	[6] = 20000
+}
+
+function funcs.doSpellAcquire()
+	local char
+	local spellLevel
+	local cost
+
+	text_cdprint(true, false, "Who seeks knowledge of the mystic arts?\n\n")
+	char = party:readSlot()
+	if (not char) then
+		return
+	end
+	spellLevel = char:getSpellLevel()
+	text_clear()
+	if (not spellLevel) then
+		text_cdprint(false, true, "\n\nThou art not a spell caster!\n")
+		return
+	end
+
+	if (spellLevel == 7) then
+		text_cdprint(false, true, "\n\nThou art at the highest level of spell ability!")
+		return
+	end
+
+	if (math.floor((char.cur_level + 1) / 2) <= spellLevel) then
+		text_cdprint(false, true, "\n\nThou cannot acquire new spells yet.")
+		return
+	end
+
+	cost = funcs.spellLevelCost[spellLevel]
+	text_print("%s %d will cost thee %d in gold. ", char.class, 
+			spellLevel + 1, cost)
+
+	if (char.gold < cost) then
+		text_cdprint(false, true, "\n\nThe spell Sages refure to teach you until you can pay!")
+		return
+	end
+
+	text_print("Will you pay?")
+	if (getYesNo()) then
+		char.gold = char.gold - cost
+		if (char.class == "Conjurer") then
+			char.conj_level = char.conj_level + 1
+		end
+		if (char.class == "Magician") then
+			char.magi_level = char.magi_level + 1
+		end
+		if (char.class == "Sorcerer") then
+			char.sorc_level = char.sorc_level + 1
+		end
+		if (char.class == "Wizard") then
+			char.wiza_level = char.wiza_level + 1
+		end
+		text_cdprint(true, true, "\n\nThe Spell Sages have taught you the lore.\n")
+	end
+
+end
+
+function funcs.selectOption()
+	local inkey
+	
+	repeat
+		if (funcs.nightCheck()) then
+			return
+		end
+
+		text_cdprint(true, false, "Wouldst thou like to be reviewed for:\n\n")
+		text_print("Advancement\n")
+		text_print("Spell Acquiring\n")
+		text_print("Class Change\n")
+		printExit()
+
+		inkey = getkey()
+		if ((inkey > "0") and (inkey < "7")) then
+			if (party:isOccupied(inkey)) then
+				party[tonumber(inkey)]:printCharacter()
+				funcs.setReviewBigpic()
+			end
+		elseif (inkey == "A") then
+			funcs.doAdvancement()
+		elseif (inkey == "C") then	
+			funcs.doClassChange()
+		elseif (inkey == "S") then
+			funcs.doSpellAcquire()
+		end
+	until (inkey == "E")
+end
+
+function review.enter()
+	if (funcs.nightCheck()) then
+		return
+	end
+	funcs.setReviewBigpic()
+	funcs.selectOption()
+end
