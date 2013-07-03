@@ -12,12 +12,16 @@ libcnv_a_SOURCES = \
 	dehuf.c		\
 	dehuf.h		\
 	cnv.h	\
+	cnv_action.h	\
+	cnv_action.c	\
 	cnv_city.h	\
 	cnv_city.c	\
 	cnv_code.h	\
 	cnv_common.h	\
 	cnv_dun.h	\
 	cnv_dun.c	\
+	cnv_function.h	\
+	cnv_function.c	\
 	cnv_gfx.h	\
 	cnv_gfx.c	\
 	cnv_int.h	\

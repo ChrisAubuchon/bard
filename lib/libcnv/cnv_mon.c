@@ -96,7 +96,7 @@ static void monsterAttack_free(const void *vma)
 	if (vma == NULL)
 		return;
 
-	btEffect_free(ma->effect);
+	btAction_free(ma->action);
 	free(ma);
 }
 
@@ -109,7 +109,7 @@ static json_t *monsterAttack_toJson(const void *vma)
 		node = json_object();
 		JSON_STRING(node, "type", getActionString(ma->type));
 		json_object_set_new(node, "action", 
-			btEffect_toJson(ma->effect));
+			btAction_toJson(ma->action));
 	}
 
 	return node;

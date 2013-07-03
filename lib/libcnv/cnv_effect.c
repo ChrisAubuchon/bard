@@ -5,45 +5,6 @@
 #define DEBUG
 #include <debug.h>
 
-
-/********************************/
-/*				*/
-/* Static data			*/
-/*				*/
-/********************************/
-
-static uint8_t *functionStrings[] = {
-	"",
-	"spells.attack(...)",
-	"spells.passive(...)",
-	"spells.disbelieve(...)",
-	"spells.bonus(...)",
-	"spells.heal(...)",
-	"spells.summon(...)",
-	"",
-	"",
-	"spells.trapZap(...)",
-	"spells.mageStar(...)",
-	"spells.teleport(...)",
-	"spells.scrySite(...)",
-	"spells.antiMagic(...)",
-	"spells.spellBind(...)",
-	"spells.safetySpell(...)",
-	"spells.dreamSpell(...)",
-	"spells.batchSpell(...)",
-	"spells.camaraderie(...)",
-	"spells.divine(...)",
-	"spells.identify(...)",
-	"spells.possess(...)",
-	"spells.earthMaw(...)",
-	"spells.chrono(...)",
-	"spells.mapSpell(...)",
-	"spells.reEnergize(...)",
-	"spells.summonHelp(...)",
-	"spells.tarjan(...)",
-	"spells.doppel(...)"
-};
-
 /********************************/
 /*				*/
 /* Private function prototypes	*/
@@ -174,48 +135,6 @@ void *btEffect_getDataPointer(btEffect_t *be)
 
 /********************************/
 /*				*/
-/* btFunction_t functions	*/
-/*				*/
-/********************************/
-
-btFunction_t *btFunction_new(uint8_t type)
-{
-	btFunction_t	*bf;
-
-	bf = (btFunction_t *)xzalloc(sizeof(btFunction_t));
-
-	return bf;
-}
-
-void btFunction_free(const void *vbf)
-{
-	btFunction_t	*bf = (btFunction_t *)vbf;
-
-	if (bf == NULL) 
-		return;
-
-	bts_free(bf->funcString);
-	free(bf);
-}
-
-json_t *btFunction_toJson(const void *vbf)
-{
-	btFunction_t	*bf = (btFunction_t *)vbf;
-	json_t		*root;
-
-	root = json_object();
-
-	if (bf->type == GENS_STRING) {
-		JSON_BTSTRING(root, "inCode", bf->funcString);
-	} else {
-		JSON_STRING(root, "inFunction", functionStrings[bf->type]);
-	}
-
-	return root;
-}
-
-/********************************/
-/*				*/
 /* repel_t functions		*/
 /*				*/
 /********************************/
@@ -329,8 +248,6 @@ static json_t *bteAttack_toJson(const void *vba)
 	node = json_object();
 	inData = json_object();
 
-	JSON_STRING(node, "inFunction", "spells.attack(...)");
-
 	JSON_NUMBER_IF_NOT_ZERO(inData, "ndice", ba->ndice);
 	JSON_NUMBER_IF_NOT_ZERO(inData, "dieval", ba->dieval);
 	JSON_TRUE_IF(inData, "allFoes", ba->allFoes);
@@ -397,25 +314,19 @@ static json_t *btePassive_toJson(const void *vbp)
 
 	switch (bp->type) {
 	case PASS_LIGHT:
-		JSON_STRING(node, "inFunction", "spells.passive.light(...)");
 		JSON_NUMBER(inData, "distance", bp->lightDistance);
 		JSON_TRUE_IF(inData, "detectSecret", bp->detectSecret);
 		break;
 	case PASS_DETECT:
-		JSON_STRING(node, "inFunction", "spells.passive.detect(...)");
 		JSON_TRUE_IF(inData, "detectStairs", bp->detectStairs);
 		JSON_TRUE_IF(inData, "detectTraps", bp->detectTraps);
 		JSON_TRUE_IF(inData, "detectSpecial", bp->detectSpecial);
 		break;
 	case PASS_SHIELD:
-		JSON_STRING(node, "inFunction", "spells.passive.shield(...)");
 		JSON_NUMBER(inData, "acBonus", bp->acBonus);
 		break;
 	case PASS_LEVITATE:
-		JSON_STRING(node, "inFunction", "spells.passive.levitate(...)");
-		break;
 	case PASS_COMPASS:
-		JSON_STRING(node, "inFunction", "spells.passive.compass(...)");
 		break;
 	}
 
@@ -456,8 +367,6 @@ static json_t *bteDisbelieve_toJson(const void *vbd)
 
 	node = json_object();
 	inData = json_object();
-
-	JSON_STRING(node, "inFunction", "spells.disbelieve(...)");
 
 	JSON_TRUE_IF(inData, "disbelieve", bd->disbelieve);
 	JSON_TRUE_IF(inData, "allBattle", bd->allBattle);
@@ -501,8 +410,6 @@ static json_t *bteBonus_toJson(const void *vbb)
 
 	node = json_object();
 	inData = json_object();
-
-	JSON_STRING(node, "inFunction", "spells.battleBonus(...)");
 
 	JSON_TRUE_IF(inData, "group", bb->group);
 	JSON_NUMBER_IF_NOT_ZERO(inData, "antimagic", bb->antiMagic);
@@ -566,8 +473,6 @@ static json_t *bteHeal_toJson(const void *vbh)
 	node = json_object();
 	inData = json_object();
 
-	JSON_STRING(node, "inFunction", "spells.heal(...)");
-
 	JSON_NUMBER_IF_NOT_ZERO(inData, "ndice", bh->ndice);
 	JSON_NUMBER_IF_NOT_ZERO(inData, "dieval", bh->dieval);
 	JSON_TRUE_IF(inData, "randomHeal", bh->randomHeal);
@@ -624,7 +529,6 @@ static json_t *bteSummon_toJson(const void *vbs)
 	node = json_object();
 	inData = json_object();
 
-	JSON_STRING(node, "inFunction", "spells.summon(...)");
 	JSON_TRUE_IF(inData, "isRandom", bs->isRandom);
 	JSON_TRUE_IF(inData, "isIllusion", bs->isIllusion);
 	JSON_BTSTRING_IF(inData, "sumOne", bs->sumZero);
@@ -640,26 +544,6 @@ static json_t *bteSummon_toJson(const void *vbs)
 /* bteGeneric functions		*/
 /*				*/
 /********************************/
-
-static uint8_t *genericFunctions[] = {
-	"", "spells.trapZap(...)", 
-	"spells.mageStar(...)", "spells.teleport(...)",
-	"spells.scrySite(...)", "", 
-	"spells.phaseDoor(...)", "spells.spellBind(...)",
-	"", "", "", "",
-	"", "", "", "",
-	"", "", "", "",
-	"", ""
-};
-
-#if 0
-        "GENS_NONE", "spell.trapZap()", "GENS_MAGESTAR", "GENS_TELEPORT",
-        "GENS_SCRYSITE", "GENS_ANTIMAGIC", "GENS_PHASEDOOR", "GENS_SPELLBIND",
-        "GENS_SAFETYSPELL", "GENS_DREAMSPELL", "GENS_BATCHSPELL", "GENS_CAMARADERIE",
-        "GENS_DIVINE", "GENS_IDENTIFY", "GENS_POSSESS", "GENS_EARTHMAW",
-        "GENS_CHRONO", "GENS_MAPSPELL", "GENS_REENERGIZE", "GENS_SUMMONHELP",
-        "GENS_TARJAN", "GENS_DOPPEL"
-#endif
 
 static bteGeneric_t *bteGeneric_new(void)
 {
@@ -692,12 +576,6 @@ static json_t *bteGeneric_toJson(const void *vbg)
 	node = json_object();
 	inData = json_object();
 
-	
-	if (bg->type == GENS_STRING) {
-		JSON_BTSTRING(node, "inCode", bg->funcString);
-	} else {
-		JSON_STRING(node, "inFunction", genericFunctions[bg->type]);
-	}
 	JSON_NUMBER_IF_NOT_ZERO(inData, "data", bg->flags);
 
 	json_object_set_new(node, "inData", inData);

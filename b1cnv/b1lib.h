@@ -2,7 +2,7 @@
 #define _B1LIB_H
 
 #include <cnv_spell.h>
-#include <cnv_effect.h>
+#include <cnv_action.h>
 #include <bt_string.h>
 
 #define IFBIT(x,y,true,false)	((x) & (y)) ? (true) : (false)
@@ -34,8 +34,8 @@
 void		convertClasses(void);
 
 /* spell.c */
-void convertSpells(void);
-btEffect_t	*getSpellEffect(uint32_t spell);
+void		convertSpells(void);
+btAction_t	*getSpellAction(uint32_t spell);
 void		getTargetting(uint32_t index, btTargetting_t *bt);
 
 /* gfx.c */

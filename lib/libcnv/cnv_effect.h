@@ -239,11 +239,6 @@ typedef struct {
 #define btEffect_generic(be) (bteGeneric_t *)btEffect_getDataPointer(be);
 
 typedef struct {
-	uint8_t		type;
-	btstring_t	*funcString;
-} btFunction_t;
-
-typedef struct {
 	uint8_t		targetted;
 	uint8_t		targetParty;
 	uint8_t		targetSummon;
@@ -266,10 +261,5 @@ json_t		*btEffect_toJson(const void *vbe);
 void		*btEffect_getDataPointer(btEffect_t *be);
 
 json_t		*btTargetting_toJson(btTargetting_t *bto);
-
-btFunction_t	*btFunction_new(uint8_t type);
-void		btFunction_free(const void *vbf);
-json_t		*btFunction_toJson(const void *vbf);
-
 
 #endif

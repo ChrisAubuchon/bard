@@ -87,7 +87,7 @@ typedef struct {
 
 	btTargetting_t	targetting;
 	uint8_t		use;
-	btEffect_t	*effect;
+	btAction_t	*action;
 } btitem_t;
 
 /********************************/

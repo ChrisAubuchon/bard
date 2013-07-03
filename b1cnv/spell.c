@@ -11,13 +11,13 @@
 /*				*/
 /********************************/
 
-static btEffect_t	*spell_attack(uint32_t index);
-static btEffect_t	*spell_passive(uint32_t index);
-static btEffect_t	*spell_disbelieve(uint32_t index);
-static btEffect_t	*spell_bonus(uint32_t index);
-static btEffect_t	*spell_heal(uint32_t index);
-static btEffect_t	*spell_summon(uint32_t index);
-static btEffect_t	*spell_generic(uint32_t index);
+static btAction_t	*spell_attack(uint32_t index);
+static btAction_t	*spell_passive(uint32_t index);
+static btAction_t	*spell_disbelieve(uint32_t index);
+static btAction_t	*spell_bonus(uint32_t index);
+static btAction_t	*spell_heal(uint32_t index);
+static btAction_t	*spell_summon(uint32_t index);
+static btAction_t	*spell_generic(uint32_t index);
 
 static void song_lightSpell(bardSong_t *bs);
 static void song_acBonus(bardSong_t *bs);
@@ -27,6 +27,8 @@ static void song_acBonus(bardSong_t *bs);
 /* Static data			*/
 /*				*/
 /********************************/
+
+typedef btAction_t *(spellFunction_t)(uint32_t index);
 
 static spellFunction_t *newSpellFunctions[] = {
 	spell_passive, spell_attack, spell_bonus, spell_generic,
@@ -39,13 +41,13 @@ static spellFunction_t *newSpellFunctions[] = {
 };
 
 static uint8_t genSpell[] = {
-	GENS_NONE, GENS_NONE, GENS_NONE, GENS_TRAPZAP,
-	GENS_NONE, GENS_NONE, GENS_NONE, GENS_NONE,
-	GENS_MAGESTAR, GENS_NONE, GENS_NONE, GENS_NONE,
-	GENS_NONE, GENS_TELEPORT, GENS_NONE, GENS_NONE,
-	GENS_NONE, GENS_NONE, GENS_NONE, GENS_NONE,
-	GENS_SCRYSITE, GENS_NONE, GENS_NONE, GENS_NONE,
-	GENS_NONE, GENS_PHASEDOOR, GENS_SPELLBIND
+	FUNC_NONE, FUNC_NONE, FUNC_NONE, FUNC_TRAPZAP,
+	FUNC_NONE, FUNC_NONE, FUNC_NONE, FUNC_NONE,
+	FUNC_MAGESTAR, FUNC_NONE, FUNC_NONE, FUNC_NONE,
+	FUNC_NONE, FUNC_TELEPORT, FUNC_NONE, FUNC_NONE,
+	FUNC_NONE, FUNC_NONE, FUNC_NONE, FUNC_NONE,
+	FUNC_SCRYSITE, FUNC_NONE, FUNC_NONE, FUNC_NONE,
+	FUNC_NONE, FUNC_PHASEDOOR, FUNC_SPELLBIND
 };
 
 /********************************/
@@ -54,40 +56,43 @@ static uint8_t genSpell[] = {
 /*				*/
 /********************************/
 
-static btEffect_t *spell_generic(uint32_t index)
+static btAction_t *spell_generic(uint32_t index)
 {
-	btEffect_t *rval;
+	btAction_t *rval;
 	bteGeneric_t *bg;
 
-	rval = btEffect_new(EFFECT_GENERIC);
-	bg = btEffect_generic(rval);
+	rval = btAction_new(genSpell[spellType[index]], EFFECT_GENERIC);
+	bg = btEffect_generic(rval->effect);
 
 	bg->type = genSpell[spellType[index]];
 
 	return rval;
 }
 
-static btEffect_t *spell_passive(uint32_t index)
+static btAction_t *spell_passive(uint32_t index)
 {
-	btEffect_t	*rval;
+	btAction_t	*rval;
 	btePassive_t	*bp;
 
-	rval = btEffect_new(EFFECT_PASSIVE);
-	bp = btEffect_passive(rval);
+	rval = btAction_new(FUNC_NONE, EFFECT_PASSIVE);
+	bp = btEffect_passive(rval->effect);
 
 	bp->duration = spellDuration[index];
 
 	switch (spellType[index]) {
 	case sp_LightSpell:
+		rval->function->type = FUNC_LIGHT;
 		bp->type = PASS_LIGHT;
 		bp->duration = lightDur[spellDuration[index]];
 		bp->lightDistance = lightDist[spellDuration[index]];
 		bp->detectSecret = (lightSDFlag[spellDuration[index]] != 0);
 		break;
 	case sp_MagicCompass:
+		rval->function->type = FUNC_COMPASS;
 		bp->type = PASS_COMPASS;
 		break;
 	case sp_Levitation:
+		rval->function->type = FUNC_LEVITATE;
 		bp->duration = levitDur[spellDuration[index]];
 		bp->type = PASS_LEVITATE;
 		break;
@@ -95,6 +100,7 @@ static btEffect_t *spell_passive(uint32_t index)
 	{
 		uint8_t effect = spellAttr[index] >> 6;
 
+		rval->function->type = FUNC_DETECT;
 		bp->type = PASS_DETECT;
 		if (effect == 0) {
 			bp->detectTraps = 1;
@@ -108,6 +114,7 @@ static btEffect_t *spell_passive(uint32_t index)
 		break;
 	}
 	case sp_GroupShield:
+		rval->function->type = FUNC_SHIELD;
 		bp->type = PASS_SHIELD;
 		bp->acBonus = 2;
 		break;
@@ -116,13 +123,13 @@ static btEffect_t *spell_passive(uint32_t index)
 	return rval;
 }
 
-static btEffect_t *spell_bonus(uint32_t index)
+static btAction_t *spell_bonus(uint32_t index)
 {
-	btEffect_t	*rval;
+	btAction_t	*rval;
 	bteBonus_t	*bb;
 
-	rval = btEffect_new(EFFECT_BONUS);
-	bb = btEffect_bonus(rval);
+	rval = btAction_new(FUNC_BONUS, EFFECT_BONUS);
+	bb = btEffect_bonus(rval->effect);
 
 	switch (spellType[index]) {
 	case sp_AntiMagic:
@@ -172,13 +179,13 @@ static btEffect_t *spell_bonus(uint32_t index)
 	return rval;
 }
 
-static btEffect_t *spell_attack(uint32_t index)
+static btAction_t *spell_attack(uint32_t index)
 {
-	btEffect_t	*rval;
+	btAction_t	*rval;
 	bteAttack_t	*ba;
 
-	rval = btEffect_new(EFFECT_ATTACK);
-	ba = btEffect_attack(rval);
+	rval = btAction_new(FUNC_ATTACK, EFFECT_ATTACK);
+	ba = btEffect_attack(rval->effect);
 
 	ba->dieval	= 4;
 	ba->attype	= 10;
@@ -215,14 +222,14 @@ static btEffect_t *spell_attack(uint32_t index)
 	return rval;
 }
 
-static btEffect_t *spell_heal(uint32_t index)
+static btAction_t *spell_heal(uint32_t index)
 {
 	uint8_t		mask;
-	btEffect_t	*rval;
+	btAction_t	*rval;
 	bteHeal_t	*bh;
 
-	rval = btEffect_new(EFFECT_HEAL);
-	bh = btEffect_heal(rval);
+	rval = btAction_new(FUNC_HEAL, EFFECT_HEAL);
+	bh = btEffect_heal(rval->effect);
 
 	bh->randomHeal = 1;
 	bh->groupHeal = IFBIT(spellDuration[index], 0x80, 1, 0);
@@ -252,14 +259,14 @@ static btEffect_t *spell_heal(uint32_t index)
 }
 	
 
-static btEffect_t *spell_summon(uint32_t index)
+static btAction_t *spell_summon(uint32_t index)
 {
 	uint8_t		sum;
-	btEffect_t	*rval;
+	btAction_t	*rval;
 	bteSummon_t	*bs;
 
-	rval = btEffect_new(EFFECT_SUMMON);
-	bs = btEffect_summon(rval);
+	rval = btAction_new(FUNC_SUMMON, EFFECT_SUMMON);
+	bs = btEffect_summon(rval->effect);
 
 	bs->isRandom = IFBIT(spellDuration[index], 0x40, 1, 0);
 	bs->isIllusion = IFBIT(spellDuration[index], 0x80, 1, 0);
@@ -283,13 +290,13 @@ static btEffect_t *spell_summon(uint32_t index)
 	return rval;
 }
 
-static btEffect_t *spell_disbelieve(uint32_t index)
+static btAction_t *spell_disbelieve(uint32_t index)
 {
-	btEffect_t	*rval;
+	btAction_t	*rval;
 	bteDisbelieve_t	*bd;
 
-	rval = btEffect_new(EFFECT_DISBELIEVE);
-	bd = btEffect_disbelieve(rval);
+	rval = btAction_new(FUNC_DISBELIEVE, EFFECT_DISBELIEVE);
+	bd = btEffect_disbelieve(rval->effect);
 
 	bd->disbelieve = 1;
 	if (spellDuration[index] == 0xff) {
@@ -352,17 +359,17 @@ static void song_generic(cnvList_t *list, uint8_t *outString)
 /*				*/
 /********************************/
 
-btEffect_t *getSpellEffect(uint32_t spell)
+btAction_t *getSpellAction(uint32_t spell)
 {
-	uint8_t sptype;
+	uint8_t		type;
 
-	sptype = spellType[spell];
+	type = spellType[spell];
 
-	if (sptype == 255)
+	if (type == 255)
 		return NULL;
 
-	if (newSpellFunctions[sptype] != NULL)
-		return newSpellFunctions[sptype](spell);
+	if (newSpellFunctions[type] != NULL)
+		return newSpellFunctions[type](spell);
 
 	return NULL;
 }
@@ -420,7 +427,7 @@ void convertSpells(void)
 		m->noncombat = IFBIT(spellAttr[i], 0x10, 1, 0);
 		getTargetting(i, &m->targetting);
 
-		m->effect = getSpellEffect(i);
+		m->action = getSpellAction(i);
 
 		cnvList_add(spells, m);
 

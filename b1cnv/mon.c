@@ -100,8 +100,9 @@ static void getSummonData(cnvList_t *mlist)
 				bteAttack_t	*ba;
 
 				ma = monsterAttack_new(ACT_MELEE);
-				ma->effect = btEffect_new(EFFECT_ATTACK);
-				ba = btEffect_attack(ma->effect);
+				ma->action = btAction_new(FUNC_ATTACK, 
+							EFFECT_ATTACK);
+				ba = btEffect_attack(ma->action->effect);
 
 				ba->meleeString = monAttType[sumlist[i].race] + 1;
 				ba->dieval = DIEVAL((sumlist[i].strength & 0x1f) | 0x20);
@@ -271,8 +272,9 @@ void convertMonsters(void)
 				bteAttack_t *ba;
 
 				ma = monsterAttack_new(ACT_MELEE);
-				ma->effect = btEffect_new(EFFECT_ATTACK);
-				ba = btEffect_attack(ma->effect);
+				ma->action = btAction_new(FUNC_ATTACK,
+							EFFECT_ATTACK);
+				ba = btEffect_attack(ma->action->effect);
 
 				ba->ndice = (monPri[i] & 0x1f) + 1;
 				ba->dieval = 4;
@@ -281,15 +283,16 @@ void convertMonsters(void)
 				ba->meleeString = monAttType[i] + 1;
 			} else if (att < 79) {
 				ma = monsterAttack_new(ACT_SPELL);
-				ma->effect = getSpellEffect(monSpellTrans[att]);
+				ma->action = getSpellAction(monSpellTrans[att]);
 			} else if (att == 0xfe) {
 				ma = monsterAttack_new(ACT_DOPPEL);
 			} else {
 				bteAttack_t *ba;
 
 				ma = monsterAttack_new(ACT_BREATH);
-				ma->effect = btEffect_new(EFFECT_ATTACK);
-				ba = btEffect_attack(ma->effect);
+				ma->action = btAction_new(FUNC_ATTACK,
+							EFFECT_ATTACK);
+				ba = btEffect_attack(ma->action->effect);
 
 				ba->isBreath = 1;
 				ba->ndice = spellDuration[att];

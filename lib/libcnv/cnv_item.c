@@ -62,9 +62,7 @@ static void btitem_free(const void *vit)
 
 	bts_free(it->name);
 	bts_free(it->macro);
-	btEffect_free(it->effect);
-/*	actionUse_free(it->use);*/
-/*	spellEffect_free(it->spell);*/
+	btAction_free(it->action);
 	free(it);
 }
 
@@ -118,9 +116,10 @@ static json_t *btitem_toJson(const void *vit)
 
 	json_object_set(item, "can_equip", equip);
 
-	if (it->effect != NULL) {
+	if (it->action != NULL) {
 		JSON_STRING(item, "useString", getUseString(it->use));
-		json_object_set_new(item, "action", btEffect_toJson(it->effect));
+/*		json_object_set_new(item, "action", btEffect_toJson(it->effect));*/
+		json_object_set_new(item, "action", btAction_toJson(it->action));
 	}
 
 	return item;

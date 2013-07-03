@@ -4,7 +4,9 @@
 #include <cnv_spell.h>
 #include <cnv_effect.h>
 
+#if 0
 typedef btEffect_t *(spellFunction_t)(uint32_t index);
+#endif
 
 extern uint8_t spellLevel[];
 extern uint8_t spptReq[];

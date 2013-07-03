@@ -1,7 +1,7 @@
 #ifndef _LIBCNV_MON_H
 #define _LIBCNV_MON_H
 
-#include <cnv_effect.h>
+#include <cnv_action.h>
 #include <cnv_common.h>
 
 /********************************/
@@ -18,7 +18,7 @@
 
 typedef struct {
 	uint8_t		type;
-	btEffect_t	*effect;
+	btAction_t	*action;
 } monsterAttack_t;
 
 typedef struct {

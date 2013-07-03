@@ -115,7 +115,7 @@ void convertItems(void)
 		} else {
 			getTargetting(itemSpell[itemEffect[i] & 0x7f], 
 					&b->targetting);
-			b->effect = getSpellEffect(spell);
+			b->action = getSpellAction(spell);
 
 			if ((spell == 90) || (spell == 91)) {
 				b->use = USE_MAKELIGHT;
