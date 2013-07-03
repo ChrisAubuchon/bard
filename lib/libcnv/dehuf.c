@@ -202,6 +202,7 @@ static void free_bitTree(hufBitTree_t *curNode)
   free(curNode);
 }
 
+#if 0
 btstring_t *dehufFile(uint8_t *fname, uint16_t size)
 {
   huffile_t *huf;
@@ -216,4 +217,21 @@ btstring_t *dehufFile(uint8_t *fname, uint16_t size)
 	fclose(fp);
 
   return rval;
+}
+#endif 
+
+btstring_t *dehufFile(btstring_t *fname, uint16_t size)
+{
+	huffile_t	*huf;
+	btstring_t	*rval;
+	FILE		*fp;
+
+	fp = xfopen(fname, "rb");
+	huf = dehuf_init(fp);
+	rval = dehuf(huf, size);
+	dehuf_free(huf);
+	fclose(fp);
+	bts_free(fname);
+
+	return rval;
 }

@@ -1,3 +1,3 @@
 #!/usr/bin/sh
 
-./configure --datadir=/home/aubucc/bard/data 'CFLAGS=-O0 -g'
+./configure --datadir=/home/aubucc/bard/data 'CFLAGS=-O0 -g' --with-dos-bard1=./dos/bard1

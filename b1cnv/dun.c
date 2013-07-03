@@ -437,7 +437,7 @@ void convertDungeons(void)
 
 	FILE *fp;
 
-	fp = xfopen(bts_strcpy("levs"), "rb");
+	fp = xfopen(mkBardOnePath("levs"), "rb");
 	nlevs = fp_read32be(fp) / sizeof(uint32_t);
 
 	dungeons = dunList_new();
@@ -454,10 +454,6 @@ void convertDungeons(void)
 
 			cnvList_add(d->levels, convertDunLevel(data, 
 					b1dungeons[dunno].levels[levno]));
-#if 0
-			dun_addLevel(d, convertDunLevel(data, 
-					b1dungeons[dunno].levels[levno]));
-#endif
 
 			dehuf_free(huf);
 			bts_free(data);
@@ -465,25 +461,6 @@ void convertDungeons(void)
 
 		cnvList_add(dungeons, d);
 	}
-
-#if 0
-	for (i = 0; i < nlevs; i++) {
-/*	for (i = 0; i < 1; i++) {*/
-		fp_moveToIndex32(fp, i, 1);
-
-		huf = dehuf_init(fp);
-		data = dehuf(huf, 0x800);
-
-#if 0
-		dump_btstring(bts_sprintf("lev%d.decomp", i), data, 0);
-#endif
-
-		dunList_add(dungeons, convertDunLevel(data, i));
-
-		dehuf_free(huf);
-		bts_free(data);
-	}
-#endif
 
 	dunList_to_json(dungeons, mkJsonPath("dungeons.json"));
 	cnvList_free(dungeons);

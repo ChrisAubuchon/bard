@@ -367,13 +367,14 @@ function character.createCharacter()
 	----------------------------------------
 	-- Assign spell level
 	----------------------------------------
-	newchar.spellLevel[newchar.class] = 1
 
 	----------------------------------------
 	-- Set initial spell points if magic user
 	----------------------------------------
 	if ((newchar.class == "Conjurer") or 
 	    (newchar.class == "Magician")) then
+		newchar.spellLevel[newchar.class] = 1
+
 		if (newchar.iq > 15) then
 			newchar.max_sppt = 10 + (18 - newchar.iq)
 		else

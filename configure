@@ -608,6 +608,7 @@ gl_LIBOBJS
 am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
+BARDONEDIR
 LIBOBJS
 LIBGNU_LTLIBDEPS
 LIBGNU_LIBDEPS
@@ -1038,6 +1039,7 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_dependency_tracking
+with_dos_bard1
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1670,6 +1672,11 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
+
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-dos-bard1=PATH   Specify path to DOS Bard1 installation
 
 Some influential environment variables:
   CC          C compiler command
@@ -10302,6 +10309,26 @@ fi
 ac_config_headers="$ac_config_headers config.h"
 
 ac_config_files="$ac_config_files Makefile bte/Makefile b1cnv/Makefile lib/Makefile lib/lua/Makefile lib/libbard/Makefile lib/libcnv/Makefile lib/libgnu/Makefile lib/jansson/Makefile"
+
+
+
+# Check whether --with-dos-bard1 was given.
+if test "${with_dos_bard1+set}" = set; then :
+  withval=$with_dos_bard1;
+		if test "x$withval" != "xno" ; then
+			case "$withval" in
+				./*|../*)	withval="`pwd`/$withval"
+			esac
+			if test -f "$withval/BARD.EXE" ; then
+				BARDONEDIR=$withval
+			else
+				BARDONEDIR=
+			fi
+		fi
+
+
+fi
+
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure

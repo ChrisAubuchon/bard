@@ -30,7 +30,10 @@ typedef struct {
 huffile_t *dehuf_init(FILE *fp);
 btstring_t *dehuf(huffile_t *huf, uint16_t maxsize);
 void dehuf_free(huffile_t *huf);
+#if 0
 btstring_t *dehufFile(uint8_t *fname, uint16_t size);
+#endif
+btstring_t *dehufFile(btstring_t *fname, uint16_t size);
 
 btstring_t *d3comp(uint8_t *buf, uint32_t size);
 btstring_t *d3compFile(uint8_t *fname, uint32_t size);

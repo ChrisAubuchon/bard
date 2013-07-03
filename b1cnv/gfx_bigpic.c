@@ -370,7 +370,7 @@ void outputBigpic(uint8_t indent)
 
 	FILE *fp;
 
-	fp = xfopen(bts_strcpy("bigpic"), "rb");
+	fp = xfopen(mkBardOnePath("bigpic"), "rb");
 	npics = fp_read32le(fp) / sizeof(uint32_t);
 
 	bpl = bigpic_list_new(npics);

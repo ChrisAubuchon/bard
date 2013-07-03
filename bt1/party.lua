@@ -308,7 +308,7 @@ function party:toTable()
 		end
 	end
 
-	return table
+	return t
 end
 
 ----------------------------------------

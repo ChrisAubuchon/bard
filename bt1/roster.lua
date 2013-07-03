@@ -49,6 +49,7 @@ end
 ----------------------------------------
 function roster.saveParty(name)
 	rost.parties[name] = party:toTable()
+	dprint(rost.parties[name])
 
 	write_table(rost, "roster")
 end
@@ -210,7 +211,7 @@ local function __init()
 
 	rost = read_table("roster", true)
 
-	if (rost["characters"] == nil) then
+	if (not rost["characters"]) then
 		rost.characters = {}
 		rost.parties = {}
 

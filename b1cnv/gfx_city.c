@@ -425,15 +425,15 @@ static void getCityGfx(bt_view_t *view, uint8_t quad)
 static void outputBldgFronts(bt_view_t *view)
 {
 	bta_cell_t *b;
-	uint8_t fbuf[512];
+/*	uint8_t fbuf[512];*/
 	uint8_t i;
 
 	xmkdir(mkImagePath("citypics/base-1"));
 	xmkdir(mkImagePath("citypics/base-1/face"));
 
 	for (i = 0; i < 4; i++) {
-		sprintf(fbuf, "b%d.huf", i);
-		b = bta_cell_new(0, 0, 56, 88, 0, dehufFile(fbuf, 0x1340));
+		b = bta_cell_new(0, 0, 56, 88, 0, 
+			dehufFile(mkBardOnePath("b%d.huf", i), 0x1340));
 		b = bta_cell_convert(b);
 		bta_toPNG(b, 
 			mkImagePath("citypics/base-1/face/%s.png",
@@ -554,7 +554,7 @@ void outputCitypics(uint8_t indent)
 
 	outputBackground();
 
-	fp = xfopen(bts_strcpy("citypics.bin"), "rb");
+	fp = xfopen(mkBardOnePath("citypics.bin"), "rb");
 	huf = dehuf_init(fp);
 
 	piczero = dehuf(huf, 0xe0cc);

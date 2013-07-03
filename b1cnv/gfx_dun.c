@@ -370,7 +370,7 @@ void outputDunpics(uint8_t indent)
 	xmkdir(mkImagePath("dpics"));
 
 	for (i = 0; i < 3; i++) {
-		fp = xfopen(bts_sprintf("dpics%d", i), "rb");
+		fp = xfopen(mkBardOnePath("dpics%d", i), "rb");
 		huf = dehuf_init(fp);
 		dundata = dehuf(huf, 0x7fff);
 		dehuf_free(huf);

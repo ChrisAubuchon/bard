@@ -351,8 +351,8 @@ void convertLevels(void)
 	blhash = gl_list_nx_create_empty(GL_LINKEDHASH_LIST,
 		bldg_compare, bldg_get_hash, bldg_free, 0);
 
-	name = dehufFile("city.nam", 0x384);
-	pat = dehufFile("city.pat", 0x384);
+	name = dehufFile(mkBardOnePath("city.nam"), 0x384);
+	pat = dehufFile(mkBardOnePath("city.pat"), 0x384);
 
 	skara = btcity_new(bts_strcpy("skara"));
 

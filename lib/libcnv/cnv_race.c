@@ -10,6 +10,7 @@
 
 static void 		btRace_free(const void *vbr);
 static json_t 		*btRace_toJson(const void *vbr);
+static json_t		*btRace_toJsonArray(const void *vbr);
 static btstring_t	*btRace_toName(const void *vbr);
 
 
@@ -50,6 +51,13 @@ static json_t *btRace_toJson(const void *vbr)
 	return root;
 }
 
+static json_t *btRace_toJsonArray(const void *vbr)
+{
+	btRace_t	*br = (btRace_t *)vbr;
+
+	return json_string(br->name->buf);
+}
+
 static btstring_t *btRace_toName(const void *vbr)
 {
 	btRace_t	*br = (btRace_t *)vbr;
@@ -73,6 +81,8 @@ void raceList_toJson(cnvList_t *rl, btstring_t *fname)
 	json_t		*root;
 
 	root = cnvList_toJsonObject(rl);
+	cnvList_setToJson(rl, btRace_toJsonArray);
+	json_object_update(root,cnvList_toJsonArray(rl));
 
 	JSON_DUMP(root, fname);
 }

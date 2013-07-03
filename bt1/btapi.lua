@@ -52,7 +52,7 @@ function compileAction(inAction)
 	elseif (inAction.inCode) then
 		inAction.func, mesg = load(
 			"local function f(inAction) " .. inAction.inCode ..
-			"end; f(...)")
+			" end f(...)")
 		if (inAction.func == nil) then
 			error("Compilation error: \n" ..
 				inAction.inCode .. "\n" .. mesg, 2)

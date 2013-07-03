@@ -57,7 +57,8 @@ static void outputScreens(uint8_t indent)
 	bta_cell_t *img;
 
 	for (i = 0; i < 2; i++) {
-		img = bta_cell_new(0, 0, 160, 200, 0, gfx_vga2gfx(dehufFile(fnames[i], 0x7d00)));
+		img = bta_cell_new(0, 0, 160, 200, 0, 
+			gfx_vga2gfx(dehufFile(mkBardOnePath("%s", fnames[i]), 0x7d00)));
 		img = bta_cell_convert(img);
 		bta_toPNG(img, mkImagePath("%s.png", tags[i]));
 		bta_cell_free(img);
@@ -202,7 +203,7 @@ static void outputIcons(uint8_t indent)
 	FILE *fp;
 	huffile_t *huf;
 
-	fp = xfopen(bts_strcpy("icons.bin"), "rb");
+	fp = xfopen(mkBardOnePath("icons.bin"), "rb");
 	huf = dehuf_init(fp);
 
 	icon_write_bta(huf, 0);

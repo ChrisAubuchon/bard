@@ -29,4 +29,21 @@ AC_CONFIG_FILES([
  lib/libgnu/Makefile
  lib/jansson/Makefile
 ])
+
+AC_ARG_WITH(dos-bard1,
+	[  --with-dos-bard1=PATH   Specify path to DOS Bard1 installation ],
+	[
+		if test "x$withval" != "xno" ; then
+			case "$withval" in
+				./*|../*)	withval="`pwd`/$withval"
+			esac
+			if test -f "$withval/BARD.EXE" ; then
+				BARDONEDIR=$withval
+			else
+				BARDONEDIR=
+			fi
+		fi
+	]
+)
+AC_SUBST(BARDONEDIR)
 AC_OUTPUT

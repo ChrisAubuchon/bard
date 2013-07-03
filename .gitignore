@@ -2,11 +2,31 @@
 ## Eclipse
 #################
 
+**/**/.deps/
+**/.deps/
 *.pydevproject
 .project
 .metadata
 bin/
 tmp/
+*.o
+*.a
+*.exe
+
+Makefile
+
+# http://www.gnu.org/software/autoconf
+
+/autom4te.cache
+/aclocal.m4
+/compile
+/depcomp
+/install-sh
+/missing
+/stamp-h1
+/config.h
+/config.status
+
 *.tmp
 *.bak
 *.swp
