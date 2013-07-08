@@ -96,14 +96,16 @@ function battleData:new()
 		-- of BT1. I've added it here but it isn't used by this
 		-- code.
 		--
-		songToHitPenalty	= 0
+		songToHitPenalty	= 0,
+		preBattleSong		= false
 	}
 
 	btTable.addParent(self, battleData)
 	btTable.setClassMetatable(self)
 
-	party.antiMagic = 0
+	party.antiMagicBonus = 0
 	party.spellAcBonus = 0
+
 
 	return self
 end
@@ -202,7 +204,7 @@ function battleData:start()
 	local continue = true
 	local partyRan = false
 
-	local xxx_convert_prebattle_songs = true
+	self:convertPreBattleSong()
 
 	if (not self.isPartyAttack) then
 		for mgroup in self.monGroups:iterator() do
@@ -212,6 +214,7 @@ function battleData:start()
 
 	self:printEncounter()
 
+	dprint("antiMagicBonus = %d", party.antiMagicBonus)
 	repeat
 		self:updateBigpic()
 		if (not self:getPlayerOptions()) then
@@ -727,3 +730,15 @@ function battleData:doReward()
 	end
 end
 
+
+function battleData:convertPreBattleSong()
+	if (party.songPlaying) then
+		self.preBattleSong = party.singer.song
+
+		if ((party.singer.song.name == "Falkens Fury") or
+		    (party.singer.song.name == "Lucklaran")) then
+			dprint("Running combatFunction")
+			party.singer.song.combatFunction.func()
+		end
+	end
+end

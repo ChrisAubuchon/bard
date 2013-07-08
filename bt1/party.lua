@@ -12,6 +12,9 @@ party = {
 	summon		= false,
 	songAcBonus	= 0,
 
+	singer		= false,
+	lightSongPlaying = false,
+
 	-- Battle specific values
 	spellAcBonus	= 0,
 	antiMagicBonus	= 0

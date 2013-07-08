@@ -117,7 +117,8 @@ function noncombat.singSong()
 	action = btAction.new()
 	action.source = char
 
-	if (not char:getTune(action, false)) then
+	tune = char:getTune()
+	if (not tune) then
 		text_clear()
 		return
 	end
@@ -131,16 +132,25 @@ function noncombat.singSong()
 	text_print(" plays a tune")
 
 	if (party.songPlaying) then
-		local xxx_stop_current_song = true
+		party.singer:songTimeout()
 	end
 
-	if (action.func) then
-		action.func(action)
+	if (tune.activate) then
+		action.func = tune.activate.func
+		action.inData = tune.nonCombatData[currentLevel.level].inData
+
+		if (action.func) then
+			action.func(action)
+		end
 	end
 
+	party.singer = char
 	party.songPlaying = true
 	party.songTime = 12
 	char.isSinging = true
+	char.song = tune
+
+	dprint("party.songPlaying" .. tostring(party.songPlaying))
 end
 
 

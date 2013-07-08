@@ -18,6 +18,12 @@ end
 
 function timer.bt1_512()
 	if (not globals.isPaused) then
+		if ((party.songPlaying) and (party.songTime > 0)) then
+			party.songTime = party.songTime - 1
+			if (party.songTime == 0) then
+				party.singer:songTimeout()
+			end
+		end
 
 		if ((party.light.active) and (party.light.duration > 0)) then
 			party.light.duration = party.light.duration - 1

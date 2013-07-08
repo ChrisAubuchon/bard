@@ -63,6 +63,9 @@ function inventory:isEmpty()
 end
 
 function inventory:isFull()
+	if (self == nil) then
+		error("Probably invalid inventory call", 2)
+	end
 	return (self.size == self.maxSize)
 end
 

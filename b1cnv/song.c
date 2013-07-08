@@ -25,9 +25,10 @@ static void song_lightSpell(btSong_t *bs)
 	uint32_t	i;
 	uint32_t	offset;
 
-	bs->activate = btFunction_new(FUNC_LIGHT);
+	bs->activate = btFunction_new(FUNC_STRING,
+				bts_strcpy(song_activateStrings[1]));
 	bs->deactivate = btFunction_new(FUNC_STRING,
-				bts_strcpy("local xxx_holding = true"));
+				bts_strcpy(song_deactivateStrings[1]));
 
 	for (i = 0; i < 8; i++) {
 		offset = songBonusList[i] + 7;
@@ -99,9 +100,9 @@ void convertSongs(void)
 			break;
 		case 4:
 			b->activate = btFunction_new(FUNC_STRING,
-					bts_strcpy(song_acBonusString));
+					bts_strcpy(song_activateStrings[i]));
 			b->deactivate = btFunction_new(FUNC_STRING,
-					bts_strcpy("local xxx_hold = true"));
+					bts_strcpy(song_deactivateStrings[i]));
 			song_generic(b->nonCombatData);
 			b->combatFunction = btFunction_new(FUNC_STRING,
 					bts_strcpy(song_combatStrings[i]));

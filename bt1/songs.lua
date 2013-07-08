@@ -1,6 +1,7 @@
 require "dataio"
 require "spells"
 require "btdebug"
+require "btapi"
 
 songs = read_table("songs")
 
@@ -11,6 +12,12 @@ local function initSongs()
 	local l
 
 	for _,s in pairs(songs) do
+		if (s.activate) then
+			compileAction(s.activate)
+			compileAction(s.deactivate)
+		end
+		compileAction(s.combatFunction)
+if false then
 		for _,l in pairs(s.combat) do
 			compileAction(l)
 if false then
@@ -35,6 +42,7 @@ if false then
 			end
 end
 		end
+end
 	end
 end
 initSongs()

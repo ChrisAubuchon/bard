@@ -45,6 +45,10 @@ lightEffect.activate = function(inDuration, inDistance, inSeeSecret)
 	lightEffect.distance	= inDistance
 	lightEffect.seeSecret	= inSeeSecret
 
+	if (party.lightSongPlaying) then
+		party.singer:songTimeout()
+	end
+
 	if (currentLevel.isDungeon()) then
 		currentLevel.buildView()
 	end
@@ -54,7 +58,8 @@ lightEffect.deactivate = function ()
 	lightEffect.distance = 0
 	lightEffect.seeSecret = false
 	lightEffect.__deactivate()
-	if (currentLevel and currentLevel.isDungeon()) then
+	if (currentLevel and currentLevel.isDungeon() 
+			 and globals.doTimeEvents) then
 		currentLevel.buildView()
 	end
 end

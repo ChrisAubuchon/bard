@@ -7,7 +7,7 @@ function funcs.selectInventory(player)
 	local itemNumber
 	local max
 
-	if (player.inventory.isEmpty()) then
+	if (player.inventory:isEmpty()) then
 		text_cdprint(true, true, "\nYou have no items.")
 		return false
 	end
@@ -15,8 +15,8 @@ function funcs.selectInventory(player)
 	text_clear()
 	text_print("\nWhich item:")
 
-	for i in player.inventory.iterator() do
-		text_print("\n" .. i.toInventoryLine(player))
+	for i in player.inventory:iterator() do
+		text_print("\n" .. i:toInventoryLine(player))
 		text_setColumn(12)
 		text_print("%7d", i.value / 2)
 	end
@@ -42,7 +42,7 @@ function funcs.buyItem(player)
 	local item
 	local itemValue
 
-	if (player.inventory.isFull()) then
+	if (player.inventory:isFull()) then
 		text_cdprint(true, true, "\nYour pockets are full.")
 		return
 	end
@@ -69,13 +69,13 @@ function funcs.buyItem(player)
 			garthInventory[item].count = garthInventory[item].count - 1
 		end
 
-		player.giveItem(item, true)
+		player:giveItem(item, true)
 		player.gold = player.gold - itemValue
 		text_clearline(11)
 		text_setCursor(0, 11)
 		text_cdprint(false, true, "Done!        ")
 
-		if (player.inventory.isFull()) then
+		if (player.inventory:isFull()) then
 			return
 		end
 	end
@@ -127,7 +127,7 @@ function funcs.sellItem(player)
 	end
 
 	player.gold = player.gold + (math.floor(inv.value / 2))
-	player.inventory.dropItem(itemNumber)
+	player.inventory:dropItem(itemNumber)
 	player.calcAC()
 end
 

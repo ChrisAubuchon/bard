@@ -1,6 +1,7 @@
 require "dataio"
 require "bttable"
 require "btdebug"
+require "btapi"
 
 local spellList = {}
 

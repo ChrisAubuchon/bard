@@ -123,6 +123,11 @@ function character:fromTable(t)
 			self.inventory:fromTable(v)
 		end
 	end
+
+	if (not self.inventory) then
+		dprint("Creating empty inventory")
+		self.inventory = inventory:new()
+	end
 end
 			
 function character:toTable()
@@ -385,7 +390,7 @@ function character.createCharacter()
 		newchar.cur_sppt = newchar.max_sppt
 	end
 
-	newchar.inventory = inventory.new()
+	newchar.inventory = inventory:new()
 
 	return newchar
 end
@@ -872,7 +877,7 @@ end
 ----------------------------------------
 -- getTune()
 ----------------------------------------
-function character:getTune(inAction, combatFlag)
+function character:getTune()
 	local i
 	local inkey
 
@@ -882,21 +887,12 @@ function character:getTune(inAction, combatFlag)
 	end
 
 	inkey = getkey()
-	if ((inkey > "0") and (inkey < tostring(#songs))) then
+	if ((inkey > "0") and (inkey < tostring(#songs + 1))) then
 		local tune
 
 		inkey = tonumber(inkey)
-		if (combatFlag) then
-			tune = songs[inkey].combat[currentLevel.level]
-		else
-			tune = songs[inkey].nonCombat[currentLevel.level]
-		end
 
-		if (tune) then
-			inAction.func = tune.func
-			inAction.inData = tune.inData
-		end
-		return true
+		return songs[inkey]
 	end
 
 	return false
@@ -919,7 +915,26 @@ function character:doVoiceCheck()
 	return true
 end
 
+----------------------------------------
+-- songTimeout()
+----------------------------------------
+function character:songTimeout()
+	if (not self.isSinging) then
+		return	
+	end
 
+	if (not self.song) then
+		return
+	end
+
+	self.song.deactivate.func()
+
+	party.singer = false
+	party.songPlaying = true
+	party.songTime = 0
+	self.isSinging = false
+	self.song = false
+end
 
 
 
