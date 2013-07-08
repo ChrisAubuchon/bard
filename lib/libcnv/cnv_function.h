@@ -58,7 +58,7 @@ typedef struct {
 /*				*/
 /********************************/
 
-btFunction_t	*btFunction_new(uint8_t type);
+btFunction_t	*btFunction_new(uint8_t type, ...);
 void		btFunction_free(const void *vbf);
 json_t		*btFunction_toJson(const void *vbf);
 

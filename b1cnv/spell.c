@@ -1,6 +1,7 @@
 #include <b1lib.h>
 #include <spell.h>
 #include <cnv_spell.h>
+#include <cnv_song.h>
 
 #define DEBUG
 #include <debug.h>
@@ -19,8 +20,13 @@ static btAction_t	*spell_heal(uint32_t index);
 static btAction_t	*spell_summon(uint32_t index);
 static btAction_t	*spell_generic(uint32_t index);
 
+#if 0
 static void song_lightSpell(bardSong_t *bs);
 static void song_acBonus(bardSong_t *bs);
+#endif
+
+static void song_lightSpell(btSong_t *bs);
+static void song_generic(btSong_t *bs);
 
 /********************************/
 /*				*/
@@ -307,12 +313,20 @@ static btAction_t *spell_disbelieve(uint32_t index)
 	return rval;
 }
 
+#if 0
+#if 0
 static void song_lightSpell(bardSong_t *bs)
+#endif
+static void song_lightSpell(btSong_t *bs)
 {
 	btEffect_t		*effect;
 	btePassive_t		*bp;
 	uint32_t 		i;
 	uint32_t		offset;
+
+	bs->activate = btFunction_new(FUNC_LIGHT);
+	bs->deactivate = btFunction_new(FUNC_STRING);
+	bs->deactivate->string = bts_strcpy("local xxx_holding=true");
 
 	for (i = 0; i < 8; i++) {
 		offset = songBonusList[i] + 7;
@@ -331,11 +345,11 @@ static void song_lightSpell(bardSong_t *bs)
 		bp->detectSecret = (lightSDFlag[spellDuration[offset]] != 0);
 #endif
 
-		cnvList_add(bs->nonCombat, effect);
+		cnvList_add(bs->nonCombatData, effect);
 	}
 }
 
-static void song_generic(cnvList_t *list, uint8_t *outString)
+static void song_generic(cnvList_t *list)
 {
 	btEffect_t		*effect;
 	bteGeneric_t		*bg;
@@ -345,13 +359,12 @@ static void song_generic(cnvList_t *list, uint8_t *outString)
 		effect = btEffect_new(EFFECT_GENERIC);
 		bg = btEffect_generic(effect);
 
-		bg->type = GENS_STRING;
-		bg->funcString = bts_strcpy(outString);
 		bg->flags = songBonusList[i];
 
 		cnvList_add(list, effect);
 	}
 }
+#endif
 
 /********************************/
 /*				*/
@@ -437,18 +450,27 @@ void convertSpells(void)
 	cnvList_free(spells);
 }
 
+#if 0
 void convertSongs(void)
 {
 	uint32_t	i, j;
 	cnvList_t	*songs;
+#if 0
 	bardSong_t	*b;
+#endif
+	btSong_t	*b;
 
 	songs = songList_new();
 
 	for (i = 0; i < 6; i++) {
+#if 0
 		b = bardSong_new();
 
 		b->full = bts_strcpy(songName[i]);
+#endif
+		b = btSong_new();
+		b->name = bts_strcpy(songName[i]);
+
 		switch (i) {
 		case 1:
 			song_lightSpell(b);
@@ -457,11 +479,19 @@ void convertSongs(void)
 		case 2:
 		case 3:
 		case 5:
-			song_generic(b->combat, song_combatStrings[i]);
+			b->combatFunction = btFunction_new(FUNC_STRING,
+					bts_strcpy(song_combatString[i]));
+			song_generic(b->combatData);
 			break;
 		case 4:
-			song_generic(b->nonCombat, song_acBonusString);
-			song_generic(b->combat, song_combatStrings[i]);
+			b->activate = btFunction_new(FUNC_STRING,
+					bts_strcpy(song_acBonusString));
+			b->deactivate = btFunction_new(FUNC_STRING,
+					bts_strcpy("local xxx_hold = true"));
+			song_generic(b->nonCombat);
+			b->combatFunction = btFunction_new(FUNC_STRING,
+					bts_strcpy(song_combatString[i]));
+			song_generic(b->combat);
 			break;
 		}
 			
@@ -471,3 +501,4 @@ void convertSongs(void)
 	songList_to_json(songs, mkJsonPath("songs.json"));
 	cnvList_free(songs);
 }
+#endif

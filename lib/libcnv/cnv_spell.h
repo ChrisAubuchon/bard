@@ -52,7 +52,9 @@ bardSong_t	*bardSong_new(void);
 cnvList_t	*spellList_new(void);
 void		spellList_to_json(cnvList_t *sl, btstring_t *fname);
 
+#if 0
 cnvList_t	*songList_new(void);
 void		songList_to_json(cnvList_t *sl, btstring_t *fname);
+#endif
 
 #endif

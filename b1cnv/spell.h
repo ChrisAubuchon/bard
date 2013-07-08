@@ -4,10 +4,6 @@
 #include <cnv_spell.h>
 #include <cnv_effect.h>
 
-#if 0
-typedef btEffect_t *(spellFunction_t)(uint32_t index);
-#endif
-
 extern uint8_t spellLevel[];
 extern uint8_t spptReq[];
 extern uint8_t spellAttr[];
@@ -32,12 +28,6 @@ extern uint8_t shieldSelf[];
 extern uint8_t battleSkill[];
 
 extern uint8_t wordoffear[];
-
-extern uint8_t songBonusList[];
-extern uint8_t *songName[];
-
-extern uint8_t song_acBonusString[];
-extern uint8_t *song_combatStrings[];
 
 #define sp_LightSpell	0
 #define sp_ArcFire	1

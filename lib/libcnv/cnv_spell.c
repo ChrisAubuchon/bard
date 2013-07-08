@@ -131,10 +131,12 @@ cnvList_t *spellList_new(void)
 	return cnvList_new(mageSpell_free, mageSpell_toJson, mageSpell_toName);
 }
 
+#if 0
 cnvList_t *songList_new(void)
 {
 	return cnvList_new(bardSong_free, bardSong_toJson, bardSong_toName);
 }
+#endif
 
 bardSong_t *bardSong_new(void)
 {

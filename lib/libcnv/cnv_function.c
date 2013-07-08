@@ -49,12 +49,19 @@ static uint8_t *functionList[] = {
 /*				*/
 /********************************/
 
-btFunction_t *btFunction_new(uint8_t type)
+btFunction_t *btFunction_new(uint8_t type, ...)
 {
 	btFunction_t	*bf;
+	va_list		args;
 
 	bf = (btFunction_t *)xzalloc(sizeof(btFunction_t));
 	bf->type = type;
+
+	if (type == FUNC_STRING) {
+		va_start(args, type);
+		bf->string = va_arg(args, btstring_t *);
+		va_end(args);
+	}
 
 	return bf;
 }
