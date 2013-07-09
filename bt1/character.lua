@@ -3,6 +3,9 @@ require "inventory"
 require "entity"
 require "dataio"
 require "battlePlayer"
+require "race"
+require "objectHash"
+require "classes"
 
 character = {}
 

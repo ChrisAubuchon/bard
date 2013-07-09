@@ -1,4 +1,4 @@
-bin_PROGRAMS = bte
+bin_PROGRAMS = bte bte_nosdl
 
 AM_CFLAGS = @CFLAGS@	\
 	-I$(top_srcdir)/lib/libbard \
@@ -46,6 +46,27 @@ bte_LDADD = \
 	$(top_builddir)/lib/libgnu/libgnu.a	\
 	$(top_builddir)/lib/jansson/libjansson.a	\
 	-lpthread
+
+bte_nosdl_SOURCES =	\
+	bt_lua.c	\
+	bt_lua.h	\
+	l_int.h		\
+	l_sys.c		\
+	l_utils.c	\
+	l_module.c	\
+	l_random.c	\
+	l_jansson.c	\
+	bte.c
+
+bte_nosdl_LDADD	=					\
+	-lz						\
+	$(top_builddir)/lib/lua/liblua.a		\
+	$(top_builddir)/lib/libbard/libbard.a		\
+	$(top_builddir)/lib/libgnu/libgnu.a		\
+	$(top_builddir)/lib/jansson/libjansson.a	\
+	-lpthread
+
+bte_nosdl_CPPFLAGS = -DNOSDL -DHAVE_CONFIG_H -DDATADIR=\"$(datadir)\"
 
 .PHONE: bini
 bini: bte.exe

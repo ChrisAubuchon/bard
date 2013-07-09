@@ -1,3 +1,6 @@
+require "bt_text"
+require "btlib"
+
 local _race = {}
 
 _race.init = function ()

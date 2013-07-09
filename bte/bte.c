@@ -1,4 +1,9 @@
+#ifndef NOSDL
 #include <SDL/SDL.h>
+#else
+#include <stdio.h>
+#endif
+
 #include <bt_lua.h>
 
 char *program_name = "BTE";

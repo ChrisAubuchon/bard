@@ -1,6 +1,3 @@
-declare_global("getkey")
-declare_global("btkeys")
-
 ----------------------------------------
 -- getkey()
 --

@@ -1,3 +1,7 @@
+require "dataio"
+require "sdl_video"
+require "globals"
+
 local rect
 local active_bigpic
 local view

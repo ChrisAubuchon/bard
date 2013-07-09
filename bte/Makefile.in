@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = bte$(EXEEXT)
+bin_PROGRAMS = bte$(EXEEXT) bte_nosdl$(EXEEXT)
 subdir = bte
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -75,6 +75,15 @@ bte_DEPENDENCIES = $(top_builddir)/lib/lua/liblua.a \
 	$(top_builddir)/lib/libbard/libbard.a \
 	$(top_builddir)/lib/libgnu/libgnu.a \
 	$(top_builddir)/lib/jansson/libjansson.a
+am_bte_nosdl_OBJECTS = bte_nosdl-bt_lua.$(OBJEXT) \
+	bte_nosdl-l_sys.$(OBJEXT) bte_nosdl-l_utils.$(OBJEXT) \
+	bte_nosdl-l_module.$(OBJEXT) bte_nosdl-l_random.$(OBJEXT) \
+	bte_nosdl-l_jansson.$(OBJEXT) bte_nosdl-bte.$(OBJEXT)
+bte_nosdl_OBJECTS = $(am_bte_nosdl_OBJECTS)
+bte_nosdl_DEPENDENCIES = $(top_builddir)/lib/lua/liblua.a \
+	$(top_builddir)/lib/libbard/libbard.a \
+	$(top_builddir)/lib/libgnu/libgnu.a \
+	$(top_builddir)/lib/jansson/libjansson.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -83,8 +92,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(bte_SOURCES)
-DIST_SOURCES = $(bte_SOURCES)
+SOURCES = $(bte_SOURCES) $(bte_nosdl_SOURCES)
+DIST_SOURCES = $(bte_SOURCES) $(bte_nosdl_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -560,6 +569,26 @@ bte_LDADD = \
 	$(top_builddir)/lib/jansson/libjansson.a	\
 	-lpthread
 
+bte_nosdl_SOURCES = \
+	bt_lua.c	\
+	bt_lua.h	\
+	l_int.h		\
+	l_sys.c		\
+	l_utils.c	\
+	l_module.c	\
+	l_random.c	\
+	l_jansson.c	\
+	bte.c
+
+bte_nosdl_LDADD = \
+	-lz						\
+	$(top_builddir)/lib/lua/liblua.a		\
+	$(top_builddir)/lib/libbard/libbard.a		\
+	$(top_builddir)/lib/libgnu/libgnu.a		\
+	$(top_builddir)/lib/jansson/libjansson.a	\
+	-lpthread
+
+bte_nosdl_CPPFLAGS = -DNOSDL -DHAVE_CONFIG_H -DDATADIR=\"$(datadir)\"
 all: all-am
 
 .SUFFIXES:
@@ -634,6 +663,9 @@ clean-binPROGRAMS:
 bte$(EXEEXT): $(bte_OBJECTS) $(bte_DEPENDENCIES) 
 	@rm -f bte$(EXEEXT)
 	$(LINK) $(bte_OBJECTS) $(bte_LDADD) $(LIBS)
+bte_nosdl$(EXEEXT): $(bte_nosdl_OBJECTS) $(bte_nosdl_DEPENDENCIES) 
+	@rm -f bte_nosdl$(EXEEXT)
+	$(LINK) $(bte_nosdl_OBJECTS) $(bte_nosdl_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -643,6 +675,13 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bt_lua.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bte.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bte_nosdl-bt_lua.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bte_nosdl-bte.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bte_nosdl-l_jansson.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bte_nosdl-l_module.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bte_nosdl-l_random.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bte_nosdl-l_sys.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bte_nosdl-l_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/btf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/font.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_anim.Po@am__quote@
@@ -786,6 +825,104 @@ l_timer.obj: sdl/l_timer.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdl/l_timer.c' object='l_timer.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o l_timer.obj `if test -f 'sdl/l_timer.c'; then $(CYGPATH_W) 'sdl/l_timer.c'; else $(CYGPATH_W) '$(srcdir)/sdl/l_timer.c'; fi`
+
+bte_nosdl-bt_lua.o: bt_lua.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-bt_lua.o -MD -MP -MF $(DEPDIR)/bte_nosdl-bt_lua.Tpo -c -o bte_nosdl-bt_lua.o `test -f 'bt_lua.c' || echo '$(srcdir)/'`bt_lua.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bte_nosdl-bt_lua.Tpo $(DEPDIR)/bte_nosdl-bt_lua.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bt_lua.c' object='bte_nosdl-bt_lua.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-bt_lua.o `test -f 'bt_lua.c' || echo '$(srcdir)/'`bt_lua.c
+
+bte_nosdl-bt_lua.obj: bt_lua.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-bt_lua.obj -MD -MP -MF $(DEPDIR)/bte_nosdl-bt_lua.Tpo -c -o bte_nosdl-bt_lua.obj `if test -f 'bt_lua.c'; then $(CYGPATH_W) 'bt_lua.c'; else $(CYGPATH_W) '$(srcdir)/bt_lua.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bte_nosdl-bt_lua.Tpo $(DEPDIR)/bte_nosdl-bt_lua.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bt_lua.c' object='bte_nosdl-bt_lua.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-bt_lua.obj `if test -f 'bt_lua.c'; then $(CYGPATH_W) 'bt_lua.c'; else $(CYGPATH_W) '$(srcdir)/bt_lua.c'; fi`
+
+bte_nosdl-l_sys.o: l_sys.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-l_sys.o -MD -MP -MF $(DEPDIR)/bte_nosdl-l_sys.Tpo -c -o bte_nosdl-l_sys.o `test -f 'l_sys.c' || echo '$(srcdir)/'`l_sys.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bte_nosdl-l_sys.Tpo $(DEPDIR)/bte_nosdl-l_sys.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='l_sys.c' object='bte_nosdl-l_sys.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-l_sys.o `test -f 'l_sys.c' || echo '$(srcdir)/'`l_sys.c
+
+bte_nosdl-l_sys.obj: l_sys.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-l_sys.obj -MD -MP -MF $(DEPDIR)/bte_nosdl-l_sys.Tpo -c -o bte_nosdl-l_sys.obj `if test -f 'l_sys.c'; then $(CYGPATH_W) 'l_sys.c'; else $(CYGPATH_W) '$(srcdir)/l_sys.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bte_nosdl-l_sys.Tpo $(DEPDIR)/bte_nosdl-l_sys.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='l_sys.c' object='bte_nosdl-l_sys.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-l_sys.obj `if test -f 'l_sys.c'; then $(CYGPATH_W) 'l_sys.c'; else $(CYGPATH_W) '$(srcdir)/l_sys.c'; fi`
+
+bte_nosdl-l_utils.o: l_utils.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-l_utils.o -MD -MP -MF $(DEPDIR)/bte_nosdl-l_utils.Tpo -c -o bte_nosdl-l_utils.o `test -f 'l_utils.c' || echo '$(srcdir)/'`l_utils.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bte_nosdl-l_utils.Tpo $(DEPDIR)/bte_nosdl-l_utils.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='l_utils.c' object='bte_nosdl-l_utils.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-l_utils.o `test -f 'l_utils.c' || echo '$(srcdir)/'`l_utils.c
+
+bte_nosdl-l_utils.obj: l_utils.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-l_utils.obj -MD -MP -MF $(DEPDIR)/bte_nosdl-l_utils.Tpo -c -o bte_nosdl-l_utils.obj `if test -f 'l_utils.c'; then $(CYGPATH_W) 'l_utils.c'; else $(CYGPATH_W) '$(srcdir)/l_utils.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bte_nosdl-l_utils.Tpo $(DEPDIR)/bte_nosdl-l_utils.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='l_utils.c' object='bte_nosdl-l_utils.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-l_utils.obj `if test -f 'l_utils.c'; then $(CYGPATH_W) 'l_utils.c'; else $(CYGPATH_W) '$(srcdir)/l_utils.c'; fi`
+
+bte_nosdl-l_module.o: l_module.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-l_module.o -MD -MP -MF $(DEPDIR)/bte_nosdl-l_module.Tpo -c -o bte_nosdl-l_module.o `test -f 'l_module.c' || echo '$(srcdir)/'`l_module.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bte_nosdl-l_module.Tpo $(DEPDIR)/bte_nosdl-l_module.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='l_module.c' object='bte_nosdl-l_module.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-l_module.o `test -f 'l_module.c' || echo '$(srcdir)/'`l_module.c
+
+bte_nosdl-l_module.obj: l_module.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-l_module.obj -MD -MP -MF $(DEPDIR)/bte_nosdl-l_module.Tpo -c -o bte_nosdl-l_module.obj `if test -f 'l_module.c'; then $(CYGPATH_W) 'l_module.c'; else $(CYGPATH_W) '$(srcdir)/l_module.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bte_nosdl-l_module.Tpo $(DEPDIR)/bte_nosdl-l_module.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='l_module.c' object='bte_nosdl-l_module.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-l_module.obj `if test -f 'l_module.c'; then $(CYGPATH_W) 'l_module.c'; else $(CYGPATH_W) '$(srcdir)/l_module.c'; fi`
+
+bte_nosdl-l_random.o: l_random.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-l_random.o -MD -MP -MF $(DEPDIR)/bte_nosdl-l_random.Tpo -c -o bte_nosdl-l_random.o `test -f 'l_random.c' || echo '$(srcdir)/'`l_random.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bte_nosdl-l_random.Tpo $(DEPDIR)/bte_nosdl-l_random.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='l_random.c' object='bte_nosdl-l_random.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-l_random.o `test -f 'l_random.c' || echo '$(srcdir)/'`l_random.c
+
+bte_nosdl-l_random.obj: l_random.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-l_random.obj -MD -MP -MF $(DEPDIR)/bte_nosdl-l_random.Tpo -c -o bte_nosdl-l_random.obj `if test -f 'l_random.c'; then $(CYGPATH_W) 'l_random.c'; else $(CYGPATH_W) '$(srcdir)/l_random.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bte_nosdl-l_random.Tpo $(DEPDIR)/bte_nosdl-l_random.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='l_random.c' object='bte_nosdl-l_random.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-l_random.obj `if test -f 'l_random.c'; then $(CYGPATH_W) 'l_random.c'; else $(CYGPATH_W) '$(srcdir)/l_random.c'; fi`
+
+bte_nosdl-l_jansson.o: l_jansson.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-l_jansson.o -MD -MP -MF $(DEPDIR)/bte_nosdl-l_jansson.Tpo -c -o bte_nosdl-l_jansson.o `test -f 'l_jansson.c' || echo '$(srcdir)/'`l_jansson.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bte_nosdl-l_jansson.Tpo $(DEPDIR)/bte_nosdl-l_jansson.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='l_jansson.c' object='bte_nosdl-l_jansson.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-l_jansson.o `test -f 'l_jansson.c' || echo '$(srcdir)/'`l_jansson.c
+
+bte_nosdl-l_jansson.obj: l_jansson.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-l_jansson.obj -MD -MP -MF $(DEPDIR)/bte_nosdl-l_jansson.Tpo -c -o bte_nosdl-l_jansson.obj `if test -f 'l_jansson.c'; then $(CYGPATH_W) 'l_jansson.c'; else $(CYGPATH_W) '$(srcdir)/l_jansson.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bte_nosdl-l_jansson.Tpo $(DEPDIR)/bte_nosdl-l_jansson.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='l_jansson.c' object='bte_nosdl-l_jansson.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-l_jansson.obj `if test -f 'l_jansson.c'; then $(CYGPATH_W) 'l_jansson.c'; else $(CYGPATH_W) '$(srcdir)/l_jansson.c'; fi`
+
+bte_nosdl-bte.o: bte.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-bte.o -MD -MP -MF $(DEPDIR)/bte_nosdl-bte.Tpo -c -o bte_nosdl-bte.o `test -f 'bte.c' || echo '$(srcdir)/'`bte.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bte_nosdl-bte.Tpo $(DEPDIR)/bte_nosdl-bte.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bte.c' object='bte_nosdl-bte.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-bte.o `test -f 'bte.c' || echo '$(srcdir)/'`bte.c
+
+bte_nosdl-bte.obj: bte.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-bte.obj -MD -MP -MF $(DEPDIR)/bte_nosdl-bte.Tpo -c -o bte_nosdl-bte.obj `if test -f 'bte.c'; then $(CYGPATH_W) 'bte.c'; else $(CYGPATH_W) '$(srcdir)/bte.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bte_nosdl-bte.Tpo $(DEPDIR)/bte_nosdl-bte.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bte.c' object='bte_nosdl-bte.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-bte.obj `if test -f 'bte.c'; then $(CYGPATH_W) 'bte.c'; else $(CYGPATH_W) '$(srcdir)/bte.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

@@ -35,6 +35,7 @@ setmetatable(_G, {
 require "declares"
 require "sdl_video"
 require "globals"
+require "btdebug"
 
 video_init()
 

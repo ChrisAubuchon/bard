@@ -1,2 +1,0 @@
-Usage: bte lua_file
-

@@ -355,6 +355,8 @@ function battleData:endRound()
 	self.actionHead = false
 	self.actionTail = false
 	self.battleDataBySource = {}
+	collectgarbage("collect")
+	dprint(collectgarbage("count"))
 
 	if (self.monGroups) then
 		for mgroup in self.monGroups:iterator() do

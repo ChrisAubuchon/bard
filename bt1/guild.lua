@@ -1,3 +1,7 @@
+require "bigpic"
+require "party"
+require "roster"
+require "character"
 
 ----------------------------------------
 -- add_member()

@@ -28,7 +28,9 @@ lua_State *bt_lua_state(void)
 		luaL_openlibs(global_state);
 		l_jansson_open(global_state);
 		l_sys_open(global_state);
+#ifndef NOSDL
 		l_sdl_open(global_state);
+#endif
 		l_random_open(global_state);
 	}
 
