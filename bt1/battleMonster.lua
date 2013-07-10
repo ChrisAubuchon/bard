@@ -46,26 +46,26 @@ function battleMonster:meleeAttack(inAction)
 	end
 
 	dprint("battleMonster:meleeAttack() inData: " .. tostring(inData))
-	text_print("A " .. self.singular .. " " ..
+	text:print("A " .. self.singular .. " " ..
 			inData.meleeString[rnd_xdy(1,2)] ..
 			inAction.target:getSingularName()
 		)
 
 	if (self:checkMeleeHits(inAction)) then
 		self:getMeleeDamage(inAction)
-		text_print(", and hits for %d ", outData.damage)
+		text:print(", and hits for %d ", outData.damage)
 		if (outData.damage == 1) then
-			text_print("point ")
+			text:print("point ")
 		else
-			text_print("points ")
+			text:print("points ")
 		end
-		text_print("of damage")
+		text:print("of damage")
 
 		if (inAction.target:doDamage(inAction)) then
-			text_print(stringTables.effects[outData.specialAttack])
-			text_print("%s!\n\n", inAction.target:getPronoun())
+			text:print(stringTables.effects[outData.specialAttack])
+			text:print("%s!\n\n", inAction.target:getPronoun())
 		else
-			text_print(".\n\n")
+			text:print(".\n\n")
 		end
 
 		party:display()
@@ -74,10 +74,10 @@ function battleMonster:meleeAttack(inAction)
 			return
 		end
 	else
-		text_print(", but misses!\n\n")
+		text:print(", but misses!\n\n")
 	end
 
-	text_delay(3)
+	timer:delay(3)
 	return
 end
 

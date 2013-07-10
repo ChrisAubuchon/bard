@@ -275,17 +275,17 @@ dun.new = function(inName, startLevel, startX, startY, startDirection)
 		end
 
 		if (next(found) ~= nil) then
-			text_print("\n")
+			text:print("\n")
 			if ((found.stairs) and (party.detect.stairs)) then
-				text_print("\nThere are stairs near.\n")
+				text:print("\nThere are stairs near.\n")
 			end
 			if ((found.traps) and (party.detect.traps)) then
-				text_print("\nThere is a trap near.\n")
+				text:print("\nThere is a trap near.\n")
 			end
 			if ((found.special) and (party.detect.special)) then
-				text_print("\nThere is something special near.\n")
+				text:print("\nThere is something special near.\n")
 			end
-			text_print("\n")
+			text:print("\n")
 		end
 	end
 
@@ -306,7 +306,7 @@ dun.new = function(inName, startLevel, startX, startY, startDirection)
 	function self.turnParty(inRelDirection)
 		self.direction = directions[inRelDirection][self.direction]
 		self.isPhasedFlag = false
-		text_clear()
+		text:clear()
 		if (self.currentSquare.isSpinner) then
 			local r = rnd_xdy(1, 4)
 			if (r == 1) then
@@ -338,14 +338,14 @@ dun.new = function(inName, startLevel, startX, startY, startDirection)
 		local curSq = self.currentSquare
 		local edge = curSq[self.direction]
 
-		text_clear()
+		text:clear()
 		self.squareFlags = {}
 		if (curSq.isStuck) then
 			return
 		end
 
 		if ((edge.isWall) and not (curSq.isPhased)) then
-			text_print("\n\nOuch!!")
+			text:print("\n\nOuch!!")
 			return
 		end
 
@@ -361,17 +361,17 @@ dun.new = function(inName, startLevel, startX, startY, startDirection)
 		self.buildView()
 
 		if (curSq.isRandomBattle) then
-			text_cdprint(true, false, "Random battle")
+			text:cdprint(true, false, "Random battle")
 			curSq.isRandomBattle = false
 		end
 		if (not (self.squareFlags["seenDarkness"]) and curSq.isDarkness) then
 			party.light.deactivate()
-			text_print("\n\nDarkness!")
+			text:print("\n\nDarkness!")
 			self.buildView()
 			self.squareFlags["seenDarkness"] = true
 		end
 		if (curSq.onEnter) then
-			text_cdprint(true, false, "onEnter")
+			text:cdprint(true, false, "onEnter")
 		end
 		if (curSq.isAntiMagic) then
 			party.levitate.deactivate()
@@ -383,33 +383,33 @@ dun.new = function(inName, startLevel, startX, startY, startDirection)
 			if (party.light.active) then
 				party.light.distance = 1
 			end
-			text_print("\nSmoke in your eyes!")
+			text:print("\nSmoke in your eyes!")
 			self.buildView()
 			self.squareFlags["seenSmoke"] = true
 		end
 		if (curSq.isTeleport) then
 			self.currentSquare = self.getSq(curSq.isTeleport)
-			text_clear()
+			text:clear()
 			bigpic.setTitle(self.title)
 			self.buildView()
 			self.runSquareCode()
 			return
 		end
 		if (curSq.isLifeDrain) then
-			text_cdprint(true, false, "isLifeDrain")
+			text:cdprint(true, false, "isLifeDrain")
 		end
 		if (curSq.isMessage) then
 			if not (self.squareFlags["seenMessage"]) then
-				text_print(curSq.isMessage)
+				text:print(curSq.isMessage)
 				
 				self.squareFlags.seenMessage = true
 			end
 		end
 		if (curSq.isForcedBattle) then
-			text_cdprint(true, false, "isForcedBattle")
+			text:cdprint(true, false, "isForcedBattle")
 		end
 		if (curSq.isTrap) then
-			text_cdprint(true, false, "isTrap")
+			text:cdprint(true, false, "isTrap")
 		end
 		if (curSq.isStairs) then
 			if not (self.squareFlags["seenStairs"]) then
@@ -421,7 +421,7 @@ dun.new = function(inName, startLevel, startX, startY, startDirection)
 	function self.main()
 		local inkey
 
-		text_clear()
+		text:clear()
 		self.resetBigpic()
 
 		repeat

@@ -19,11 +19,11 @@ _class.init = function ()
 		clist = race.startingClasses(r)
 
 		for i = 1, #clist do
-			text_print("\n%d) %s", i, clist[i])
+			text:print("\n%d) %s", i, clist[i])
 		end
 
-		text_setCursor(0, 10)
-		text_print("\n   (REROLL)")
+		text:setCursor(0, 10)
+		text:print("\n   (REROLL)")
 
 		repeat
 			inkey = getkey()

@@ -79,7 +79,8 @@ static void l_loop_free(const void *data)
 
 static int l_anim_isAnim(lua_State *L)
 {
-	lua_pushnumber(L, 1);
+/*	lua_pushnumber(L, 1);*/
+	lua_pushboolean(L, 1);
 	return 1;
 }
 

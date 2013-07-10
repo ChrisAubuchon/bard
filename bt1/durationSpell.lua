@@ -19,7 +19,7 @@ durationSpell.new = function(inIcon)
 			self.duration = inDuration
 		end
 		icons.displayIcon(self.icon)
-		printEllipsis()
+		text:printEllipsis()
 	end
 
 	function self.deactivate()
@@ -29,6 +29,7 @@ durationSpell.new = function(inIcon)
 	function self.__deactivate()
 		self.active = false
 		self.duration = false
+dprint(icons.deactivateIcon)
 		icons.deactivateIcon(self.icon)
 	end
 
@@ -103,7 +104,7 @@ compassEffect.activate = function(inDuration)
 	else
 		compassEffect.duration = inDuration
 	end
-	printEllipsis()
+	text:printEllipsis()
 end
 
 compassEffect.update = function (inData)

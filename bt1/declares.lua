@@ -26,14 +26,6 @@ declare_global("compileAction")
 declare_global("dprint")
 declare_global("btdebug")
 
--- bt_text.lua
-declare_global("printContinue")
-declare_global("printCancel")
-declare_global("printExit")
-declare_global("getYesNo")
-declare_global("splashMessage")
-declare_global("printEllipsis")
-
 -- btio.lua
 declare_global("getkey")
 declare_global("btkeys")
@@ -82,6 +74,7 @@ declare_global("globals")
 declare_global("directions")
 declare_global("currentLevel")
 declare_global("stringTables")
+declare_global("m_window")
 
 -- guild.lua
 declare_global("guild")
@@ -134,12 +127,16 @@ declare_global("roscoes")
 declare_global("roster")
 
 -- sdl_video.lua
-declare_global("load_image")
-declare_global("m_window")
-declare_global("video_rectangle")
-declare_global("video_color")
-declare_global("video_new_window")
-declare_global("video_init")
+declare_global("gfxScreen")
+declare_global("gfxWindow")
+declare_global("gfxImage")
+declare_global("gfxRectangle")
+declare_global("gfxColor")
+declare_global("gfxFont")
+
+-- sdl_text.lua
+declare_global("text")
+declare_global("textBox")
 
 -- song.lua
 declare_global("song")
@@ -158,17 +155,7 @@ declare_global("tavern")
 declare_global("temple")
 
 -- text.lua
-declare_global("text_clear")
-declare_global("text_clearline")
 declare_global("text_delay")
-declare_global("text_print")
-declare_global("text_cdprint")
-declare_global("text_setColumn")
-declare_global("text_setCursor")
-declare_global("text_readString")
-declare_global("text_select")
-declare_global("text_scrollSelect")
-declare_global("text_readNumber")
 declare_global("printStatusLine")
 
 -- timer.lua

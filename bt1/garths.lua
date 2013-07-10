@@ -8,22 +8,22 @@ function funcs.selectInventory(player)
 	local max
 
 	if (player.inventory:isEmpty()) then
-		text_cdprint(true, true, "\nYou have no items.")
+		text:cdprint(true, true, "\nYou have no items.")
 		return false
 	end
 
-	text_clear()
-	text_print("\nWhich item:")
+	text:clear()
+	text:print("\nWhich item:")
 
 	for i in player.inventory:iterator() do
-		text_print("\n" .. i:toInventoryLine(player))
-		text_setColumn(12)
-		text_print("%7d", i.value / 2)
+		text:print("\n" .. i:toInventoryLine(player))
+		text:setColumn(12)
+		text:print("%7d", i.value / 2)
 	end
 
-	printCancel()
+	text:printCancel()
 
-	itemNumber = text_select(2, player.inventory.size)
+	itemNumber = text:select(2, player.inventory.size)
 	if (not itemNumber) then
 		return false
 	end
@@ -32,9 +32,9 @@ function funcs.selectInventory(player)
 end
 
 function funcs.printGarthItem(itemName)
-	text_print(itemName)
-	text_setColumn(12)
-	text_print("%7d", items.getItemValueByName(itemName))
+	text:print(itemName)
+	text:setColumn(12)
+	text:print("%7d", items.getItemValueByName(itemName))
 end
 
 function funcs.buyItem(player)
@@ -43,7 +43,7 @@ function funcs.buyItem(player)
 	local itemValue
 
 	if (player.inventory:isFull()) then
-		text_cdprint(true, true, "\nYour pockets are full.")
+		text:cdprint(true, true, "\nYour pockets are full.")
 		return
 	end
 
@@ -54,14 +54,14 @@ function funcs.buyItem(player)
 			end
 		end
 
-		item = text_scrollSelect(itemList, funcs.printGarthItem)
+		item = text:scrollingSelect(itemList, funcs.printGarthItem)
 		if (not item) then
 			return	
 		end
 
 		itemValue = items.getItemValueByName(item)
 		if (itemValue > player.gold) then
-			text_cdprint(true, true, "\nNot enough gold.")
+			text:cdprint(true, true, "\nNot enough gold.")
 			return
 		end
 
@@ -71,9 +71,9 @@ function funcs.buyItem(player)
 
 		player:giveItem(item, true)
 		player.gold = player.gold - itemValue
-		text_clearline(11)
-		text_setCursor(0, 11)
-		text_cdprint(false, true, "Done!        ")
+		text:clearline(11)
+		text:setCursor(0, 11)
+		text:cdprint(false, true, "Done!        ")
 
 		if (player.inventory:isFull()) then
 			return
@@ -94,13 +94,13 @@ function funcs.identifyItem(player)
 
 	inv = player.inventory[itemNumber]
 	if (inv.isIdentified) then
-		splashMessage("\nThat item is known already.")
+		text:splashMessage("\nThat item is known already.")
 		return
 	end
 
 	value = math.floor(inv.value / 2)
 	if (value > player.gold) then
-		splashMessage("\nNot enough gold.")
+		text:splashMessage("\nNot enough gold.")
 		return
 	end
 
@@ -128,23 +128,23 @@ function funcs.sellItem(player)
 
 	player.gold = player.gold + (math.floor(inv.value / 2))
 	player.inventory:dropItem(itemNumber)
-	player.calcAC()
+	player:display()
 end
 
 function funcs.selectOption(player)
 	local inkey
 
 	repeat
-		text_clear()
-		text_print("Greetings, "..player.name)
-		text_print(". Would you like to:")
-		text_setCursor(0, 3)
-		text_print("\nBuy an item.")
-		text_print("\nSell an item.")
-		text_print("\nIdentify an item.")
-		text_print("\nPool gold.")
-		text_print("\nDone.")
-		text_print("\n\nYou have: " .. tostring(player.gold) .. " gold.")
+		text:clear()
+		text:print("Greetings, "..player.name)
+		text:print(". Would you like to:")
+		text:setCursor(0, 3)
+		text:print("\nBuy an item.")
+		text:print("\nSell an item.")
+		text:print("\nIdentify an item.")
+		text:print("\nPool gold.")
+		text:print("\nDone.")
+		text:print("\n\nYou have: " .. tostring(player.gold) .. " gold.")
 		inkey = getkey()
 		if (inkey == "B") then
 			funcs.buyItem(player)
@@ -169,10 +169,10 @@ function funcs.selectCharacter()
 	local inkey
 
 	repeat
-		text_clear()
-		text_print("Welcome to Garth's Equipment Shoppe, oh wealthy travelers!")
-		text_print("\nWhich of you is interested in my fine wares?")
-		printExit()
+		text:clear()
+		text:print("Welcome to Garth's Equipment Shoppe, oh wealthy travelers!")
+		text:print("\nWhich of you is interested in my fine wares?")
+		text:printExit()
 		inkey = getkey()
 		if ((inkey > "0") and (inkey < "7")) then
 			inkey = tonumber(inkey)

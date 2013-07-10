@@ -78,39 +78,39 @@ function battlePlayer:doMeleeAttack(inAction)
 	end
 	dprint("target: " .. tostring(target))
 
-	text_print(self:getSingularName())
+	text:print(self:getSingularName())
 	if (self:isTypeEquipped("Weapon")) then
-		text_print(" swings at ")
+		text:print(" swings at ")
 	else
-		text_print(" chops at ")
+		text:print(" chops at ")
 	end
 
-	text_print(target:getSingularName())
+	text:print(target:getSingularName())
 
 	if (not self:checkMeleeHits(inAction)) then
-		text_print(", but misses!\n\n")
-		text_delay(3)
+		text:print(", but misses!\n\n")
+		timer:delay(3)
 		return
 	else
-		text_print(", and hits ")
+		text:print(", and hits ")
 		if (self.numAttacks > 1) then
-			text_print("%d times ", self.numAttacks)
+			text:print("%d times ", self.numAttacks)
 		end
 
 		self:getMeleeDamage(inAction)
-		text_print("for %d ", outData.damage)
+		text:print("for %d ", outData.damage)
 		if (outData.damage == 1) then
-			text_print("point ")
+			text:print("point ")
 		else
-			text_print("points ")
+			text:print("points ")
 		end
-		text_print("of damage")
+		text:print("of damage")
 
 		if (target:doDamage(inAction)) then
-			text_print(stringTables.effects[outData.specialAttack])
-			text_print("%s!\n\n", target:getPronoun())
+			text:print(stringTables.effects[outData.specialAttack])
+			text:print("%s!\n\n", target:getPronoun())
 		else
-			text_print(".\n\n")
+			text:print(".\n\n")
 		end
 
 		if (target:isCharacter()) then
@@ -123,7 +123,7 @@ function battlePlayer:doMeleeAttack(inAction)
 		end
 	end
 
-	text_delay(3)
+	timer:delay(3)
 end
 
 function battlePlayer:checkMeleeHits(inAction)
@@ -302,12 +302,12 @@ function battlePlayer:getCombatSpell(inAction)
 
 	s = self:getSpell(false)
 	if (not s.combat) then
-		text_cdprint(false, true, "\nNot a combat spell.")
+		text:cdprint(false, true, "\nNot a combat spell.")
 		return false
 	end
 
 	if (self.cur_sppt < s.sppt) then
-		text_cdprint(false, true, "\nNot enough spell points.")
+		text:cdprint(false, true, "\nNot enough spell points.")
 		return false
 	end
 
@@ -316,7 +316,7 @@ function battlePlayer:getCombatSpell(inAction)
 	inAction.inData.sppt	= s.sppt
 
 	if (s.targetted) then
-		text_cdprint(true, false, "Use on:")
+		text:cdprint(true, false, "Use on:")
 		inAction.target = getActionTarget(s.targetted, false)
 		if (not inAction.target) then
 			return false
@@ -327,7 +327,7 @@ function battlePlayer:getCombatSpell(inAction)
 end
 
 function battlePlayer:doCombatSpell(inAction)
-	text_print(self.name)
+	text:print(self.name)
 	self:castSpell(inAction)
 end
 
@@ -340,18 +340,18 @@ function battlePlayer:doUseItem(inAction)
 end
 
 function battlePlayer:doBardSong(inAction)
-	text_print(self.name)
+	text:print(self.name)
 
 	if (not self:doVoiceCheck()) then
 		return
 	end
 
 	if (not self:isTypeEquipped("Instrument")) then
-		text_cdprint(false, true, "\n has no instrument to play.")
+		text:cdprint(false, true, "\n has no instrument to play.")
 		return
 	end
 
-	text_print(" plays a tune...\n\n")
+	text:print(" plays a tune...\n\n")
 
 	if (inAction.func) then
 		inAction.func(inAction)

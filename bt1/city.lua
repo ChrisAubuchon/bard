@@ -312,8 +312,8 @@ city.new = function (inName, startX, startY, startDirection)
 			self.buildView()
 		end
 
-		text_clear()
-		text_print(self.currentSquare.label)
+		text:clear()
+		text:print(self.currentSquare.label)
 	end
 
 	function self.getPoisonDamage()
@@ -332,7 +332,7 @@ city.new = function (inName, startX, startY, startDirection)
 	function self.main()
 		local inkey
 
-		text_clear()
+		text:clear()
 		self.resetBigpic()
 
 		repeat
@@ -361,15 +361,15 @@ city.new = function (inName, startX, startY, startDirection)
 
 	function self.printLocation()
 		if (self.currentSquare.location == "grand") then
-			text_print("\n\nYou're in the Grand Plaz.")
+			text:print("\n\nYou're in the Grand Plaz.")
 		else
-			text_print("\n\nYou are on " .. 
+			text:print("\n\nYou are on " .. 
 					self.currentSquare.location .. 
 					" facing " .. self.direction
 				)
 		end
 
-		text_print("\n\nIt's now " .. timeOfDay[globals.gameHour])
+		text:print("\n\nIt's now " .. timeOfDay[globals.gameHour])
 	end
 
 	function self.getBattleReward()

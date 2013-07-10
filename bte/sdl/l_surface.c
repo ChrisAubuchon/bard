@@ -93,7 +93,8 @@ static int l_surface_tostring(lua_State *L)
 
 static int l_surface_get_isanim(lua_State *L)
 {
-	lua_pushnumber(L, 0);
+/*	lua_pushnumber(L, 0);*/
+	lua_pushboolean(L, 0);
 	
 	return 1;
 }

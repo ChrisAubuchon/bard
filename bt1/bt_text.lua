@@ -5,8 +5,8 @@
 -- to continue
 ----------------------------------------
 function splashMessage(format, ...)
-	text_clear()
-	text_print(format, ...)
+	text:clear()
+	text:print(format, ...)
 
 	printContinue()
 
@@ -20,8 +20,8 @@ end
 -- at the bottom of the screen
 ----------------------------------------
 function printContinue()
-	text_setCursor(0, 11)
-	text_print("   (CONTINUE)")
+	text:setCursor(0, 11)
+	text:print("   (CONTINUE)")
 end
 
 ----------------------------------------
@@ -31,13 +31,13 @@ end
 -- the bottom of the text window
 ----------------------------------------
 function printCancel()
-	text_setCursor(0, 11)
-	text_print("    (CANCEL)")
+	text:setCursor(0, 11)
+	text:print("    (CANCEL)")
 end
 
 function printExit()
-	text_setCursor(0, 11)
-	text_print("     (EXIT)")
+	text:setCursor(0, 11)
+	text:print("     (EXIT)")
 end
 
 ----------------------------------------
@@ -49,7 +49,7 @@ end
 function getYesNo()
 	local inkey
 
-	text_print("\n\nYes\nNo")
+	text:print("\n\nYes\nNo")
 
 	while true do 
 		inkey = getkey()
@@ -69,7 +69,7 @@ end
 -- according to current delay setting
 ----------------------------------------
 function printEllipsis()
-	text_print("...\n\n")
+	text:print("...\n\n")
 	party:display()
 	local XXX_text_table_delay = true
 end

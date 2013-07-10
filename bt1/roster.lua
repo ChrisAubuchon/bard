@@ -128,12 +128,12 @@ end
 function roster.printMember(member)
 	if (rost.characters[member] ~= nil) then
 		if (rost.characters[member].isDead) then
-			text_print("@" .. member)
+			text:print("@" .. member)
 		else
-			text_print(" " .. member)
+			text:print(" " .. member)
 		end
 	else
-		text_print("*" .. member)
+		text:print("*" .. member)
 	end
 end
 

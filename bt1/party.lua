@@ -10,14 +10,16 @@ party = {
 	compass		= compassEffect,
 	levitate	= levitateEffect,
 	summon		= false,
-	songAcBonus	= 0,
 
-	singer		= false,
-	lightSongPlaying = false,
-
-	-- Battle specific values
-	spellAcBonus	= 0,
-	antiMagicBonus	= 0
+	song		= {
+		acBonus		= 0,
+		lightSong	= false,
+		singer		= false
+	},
+	battle	= {
+		acBonus		= 0,
+		antiMagic	= 0
+	}
 }
 
 btTable.addParent(party, btArray)
@@ -229,7 +231,7 @@ function party:display()
 		dprint(self.summon)
 		charString,hpString = self.summon:getStatusLine()
 	end
-	printStatusLine(charString, hpString, 0)
+	self:printStatusLine(charString, hpString, 0)
 
 	for i = 1,6 do
 		if (self[i]) then
@@ -238,7 +240,7 @@ function party:display()
 			charString = false
 		end
 
-		printStatusLine(charString, hpString, i)
+		self:printStatusLine(charString, hpString, i)
 	end
 end
 
@@ -324,16 +326,16 @@ function party:reorder()
 	local toNum
 	local tmp
 
-	text_clear()
-	text_print("Move who?")
+	text:clear()
+	text:print("Move who?")
 
 	fromNum = self:readSlotNumber()
 	if (not fromNum) then
 		return
 	end
 
-	text_clear()
-	text_print("\n\nTo where?")
+	text:clear()
+	text:print("\n\nTo where?")
 
 	toNum = getkey()
 	if ((toNum < "1") or (toNum > "6")) then
@@ -548,7 +550,7 @@ end
 function party:readSlotNumber()
 	local inkey
 
-	printCancel()
+	text:printCancel()
 	inkey = getkey()
 	if ((inkey < "1") or (inkey > "6")) then	
 		return false
@@ -560,6 +562,35 @@ function party:readSlotNumber()
 
 	return tonumber(inkey)
 end
+
+----------------------------------------
+-- printStatusLine()
+--
+--
+----------------------------------------
+function party:printStatusLine(inCharString, inHpString, inSlot)
+	local renderedText
+	local fontP
+	local y
+
+	y = 266 + (16 * inSlot)
+	fontP = globals.fonts.mono
+	m_window:Fill(gfxRectangle:new(32, y, 580, 16), globals.colors[8])
+
+	if (inCharString) then
+		renderedText = fontP:Render(inCharString, globals.colors[16])
+		m_window:Draw(gfxRectangle:new(32, y, 0, 0), renderedText, nil)
+		renderedText = fontP:Render(inHpString, globals.colors[1])
+		m_window:Draw(gfxRectangle:new(416, y, 0, 0), renderedText, nil)
+	end
+
+	m_window:Update()
+end
+
+
+
+
+
 
 
 

@@ -58,7 +58,7 @@ end
 
 spells.trapZap = function()
 	if (globals.gameState == globals.STATE_CITY) then
-		printEllipsis()
+		text:printEllipsis()
 		return
 	end
 
@@ -79,7 +79,7 @@ spells.scrySite = function()
 	local outString = "You face "
 
 	if (currentLevel.isCity()) then
-		splashMessage(outString .. currentLevel.direction .. " and are in Skara Brae.")
+		text:splashMessage(outString .. currentLevel.direction .. " and are in Skara Brae.")
 	else
 		local east
 		local north
@@ -108,10 +108,10 @@ spells.scrySite = function()
 			outString = outString .. " squares "
 		end
 		outString = outString .. "east of the entry stairs"
-		splashMessage(outString)
+		text:splashMessage(outString)
 	end
 
-	text_clear()
+	text:clear()
 end
 
 spells.phaseDoor = function()
@@ -123,17 +123,17 @@ spells.phaseDoor = function()
 			currentLevel.buildView()
 		end
 	end
-	printEllipsis()
+	text:printEllipsis()
 end
 
 local function teleportHelper(inValue, inLine)
-	text_setCursor(108, inLine)
-	text_print("     ")
-	text_setColumn(9)
+	text:setCursor(108, inLine)
+	text:print("     ")
+	text:setColumn(9)
 	if (inValue > 0) then
-		text_print("+")
+		text:print("+")
 	end
-	text_print(tostring(inValue))
+	text:print(tostring(inValue))
 end
 
 spells.teleport = function()
@@ -147,21 +147,21 @@ spells.teleport = function()
 	}
 
 	if (not btapi.inDungeon()) then
-		text_cdprint(false, true, " but it fizzles!\n\n")
-		text_clear()
+		text:cdprint(false, true, " but it fizzles!\n\n")
+		text:clear()
 		return
 	end
 
 	repeat
-		text_cdprint(true, false, "\n\n  North\n  East\n  Up\n")
-		text_setCursor(0, cursorPosition)
-		text_print("*")
-		text_setCursor(0, 11)
-		text_print("Done         Cancel")
-		text_setCursor(18 * 12, 2)
-		text_print("+")
-		text_setCursor(18 * 12, 4)
-		text_print("-")
+		text:cdprint(true, false, "\n\n  North\n  East\n  Up\n")
+		text:setCursor(0, cursorPosition)
+		text:print("*")
+		text:setCursor(0, 11)
+		text:print("Done         Cancel")
+		text:setCursor(18 * 12, 2)
+		text:print("+")
+		text:setCursor(18 * 12, 4)
+		text:print("-")
 		teleportHelper(deltas[2], 2)
 		teleportHelper(deltas[3], 3)
 		teleportHelper(deltas[4], 4)
@@ -195,7 +195,7 @@ spells.teleport = function()
 				cursorPosition = 4
 			end
 		elseif (inkey == "D") then
-			text_clear()
+			text:clear()
 			if (deltas[4] == 0) then
 				-- Inter level teleport
 				local x
@@ -248,7 +248,7 @@ spells.teleport = function()
 		end
 	until (inkey == "C")
 
-	text_clear()
+	text:clear()
 
 end
 
@@ -265,7 +265,7 @@ function spells.summon(inAction)
 		party:doSummon(inData.sumOne, inData.illusionFlag)
 	end	
 
-	printEllipsis()
+	text:printEllipsis()
 end
 
 local function __doHeal(inAction, inTarget)
@@ -333,7 +333,7 @@ function spells.heal(inAction)
 		__doHeal(inAction, inAction.target)
 	end
 
-	printEllipsis()
+	text:printEllipsis()
 
 end
 

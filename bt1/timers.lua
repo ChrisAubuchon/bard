@@ -1,22 +1,16 @@
-timer = {}
-
-function timer.new(inFunction, interval)
-	sdl.AddTimer(inFunction, interval)
-end
-
-function timer.bt1_16()
+local function bt1_16()
 	if (globals.doTimeEvents) then
 		local xxx_bt1_16 = true
 	end
 end
 
-function timer.bt1_256()
+local function bt1_256()
 	if ((not globals.isPaused) and (globals.doTimeEvents)) then
 		local xxx_bt1_256 = true
 	end
 end
 
-function timer.bt1_512()
+local function bt1_512()
 	if (not globals.isPaused) then
 		if ((party.songPlaying) and (party.songTime > 0)) then
 			party.songTime = party.songTime - 1
@@ -58,7 +52,7 @@ function timer.bt1_512()
 	end
 end
 
-function timer.bt1_2048()
+local function bt1_2048()
 	if (not globals.isPaused) then
 		if (globals.gameHour == 23) then
 			globals.gameHour = 0
@@ -93,10 +87,10 @@ function timer.bt1_2048()
 end
 
 local function __init()
-	timer.new(timer.bt1_16,	880)
-	timer.new(timer.bt1_256, 14080)
-	timer.new(timer.bt1_512, 28160)
-	timer.new(timer.bt1_2048, 112640)
+	timer:new(bt1_16,	880)
+	timer:new(bt1_256,	14080)
+	timer:new(bt1_512,	28160)
+	timer:new(bt1_2048,	112640)
 end
 
 __init()

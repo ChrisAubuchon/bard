@@ -64,23 +64,11 @@ function character:getStatusLine()
 	local outString
 	local outHpString
 
-	ac = self.ac
-	if (party.shield.active) then
-		ac = ac - party.shield.bonus
-	end
-
-	if (party.songAcBonus) then
-		ac = ac - party.songAcBonus
-	end
-
-	if (party.spellAcBonus) then
-		ac = ac - party.spellAcBonus
-	end
-
-	if (ac >= -9) then
-		ac = string.format("%2d", ac)
-	else
+	self:calcAC()
+	if (self.ac == -10) then
 		ac = "L0"
+	else
+		ac = string.format("%2d", self.ac)
 	end
 		
 	if (self.isDead) then
@@ -197,11 +185,21 @@ function character:calcAC()
 		end
 	end
 
-	-- XXX - Magic bonuses
+	if (party.shield.active) then
+		self.ac = self.ac - party.shield.bonus
+	end
 
-	-- The party display is always updated after calculating
-	-- the AC
-	party:display()
+	if (party.song.acBonus) then
+		self.ac = self.ac - party.song.acBonus
+	end
+
+	if (party.battle.acBonus) then
+		self.ac = self.ac - party.battle.acBonus
+	end
+
+	if (self.ac < -10) then
+		self.ac = -10
+	end
 end
 
 function character:isCharacter()
@@ -342,7 +340,7 @@ function character.createCharacter()
 	newchar.max_hp = rnd_xdy_z(2, 16, 1) + 14
 	newchar.cur_hp = newchar.max_hp
 
-	text_clear()
+	text:clear()
 	character.printAttributes(newchar)
 
 	newchar.class = classes.selectClass(newchar.race)
@@ -422,9 +420,9 @@ end
 -- Print a character's attributes
 ----------------------------------------
 function character:printAttributes()
-	text_print("St: %2d  IQ: %2d", self.st, self.iq)
-	text_print("\nDx: %2d  Cn: %2d", self.dx, self.cn)
-	text_print("\nLk: %2d  HP: %d", self.lk, self.max_hp)
+	text:print("St: %2d  IQ: %2d", self.st, self.iq)
+	text:print("\nDx: %2d  Cn: %2d", self.dx, self.cn)
+	text:print("\nLk: %2d  HP: %d", self.lk, self.max_hp)
 end
 
 ----------------------------------------
@@ -440,19 +438,19 @@ function character:printCharacter()
 	bigpic.setTitle(self.class)
 
 	repeat
-		text_clear()
-		text_print(self.name)
-		text_print("\nRace:  " .. self.race)
-		text_print("\nClass: " .. self.class)
-		text_print("\n")
+		text:clear()
+		text:print(self.name)
+		text:print("\nRace:  " .. self.race)
+		text:print("\nClass: " .. self.class)
+		text:print("\n")
 		self:printAttributes()
-		text_print("\nLvl:%2d", self.cur_level)
-		text_print(" SpPt:%3d", self.max_sppt)
-		text_print("\nExper:%9d\n", self.xp)
+		text:print("\nLvl:%2d", self.cur_level)
+		text:print(" SpPt:%3d", self.max_sppt)
+		text:print("\nExper:%9d\n", self.xp)
 
-		text_print("Gold:%10d", self.gold)
-		text_print("\n   (POOL GOLD)\n   (TRADE GOLD)")
-		printContinue()
+		text:print("Gold:%10d", self.gold)
+		text:print("\n   (POOL GOLD)\n   (TRADE GOLD)")
+		text:printContinue()
 
 		inkey = getkey()
 	
@@ -468,16 +466,16 @@ function character:printCharacter()
 		local i
 		local slot
 
-		text_clear()
-		text_print(self.name)
+		text:clear()
+		text:print(self.name)
 
 		self.inventory:printScreen(self)
 
-		text_print("\nConj:" .. self.spellLevel.Conjurer)
-		text_print(" Sorc:" .. self.spellLevel.Sorcerer)
-		text_print("\nMagi:" .. self.spellLevel.Magician)
-		text_print(" Wizd:" .. self.spellLevel.Wizard)
-		text_print("\n     (DONE)")
+		text:print("\nConj:" .. self.spellLevel.Conjurer)
+		text:print(" Sorc:" .. self.spellLevel.Sorcerer)
+		text:print("\nMagi:" .. self.spellLevel.Magician)
+		text:print(" Wizd:" .. self.spellLevel.Wizard)
+		text:print("\n     (DONE)")
 
 		inkey = getkey()
 		if ((inkey < "1") or (inkey > "8")) then
@@ -486,25 +484,25 @@ function character:printCharacter()
 	
 		slot = tonumber(inkey)
 		if (self.inventory[slot]) then
-			text_clear()
-			text_print(self.name)
+			text:clear()
+			text:print(self.name)
 
-			text_print(" do you wish to:")
-			text_setCursor(0, 3)
-			text_print("\nTrade the item")
-			text_print("\nDrop the item")
+			text:print(" do you wish to:")
+			text:setCursor(0, 3)
+			text:print("\nTrade the item")
+			text:print("\nDrop the item")
 
 			inv = self.inventory[slot]
 			if (inv:canEquip(self.class)) then
 				if (inv.isEquipped) then
-					text_print("\nUne")
+					text:print("\nUne")
 				else
-					text_print("\nE")
+					text:print("\nE")
 				end
-				text_print("quip the item")
+				text:print("quip the item")
 			end
 
-			printCancel()
+			text:printCancel()
 
 			local continue = true
 			repeat
@@ -545,25 +543,25 @@ function character:tradeGold()
 	local amount
 	local toc
 
-	text_clear()
-	text_print("Trade gold to who?")
+	text:clear()
+	text:print("Trade gold to who?")
 
 	toc = party:readSlot()
 	if (not toc) then
 		return
 	end
 
-	text_clear()
-	text_print("How much will you give to him?\n")
+	text:clear()
+	text:print("How much will you give to him?\n")
 
-	amount = text_readNumber()
+	amount = text:readNumber()
 	if (amount == false) then
 		return
 	end
 
 	if (amount > self.gold) then
-		text_print("\nNot enough gold.   ")
-		text_delay(6)
+		text:print("\nNot enough gold.   ")
+		timer:delay(6)
 		return
 	end
 
@@ -582,9 +580,9 @@ function character:tradeItem(slot)
 	local toc
 
 	item = self.inventory[slot]
-	text_clear()
-	text_print("\nWho does " .. self.name .. " want to give the ")
-	text_print(item.name .. " to?")
+	text:clear()
+	text:print("\nWho does " .. self.name .. " want to give the ")
+	text:print(item.name .. " to?")
 
 	toc = party:readSlot()
 	if (not toc) then
@@ -597,9 +595,9 @@ function character:tradeItem(slot)
 	end
 
 	if (not toc.inventory:addItem(item.name, item.isIdentified)) then
-		text_clear()
-		text_print(toc.name .. " has no room for that item!")
-		text_delay(6)
+		text:clear()
+		text:print(toc.name .. " has no room for that item!")
+		timer:delay(6)
 
 		return
 	end
@@ -617,17 +615,17 @@ function character.getCharacterName()
 	local name
 
 	while true do
-		text_clear()
+		text:clear()
 
-		text_print("Enter the new member's name.\n\n")
+		text:print("Enter the new member's name.\n\n")
 
-		name = text_readString()
+		name = text:readString()
 
 		if (name:len() == 0) then
 			return false
 		end
 		if (roster.nameExists(name)) then
-			splashMessage("\n\nThere is a already a person by that name.\n")
+			text:splashMessage("\n\nThere is a already a person by that name.\n")
 		else
 			return name
 		end
@@ -658,7 +656,7 @@ function character:equipItem(slot)
 	self.inventory:equipItem(slot)
 
 	-- Update the character's AC
-	self:calcAC()
+	party:display()
 end
 
 ----------------------------------------
@@ -674,7 +672,7 @@ function character:unequipItem(slot)
 	-- It looks like it stops the song regardless of what item is
 	-- unequipped.
 
-	self:calcAC()
+	party:display()
 end
 
 ----------------------------------------
@@ -700,7 +698,7 @@ function character:readInventorySlot()
 	local slot
 
 	self.inventory:printScreen(self)
-	printCancel()
+	text:printCancel()
 
 	while true do
 		slot = getkey()
@@ -728,16 +726,16 @@ function character:getUseItem(inAction)
 		return false
 	end
 
-	text_cdprint(true, false, "Use item #(1-8)\n")
+	text:cdprint(true, false, "Use item #(1-8)\n")
 	item = self:readInventorySlot()
 	if (not item) then
-		text_clear()
+		text:clear()
 		return false
 	end
 
 	local function cantUse()
-		text_cdprint(true, true, "\nYou can't use that.")
-		text_clear()
+		text:cdprint(true, true, "\nYou can't use that.")
+		text:clear()
 	end
 
 	if ((not item.isEquipped) or (not item.usable)) then
@@ -750,11 +748,11 @@ function character:getUseItem(inAction)
 	inAction.func = item.action.func
 
 	if (item.targetted) then
-		text_cdprint(true, false, "Use on:")
+		text:cdprint(true, false, "Use on:")
 
 		inAction.target = getActionTarget(item.targetted, false)
 		if (not inAction.target) then
-			text_clear()
+			text:clear()
 			return false
 		end
 	end
@@ -771,7 +769,7 @@ end
 function character:useItem(inAction)
 	self:consumeItem(inAction)
 
-	text_cdprint(true, false, "%s%s", self.name,
+	text:cdprint(true, false, "%s%s", self.name,
 				inAction.inData.item.useString)
 
 	if (inAction.func) then
@@ -831,16 +829,16 @@ function character:getSpell(mouseFlag)
 		return
 	end
 
-	text_cdprint(true, false, "\nSpell to cast:\n")
-	spellAbbr = text_readString(4)
+	text:cdprint(true, false, "\nSpell to cast:\n")
+	spellAbbr = text:readString(4)
 	s = spells.getSpellByAbbreviation(spellAbbr)
 	if (not s) then
-		text_cdprint(false, true, "\nNo spell by that name.")
+		text:cdprint(false, true, "\nNo spell by that name.")
 		return false
 	end
 
 	if (s.level > self.spellLevel[s.class]) then
-		text_cdprint(false, true, "\nYou don't knw this spell")
+		text:cdprint(false, true, "\nYou don't knw this spell")
 		return false
 	end
 
@@ -858,7 +856,7 @@ function character:castSpell(inAction)
 
 	dprint("castSpell() called")
 
-	text_print(" casts a spell")
+	text:print(" casts a spell")
 
 	fizzle = self:consumeSpellPoints(inAction)
 
@@ -868,7 +866,7 @@ function character:castSpell(inAction)
 
 	if (fizzle) then
 		party:display()
-		text_print(false, true, " but it fizzles!\n")
+		text:print(false, true, " but it fizzles!\n")
 		return
 	end
 
@@ -884,9 +882,9 @@ function character:getTune()
 	local i
 	local inkey
 
-	text_cdprint(true, false, "Play tune #\n\n")
+	text:cdprint(true, false, "Play tune #\n\n")
 	for i = 1,#songs do
-		text_print("%d)%s\n", i, songs[i].name)
+		text:print("%d)%s\n", i, songs[i].name)
 	end
 
 	inkey = getkey()
@@ -908,7 +906,7 @@ end
 function character:doVoiceCheck()
 	if (not self:isEffectEquipped("hasFreeSinging")) then
 		if (self.songs == 0) then
-			text_cdprint(false, true, " lost his voice!\n\n")
+			text:cdprint(false, true, " lost his voice!\n\n")
 			return false
 		end
 

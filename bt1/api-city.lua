@@ -15,9 +15,9 @@ function btapi.city.emptyBuilding()
 	bigpic.setTitle("Empty Building")
 	bigpic.drawBigpic("PIC_EMPTYBLDG")
 
-	text_clear()
-	text_print("You're in an empty building.")
-	printExit()
+	text:clear()
+	text:print("You're in an empty building.")
+	text:printExit()
 	getkey()
 	currentLevel.turnParty("back")
 end
@@ -26,10 +26,10 @@ function btapi.city.enterStables()
 	bigpic.setTitle("Empty Building")
 	bigpic.drawBigpic("PIC_EMPTYBLDG")
 
-	text_clear()
-	text_print("\nSorry, friends, all the horses have ")
-	text_print("been eaten by creatures!")
-	printExit()
+	text:clear()
+	text:print("\nSorry, friends, all the horses have ")
+	text:print("been eaten by creatures!")
+	text:printExit()
 	getkey()
 
 	currentLevel.turnParty("back")
@@ -39,10 +39,10 @@ function btapi.city.cityGates()
 	bigpic.setTitle("City Gate")
 	bigpic.drawBigpicTimeAware("PIC_CITYGATE")
 
-	text_clear()
-	text_print("You stand before the city gates, ")
-	text_print("which are blocked by a gigantic snow drift.")
-	printContinue()
+	text:clear()
+	text:print("You stand before the city gates, ")
+	text:print("which are blocked by a gigantic snow drift.")
+	text:printContinue()
 	getkey()
 
 	currentLevel.turnParty("back")
@@ -50,17 +50,17 @@ end
 
 function btapi.city.enterGarths()
 	if (globals.isNight) then
-		text_clear()
-		text_print("\nThe shoppe is closed at night.")
-		printContinue()
+		text:clear()
+		text:print("\nThe shoppe is closed at night.")
+		text:printContinue()
 		getkey()
-		text_clear()
+		text:clear()
 		currentLevel.turnParty("back")
 		return
 	end
 
 	garths.enter()
-	text_clear()
+	text:clear()
 	currentLevel.turnParty("back")
 end
 
@@ -72,7 +72,7 @@ end
 
 function btapi.city.enterTavern(tavernName)
 	tavern.enter(tavernName)
-	text_clear()
+	text:clear()
 	currentLevel.turnParty("back")
 end
 
@@ -88,8 +88,8 @@ end
 
 function btapi.city.enterReview()
 	if (globals.isNight) then
-		text_cdprint(true, false, "The review Board is closed for the evening.")
-		text_cdprint(false, true, " The guild leaders will meet with you in the morning.\n\n")
+		text:cdprint(true, false, "The review Board is closed for the evening.")
+		text:cdprint(false, true, " The guild leaders will meet with you in the morning.\n\n")
 		currentLevel.turnParty("back")
 		return
 	end

@@ -3,8 +3,8 @@ local funcs = {}
 
 function funcs.nightCheck()
 	if (globals.isNight) then
-		text_cdprint(true, false, "The review Board is closed for the evening.")
-		text_cdprint(false, true, " The guild leaders will meet with you in the morning.\n\n")
+		text:cdprint(true, false, "The review Board is closed for the evening.")
+		text:cdprint(false, true, " The guild leaders will meet with you in the morning.\n\n")
 		return true
 	end
 
@@ -29,12 +29,12 @@ function funcs.advanceRandomStat(char)
 	if (#canAdvance > 0) then
 		rndStat = (rnd() % #canAdvance) + 1
 		char[canAdvance[rndStat]] = char[canAdvance[rndStat]] + 1
-		text_print("\n+1 to ")
-		if (canAdvance[rndStat] == "st") then text_print("strength.") end
-		if (canAdvance[rndStat] == "iq") then text_print("I.Q..") end
-		if (canAdvance[rndStat] == "dx") then text_print("dexterity.") end
-		if (canAdvance[rndStat] == "cn") then text_print("constitution.") end
-		if (canAdvance[rndStat] == "lk") then text_print("luck.") end
+		text:print("\n+1 to ")
+		if (canAdvance[rndStat] == "st") then text:print("strength.") end
+		if (canAdvance[rndStat] == "iq") then text:print("I.Q..") end
+		if (canAdvance[rndStat] == "dx") then text:print("dexterity.") end
+		if (canAdvance[rndStat] == "cn") then text:print("constitution.") end
+		if (canAdvance[rndStat] == "lk") then text:print("luck.") end
 	end
 end
 
@@ -42,21 +42,21 @@ function funcs.doAdvancement()
 	local char
 	local xpRequired
 
-	text_cdprint(true, false, "The Guild leaders prepare to weigh thy merits.\n\n")
-	text_print("Who shall be reviewed?")
+	text:cdprint(true, false, "The Guild leaders prepare to weigh thy merits.\n\n")
+	text:print("Who shall be reviewed?")
 
 	char = party:readSlot()
 	if (not char) then
 		return
 	end
-	text_cdprint(true, false, "The guild leaders deem that " .. char.name)
+	text:cdprint(true, false, "The guild leaders deem that " .. char.name)
 	xpRequired = classes.getXpForLevel(char.class, char.cur_level + 1)
 	if (char.xp < xpRequired) then
-		text_cdprint(false, true, " still needeth %d experience points prior to advancement...\n", xpRequired - char.xp)
+		text:cdprint(false, true, " still needeth %d experience points prior to advancement...\n", xpRequired - char.xp)
 		return
 	end
 
-	text_print(" hath earned a level of advancement...")
+	text:print(" hath earned a level of advancement...")
 	char.cur_level = char.cur_level + 1
 	char.max_level = char.cur_level
 
@@ -101,7 +101,7 @@ function funcs.doAdvancement()
 	end
 	funcs.advanceRandomStat(char)
 	party:display()
-	printContinue()
+	text:printContinue()
 	getkey()
 end
 
@@ -111,53 +111,53 @@ function funcs.doClassChange()
 	local numAvailable = 0
 	local inkey
 
-	text_cdprint(true, false, "Which mage seeks to change his class?")
+	text:cdprint(true, false, "Which mage seeks to change his class?")
 	char = party:readSlot()
 	if (not char) then
 		return
 	end
 	if (not char.getSpellLevel()) then
-		text_cdprint(true, true, "\n\nThou are not a spell caster!\n")
+		text:cdprint(true, true, "\n\nThou are not a spell caster!\n")
 		return
 	end
 
 	if (char.getSpellLevel() < 3) then
-		text_cdprint(false, true, "\nThou must know at least 3 spell levels in your present art first.")
+		text:cdprint(false, true, "\nThou must know at least 3 spell levels in your present art first.")
 		return
 	end
 
-	text_cdprint(true, false, char.name .. "\n\n")
+	text:cdprint(true, false, char.name .. "\n\n")
 	if (char.conj_level == 0) then 
-		text_print("\nConjurer")
+		text:print("\nConjurer")
 		options["C"] = true
 		numAvailable = numAvailable + 1
 	end
 	if (char.magi_level == 0) then 
-		text_print("\nMagician")
+		text:print("\nMagician")
 		options["M"] = true
 		numAvailable = numAvailable + 1
 	end
 	if (char.sorc_level == 0) then 
-		text_print("\nSorcerer")
+		text:print("\nSorcerer")
 		options["S"] = true
 		numAvailable = numAvailable + 1
 	end
 	if (char.wiza_level == 0) then 
 		-- Must have two classes to level 3 to be a wizard
 		if (numAvailable < 2) then
-			text_print("\nWizard")
+			text:print("\nWizard")
 			options["W"] = true
 			numAvailable = numAvailable + 1
 		end
 	end
 
 	if (numAvailable == 0) then
-		text_cdprint(false, true, "\n\nThou cannot change to an old class!\n")
+		text:cdprint(false, true, "\n\nThou cannot change to an old class!\n")
 		return
 	end
 
 	repeat
-		printExit()
+		text:printExit()
 		inkey = getkey()
 		if (options[inkey] ~= nil) then
 			if (inkey == "C") then
@@ -179,7 +179,7 @@ function funcs.doClassChange()
 			char.max_level = 1
 			char.xp = 0
 			party:display()
-			text_cdprint(true, true, "\n\nDone!")
+			text:cdprint(true, true, "\n\nDone!")
 			return
 		end
 	until (inkey == "E")
@@ -199,39 +199,39 @@ function funcs.doSpellAcquire()
 	local spellLevel
 	local cost
 
-	text_cdprint(true, false, "Who seeks knowledge of the mystic arts?\n\n")
+	text:cdprint(true, false, "Who seeks knowledge of the mystic arts?\n\n")
 	char = party:readSlot()
 	if (not char) then
 		return
 	end
 	spellLevel = char:getSpellLevel()
-	text_clear()
+	text:clear()
 	if (not spellLevel) then
-		text_cdprint(false, true, "\n\nThou art not a spell caster!\n")
+		text:cdprint(false, true, "\n\nThou art not a spell caster!\n")
 		return
 	end
 
 	if (spellLevel == 7) then
-		text_cdprint(false, true, "\n\nThou art at the highest level of spell ability!")
+		text:cdprint(false, true, "\n\nThou art at the highest level of spell ability!")
 		return
 	end
 
 	if (math.floor((char.cur_level + 1) / 2) <= spellLevel) then
-		text_cdprint(false, true, "\n\nThou cannot acquire new spells yet.")
+		text:cdprint(false, true, "\n\nThou cannot acquire new spells yet.")
 		return
 	end
 
 	cost = funcs.spellLevelCost[spellLevel]
-	text_print("%s %d will cost thee %d in gold. ", char.class, 
+	text:print("%s %d will cost thee %d in gold. ", char.class, 
 			spellLevel + 1, cost)
 
 	if (char.gold < cost) then
-		text_cdprint(false, true, "\n\nThe spell Sages refure to teach you until you can pay!")
+		text:cdprint(false, true, "\n\nThe spell Sages refure to teach you until you can pay!")
 		return
 	end
 
-	text_print("Will you pay?")
-	if (getYesNo()) then
+	text:print("Will you pay?")
+	if (text:getYesNo()) then
 		char.gold = char.gold - cost
 		if (char.class == "Conjurer") then
 			char.conj_level = char.conj_level + 1
@@ -245,7 +245,7 @@ function funcs.doSpellAcquire()
 		if (char.class == "Wizard") then
 			char.wiza_level = char.wiza_level + 1
 		end
-		text_cdprint(true, true, "\n\nThe Spell Sages have taught you the lore.\n")
+		text:cdprint(true, true, "\n\nThe Spell Sages have taught you the lore.\n")
 	end
 
 end
@@ -258,11 +258,11 @@ function funcs.selectOption()
 			return
 		end
 
-		text_cdprint(true, false, "Wouldst thou like to be reviewed for:\n\n")
-		text_print("Advancement\n")
-		text_print("Spell Acquiring\n")
-		text_print("Class Change\n")
-		printExit()
+		text:cdprint(true, false, "Wouldst thou like to be reviewed for:\n\n")
+		text:print("Advancement\n")
+		text:print("Spell Acquiring\n")
+		text:print("Class Change\n")
+		text:printExit()
 
 		inkey = getkey()
 		if ((inkey > "0") and (inkey < "7")) then

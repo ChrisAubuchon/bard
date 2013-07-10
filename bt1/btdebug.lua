@@ -24,29 +24,29 @@ function btdebug.enterDungeon()
 	local level
 
 	repeat
-		text_cdprint(true, false, "1. Sewers\n")
-		text_print("2. Catacombs\n")
-		text_print("3. Castle\n")
-		text_print("4. Tower\n")
-		text_print("5. Mangar\n")
+		text:cdprint(true, false, "1. Sewers\n")
+		text:print("2. Catacombs\n")
+		text:print("3. Castle\n")
+		text:print("4. Tower\n")
+		text:print("5. Mangar\n")
 		inkey = getkey()
 
 		if (inkey == "1") then
-			text_cdprint(true, false, "Enter level [1-4]:\n")
+			text:cdprint(true, false, "Enter level [1-4]:\n")
 			level = getkey()
 			if ((level > "0") and (level < "5")) then
 				btapi.city.enterDungeon("cellars", tonumber(level))
 				return true
 			end 
 		elseif (inkey == "2") then
-			text_cdprint(true, false, "Enter level [1-3]:\n")
+			text:cdprint(true, false, "Enter level [1-3]:\n")
 			level = getkey()
 			if ((level > "0") and (level < "4")) then
 				btapi.city.enterDungeon("catacombs", tonumber(level))
 				return true
 			end 
 		elseif (inkey == "3") then
-			text_cdprint(true, false, "Enter level [1-3]:\n")
+			text:cdprint(true, false, "Enter level [1-3]:\n")
 			level = getkey()
 			if ((level > "0") and (level < "4")) then
 				btapi.city.enterDungeon("castle", tonumber(level))
@@ -56,7 +56,7 @@ function btdebug.enterDungeon()
 			btapi.city.enterDungeon("kylr", 1)
 			return true
 		elseif (inkey == "5") then
-			text_cdprint(true, false, "Enter level [1-5]:\n")
+			text:cdprint(true, false, "Enter level [1-5]:\n")
 			level = getkey()
 			if ((level > "0") and (level < "6")) then
 				btapi.city.enterDungeon("mangar", tonumber(level))
@@ -72,11 +72,11 @@ function btdebug.cityDebug()
 	local inkey
 
 	repeat
-		text_cdprint(true, false, "1. Toggle night\n")
-		text_print("2. Enter dungeon\n")
-		text_print("3. Random battle\n")
-		text_print("4. Enter building\n")
-		printExit()
+		text:cdprint(true, false, "1. Toggle night\n")
+		text:print("2. Enter dungeon\n")
+		text:print("3. Random battle\n")
+		text:print("4. Enter building\n")
+		text:printExit()
 		inkey = getkey()
 
 		if (inkey == "1") then
@@ -100,16 +100,16 @@ function btdebug.cityDebug()
 
 	until (inkey == "E")
 
-	text_clear()
+	text:clear()
 end
 
 function btdebug.enterBuilding()
 	local inkey
 
 	repeat
-		text_cdprint(true, false, "1. Garth's\n")
-		text_print("2. Roscoe's\n")
-		printExit()
+		text:cdprint(true, false, "1. Garth's\n")
+		text:print("2. Roscoe's\n")
+		text:printExit()
 		inkey = getkey()
 
 		if (inkey == "1") then
@@ -138,11 +138,11 @@ function btdebug.dunSqFlags()
 	local inkey
 
 	repeat
-		text_cdprint(true, false, "1. isDarkness\n")
-		text_print("2. isSpinner\n")
-		text_print("3. isTrap\n")
-		text_print("4. isStuck\n")
-		printExit()
+		text:cdprint(true, false, "1. isDarkness\n")
+		text:print("2. isSpinner\n")
+		text:print("3. isTrap\n")
+		text:print("4. isStuck\n")
+		text:printExit()
 
 		inkey = getkey()
 
@@ -162,10 +162,10 @@ function btdebug.dunDebug()
 	local inkey
 
 	repeat
-		text_cdprint(true, false, "1. Square Flags\n")
-		text_print("2. Move to square\n")
-		text_print("3. Random Encounter\n")
-		printExit()
+		text:cdprint(true, false, "1. Square Flags\n")
+		text:print("2. Move to square\n")
+		text:print("3. Random Encounter\n")
+		text:printExit()
 		inkey = getkey()
 
 		if (inkey == "1") then
@@ -178,7 +178,7 @@ function btdebug.dunDebug()
 		end
 	until (inkey == "E")
 
-	text_clear()
+	text:clear()
 end
 
 function btdebug.moveToSquare()
@@ -190,21 +190,21 @@ function btdebug.moveToSquare()
 	local cursor = 2
 
 	repeat
-		text_cdprint(true, false, "\n\n  North\n  East\n")
-		text_setCursor(0, cursor)
-		text_print("*")
-		text_setCursor(0, 11)
-		text_print("Done       Cancel")
-		text_setCursor(18 * 12, 2)
-		text_print("+")
-		text_setCursor(18 * 12, 4)
-		text_print("-")
-		text_setCursor(108, 2)
-		text_print("     ")
-		text_print(tostring(newCoords[2]))
-		text_setCursor(108, 3)
-		text_print("     ")
-		text_print(tostring(newCoords[3]))
+		text:cdprint(true, false, "\n\n  North\n  East\n")
+		text:setCursor(0, cursor)
+		text:print("*")
+		text:setCursor(0, 11)
+		text:print("Done       Cancel")
+		text:setCursor(18 * 12, 2)
+		text:print("+")
+		text:setCursor(18 * 12, 4)
+		text:print("-")
+		text:setCursor(108, 2)
+		text:print("     ")
+		text:print(tostring(newCoords[2]))
+		text:setCursor(108, 3)
+		text:print("     ")
+		text:print(tostring(newCoords[3]))
 
 		inkey = getkey()
 		if ((inkey == "-") or (inkey == btkeys.BTKEY_LEFT)) then
@@ -240,5 +240,5 @@ function btdebug.moveToSquare()
 		end
 	until (inkey == "C")
 
-	text_clear()
+	text:clear()
 end

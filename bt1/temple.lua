@@ -10,8 +10,8 @@ function funcs.selectCharacter()
 	local inkey
 
 	repeat
-		text_cdprint(true,false, "Welcome, oh weary ones, to our humble temple. Who needeth healing?")
-		printExit()
+		text:cdprint(true,false, "Welcome, oh weary ones, to our humble temple. Who needeth healing?")
+		text:printExit()
 		inkey = getkey()
 		if ((inkey > "0") and (inkey < "7")) then
 			inkey = tonumber(inkey)
@@ -23,9 +23,9 @@ function funcs.selectCharacter()
 end
 
 function funcs.notEnoughGold()
-	text_clearline(11)
-	text_setCursor(0, 11)
-	text_cdprint(false, true, "Not enough gold.")
+	text:clearline(11)
+	text:setCursor(0, 11)
+	text:cdprint(false, true, "Not enough gold.")
 end
 
 function funcs.healAffliction(char)
@@ -34,7 +34,7 @@ function funcs.healAffliction(char)
 	local payerNumber
 	local payer
 
-	text_print(" is in bad shape, indeed. It will cost ")
+	text:print(" is in bad shape, indeed. It will cost ")
 	if (char.isDead) then
 		multiplier = 900
 	elseif (char.isOld) then
@@ -96,7 +96,7 @@ function funcs.restoreLife(char)
 		return false
 	end
 
-	text_print(" has been drained of life force. It will cost ")
+	text:print(" has been drained of life force. It will cost ")
 	if (char.cur_level < 13) then
 		cost = 900 * char.cur_level
 	else
@@ -118,7 +118,7 @@ function funcs.healHp(char)
 	local cost
 
 	cost = 10 * (char.max_hp - char.cur_hp)
-	text_print(" has wounds which need tending. It will cost ")
+	text:print(" has wounds which need tending. It will cost ")
 
 	if (not funcs.getPayer(cost)) then
 		return false
@@ -139,7 +139,7 @@ end
 function funcs.getPayer(cost)
 	local payer
 
-	text_print("%d in gold. Who will pay?", cost)
+	text:print("%d in gold. Who will pay?", cost)
 	payer = party:readSlot()
 	if (not payer) then
 		return false
@@ -157,8 +157,8 @@ function funcs.doHealing(characterNumber)
 	local char
 
 	char = party[characterNumber]
-	text_clear()
-	text_print(char.name)
+	text:clear()
+	text:print(char.name)
 	if (char:isAfflicted()) then
 		if (not funcs.healAffliction(char)) then
 			return
@@ -172,12 +172,12 @@ function funcs.doHealing(characterNumber)
 			return
 		end
 	else
-		text_cdprint(false, true, " does not require any healing.")
+		text:cdprint(false, true, " does not require any healing.")
 		return
 	end
 
-	text_cdprint(true, true, "\n\nThe priests lay hands on him...\n\n")
-	text_cdprint(false, true, "...and he is healed!")
+	text:cdprint(true, true, "\n\nThe priests lay hands on him...\n\n")
+	text:cdprint(false, true, "...and he is healed!")
 	party:display()
 end
 

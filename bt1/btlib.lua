@@ -31,7 +31,7 @@ function keyboardCommand(inkey)
 		if (party:isOccupied(inkey)) then
 			party[inkey]:printCharacter()
 			currentLevel.resetBigpic()
-			text_clear()
+			text:clear()
 		end
 	elseif (inkey == "B") then
 		noncombat.singSong()
@@ -49,15 +49,15 @@ function keyboardCommand(inkey)
 	elseif (inkey == "T") then
 		globals.isPaused = true
 
-		text_cdprint(true, false, "\n\nPausing ! !")
-		printContinue()
+		text:cdprint(true, false, "\n\nPausing ! !")
+		text:printContinue()
 		getkey()
 
-		text_clear()
+		text:clear()
 		globals.isPaused = false
 		return true
 	elseif (inkey == "U") then
-		text_clear()
+		text:clear()
 		noncombat.useItem()
 		return true
 	elseif (inkey == btkeys.BTKEY_LEFT) then
@@ -87,12 +87,12 @@ function getActionTarget(inTargetOptions, inTargets)
 			optionKeys[tostring(i)] = true
 		end
 
-		text_print("\nMember #[1-%d", party.size)
+		text:print("\nMember #[1-%d", party.size)
 		if ((inTargetOptions.summon) and party.summon) then
 			optionKeys["S"] = true
-			text_print("S]")
+			text:print("S]")
 		else
-			text_print("]")
+			text:print("]")
 		end
 	end
 
@@ -105,14 +105,14 @@ function getActionTarget(inTargetOptions, inTargets)
 			return inTargets:getLeadGroup()
 		end
 		
-		text_print("\n")
+		text:print("\n")
 		for i,mgroup in inTargets:ipairs() do
 			if ((i > 2) and (inTargetOptions.melee)) then
 				break
 			end
 
 			optionKeys[string.char((i-1) + string.byte("A"))] = true
-			text_print("[%s] %d %s\n", 
+			text:print("[%s] %d %s\n", 
 				string.char((i - 1) + string.byte("a")), 
 				mgroup.size,
 				monster.pluralizeName(mgroup.name)

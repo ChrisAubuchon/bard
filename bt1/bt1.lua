@@ -34,27 +34,22 @@ setmetatable(_G, {
 
 require "declares"
 require "sdl_video"
+require "sdl_timer"
+require "sdl_text"
 require "globals"
 require "btdebug"
 
-video_init()
-
-local w_title = sdl.img.LoadPNG("images/title.png")
-m_window:Blit(nil, w_title, nil)
-m_window:Flip()
+m_window:Draw(nil, gfxImage:new("images/title.png", "png"), nil)
+m_window:Update()
 
 require "bttable"
 require "entity"
-require "btlib"
 require "btapi"
 require "btdebug"
 require "dataio"
 require "battle"
 require "action"
-require "btio"
 require "random"
-require "text"
-require "bt_text"
 require "spells"
 require "durationSpell"
 require "icons"
@@ -76,7 +71,7 @@ require "roster"
 require "party"
 require "items"
 require "inventory"
-require "timer"
+require "timers"
 require "songs"
 require "monster"
 require "summon"
@@ -88,9 +83,7 @@ require "api-city"
 
 getkey()
 
-w_title = sdl.img.LoadPNG("images/screen.png")
-m_window:Blit(nil, w_title, nil)
-m_window:Flip()
+m_window:Draw(nil, gfxImage:new("images/screen.png", "png"), nil)
 
 repeat
 	if (globals.gameState == globals.STATE_GUILD) then

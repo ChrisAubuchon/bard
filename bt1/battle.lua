@@ -233,14 +233,14 @@ function battleData:start()
 
 		if (self.isPartyAttack) then
 			if (not party:isHostile()) then
-				text_cdprint(true, false, 
+				text:cdprint(true, false, 
 					"Do you wish to continue?")
 				if (not getYesNo()) then
 					break
 				end
 			end
 		elseif (self.monGroups.size >= 1) then
-			text_cdprint(true, false, "\nYou still face ")
+			text:cdprint(true, false, "\nYou still face ")
 			self:printMonsterGroups()
 
 			local xxx_monsters_advance = true
@@ -259,7 +259,7 @@ function battleData:start()
 end
 
 function battleData:stop()
-	text_clear()
+	text:clear()
 	party:display()
 end
 
@@ -286,12 +286,12 @@ local encounterStringList = {
 }
 
 function battleData:printEncounter()
-	text_clear()
+	text:clear()
 
 	if (self.isPartyAttack) then
-		text_print("\nThere is dissention in your ranks...\n\n")
+		text:print("\nThere is dissention in your ranks...\n\n")
 	else
-		text_print(encounterStringList[rnd_xdy(1,#encounterStringList)])
+		text:print(encounterStringList[rnd_xdy(1,#encounterStringList)])
 		self:printMonsterGroups()
 	end
 end
@@ -301,27 +301,27 @@ function battleData:printMonsterGroups()
 	local mgroup
 
 	if (self.isPartyAttack) then
-		text_print("\nhostile party members!\n\n")
+		text:print("\nhostile party members!\n\n")
 		return
 	end
 
 	for i,mgroup in self.monGroups:ipairs() do
 		if (i ~= 1) then
 			if ((i == 4) or (not self.monGroups:isGroup(i+1))) then
-				text_print(", and ")
+				text:print(", and ")
 			else
-				text_print(", ")
+				text:print(", ")
 			end
 		end
 
-		text_print("%d ", mgroup.size)
+		text:print("%d ", mgroup.size)
 		if (mgroup.size == 1) then
-			text_print(mgroup.singular)
+			text:print(mgroup.singular)
 		else
-			text_print(mgroup.plural)
+			text:print(mgroup.plural)
 		end
 	end
-	text_print(".\n\n")
+	text:print(".\n\n")
 end
 
 ----------------------------------------
@@ -334,7 +334,7 @@ function battleData:doRound()
 	local currentAction
 
 	currentAction = self.actionHead
-	text_setCursor(0, 11)
+	text:setCursor(0, 11)
 	while (currentAction) do
 		currentAction.inBattle = self
 		dprint(tostring(currentAction.source))
@@ -480,13 +480,13 @@ function battleData:getPlayerOptions()
 			self:addAction(c, self:getPlayerOption(i,c))
 		end
 
-		text_cdprint(true, false, "Use these attack commands?")
+		text:cdprint(true, false, "Use these attack commands?")
 		if (not getYesNo()) then
 			for c in party:iterator() do
 				self:removeAction(c)
 			end
 		else
-			text_clear()
+			text:clear()
 			done = true
 		end	
 	until (done)
@@ -498,7 +498,7 @@ function battleData:getRunFightOption()
 	local inkey
 
 	if (self.isPartyAttack) then
-		text_delay(3)
+		timer:delay(3)
 		return false
 	end
 
@@ -507,9 +507,9 @@ function battleData:getRunFightOption()
 		return false
 	end
 
-	text_print("Will your stalwart band choose to\n")
-	text_print("Fight or\n")
-	text_print("Run?")
+	text:print("Will your stalwart band choose to\n")
+	text:print("Fight or\n")
+	text:print("Run?")
 
 	repeat
 		inkey = getkey()
@@ -543,40 +543,40 @@ function battleData:getPlayerOption(partySlot, c)
 	end
 
 	while true do
-		text_clear()
-		text_print(c.name.." has these options this battle round:\n\n")
+		text:clear()
+		text:print(c.name.." has these options this battle round:\n\n")
 
-		text_print("Party attack\n")
+		text:print("Party attack\n")
 		options["P"] = true
 
 		if ((not self.isPartyAttack) and (partySlot < 4)) then
-			text_print("Attack foes\n")
+			text:print("Attack foes\n")
 			options["A"] = true
 		end
 
-		text_print("Defend\n")
+		text:print("Defend\n")
 		options["D"] = true
 
 		if (c.cur_sppt > 0) then
-			text_print("Cast a spell\n")
+			text:print("Cast a spell\n")
 			options["C"] = true
 		end
 
-		text_print("Use an item\n")
+		text:print("Use an item\n")
 		options["U"] = true
 
 		if (c.class == "Rogue") then
-			text_print("Hide in shadows\n")
+			text:print("Hide in shadows\n")
 			options["H"] = true
 		end
 
 		if ((c.class == "Bard") and 
 		    (c:isTypeEquipped("Instrument"))) then
-			text_print("Bard Song\n")
+			text:print("Bard Song\n")
 			options["B"] = true
 		end
 
-		text_print("\nSelect an option.")
+		text:print("\nSelect an option.")
 
 		while true do
 			inkey = getkey()
@@ -621,7 +621,7 @@ end
 
 function battleData:meleeTarget(inAction)
 	if (self.isPartyAttack) then
-		text_cdprint(true, false, "Attack:")
+		text:cdprint(true, false, "Attack:")
 		inAction.target = getActionTarget({party = true, summon = true},
 						self.monGroups)
 		if (not inAction.target) then
@@ -629,7 +629,7 @@ function battleData:meleeTarget(inAction)
 		end
 	else
 		if (self.monGroups.size > 1) then
-			text_cdprint(true, false, "Attack:")
+			text:cdprint(true, false, "Attack:")
 		end
 
 		inAction.target = getActionTarget({melee = true}, 
@@ -700,7 +700,7 @@ function battleData:doReward()
 	xp = xp / partySize
 	au = au / partySize
 
-	text_cdprint(true, false, "Each character receives %d experience points for valor and battle knowledge, and %d pieces of gold.\n\n", xp, au)
+	text:cdprint(true, false, "Each character receives %d experience points for valor and battle knowledge, and %d pieces of gold.\n\n", xp, au)
 
 	for i in party:liveCharacterIterator() do
 		i.xp = i.xp + xp
@@ -724,11 +724,11 @@ function battleData:doReward()
 		end
 
 		if (itemsToGive == 0) then
-			text_delay(8)
+			timer:delay(8)
 			return
 		end
 	else
-		text_delay(10)
+		timer:delay(10)
 	end
 end
 

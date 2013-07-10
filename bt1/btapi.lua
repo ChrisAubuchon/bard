@@ -64,14 +64,12 @@ end
 -- API functions
 ----------------------------------------
 
-btapi.clearText = text_clear
-
 function btapi.doStairs(direction)
-	text_print("\nThere are stairs here, going " .. direction ..". Do you wish to take them?")
+	text:print("\nThere are stairs here, going " .. direction ..". Do you wish to take them?")
 	if (getYesNo()) then
 		return true
 	else
-		text_clear()
+		text:clear()
 	end
 end
 

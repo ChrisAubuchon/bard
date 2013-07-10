@@ -1,4 +1,3 @@
-require "bt_text"
 require "btlib"
 
 local _race = {}
@@ -58,11 +57,11 @@ _race.init = function ()
 		local r
 		local inkey
 
-		text_clear()
-		text_print("Select a race for your new character:")
-		text_setCursor(0, 3)
+		text:clear()
+		text:print("Select a race for your new character:")
+		text:setCursor(0, 3)
 		for i,r in self.ipairs() do
-			text_print("\n%d) %s", i, r)
+			text:print("\n%d) %s", i, r)
 		end
 
 		printCancel()

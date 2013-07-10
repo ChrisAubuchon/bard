@@ -4,8 +4,10 @@ local function classSearch(inKey, inClassList)
 	local c
 
 	for _,c in ipairs(inClassList) do
-		if (type(c) ~= "table") then
-			error("Invalid class", 4)
+		if ((type(c) ~= "table") and
+		    (type(c) ~= "userdata")) then
+			dprint(type(c))
+			error("Invalid class", 3)
 		end
 		local v = c[inKey]
 		if (v ~= nil) then return v end

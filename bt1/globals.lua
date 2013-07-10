@@ -1,35 +1,39 @@
 require "dataio"
 
-local fonts = {}
 local colors = {}
 globals = {}
 
-colors[1] = video_color(0,0,0)
-colors[2] = video_color(0,0,170)
-colors[3] = video_color(0,170,0)
-colors[4] = video_color(0,170,170)
-colors[5] = video_color(170,0,0)
-colors[6] = video_color(170,0,170)
-colors[7] = video_color(170,85,0)
-colors[8] = video_color(170,170,170)
-colors[9] = video_color(85,85,85)
-colors[10] = video_color(85,85,255)
-colors[11] = video_color(85,255,85)
-colors[12] = video_color(85,255,255)
-colors[13] = video_color(255,85,85)
-colors[14] = video_color(255,85,255)
-colors[15] = video_color(255,255,85)
-colors[16] = video_color(255,255,255)
+colors[1] = gfxColor:new(0,0,0)
+colors[2] = gfxColor:new(0,0,170)
+colors[3] = gfxColor:new(0,170,0)
+colors[4] = gfxColor:new(0,170,170)
+colors[5] = gfxColor:new(170,0,0)
+colors[6] = gfxColor:new(170,0,170)
+colors[7] = gfxColor:new(170,85,0)
+colors[8] = gfxColor:new(170,170,170)
+colors[9] = gfxColor:new(85,85,85)
+colors[10] = gfxColor:new(85,85,255)
+colors[11] = gfxColor:new(85,255,85)
+colors[12] = gfxColor:new(85,255,255)
+colors[13] = gfxColor:new(255,85,85)
+colors[14] = gfxColor:new(255,85,255)
+colors[15] = gfxColor:new(255,255,85)
+colors[16] = gfxColor:new(255,255,255)
 
 globals.doTimeEvents	= false
 globals.gameHour	= 7
 globals.inDungeon	= false
 globals.isNight		= false
 globals.isPaused	= false
-globals.fonts		= fonts
 globals.colors		= colors
 globals.debug		= true
 globals.partyDied	= false
+
+m_window		= gfxScreen:new()
+globals.fonts		= {}
+globals.fonts.mono	= gfxFont:new("fonts/bt1font.btf", true)
+globals.fonts.var	= gfxFont:new("fonts/bt1font.btf", false)
+text			= textBox:new(m_window)
 
 currentLevel		= false
 directions = {
@@ -77,3 +81,23 @@ stringTables.effects = {
 	stone	= " and stones ",
 	critical= " and critically hits "
 }
+
+btkeys = {
+	BTKEY_RETURN = ":A:",
+	BTKEY_ESCAPE = ":B:",
+	BTKEY_BACKSPACE = ":C:",
+	BTKEY_UP = ":D:",
+	BTKEY_DOWN = ":E:",
+	BTKEY_LEFT = ":F:",
+	BTKEY_RIGHT = ":G:",
+	BTKEY_PAGEUP = ":H:",
+	BTKEY_PAGEDOWN = ":I:",
+	BTKEY_F1 = ":J:",
+	BTKEY_F2 = ":K:",
+	BTKEY_F3 = ":L:",
+	BTKEY_F4 = ":M:",
+	BTKEY_F5 = ":N:",
+	BTKEY_F6 = ":O:",
+	BTKEY_F7 = ":P:"
+}
+

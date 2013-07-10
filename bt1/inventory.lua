@@ -103,10 +103,10 @@ function inventory:printScreen(inCharacter)
 	local i
 
 	for i = 1,self.maxSize do
-		text_print("\n%d)", i)
+		text:print("\n%d)", i)
 
 		if (self[i]) then
-			text_print(self[i]:toInventoryLine(inCharacter))
+			text:print(self[i]:toInventoryLine(inCharacter))
 		end
 	end
 end
