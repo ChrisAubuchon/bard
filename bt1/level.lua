@@ -33,7 +33,7 @@ level.new = function()
 		return false
 	end
 	function self.setTitle()
-		bigpic.setTitle(self.title)
+		bigpic:setTitle(self.title)
 	end
 
 	function self.getBattleReward()

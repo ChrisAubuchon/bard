@@ -146,10 +146,10 @@ local function __buildView(maxdepth, sq, dir, depth, cycle, prevleft, prevright)
 	--
 	if (front_sq.isBuilding()) then
 		if (depth == 1) then
-			bigpic.city_add(quad, "face", front_sq.nearFace)
+			bigpic:cityAdd(quad, "face", front_sq.nearFace)
 			return 
 		else
-			bigpic.city_add(quad, "face", front_sq.distFace)
+			bigpic:cityAdd(quad, "face", front_sq.distFace)
 		end
 	else
 		-- Recursively call with an increased depth
@@ -160,16 +160,16 @@ local function __buildView(maxdepth, sq, dir, depth, cycle, prevleft, prevright)
 
 
 	if (left_sq.isBuilding()) then
-		bigpic.city_add(quad, "leftfront", left_sq.distFace)
+		bigpic:cityAdd(quad, "leftfront", left_sq.distFace)
 		if (not prevleft) then
-			bigpic.city_add(quad, "leftside", left_sq.distFace)
+			bigpic:cityAdd(quad, "leftside", left_sq.distFace)
 		end
 	end
 
 	if (right_sq.isBuilding()) then
-		bigpic.city_add(quad, "rightfront", right_sq.distFace)
+		bigpic:cityAdd(quad, "rightfront", right_sq.distFace)
 		if (not prevright) then
-			bigpic.city_add(quad, "rightside", right_sq.distFace)
+			bigpic:cityAdd(quad, "rightside", right_sq.distFace)
 		end
 	end
 end
@@ -257,10 +257,10 @@ city.new = function (inName, startX, startY, startDirection)
 	end
 
 	function self.buildView()
-		bigpic.city_background()
+		bigpic:cityBackground()
 		__buildView(4, self.currentSquare, self.direction, 1,
 				"base", true, true)
-		bigpic.city_display()
+		bigpic:cityDisplay()
 	end
 
 	----------------------------------------
@@ -271,20 +271,20 @@ city.new = function (inName, startX, startY, startDirection)
 	-- don't even really notice.
 	----------------------------------------
 	function self.animateMove()
-		bigpic.city_background()
+		bigpic:cityBackground()
 		__buildView(4, self.currentSquare, self.direction, 1,
 				"1", true, true)
-		bigpic.city_display()
+		bigpic:cityDisplay()
 
-		bigpic.city_background()
+		bigpic:cityBackground()
 		__buildView(4, self.currentSquare, self.direction, 1,
 				"2", true, true)
-		bigpic.city_display()
+		bigpic:cityDisplay()
 
-		bigpic.city_background()
+		bigpic:cityBackground()
 		__buildView(4, self.currentSquare, self.direction, 1,
 				"3", true, true)
-		bigpic.city_display()
+		bigpic:cityDisplay()
 	end
 
 	function self.turnParty(inRelDirection) 
@@ -303,7 +303,7 @@ city.new = function (inName, startX, startY, startDirection)
 			if (self.exit) then
 				return true
 			end
-			bigpic.setTitle("Skara Brae")
+			bigpic:setTitle("Skara Brae")
 		else
 			self.animateMove()
 			if (not front_sq.onEnter(self)) then

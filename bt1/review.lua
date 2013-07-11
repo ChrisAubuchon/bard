@@ -12,8 +12,8 @@ function funcs.nightCheck()
 end
 
 function funcs.setReviewBigpic()
-	bigpic.drawBigpic("PIC_REVINT")
-	bigpic.setTitle("Review board")
+	bigpic:drawImage("PIC_REVINT")
+	bigpic:setTitle("Review board")
 end
 
 function funcs.advanceRandomStat(char)

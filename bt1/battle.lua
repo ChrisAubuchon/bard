@@ -235,7 +235,7 @@ function battleData:start()
 			if (not party:isHostile()) then
 				text:cdprint(true, false, 
 					"Do you wish to continue?")
-				if (not getYesNo()) then
+				if (not text:getYesNo()) then
 					break
 				end
 			end
@@ -265,16 +265,16 @@ end
 
 function battleData:updateBigpic()
 	if (self.isPartyAttack) then
-		bigpic.setTitle("PARTY")
-		bigpic.drawBigpic("PIC_WARRIOR")
+		bigpic:setTitle("PARTY")
+		bigpic:drawImage("PIC_WARRIOR")
 	else
 		local leadGroup = self.monGroups:getLeadGroup()
 		if (leadGroup.size == 1) then
-			bigpic.setTitle(leadGroup.singular)
+			bigpic:setTitle(leadGroup.singular)
 		else
-			bigpic.setTitle(leadGroup.plural)
+			bigpic:setTitle(leadGroup.plural)
 		end
-		bigpic.drawBigpic(leadGroup.picture)
+		bigpic:drawImage(leadGroup.picture)
 	end
 end
 
@@ -481,7 +481,7 @@ function battleData:getPlayerOptions()
 		end
 
 		text:cdprint(true, false, "Use these attack commands?")
-		if (not getYesNo()) then
+		if (not text:getYesNo()) then
 			for c in party:iterator() do
 				self:removeAction(c)
 			end
@@ -675,8 +675,8 @@ function battleData:doReward()
 		local xxx_do_treasure_chest = true
 	end
 
-	bigpic.drawBigpic("PIC_TREASURE")
-	bigpic.setTitle("Treasure!")
+	bigpic:drawImage("PIC_TREASURE")
+	bigpic:setTitle("Treasure!")
 
 	for mgroup,nmonsters in pairs(self.killCount) do
 		for i = 1,nmonsters do

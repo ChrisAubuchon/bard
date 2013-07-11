@@ -348,13 +348,13 @@ function character.createCharacter()
 		goto restart
 	end
 
-	bigpic.drawBigpic(classes.get(newchar.class, "pic"))
-	bigpic.setTitle(newchar.class)
+	bigpic:drawImage(classes.get(newchar.class, "pic"))
+	bigpic:setTitle(newchar.class)
 
 	newchar.name = character.getCharacterName()
 	if (not newchar.name) then
-		bigpic.drawBigpic("PIC_GUILDINT")
-		bigpic.setTitle("The Guild")
+		bigpic:drawImage("PIC_GUILDINT")
+		bigpic:setTitle("The Guild")
 		goto restart
 	end
 
@@ -434,8 +434,8 @@ function character:printCharacter()
 	local inkey
 	local inv
 
-	bigpic.drawBigpic(classes.get(self.class, "pic"))
-	bigpic.setTitle(self.class)
+	bigpic:drawImage(classes.get(self.class, "pic"))
+	bigpic:setTitle(self.class)
 
 	repeat
 		text:clear()

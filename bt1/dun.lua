@@ -21,11 +21,11 @@ end
 
 local function __addPortal(sq, quad, tileSet)
 	if (sq.hasCeilPortal) then
-		bigpic.dun_add(quad, tileSet, "portal", sq"ceil")
+		bigpic:dunAdd(quad, tileSet, "portal", sq"ceil")
 	end
 
 	if (sq.hasFloorPortal) then
-		bigpic.dun_add(quad, tileset, "portal", sq"floor")
+		bigpic:dunAdd(quad, tileset, "portal", sq"floor")
 	end
 end
 
@@ -70,11 +70,11 @@ local function __buildSide(sq, tileSet, pathDir, wallDir, depth,
 	
 
 	if ((sq[wallDir].gfx) and (sideDepth ~= 1)) then
-		bigpic.dun_add(quad, tileSet, "front", sq[wallDir])
+		bigpic:dunAdd(quad, tileSet, "front", sq[wallDir])
 	end
 	if (sideDepth < sideLimit[depth]) then
 		if (sq[pathDir].gfx) then
-			bigpic.dun_add(quad, tileSet, face, sq[pathDir])
+			bigpic:dunAdd(quad, tileSet, face, sq[pathDir])
 		else
 			__buildSide(sq[pathDir].path, tileSet, pathDir, wallDir,
 				depth, sideDepth + 1, face)
@@ -98,7 +98,7 @@ local function __buildView(sq, dir, tileSet, maxDepth, depth)
 	end
 
 	if ((sq[frontDir].gfx) and not (sq.isPhased)) then
-		bigpic.dun_add(dunViewMiddle[depth], tileSet, "front", 
+		bigpic:dunAdd(dunViewMiddle[depth], tileSet, "front", 
 				sq[frontDir])
 		recurse = false
 	else
@@ -246,7 +246,7 @@ dun.new = function(inName, startLevel, startX, startY, startDirection)
 	end
 
 	function self.setTitle()
-		bigpic.setTitle(self.title)
+		bigpic:setTitle(self.title)
 	end
 
 	function self.getCoordinates()
@@ -290,13 +290,13 @@ dun.new = function(inName, startLevel, startX, startY, startDirection)
 	end
 
 	function self.buildView()
-		bigpic.dun_background(self.tileSet)
-		bigpic.dun_display()
+		bigpic:dunBackground(self.tileSet)
+		bigpic:dunDisplay()
 		if (party.light.active) then
 			__buildView(self.currentSquare, self.direction, 
 				self.tileSet, party.light.distance, 1)
 		end
-		bigpic.dun_display()
+		bigpic:dunDisplay()
 
 		if (party.detect.active) then
 			doDetect()
@@ -390,7 +390,7 @@ dun.new = function(inName, startLevel, startX, startY, startDirection)
 		if (curSq.isTeleport) then
 			self.currentSquare = self.getSq(curSq.isTeleport)
 			text:clear()
-			bigpic.setTitle(self.title)
+			bigpic:setTitle(self.title)
 			self.buildView()
 			self.runSquareCode()
 			return

@@ -1,308 +1,297 @@
-require "dataio"
-require "sdl_video"
-require "globals"
+local __bigpic = {}
+function __bigpic:new()
+	local self = {
+		titleRect	= false,
+		gfxRect		= false,
+		activeBigpic	= nil,
+		surface		= false,
+		imgs		= false,
+		city		= {},
+		dun		= {}
+	}
 
-local rect
-local active_bigpic
-local view
-local bp			-- bigpic images and animations
-local city_quad			-- City quadrant table
-local cv_rect			-- City view rectangles
-local dun_quad			-- dungeon quadrant table
-local dun_rect			-- dungeon view rectangles
+	local function readImages()
+		local k
+		local v
 
-----------------------------------------
--- setTitle
---
--- Set the title of the active bigpic
-----------------------------------------
-local function setTitle(format, ...)
-	local title;
-	local f;
-	local surface;
-	local w;
-	local h;
-	local x;
+		self.imgs = read_table("bigpic")
+		for k,v in pairs(self.imgs) do
+			v.img = gfxImage:new(v.path, v.type)
+		end
+	end
+
+	local function makeRectangles()
+		self.titleRect	= gfxRectangle:new(32, 212, 224, 16)
+		self.gfxRect	= gfxRectangle:new(32, 30, 224, 176)
+	end
+
+	local function readCityImages()
+		local quad
+		local quadname
+		local facet
+		local facetname
+		local buildingString = "images/citypics/%s/%s/building%d.png"
+
+		local function __readImages(f, fn, qn)
+			local i
+			local nameFormat = "building%d"
+
+			f.rect = gfxRectangle:new(f.x, f.y, f.x, f.h)
+			for i = 1,4 do
+				local index = string.format(nameFormat, i)
+				local path=string.format(buildingString,qn,fn,i)
+
+				f[index] = gfxImage:new(path, "png")
+			end
+		end
+		
+
+		self.city = read_table("cityview")
+		for quadname,quad in pairs(self.city) do
+			for facetname,facet in pairs(quad) do
+				__readImages(facet, facetname, quadname)
+			end
+		end
+
+		self.city.bg = gfxImage:new("images/citypics/citybg.png", "png")
+	end
+
+	local function readDunImages()
+		local quad
+		local quadname
+		local facet
+		local facetname
+
+		self.dun = read_table("dunview")
+		for quadname, quad in pairs(self.dun) do
+			for facetname, facet in pairs(quad) do
+				local path
+
+				path = "images/dpics/"..quadname.."/"..facetname
+				facet.rect = gfxRectangle:new(
+					facet.x, facet.y, facet.w, facet.h)
+
+				if (facetname == "portal") then
+					facet.floor = {}
+					facet.floor[0] = gfxImage:new(
+						path.."/0-floor.png", "png")
+					facet.floor[1] = gfxImage:new(
+						path.."/1-floor.png", "png")
+					facet.floor[2] = gfxImage:new(
+						path.."/2-floor.png", "png")
+					facet.ceiling = {}
+					facet.ceiling[0] = gfxImage:new(
+						path.."/0-ceiling.png", "png")
+					facet.ceiling[1] = gfxImage:new(
+						path.."/1-ceiling.png", "png")
+					facet.ceiling[2] = gfxImage:new(
+						path.."/2-ceiling.png", "png")
+				else
+					facet.door = {}
+					facet.door[0] = gfxImage:new(
+						path.."/0-door.png", "png")
+					facet.door[1] = gfxImage:new(
+						path.."/1-door.png", "png")
+					facet.door[2] = gfxImage:new(
+						path.."/2-door.png", "png")
+					facet.wall = {}
+					facet.wall[0] = gfxImage:new(
+						path.."/0-wall.png", "png")
+					facet.wall[1] = gfxImage:new(
+						path.."/1-wall.png", "png")
+					facet.wall[2] = gfxImage:new(
+						path.."/2-wall.png", "png")
+				end
+			end
+		end
+		self.dun.bg = {}
+		self.dun.bg[0] = gfxImage:new("images/dpics/0-bg.png", "png")
+		self.dun.bg[1] = gfxImage:new("images/dpics/1-bg.png", "png")
+		self.dun.bg[2] = gfxImage:new("images/dpics/2-bg.png", "png")
+
+		self.dun.lightRect = {}
+		self.dun.lightRect[0] = gfxRectangle:new(0, 0, 224, 176)
+		self.dun.lightRect[1] = gfxRectangle:new(0, 10, 224, 156)
+		self.dun.lightRect[2] = gfxRectangle:new(0, 26, 224, 108)
+		self.dun.lightRect[3] = gfxRectangle:new(0, 48, 224, 66)
+	end
+
+
+	btTable.addParent(self, __bigpic)
+	btTable.setClassMetatable(self)
+
+	readImages()
+	makeRectangles()
+	readCityImages()
+	readDunImages()
+
+	self.surface = gfxWindow:new(224, 176, 8)
+
+	return self
+end
+
+bigpic = __bigpic:new()
+
+function bigpic:setTitle(format, ...)
+	local title
+	local fontP
+	local surface
+	local w
+	local h
+	local x
 
 	if (format == nil) then
-		error("setTitle() with a nil format", 2)
+		error("setTitle() with nil format", 2)
 	end
 
 	title = string.format(format, ...)
+	fontP = globals.fonts.var
 
-	f = globals.fonts.var;
-
-	--w, h = f:SizeText(title);
-	w,h = f:Size(title)
+	w,h = fontP:Size(title)
 	if (w > 224) then
-		return;
-	end
-
-	--surface = f:RenderText(title, globals.colors[16]);
-	surface = f:Render(title, globals.colors[16])
-	x = ((224 - w) / 2) + 36;
-
-	m_window:Fill(gfxRectangle:new(32,212,224,16), globals.colors[1])
-	m_window:Draw(gfxRectangle:new(x,212,0,0), surface, nil)
-	m_window:Update(gfxRectangle:new(32,212,224,16))
-end
-
-----------------------------------------
--- drawBigpic()
---
--- Draw the bigpic
-----------------------------------------
-local function drawBigpic(i)
-	if (active_bigpic ~= nil) then
-		active_bigpic:Clear()
-	end
-	active_bigpic = nil
-
-	if (bp[i] == nil) then
-		return;
-	end
-
-	active_bigpic = bp[i].img
-	active_bigpic:Draw(m_window, rect)
-end
-
-----------------------------------------
--- drawBigpicTimeAware()
---
--- Draw a bigpic image being aware of
--- the current time of day. The city
--- gates, for example darkens the sky
--- based on the time of day
-----------------------------------------
-local function drawBigpicTimeAware(i)
-	if (active_bigpic ~= nil) then
-		active_bigpic:Clear()
-		active_bigpic = nil
-	end
-
-	view:Draw(nil, bp[i].img, nil)
-	view:Update()
-	if (globals.isNight) then
-		view:SetColor(11, globals.colors[1])
-	end
-	m_window:Draw(rect, view, nil)
-	m_window:Update()
-
-	if (globals.isNight) then
-		view:SetColor(11, globals.colors[12])
-	end
-end
-
-----------------------------------------
--- city_add()
---
--- Add a section of the city graphics
--- to the view
-----------------------------------------
-local function city_add(quad, facet, building)
-	local q
-
-	assert(city_quad[quad] ~= nil, "Quadrant: " .. quad)
-
-	if (city_quad[quad][facet] == nil) then
 		return
 	end
 
-	q = city_quad[quad][facet]
+	surface = fontP:Render(title, globals.colors[16])
+	x = ((224 - w) / 2) + 36
 
-	if (q[building] == nil) then
-		view:Draw(nil, bp[building].img, nil)
+	m_window:Fill(self.titleRect, globals.colors[1])
+	m_window:Draw(gfxRectangle:new(x,212,0,0), surface, nil)
+	m_window:Update(self.titleRect)
+end
+
+function bigpic:drawImage(inName, inIsTimeAware)
+	local isTimeAware = inIsTimeAware or false
+
+	if (self.activeBigpic ~= nil) then
+		self.activeBigpic:Clear()
+		self.activeBigpic = nil
+	end
+
+	self.activeBigpic = self.imgs[inName].img
+	if (globals.isNight) then
+		self.surface:Draw(nil, self.activeBigpic, nil)
+		self.surface:Update()
+		self.surface:SetColor(11, globals.colors[1])
+		m_window:Draw(self.gfxRect, self.surface, nil)
+		m_window:Update(self.gfxRect)
+		self.surface:SetColor(11, globals.colors[12])
 	else
-		view:Draw(q.rect, q[building], nil)
+		self.activeBigpic:Draw(m_window, self.gfxRect)
 	end
 end
 
-----------------------------------------
--- dun_add()
---
--- Add a section of the dungeon graphics
--- to the view
-----------------------------------------
-local function dun_add(quad, tileSet, facet, sq)
+function bigpic:cityBackground()
+	self.surface:Draw(nil, self.city.bg, nil)
+end
+
+function bigpic:cityAdd(inQuad, inFacet, inBuilding)
+	local q
+
+	if (self.city[inQuad][inFacet] == nil) then
+		return
+	end
+
+	q = self.city[inQuad][inFacet]
+
+	if (q[inBuilding] == nil) then
+		self.surface:Draw(nil, self.imgs[inBuilding].img, nil)
+	else
+		self.surface:Draw(q.rect, q[inBuilding], nil)
+	end
+end
+
+function bigpic:cityDisplay()
+	if (self.activeBigpic ~= nil) then
+		self.activeBigpic:Clear()
+		self.activeBigpic = nil
+	end
+
+	self.surface:Update()
+	if (globals.isNight) then
+		self.surface:SetColor(11, globals.colors[1])
+	end
+	m_window:Draw(self.gfxRect, self.surface, nil)
+	m_window:Update()
+
+	if (globals.isNight) then
+		self.surface:SetColor(11, globals.colors[12])
+	end
+end
+
+function bigpic:dunBackground(inTileSet)
+	if (not party.light.active) then
+		self.surface:Fill(self.dun.lightRect[0], globals.colors[1])
+		return
+	end
+
+	self.surface:Draw(nil, self.dun.bg[inTileSet], nil)
+	if (party.light.distance < 4) then
+		self.surface:Fill(self.dun.lightRect[party.light.distance],
+				globals.colors[1])
+	end
+end
+
+function bigpic:dunAdd(inQuad, inTileSet, inFacet, inSq)
 	local gfx
 	local q
 
-	assert(dun_quad[quad] ~= nil, "Quadrant: " .. tostring(quad))
-
-	if (dun_quad[quad][facet] == nil) then
-		return
+	if (self.dun[inQuad][inFacet] == nil) then
+		return	
 	end
 
-	if (facet == "portal") then
-		if (sq.hasCeilPortal) then
+	if (inFacet == "portal") then
+		if (inSq.hasCeilPortal) then
 			gfx = "ceil"
 		end
-		if (sq.hasFloorPortal) then
+		if (inSq.hasFloorPortal) then
 			gfx = "floor"
 		end
 	else
-		-- Add in flag check for swapping walls and doors here
-		if ((sq.secret) and (party.light.seeSecret)) then
+		local xxx_swap_walls_and_doors = true
+
+		if ((inSq.secret) and (party.light.seeSecret)) then
 			gfx = "door"
 		else
-			gfx = sq.gfx
+			gfx = inSq.gfx
 		end
 	end
 
-	q = dun_quad[quad][facet]
-	view:Draw(q.rect, q[gfx][tileSet], nil)
+	q = self.dun[inQuad][inFacet]
+	self.surface:Draw(q.rect, q[gfx][inTileSet], nil)
 end
 
-----------------------------------------
--- city_background()
---
--- Set the background for the city view
-----------------------------------------
-local function city_background()
-	view:Draw(nil, city_quad.bg, nil)
+function bigpic:dunDisplay()
+	if (self.activeBigpic ~= nil) then
+		self.activeBigpic:Clear()
+		self.activeBigpic = nil
+	end
+
+	self.surface:Update()
+	m_window:Draw(self.gfxRect, self.surface, nil)
+	m_window:Update(self.gfxRect)
 end
 
-----------------------------------------
--- dun_background()
---
--- Set the background for the dungeon
--- view
-----------------------------------------
-local function dun_background(tileSet)
-	if (not party.light.active) then
-		view:Fill(gfxRectangle:new(0, 0, 224, 176), globals.colors[1])
-		return
-	end
 
-	view:Draw(nil, dun_quad.bg[tileSet], nil)
-	if (party.light.distance == 1) then
-		view:Fill(gfxRectangle:new(0, 10, 224, 156), globals.colors[1])
-	elseif (party.light.distance == 2) then
-		view:Fill(gfxRectangle:new(0, 26, 224, 108), globals.colors[1])
-	elseif (party.light.distance == 3) then
-		view:Fill(gfxRectangle:new(0, 48, 224, 66), globals.colors[1])
-	end
-end
 
-----------------------------------------
--- city_display()
---
--- Display the city view
-----------------------------------------
-local function city_display()
-	if (active_bigpic ~= nil) then
-		active_bigpic:Clear()
-		active_bigpic = nil;
-	end
 
-	view:Update()
-	if (globals.isNight) then
-		view:SetColor(11, globals.colors[1])
-	end
-	m_window:Draw(rect, view, nil)
-	m_window:Update()
 
-	if (globals.isNight) then
-		view:SetColor(11, globals.colors[12])
-	end
-end
 
-----------------------------------------
--- dun_display()
---
--- Display the dungeon view
-----------------------------------------
-local function dun_display()
-	if (active_bigpic ~= nil) then
-		active_bigpic:Clear()
-		active_bigpic = nil
-	end
 
-	view:Update()
-	m_window:Draw(rect, view, nil)
-	m_window:Update()
-end
 
-local function __init()
-	local bpl
-	local b
-	local k1
-	local k2
-	local v1
-	local v2
 
-	bp = read_table("bigpic")
-	for bpl,b in pairs(bp) do
-		b.img = gfxImage:new(b.path, b.type)
-	end
 
-	rect = gfxRectangle:new(32, 30, 224, 176);
 
-	city_quad = read_table("cityview")
 
-	for k1,v1 in pairs(city_quad) do
-		for k2, v2 in pairs(v1) do
-			v2.rect = gfxRectangle:new(v2.x, v2.y, v2.w, v2.h);
-			v2.building1 = gfxImage:new(
-				"images/citypics/"..k1.."/"..k2.."/building1.png", "png")
-			v2.building2 = gfxImage:new(
-				"images/citypics/"..k1.."/"..k2.."/building2.png", "png")
-			v2.building3 = gfxImage:new(
-				"images/citypics/"..k1.."/"..k2.."/building3.png", "png")
-			v2.building4 = gfxImage:new(
-				"images/citypics/"..k1.."/"..k2.."/building4.png", "png")
-		end
-	end
 
-	city_quad["bg"] = gfxImage:new("images/citypics/citybg.png", "png")
 
-	dun_quad = read_table("dunview")
-	for k1,v1 in pairs(dun_quad) do
-		for k2, v2 in pairs(v1) do
-			local path
 
-			path = "images/dpics/"..k1.."/"..k2
 
-			v2.rect = gfxRectangle:new(v2.x, v2.y, v2.w, v2.h)
-			if (k2 == "portal") then
-				v2.floor = {}
-				v2.floor[0] = gfxImage:new(path.."/0-floor.png", "png")
-				v2.floor[1] = gfxImage:new(path.."/1-floor.png", "png")
-				v2.floor[2] = gfxImage:new(path.."/2-floor.png", "png")
-				v2.ceiling = {}
-				v2.ceiling[0] = gfxImage:new(path.."/0-ceiling.png", "png")
-				v2.ceiling[1] = gfxImage:new(path.."/1-ceiling.png", "png")
-				v2.ceiling[2] = gfxImage:new(path.."/2-ceiling.png", "png")
-			else
-				v2.door = {}
-				v2.door[0] = gfxImage:new(path.."/0-door.png", "png")
-				v2.door[1] = gfxImage:new(path.."/1-door.png", "png")
-				v2.door[2] = gfxImage:new(path.."/2-door.png", "png")
-				v2.wall = {}
-				v2.wall[0] = gfxImage:new(path.."/0-wall.png", "png")
-				v2.wall[1] = gfxImage:new(path.."/1-wall.png", "png")
-				v2.wall[2] = gfxImage:new(path.."/2-wall.png", "png")
-			end
-		end
-	end
-	dun_quad["bg"] = {}
-	dun_quad.bg[0] = gfxImage:new("images/dpics/0-bg.png", "png")
-	dun_quad.bg[1] = gfxImage:new("images/dpics/1-bg.png", "png")
-	dun_quad.bg[2] = gfxImage:new("images/dpics/2-bg.png", "png")
 
-	view = gfxWindow:new(224, 176, 8)
-end
 
-__init()
 
-bigpic = {
-	city_add		= city_add,
-	city_background		= city_background,
-	city_display		= city_display,
-	dun_add			= dun_add,
-	dun_background		= dun_background,
-	dun_display		= dun_display,
-	drawBigpic		= drawBigpic,
-	drawBigpicTimeAware	= drawBigpicTimeAware,
-	setTitle		= setTitle
-};
+
+
+
+
+

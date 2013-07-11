@@ -158,8 +158,8 @@ function funcs.selectOption(player)
 			inkey = tonumber(inkey)
 			if (party:isOccupied(inkey)) then
 				party[inkey]:printCharacter()
-				bigpic.drawBigpic("PIC_GARTHINT")
-				bigpic.setTitle("The Shoppe")
+				bigpic:drawImage("PIC_GARTHINT")
+				bigpic:setTitle("The Shoppe")
 			end
 		end
 	until (inkey == "D")
@@ -184,7 +184,7 @@ function funcs.selectCharacter()
 end
 
 function garths.enter()
-	bigpic.drawBigpic("PIC_GARTHINT")
-	bigpic.setTitle("The Shoppe")
+	bigpic:drawImage("PIC_GARTHINT")
+	bigpic:setTitle("The Shoppe")
 	funcs.selectCharacter()
 end

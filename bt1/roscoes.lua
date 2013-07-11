@@ -2,8 +2,8 @@ roscoes = {}
 local funcs = {}
 
 function funcs.setRoscoesBigpic()
-	bigpic.drawBigpic("PIC_ROSCOEINT")
-	bigpic.setTitle("Roscoe's")
+	bigpic:drawImage("PIC_ROSCOEINT")
+	bigpic:setTitle("Roscoe's")
 end
 
 function funcs.doReenergize(characterNumber)

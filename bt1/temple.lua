@@ -2,8 +2,8 @@ temple = {}
 local funcs = {}
 
 function funcs.setTempleBigpic()
-	bigpic.drawBigpic("PIC_TEMPLEINT")
-	bigpic.setTitle(funcs.templeName)
+	bigpic:drawImage("PIC_TEMPLEINT")
+	bigpic:setTitle(funcs.templeName)
 end
 
 function funcs.selectCharacter()

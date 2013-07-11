@@ -2,8 +2,8 @@ tavern = {}
 local funcs = {}
 
 function funcs.setTavernBigpic()
-	bigpic.drawBigpic("PIC_BARINT")
-	bigpic.setTitle(funcs.tavernName)
+	bigpic:drawImage("PIC_BARINT")
+	bigpic:setTitle(funcs.tavernName)
 end
 
 function funcs.selectOption()

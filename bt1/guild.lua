@@ -177,8 +177,8 @@ local function enter()
 	local inkey;
 
 	dprint("guild.enter() called")
-	bigpic.drawBigpic("PIC_GUILDINT");
-	bigpic.setTitle("The Guild");
+	bigpic:drawImage("PIC_GUILDINT")
+	bigpic:setTitle("The Guild")
 
 	while 1 do
 		text:clear()
@@ -197,8 +197,8 @@ local function enter()
 			add_member()
 		elseif (inkey == "C") then
 			create_member()
-			bigpic.drawBigpic("PIC_GUILDINT")
-			bigpic.setTitle("The Guild")
+			bigpic:drawImage("PIC_GUILDINT")
+			bigpic:setTitle("The Guild")
 		elseif (inkey == "D") then
 			delete_member()
 		elseif (inkey == "E") then
@@ -231,8 +231,8 @@ local function enter()
 		elseif ((inkey > "0") and (inkey < "7")) then
 			if (party:isOccupied(inkey)) then
 				party[tonumber(inkey)]:printCharacter()
-				bigpic.drawBigpic("PIC_GUILDINT")
-				bigpic.setTitle("The Guild")
+				bigpic:drawImage("PIC_GUILDINT")
+				bigpic:setTitle("The Guild")
 			end
 		end
 	end

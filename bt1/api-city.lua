@@ -12,8 +12,8 @@ function btapi.city.emptyBuilding()
 		end
 	end
 
-	bigpic.setTitle("Empty Building")
-	bigpic.drawBigpic("PIC_EMPTYBLDG")
+	bigpic:setTitle("Empty Building")
+	bigpic:drawImage("PIC_EMPTYBLDG")
 
 	text:clear()
 	text:print("You're in an empty building.")
@@ -23,8 +23,8 @@ function btapi.city.emptyBuilding()
 end
 
 function btapi.city.enterStables()
-	bigpic.setTitle("Empty Building")
-	bigpic.drawBigpic("PIC_EMPTYBLDG")
+	bigpic:setTitle("Empty Building")
+	bigpic:drawImage("PIC_EMPTYBLDG")
 
 	text:clear()
 	text:print("\nSorry, friends, all the horses have ")
@@ -36,8 +36,8 @@ function btapi.city.enterStables()
 end
 
 function btapi.city.cityGates()
-	bigpic.setTitle("City Gate")
-	bigpic.drawBigpicTimeAware("PIC_CITYGATE")
+	bigpic:setTitle("City Gate")
+	bigpic:drawImage("PIC_CITYGATE", true)
 
 	text:clear()
 	text:print("You stand before the city gates, ")

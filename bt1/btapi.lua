@@ -66,7 +66,7 @@ end
 
 function btapi.doStairs(direction)
 	text:print("\nThere are stairs here, going " .. direction ..". Do you wish to take them?")
-	if (getYesNo()) then
+	if (text:getYesNo()) then
 		return true
 	else
 		text:clear()
