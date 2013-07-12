@@ -928,7 +928,9 @@ function character:songTimeout()
 		return
 	end
 
-	self.song.deactivate.func()
+	if (self.song.deactivate) then
+		self.song.deactivate.func()
+	end
 
 	party.singer = false
 	party.songPlaying = true

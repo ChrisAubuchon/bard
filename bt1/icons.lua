@@ -1,71 +1,150 @@
-declare_global("icons")
-local iconGfx = {};
-local clear = {};
-local rects = {};
-local active = {};
+----------------------------------------
+-- Icon definitions
+----------------------------------------
+local iconData = {
+	{ 
+		gfx		= "images/icon_light.bta",
+		gfxType		= "bta",
+		clear		= "images/icon_light_clear.png",
+		clearType	= "png",
+		x		= 256,
+		y		= 22,
+		w		= 80,
+		h		= 38
+	},
+	{ 
+		gfx		= "images/icon_levitate.bta",
+		gfxType		= "bta",
+		clear		= "images/icon_levitate_clear.png",
+		clearType	= "png",
+		x		= 256,
+		y		= 66,
+		w		= 80,
+		h		= 44
+	},
+	{ 
+		gfx		= "images/icon_detect.bta",
+		gfxType		= "bta",
+		clear		= "images/icon_detect_clear.png",
+		clearType	= "png",
+		x		= 256,
+		y		= 166,
+		w		= 80,
+		h		= 28
+	},
+	{ 
+		gfx		= "images/icon_shield.png",
+		gfxType		= "png",
+		clear		= "images/icon_shield_clear.png",
+		clearType	= "png",
+		x		= 256,
+		y		= 202,
+		w		= 80,
+		h		= 34
+	},
+	{ 
+		gfx		= {
+			north = "images/icon_compass_north.png",
+			south = "images/icon_compass_south.png",
+			east = "images/icon_compass_east.png",
+			west = "images/icon_compass_west.png",
+		},
+		gfxType		= "png",
+		clear		= "images/icon_compass_clear.png",
+		clearType	= "png",
+		x		= 256,
+		y		= 112,
+		w		= 80,
+		h		= 50
+	}
+}
+		
 
-local function __init()
-	iconGfx.light = gfxImage:new("images/icon_light.bta", "bta");
-	iconGfx.levitate = gfxImage:new("images/icon_levitate.bta", "bta");
-	iconGfx.detect = gfxImage:new("images/icon_detect.bta", "bta");
-	iconGfx.shield = gfxImage:new("images/icon_shield.png", "png");
-	
-	iconGfx.compass = {};
-	iconGfx.compass["north"] = gfxImage:new("images/icon_compass_north.png", "png");
-	iconGfx.compass["south"] = gfxImage:new("images/icon_compass_south.png", "png");
-	iconGfx.compass["east"] = gfxImage:new("images/icon_compass_east.png", "png");
-	iconGfx.compass["west"] = gfxImage:new("images/icon_compass_west.png", "png");
-	
-	
-	clear.light = gfxImage:new("images/icon_light_clear.png", "png");
-	clear.levitate = gfxImage:new("images/icon_levitate_clear.png", "png");
-	clear.shield = gfxImage:new("images/icon_shield_clear.png", "png");
-	clear.detect = gfxImage:new("images/icon_detect_clear.png", "png");
-	clear.compass = gfxImage:new("images/icon_compass_clear.png", "png");
-	
-	
-	rects.light = gfxRectangle:new(256, 22, 80, 38);
-	rects.levitate = gfxRectangle:new(256, 66, 80, 44);
-	rects.compass = gfxRectangle:new(256, 112, 80, 50);
-	rects.detect = gfxRectangle:new(256, 166, 80, 28);
-	rects.shield = gfxRectangle:new(256, 202, 80, 34);
-	
-	active.light = false;
-	active.levitate = false;
-	active.compass = false;
-	active.detect = false;
-	active.shield = false;
-end
+icons = {}
 
-local function displayIcon(i)
-	if (iconGfx[i] == nil) then
-		return;
+----------------------------------------
+-- Constants
+----------------------------------------
+icons.ICON_LIGHT	= 1
+icons.ICON_LEVITATE	= 2
+icons.ICON_DETECT	= 3
+icons.ICON_SHIELD	= 4
+icons.ICON_COMPASS	= 5
+
+----------------------------------------
+-- new()
+----------------------------------------
+function icons:new(inType)
+	local self = {
+		type		= inType,
+		gfx		= false,
+		clear		= false,
+		rectangle	= false,
+		active		= false
+	}
+
+	local data = iconData[inType]
+	if (inType == icons.ICON_COMPASS) then
+		self.gfx = {}
+		self.gfx.north = gfxImage:new(data.gfx.north, data.gfxType)
+		self.gfx.south = gfxImage:new(data.gfx.south, data.gfxType)
+		self.gfx.east = gfxImage:new(data.gfx.east, data.gfxType)
+		self.gfx.west = gfxImage:new(data.gfx.west, data.gfxType)
+	else
+		self.gfx = gfxImage:new(data.gfx, data.gfxType)
 	end
 
-	active[i] = true
-	iconGfx[i]:Draw(m_window, rects[i])
+	self.clear = gfxImage:new(data.clear, data.clearType)
+	self.rectangle = gfxRectangle:new(data.x, data.y, data.w, data.h)
+
+	btTable.addParent(self, icons)
+	btTable.setClassMetatable(self)
+
+	return self
 end
 
-local function deactivateIcon(i)
-	if (active[i]) then
-		active[i] = false
-		iconGfx[i]:Clear()
+function icons:activate()
+	self.active = true
+	self.gfx:Draw(m_window, self.rectangle)
+end
+
+function icons:deactivate()
+	if (self.active) then
+		self.active = false
+		self.gfx:Clear()
 	end
 
-	m_window:Draw(rects[i], clear[i], nil)
+	self.clear:Draw(m_window, self.rectangle)
 end
 
-local function updateCompass(dir)
-	m_window:Draw(rects.compass, iconGfx.compass[dir], nil);
-	m_window:Update(rects.compass);
-
+function icons:update(inDirection)
+	if (self.type == icons.ICON_COMPASS) then
+		self.gfx[inDirection]:Draw(m_window, self.rectangle)
+		m_window:Update(self.rectangle)
+	end
 end
 
-__init()
 
 
-icons = {
-	displayIcon = displayIcon,
-	deactivateIcon = deactivateIcon,
-	updateCompass = updateCompass
-};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

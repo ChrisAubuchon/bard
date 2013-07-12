@@ -34,10 +34,10 @@ function keyboardCommand(inkey)
 			text:clear()
 		end
 	elseif (inkey == "B") then
-		noncombat.singSong()
+		party:singSong()
 		return true
 	elseif (inkey == "C") then
-		noncombat.castSpell()
+		party:castSpell()
 		return true
 	elseif (inkey == "N") then
 		party:reorder()
@@ -58,7 +58,7 @@ function keyboardCommand(inkey)
 		return true
 	elseif (inkey == "U") then
 		text:clear()
-		noncombat.useItem()
+		party:useItem()
 		return true
 	elseif (inkey == btkeys.BTKEY_LEFT) then
 		currentLevel.turnParty("left")

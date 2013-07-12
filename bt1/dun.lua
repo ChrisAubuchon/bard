@@ -319,7 +319,7 @@ dun.new = function(inName, startLevel, startX, startY, startDirection)
 				self.direction = "west"
 			end
 		else
-			party.compass.update(self.direction)
+			party.compass:update(self.direction)
 		end
 
 		if (self.currentSquare.isPhased) then

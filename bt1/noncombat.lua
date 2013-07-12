@@ -5,27 +5,6 @@ noncombat = {}
 -- moved to the party class.
 ----------------------------------------
 
-function noncombat.useItem()
-	local char
-	local action
-
-	text:cdprint(true, false, "Who wishes to use an item?")
-	char = party:readSlot()
-	if (not char) then
-		text:clear()
-		return	
-	end
-
-	action = btAction.new()
-	action.source = char
-
-	if (not char:getUseItem(action)) then
-		return
-	end
-
-	char:useItem(action)
-end
-
 function noncombat.castSpell()
 	local char
 	local action

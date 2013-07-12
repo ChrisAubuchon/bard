@@ -20,7 +20,7 @@ uint8_t *song_activateStrings[] = {
 
 uint8_t *song_deactivateStrings[] = {
 	"",
-	"party.light.deactivate(); party.song.lightSong = false",
+	"party.light:deactivate(); party.song.lightSong = false",
 	"",
 	"",
 	"party.song.acBonus = 0; party:display()",

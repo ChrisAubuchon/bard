@@ -75,6 +75,26 @@ function textBox:cdprint(clearFlag, delayFlag, format, ...)
 end
 
 ----------------------------------------
+-- cdcprint()
+--
+-- Clear, Delay, Clear, Print
+----------------------------------------
+function textBox:cdcprint(preClear, delay, postClear, format, ...)
+	if (preClear) then
+		self:clear()
+	end
+
+	self:print(format, ...)
+	if (delay) then
+		timer:delay(6)
+	end
+
+	if (postClear) then
+		self:clear()
+	end
+end
+
+----------------------------------------
 -- setColumn
 ----------------------------------------
 function textBox:setColumn(inX)

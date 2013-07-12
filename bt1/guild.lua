@@ -126,7 +126,6 @@ local function remove_member()
 
 		roster.updateCharacter(member)
 
-		--party:pack()
 		party:display()
 	end
 end

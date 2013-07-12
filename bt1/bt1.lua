@@ -51,8 +51,8 @@ require "battle"
 require "action"
 require "random"
 require "spells"
-require "durationSpell"
 require "icons"
+require "durationSpell"
 require "race"
 require "classes"
 require "level"
@@ -75,7 +75,6 @@ require "timers"
 require "songs"
 require "monster"
 require "summon"
-require "noncombat"
 require "api-monster"
 require "api-dun"
 require "api-battle"
@@ -89,11 +88,11 @@ repeat
 	if (globals.gameState == globals.STATE_GUILD) then
 		globals.partyDied = false
 		local xxx_bard_song_timeout
-		party.detect.deactivate()
-		party.shield.deactivate()
-		party.levitate.deactivate()
-		party.light.deactivate()
-		party.compass.deactivate()
+		party.detect:deactivate()
+		party.shield:deactivate()
+		party.levitate:deactivate()
+		party.light:deactivate()
+		party.compass:deactivate()
 		guild.enter()
 	elseif (globals.gameState == globals.STATE_CITY) then
 		currentLevel.main()

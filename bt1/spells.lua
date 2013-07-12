@@ -25,19 +25,19 @@ spells.passive.light = function(inAction)
 	if (inData.isBardSong) then
 		local XXX_StopBardSong
 	end
-	party.light.activate(duration, inData.distance, inData.detectSecret)
+	party.light:activate(duration, inData.distance, inData.detectSecret)
 end
 
 spells.passive.levitate = function(inAction)
 	local duration	= getPassiveDuration(inAction.inData)
-	party.levitate.activate(duration)
+	party.levitate:activate(duration)
 end
 
 spells.passive.detect = function(inAction)
 	local inData	= inAction.inData
 	local duration	= getPassiveDuration(inAction.inData)
 
-	party.detect.activate(duration, inData.detectStairs,
+	party.detect:activate(duration, inData.detectStairs,
 			inData.detectTraps,
 			inData.detectSpecial)
 end
@@ -46,14 +46,15 @@ spells.passive.shield = function(inAction)
 	local inData	= inAction.inData
 	local duration	= getPassiveDuration(inAction.inData)
 
-	party.shield.activate(duration, inData.acBonus)
+	party.shield:activate(duration, inData.acBonus)
 end
 
 spells.passive.compass = function(inAction)
 	local duration	= getPassiveDuration(inAction.inData)
 
-	party.compass.activate(duration)
-	party.compass.update(currentLevel.direction)
+	party.compass:activate(duration)
+	party.compass:update(currentLevel.direction)
+	text:printEllipsis()
 end
 
 spells.trapZap = function()

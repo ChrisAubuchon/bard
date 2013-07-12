@@ -291,7 +291,7 @@ city.new = function (inName, startX, startY, startDirection)
 		self.direction = directions[inRelDirection][self.direction]
 		self.buildView()
 		if (party.compass.active) then
-			party.compass.update(self.direction)
+			party.compass:update(self.direction)
 		end
 	end
 

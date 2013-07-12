@@ -4,17 +4,18 @@ require "random"
 
 party = {
 	className	= "party",
-	detect		= detectEffect,
-	shield		= shieldEffect,
-	light		= lightEffect,
-	compass		= compassEffect,
-	levitate	= levitateEffect,
+	detect		= detectEffect:new(),
+	shield		= shieldEffect:new(),
+	light		= lightEffect:new(),
+	compass		= compassEffect:new(),
+	levitate	= levitateEffect:new(),
 	summon		= false,
 
 	song		= {
+		active		= false,
 		acBonus		= 0,
 		lightSong	= false,
-		singer		= false
+		singer		= false,
 	},
 	battle	= {
 		acBonus		= 0,
@@ -587,9 +588,166 @@ function party:printStatusLine(inCharString, inHpString, inSlot)
 	m_window:Update()
 end
 
+----------------------------------------
+-- useItem()
+--
+-- 
+----------------------------------------
+function party:useItem()
+	local char
+	local action
 
+	text:cdprint(true, false, "Who wishes to use an item?")
+	char = self:readSlot()
+	if (not char) then
+		text:clear()
+		return
+	end
 
+	action = btAction.new()
+	action.source = char
 
+	if (not char:getUseItem(action)) then
+		return
+	end
+
+	char:useItem(action)
+end
+
+----------------------------------------
+-- castSpell()
+--
+--
+----------------------------------------
+
+function party:castSpell()
+	local char
+	local action
+	local s
+
+	text:cdprint(true, false, "\n\nWho do you wish to cast the spell?")
+	char = self:readSlot()
+	if (not char) then
+		text:clear()
+		return
+	end
+
+	if (char:isDisabled()) then
+		text:cdcprint(true, true, true,
+			"Sorry, %s is in no condition to cast a spell.", 
+			char.name)
+		return
+	end
+
+	if (not char:isSpellCaster()) then
+		text:cdcprint(true, true, true,
+			"\n\nThou art not a spell caster!")
+		return
+	end
+
+	s = char:getSpell(false)
+	if (not s) then
+		text:clear()
+		return
+	end
+
+	if (not s.noncombat) then
+		text:cdcprint(false, true, true, 
+			"\nYou can only cast that in combat.")
+		return
+	end
+
+	if (s.sppt > char.cur_sppt) then
+		text:cdcprint(false, true, true, 
+			"\nNot enough spells points.")
+		return
+	end
+
+	action = btAction.new()
+	action.source	= char
+	action.func	= s.action.func
+	action.inData	= s.action.inData
+	action.inData.sppt	= s.sppt
+
+	if (s.targetted) then
+		text:cdprint(true, false, "Use on:")
+
+		action.target = getActionTarget(s.targetted, false)
+		if (not action.target) then
+			text:clear()
+			return
+		end
+	end
+
+	text:cdprint(true, false, char.name)
+	char:castSpell(action)
+	party:sort()
+end
+
+----------------------------------------
+-- singSong()
+--
+--
+----------------------------------------
+function party:singSong()
+	local char
+	local action
+	local tune
+
+	text:cdprint(true, false, "Who will play?")
+	char = self:readSlot()
+	if (not char) then
+		text:clear()
+		return
+	end
+
+	if ((char.class ~= "Bard") or (char:isDisabled())) then
+		text_cdcprint(true, true, true, "\n\nHe can't sing")
+		return
+	end
+
+	if (not char:isTypeEquipped("Instrument")) then
+		text_cdcprint(true, true, true, 
+			"\n\nHe has no instrument to play.")
+		return
+	end
+
+	action = btAction.new()
+	action.source = char
+
+	tune = char:getTune()
+	if (not tune) then
+		text:clear()
+		return
+	end
+
+	text:cdprint(true, false, char.name)
+	if (not char:doVoiceCheck()) then
+		timer:delay(3)
+		return
+	end
+
+	text:print(" plays a tune")
+
+	if (party.song.active) then
+		party.song.singer:songTimeout()
+	end
+
+	if (tune.activate) then
+		action.func = tune.activate.func
+		action.inData = tune.nonCombatData[currentLevel.level].inData
+
+		if (action.func) then
+			action.func(action)
+		end
+	end
+
+	party.song.singer	= char
+	party.song.active	= true
+	party.song.timer	= 12
+	char.isSinging		= true
+	char.song		= tune
+end
 
 
 

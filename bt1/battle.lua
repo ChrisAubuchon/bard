@@ -103,8 +103,8 @@ function battleData:new()
 	btTable.addParent(self, battleData)
 	btTable.setClassMetatable(self)
 
-	party.antiMagicBonus = 0
-	party.spellAcBonus = 0
+	party.battle.antiMagic = 0
+	party.battle.acBonus = 0
 
 
 	return self
@@ -214,7 +214,8 @@ function battleData:start()
 
 	self:printEncounter()
 
-	dprint("antiMagicBonus = %d", party.antiMagicBonus)
+	dprint("party.battle.antiMagic = %d", party.battle.antiMagic)
+	dprint("self.songDamageBonus = %d", self.songDamageBonus)
 	repeat
 		self:updateBigpic()
 		if (not self:getPlayerOptions()) then
@@ -734,13 +735,18 @@ end
 
 
 function battleData:convertPreBattleSong()
-	if (party.songPlaying) then
-		self.preBattleSong = party.singer.song
+	if (party.song.active) then
+		local singer = party.song.singer
 
-		if ((party.singer.song.name == "Falkens Fury") or
-		    (party.singer.song.name == "Lucklaran")) then
+		self.preBattleSong = singer.song
+
+		if ((singer.song.name == "Falkens Fury") or
+		    (singer.song.name == "Lucklaran")) then
 			dprint("Running combatFunction")
-			party.singer.song.combatFunction.func()
+			local action = btAction.new()
+			action.inBattle = self
+			action.inData = singer.song.combatData[currentLevel.level].inData
+			singer.song.combatFunction.func(action)
 		end
 	end
 end
