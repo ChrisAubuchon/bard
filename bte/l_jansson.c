@@ -120,6 +120,8 @@ static json_t *_lua_value(lua_State *L, int index)
 	}
 	case LUA_TNIL:
 		return json_null();
+	case LUA_TFUNCTION:
+		return NULL;
 	default:
 		luaL_error(L, "Not implemented: Type %d", lua_type(L, index));
 	}
@@ -152,13 +154,15 @@ static void lua_to_json(lua_State *L, json_t *j)
 
 			value = _lua_value(L, -1);
 
-			json_array_append_new(records, value);
+			if (value != NULL)
+				json_array_append_new(records, value);
 		} else if (lua_type(L, -2) == LUA_TSTRING) {
 			key = lua_tostring(L, -2);
 
 			value = _lua_value(L, -1);
 
-			json_object_set_new_nocheck(j, key, value);
+			if (value != NULL)
+				json_object_set_new_nocheck(j, key, value);
 		}
 
 		lua_pop(L, 1);

@@ -59,7 +59,7 @@ function btapi.city.enterGarths()
 		return
 	end
 
-	garths.enter()
+	garths:enter()
 	text:clear()
 	currentLevel.turnParty("back")
 end

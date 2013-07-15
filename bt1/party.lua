@@ -67,8 +67,8 @@ function party:addParty(inParty)
 		end
 
 		if ((not self:findByName(name)) and
-		    (roster.nameExists(name))) then
-			self:addCharacter(roster.getCharacter(name))
+		    (roster:nameExists(name))) then
+			self:addCharacter(roster:readCharacter(name))
 		end
 	end
 

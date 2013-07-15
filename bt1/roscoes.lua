@@ -28,7 +28,7 @@ function funcs.doReenergize(characterNumber)
 		return
 	end
 	if (payer.gold < rechargeCost) then
-		text:clearline(11)
+		text:clearLine(11)
 		text:setCursor(0, 11)
 		text:cdprint(false, true, "Not enough gold.   ")
 		return

@@ -624,7 +624,7 @@ function character.getCharacterName()
 		if (name:len() == 0) then
 			return false
 		end
-		if (roster.nameExists(name)) then
+		if (roster:nameExists(name)) then
 			text:splashMessage("\n\nThere is a already a person by that name.\n")
 		else
 			return name

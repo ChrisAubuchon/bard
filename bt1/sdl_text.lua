@@ -201,6 +201,11 @@ end
 
 ----------------------------------------
 -- scrollingSelect()
+--
+-- xxx - inTable can be an array or an
+-- object with a "toArray" method. Look
+-- in to converting callers to only use
+-- objects with "toArray"
 ----------------------------------------
 function textBox:scrollingSelect(inTable, inFunc)
 	local topIndex		= 1
@@ -208,24 +213,27 @@ function textBox:scrollingSelect(inTable, inFunc)
 	local i
 	local k
 	local inkey
+	local listItems
+
+	listItems = inTable:toArray()
 
 	local function scroll_reset()
 		local i
 
 		self:clear()
 
-		if (#inTable > 0) then
+		if (#listItems > 0) then
 			for i = 0,10 do
 				local n = i + topIndex
 	
 				if (i ~= 0) then
 					self:print("\n")
-					inFunc(inTable[n])
+					inFunc(inTable, listItems[n])
 				else
-					inFunc(inTable[n])
+					inFunc(inTable, listItems[n])
 				end
 
-				if (n >= #inTable) then
+				if (n >= #listItems) then
 					break
 				end
 			end
@@ -254,12 +262,12 @@ function textBox:scrollingSelect(inTable, inFunc)
 				-- Increment the top index if we are at the end
 				-- of the window but not at the end of the list
 				--
-				if ((topIndex + highIndex) < #inTable) then
+				if ((topIndex + highIndex) < #listItems) then
 					topIndex = topIndex + 1
 					scroll_reset()
 				end
 			else
-				if (highIndex < #inTable - 1) then
+				if (highIndex < #listItems - 1) then
 					self.window:UnHighlight(highIndex)
 					highIndex = highIndex + 1
 					self.window:Highlight(highIndex)
@@ -284,15 +292,15 @@ function textBox:scrollingSelect(inTable, inFunc)
 			end
 			scroll_reset()
 		elseif (inkey == btkeys.BTKEY_PAGEDOWN) then
-			if ((topIndex + 20) > #inTable) then
-				topIndex = #inTable - 10
+			if ((topIndex + 20) > #listItems) then
+				topIndex = #listItems - 10
 			else
 				topIndex = topIndex + 10
 			end
 			scroll_reset()
 		elseif ((inkey == btkeys.BTKEY_RETURN) or
 			(inkey == " ")) then
-			return inTable[topIndex + highIndex]
+			return listItems[topIndex + highIndex]
 		elseif ((inkey == btkeys.BTKEY_ESCAPE) or
 			(inkey == "C")) then
 			return false

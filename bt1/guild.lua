@@ -18,22 +18,22 @@ local function add_member()
 		return
 	end
 
-	member = text:scrollingSelect(roster.toArray(), roster.printMember)
+	member = text:scrollingSelect(roster, roster.printMember)
 	if (not member) then
 		return
 	end
 
 	text:clear()
 
-	if (roster.isParty(member)) then
-		party:addParty(roster.getParty(member))
+	if (roster:isParty(member)) then
+		party:addParty(roster:readParty(member))
 	else
 		if (party:findByName(member)) then
 			text:splashMessage("\n\nThat member is already in the party.")
 			return
 		end
 
-		party:addCharacter(roster.getCharacter(member))
+		party:addCharacter(roster:readCharacter(member))
 		party:display()
 	end
 end
@@ -53,7 +53,7 @@ local function create_member()
 		----------------------------------------
 		-- Add the character to the roster
 		----------------------------------------
-		roster.saveCharacter(newchar)
+		roster:writeCharacter(newchar)
 	end
 end
 
@@ -66,7 +66,7 @@ end
 local function delete_member()
 	local member
 
-	member = text:scrollingSelect(roster.toArray(), roster.printMember)
+	member = text:scrollingSelect(roster, roster.printMember)
 	if (not member) then
 		return
 	end
@@ -83,7 +83,7 @@ local function delete_member()
 		return
 	end
 
-	roster.removeCharacter(member)
+	roster:remove(member)
 end
 
 ----------------------------------------
@@ -124,7 +124,7 @@ local function remove_member()
 		member = party:removeCharacter(tonumber(inkey))
 		dprint(member)
 
-		roster.updateCharacter(member)
+		roster:writeCharacter(member)
 
 		party:display()
 	end
@@ -152,11 +152,11 @@ local function save_party()
 		return
 	end
 
-	if (roster.nameExists(name)) then
+	if (roster:nameExists(name)) then
 		text:clear()
 		text:print("That name is already in use.")
 
-		if (not roster.isParty(name)) then
+		if (not roster:isParty(name)) then
 			text:printContinue()
 			getkey()
 
@@ -169,7 +169,7 @@ local function save_party()
 		end
 	end
 
-	roster.saveParty(name)
+	roster:writeParty(name)
 end
 
 local function enter()

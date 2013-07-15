@@ -1,224 +1,158 @@
-----------------------------------------
--- Package variables
-----------------------------------------
-local rost
+require "character"
+
+local __roster = {}
+function __roster:new(inFileName)
+	local self = read_table(inFileName, true)
+	self.fileName = inFileName
+
+	if (not self.characters) then
+		self.characters = {}
+		self.parties = {}
+		write_table(inFileName)
+	end
+
+	btTable.addParent(self, __roster)
+	btTable.setClassMetatable(self)
+
+	return self
+end
+
+function __roster:write()
+	local t = {}
+	t.characters = self.characters
+	t.parties = self.parties
+	write_table(t, self.fileName)
+end
 
 ----------------------------------------
--- Package functions
+-- toArray()
+--
+-- Return an array with a sorted list
+-- of the parties and characters
 ----------------------------------------
-roster = {}
+function __roster:toArray()
+	local t = {}
+	local k
+
+	dprint("roster.toArray()")
+
+	for k,_ in pairs(self.characters) do
+		table.insert(t, k)
+	end
+
+	for k,_ in pairs(self.parties) do
+		table.insert(t, k)
+	end
+
+	table.sort(t)
+
+	return t
+end
+
+roster = __roster:new("roster")
 
 ----------------------------------------
 -- nameExists()
 --
--- Check if the name already exists in
--- the roster
+--
 ----------------------------------------
-function roster.nameExists(name)
-	for i,v in pairs(rost.characters) do
-		if (i == name) then
-			return true
-		end
-	end
-
-	for i,v in pairs(rost.parties) do
-		if (i == name) then
-			return true
-		end
+function roster:nameExists(inName)
+	if ((self.characters[inName] ~= nil) or
+	    (self.parties[inName] ~= nil)) then
+		return true
 	end
 
 	return false
-
 end
 
 ----------------------------------------
--- saveCharacter()
---
--- Add a character to the roster
+-- writeCharacter()
 ----------------------------------------
-function roster.saveCharacter(c)
-	rost.characters[c.name] = c:toTable()
-
-	write_table(rost, "roster")
+function roster:writeCharacter(inChar)
+	self.characters[inChar.name] = inChar:toTable()
+	self:write()
 end
 
 ----------------------------------------
--- saveParty()
---
--- Add party to the roster
+-- readCharacter()
 ----------------------------------------
-function roster.saveParty(name)
-	rost.parties[name] = party:toTable()
-	dprint(rost.parties[name])
+function roster:readCharacter(inName)
+	local char
 
-	write_table(rost, "roster")
+	assert(self.characters[inName] ~= nil)
+
+	char = character:new()
+	char:fromTable(self.characters[inName])
+
+	return char
 end
 
 ----------------------------------------
--- getCharacter()
---
--- Return the character structure for
--- member "name"
+-- writeParty()
 ----------------------------------------
-function roster.getCharacter(name)
-	local c
-
-	assert(rost.characters[name] ~= nil)
-
-	c = character:new()
-	c:fromTable(rost.characters[name])
-
-	return c
+function roster:writeParty(inName, inParty)
+	self.parties[name] = inParty:toTable()
+	self:write()
 end
 
 ----------------------------------------
--- getParty()
---
--- Return the party structure for
--- member "name"
+-- readParty()
 ----------------------------------------
-function roster.getParty(name)
-	assert(rost.parties[name] ~= nil)
+function roster:readParty(inName)
+	assert(self.parties[inName] ~= nil)
 
-	return rost.parties[name]
+	return self.parties[inName]
 end
 
 ----------------------------------------
 -- isParty()
---
--- Return true if the roster member is
--- a party
 ----------------------------------------
-function roster.isParty(name)
-	if (rost.parties[name] ~= nil) then
+function roster:isParty(inName)
+	if (self.parties[inName] ~= nil) then
 		return true
-	else
-		return false
 	end
+
+	return false
 end
 
 ----------------------------------------
--- listRoster()
+-- printMember()
 --
--- Return a table of roster entries
+-- Print the member line in list format
 ----------------------------------------
-function roster.listRoster()
-	local rtable = {}
-
-	for k,v in pairs(rost.characters) do
-		if (k ~= "struct") then
-			-- Dead characters have an '@' in front
-			if (rost.characters[k].isDead) then
-				rtable[k] = "@" .. k
-			else
-				rtable[k] = " " .. k
-			end
-		end
-	end
-
-	for k,v in pairs(rost.parties) do
-		if (k ~= "struct") then
-			rtable[k] = "*" .. k
-		end
-	end
-
-	return rtable
-end
-
-function roster.printMember(member)
-	if (rost.characters[member] ~= nil) then
-		if (rost.characters[member].isDead) then
-			text:print("@" .. member)
+function roster:printMember(inName)
+	if (self.characters[inName] ~= nil) then
+		if (self.characters[inName].isDead) then
+			text:print("@" .. inName)
 		else
-			text:print(" " .. member)
+			text:print(" " .. inName)
 		end
 	else
-		text:print("*" .. member)
+		text:print("*" .. inName)
 	end
 end
 
-function roster.toArray()
-	local rtable = {}
-	local k
-
-	for k,_ in pairs(rost.characters) do
-		table.insert(rtable, k)
-	end	
-
-	for k,_ in pairs(rost.parties) do
-		table.insert(rtable, k)
-	end
-
-	table.sort(rtable)
-
-	return rtable
-end
-
 ----------------------------------------
--- removeCharacter()
---
--- Remove a character from the roster
+-- remove()
 ----------------------------------------
-function roster.removeCharacter(member)
-
-	if (rost.characters[member] ~= nil) then
-		rost.characters[member] = nil
+function roster:remove(inName)
+	if (self.characters[inName] ~= nil) then
+		self.characters[inName] = nil
 	else
-		rost.parties[member] = nil
-	end
-
-	write_table(rost, "roster")
-end
-
-----------------------------------------
--- updateCharacter()
---
--- Update a character in the roster
--- from the given table
-----------------------------------------
-function roster.updateCharacter(member)
-	local k
-	local v
-	local name
-
-	assert(member:isCharacter())
-	assert(rost.characters[member.name] ~= nil)
-
-	rost.characters[member.name] = member:toTable()
-
-	write_table(rost, "roster")
-end
-
-function roster.copyCharacter(member)
-	local k
-	local v
-	local c = {}
-
-	assert(rost.characters[member] ~= nil)
-
-	for k,v in pairs(rost.characters[member]) do
-		c[k] = v
-	end
-
-	return c
-end
-
-----------------------------------------
--- Package initialization
-----------------------------------------
-local function __init()
-	local diff
-
-	rost = read_table("roster", true)
-
-	if (not rost["characters"]) then
-		rost.characters = {}
-		rost.parties = {}
-
-		write_table(rost, "roster")
+		self.parties[inName] = nil
 	end
 end
 
 
-__init()
+
+
+
+
+
+
+
+
+
+
+
 

@@ -34,6 +34,7 @@ globals.fonts		= {}
 globals.fonts.mono	= gfxFont:new("fonts/bt1font.btf", true)
 globals.fonts.var	= gfxFont:new("fonts/bt1font.btf", false)
 text			= textBox:new(m_window)
+garths			= false
 
 currentLevel		= false
 directions = {

@@ -23,7 +23,7 @@ function funcs.selectCharacter()
 end
 
 function funcs.notEnoughGold()
-	text:clearline(11)
+	text:clearLine(11)
 	text:setCursor(0, 11)
 	text:cdprint(false, true, "Not enough gold.")
 end
