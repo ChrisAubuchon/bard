@@ -35,12 +35,15 @@ function keyboardCommand(inkey)
 		end
 	elseif (inkey == "B") then
 		party:singSong()
+		text:clear()
 		return true
 	elseif (inkey == "C") then
 		party:castSpell()
+		text:clear()
 		return true
 	elseif (inkey == "N") then
 		party:reorder()
+		text:clear()
 	elseif (inkey == "P") then
 		battle.partyAttack()
 		if (globals.partyDied) then
@@ -59,6 +62,7 @@ function keyboardCommand(inkey)
 	elseif (inkey == "U") then
 		text:clear()
 		party:useItem()
+		text:clear()
 		return true
 	elseif (inkey == btkeys.BTKEY_LEFT) then
 		currentLevel.turnParty("left")

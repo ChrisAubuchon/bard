@@ -76,6 +76,7 @@ end
 function battleData:new()
 	local self = {
 		isPartyAttack		= false,
+		isPartyBigpicDone	= false,
 		skipParty		= false,
 		numGroups		= 0,
 		monGroups	 	= false,
@@ -266,8 +267,11 @@ end
 
 function battleData:updateBigpic()
 	if (self.isPartyAttack) then
-		bigpic:setTitle("PARTY")
-		bigpic:drawImage("PIC_WARRIOR")
+		if (not self.isPartyBigpicDone) then
+			bigpic:setTitle("PARTY")
+			bigpic:drawImage("PIC_WARRIOR")
+			self.isPartyBigpicDone = true
+		end
 	else
 		local leadGroup = self.monGroups:getLeadGroup()
 		if (leadGroup.size == 1) then
@@ -347,7 +351,9 @@ function battleData:doRound()
 
 		currentAction = currentAction.next
 	end
-	self.monGroups:adjustMeleeGroups()
+	if (self.monGroups) then
+		self.monGroups:adjustMeleeGroups()
+	end
 end
 
 function battleData:endRound()
@@ -356,8 +362,6 @@ function battleData:endRound()
 	self.actionHead = false
 	self.actionTail = false
 	self.battleDataBySource = {}
-	collectgarbage("collect")
-	dprint(collectgarbage("count"))
 
 	if (self.monGroups) then
 		for mgroup in self.monGroups:iterator() do

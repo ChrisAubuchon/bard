@@ -25,6 +25,7 @@ spells.passive.light = function(inAction)
 	if (inData.isBardSong) then
 		local XXX_StopBardSong
 	end
+	dprint(duration)
 	party.light:activate(duration, inData.distance, inData.detectSecret)
 end
 

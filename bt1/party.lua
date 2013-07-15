@@ -13,6 +13,7 @@ party = {
 
 	song		= {
 		active		= false,
+		timer		= 0,
 		acBonus		= 0,
 		lightSong	= false,
 		singer		= false,

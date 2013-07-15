@@ -130,7 +130,6 @@ end
 -- animation sequence
 ----------------------------------------
 function gfxImage:Draw(inParent, inDestRect)
-	dprint(self.surface.isAnim)
 	if (self.surface.isAnim) then
 		self.surface:start(inParent.surface, inDestRect)
 	else

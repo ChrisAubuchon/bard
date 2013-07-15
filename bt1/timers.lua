@@ -12,19 +12,21 @@ end
 
 local function bt1_512()
 	if (not globals.isPaused) then
-		if ((party.songPlaying) and (party.songTime > 0)) then
-			party.songTime = party.songTime - 1
-			if (party.songTime == 0) then
+		if ((party.song.active) and (party.song.timer > 0)) then
+			party.song.timer = party.song.timer - 1
+			if (party.song.timer == 0) then
 				party.singer:songTimeout()
 			end
 		end
 
-		if ((party.light.active) and (party.light.duration > 0)) then
+		if ((party.light.active) and (party.light.duration > 0)
+			and (not party.song.lightSong)) then
 			party.light.duration = party.light.duration - 1
 			if (party.light.duration == 0) then
 				party.light.deactivate()
 			end
 		end
+
 		if ((party.levitate.active) and (party.levitate.duration > 0)) then
 			party.levitate.duration = party.levitate.duration - 1
 			if (party.levitate.duration == 0) then

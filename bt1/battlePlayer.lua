@@ -228,7 +228,7 @@ function battlePlayer:doDamage(inAction)
 		self.possessed = false
 		self.isDead = true
 
-		local xxx_cancelPreBattleSong = true
+		self:songTimeout()
 
 		outData.specialAttack = "kill"
 
@@ -288,12 +288,12 @@ function battlePlayer:inflictStatus(inAction)
 	elseif (inData.specialAttack == "stone") then
 		self.cur_hp		= 0
 		self.isStoned		= true
-		local xxx_cancelPreBattleSong = true
+		self:songTimeout()
 	elseif (inData.specialAttack == "critical") then
 		self.cur_hp		= 0
 		self.possessed		= false
 		self.isDead		= true
-		local xxx_cancelPreBattleSong = true
+		self:songTimeout()
 	end
 end
 

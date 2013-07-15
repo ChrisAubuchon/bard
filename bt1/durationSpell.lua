@@ -11,7 +11,7 @@ function durationSpell:new(inIcon)
 	return self
 end
 
-function durationSpell:activate(inDuration)
+function durationSpell:__activate(inDuration)
 	if (inDuration > 0) then
 		self.duration = inDuration + rnd_xdy(1,16)
 	else
@@ -21,7 +21,7 @@ function durationSpell:activate(inDuration)
 	text:printEllipsis()
 end
 
-function durationSpell:deactivate()
+function durationSpell:__deactivate()
 	self.duration = 0
 	self.icon:deactivate()
 end
@@ -35,7 +35,7 @@ function lightEffect:new()
 		effect		= durationSpell:new(icons.ICON_LIGHT)
 	}
 
-	btTable.addParent(self, lightEffect)
+	btTable.addParent(self, lightEffect, self.effect)
 	btTable.setClassMetatable(self)
 
 	return self
@@ -46,7 +46,7 @@ function lightEffect:activate(inDuration, inDistance, inSeeSecret)
 	self.distance	= inDistance
 	self.seeSecret	= inSeeSecret
 
-	self.effect:activate(inDuration)
+	self.effect:__activate(inDuration)
 
 	if (party.song.lightSong) then
 		party.song.singer:songTimeout()
@@ -61,7 +61,7 @@ function lightEffect:deactivate()
 	self.active	= false
 	self.distance	= 0
 	self.seeSecret	= false
-	self.effect:deactivate()
+	self.effect:__deactivate()
 	if (currentLevel and currentLevel.isDungeon() 
 			 and globals.doTimeEvents) then
 		currentLevel.buildView()
@@ -76,7 +76,7 @@ function shieldEffect:new()
 		effect		= durationSpell:new(icons.ICON_SHIELD)
 	}
 
-	btTable.addParent(self, shieldEffect)
+	btTable.addParent(self, shieldEffect, self.effect)
 	btTable.setClassMetatable(self)
 
 	return self
@@ -85,14 +85,14 @@ end
 function shieldEffect:activate(inDuration, inBonus)
 	self.active	= true
 	self.bonus	= inBonus
-	self.effect:activate(inDuration)
+	self.effect:__activate(inDuration)
 	party:display()
 end
 
 function shieldEffect:deactivate()
 	self.active	= false
 	self.bonus	= 0
-	self.effect:deactivate()
+	self.effect:__deactivate()
 	party:display()
 end
 
@@ -106,7 +106,7 @@ function detectEffect:new()
 		effect		= durationSpell:new(icons.ICON_DETECT)
 	}
 
-	btTable.addParent(self, detectEffect)
+	btTable.addParent(self, detectEffect, self.effect)
 	btTable.setClassMetatable(self)
 
 	return self
@@ -117,7 +117,7 @@ function detectEffect:activate(inDuration, inStairs, inTraps, inSpecial)
 	self.stairs	= inStairs
 	self.traps	= inTraps
 	self.special	= inSpecial
-	self.effect:activate(inDuration)
+	self.effect:__activate(inDuration)
 end
 
 function detectEffect:deactivate()
@@ -125,7 +125,7 @@ function detectEffect:deactivate()
 	self.stairs	= false
 	self.traps	= false
 	self.special	= false
-	self.effect:deactivate()
+	self.effect:__deactivate()
 end
 
 levitateEffect = {}
@@ -135,7 +135,7 @@ function levitateEffect:new()
 		effect		= durationSpell:new(icons.ICON_LEVITATE)
 	}
 
-	btTable.addParent(self, levitateEffect)
+	btTable.addParent(self, levitateEffect, self.effect)
 	btTable.setClassMetatable(self)
 
 	return self
@@ -143,12 +143,12 @@ end
 
 function levitateEffect:activate(inDuration)
 	self.active	= true
-	self.effect:activate(inDuration)
+	self.effect:__activate(inDuration)
 end
 
 function levitateEffect:deactivate()
 	self.active	= false
-	self.effect:deactivate()
+	self.effect:__deactivate()
 end
 
 compassEffect = {}
@@ -167,9 +167,9 @@ end
 function compassEffect:activate(inDuration)
 	self.active	= true
 	if (inDuration > 0) then
-		self.effect.duration = inDuration + rnd_xdy(1,16)
+		self.duration = inDuration + rnd_xdy(1,16)
 	else
-		self.effect.duration = inDuration
+		self.duration = inDuration
 	end
 end
 
