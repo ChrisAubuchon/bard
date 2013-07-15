@@ -77,7 +77,7 @@ function btapi.city.enterTavern(tavernName)
 end
 
 function btapi.city.enterTemple(templeName)
-	temple.enter(templeName)
+	temple:new(templeName)
 	currentLevel.turnParty("back")
 end
 
