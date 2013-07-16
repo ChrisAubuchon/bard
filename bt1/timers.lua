@@ -1,6 +1,20 @@
 local function bt1_16()
 	if (globals.doTimeEvents) then
-		local xxx_bt1_16 = true
+		if (globals.isNight) then
+			if (rnd_and_x(0x3f) == 2) then
+				return btkeys.BTKEY_RANDOMBATTLE
+			end
+		else
+			if (rnd_and_x(0x7f) == 2) then
+				text:print("random encounter")
+				return btkeys.BTKEY_RANDOMBATTLE
+			end
+		end
+
+		if (rnd_and_x(0xff) == 2) then
+			text:print("Wandering monster")
+			return btkeys.BTKEY_WANDERING
+		end
 	end
 end
 
@@ -10,9 +24,6 @@ local function bt1_256()
 
 		if (not party:isLive()) then
 			globals.doTimeEvents = false
-			globals.partyDied = true
-
-			party:died()
 			return false
 		end
 	end
@@ -63,14 +74,19 @@ local function bt1_512()
 
 		if (globals.doTimeEvents) then
 			if ((currentLevel.currentSquare.isSpptRegen) or
-			    (currentLevel.isCity() and not globals.isNight))
+			    (currentLevel:isCity() and not globals.isNight))
 			    then
 				party:regenSpellPoints()
 			end
 
 			party:doEquippedEffects()
 
-			local xxx_on_dungeon_life_drain_square
+			if (currentLevel.currentSquare.isLifeDrain) then
+				currentLevel:doLifeDrain()
+				if (not party:isLive()) then
+					return false
+				end
+			end
 		end
 	end
 end
@@ -89,7 +105,7 @@ local function bt1_2048()
 				currentLevel.level = 2
 
 				if (globals.doTimeEvents) then
-					if (currentLevel.isCity()) then
+					if (currentLevel:isCity()) then
 						currentLevel:buildView()
 					end
 				end
@@ -100,7 +116,7 @@ local function bt1_2048()
 
 				currentLevel.level = 1
 				if (globals.doTimeEvents) then
-					if (currentLevel.isCity()) then
+					if (currentLevel:isCity()) then
 						currentLevel:buildView()
 					end
 				end
@@ -110,7 +126,7 @@ local function bt1_2048()
 end
 
 local function __init()
-	--timer:new(bt1_16,	880)
+	timer:new(bt1_16,	880)
 	timer:new(bt1_256,	14080)
 	timer:new(bt1_512,	28160)
 	timer:new(bt1_2048,	112640)

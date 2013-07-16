@@ -118,7 +118,6 @@ function battlePlayer:doMeleeAttack(inAction)
 		end
 
 		if (not party:isLive()) then
-			globals.partyDied = true
 			return
 		end
 	end

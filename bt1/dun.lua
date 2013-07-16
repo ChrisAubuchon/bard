@@ -341,7 +341,9 @@ function dun:turnParty(inRelDirection)
 	end
 
 	if (self.currentSquare.isLifeDrain) then
-		local XXX = "doLifeDrain"
+		self:doLifeDrain()
+		party:isLive()
+		return
 	end
 
 	self:buildView()
@@ -357,9 +359,16 @@ function dun:moveForward()
 		return
 	end
 
-	if ((edge.isWall) and not (curSq.isPhased)) then
-		text:print("\n\nOuch!!")
-		return
+	if (globals.swapWallsAndDoors) then
+		if (edge.isDoor and not curSq.isPhased) then
+			text:print("\n\nOuch!!")
+			return
+		end
+	else
+		if ((edge.isWall) and not (curSq.isPhased)) then
+			text:print("\n\nOuch!!")
+			return
+		end
 	end
 
 	self.currentSquare.isPhased = nil
@@ -449,7 +458,25 @@ function dun:main()
 				end
 			end
 		end
+
+		if (globals.partyDied) then
+			globals.gameState = globals.STATE_PARTYDIED
+			return
+		end
 	until (self.exit)
+end
+
+function dun:doLifeDrain()
+	local c
+	local action
+
+	for c in party:iterator() do
+		action = btAction.new()
+		action.outData.damage = self.level
+		c:doDamage(action)
+	end
+
+	party:display()
 end
 
 local function __init()

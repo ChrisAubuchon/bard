@@ -256,6 +256,10 @@ function getkey()
 			return btkeys.BTKEY_F7
 		elseif (inkey == 0) then
 			return inkey
+		elseif (inkey == btkeys.BTKEY_RANDOMBATTLE) then
+			dprint("Random battle")
+		elseif (inkey == btkeys.BTKEY_WANDERING) then
+			dprint("Wandering monster")
 		elseif (inkey < 255) then
 			return string.upper(string.char(inkey))
 		end

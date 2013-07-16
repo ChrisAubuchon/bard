@@ -70,7 +70,6 @@ function battleMonster:meleeAttack(inAction)
 
 		party:display()
 		if (not party:isLive()) then
-			globals.partyDied = true
 			return
 		end
 	else

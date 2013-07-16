@@ -248,12 +248,18 @@ function bigpic:dunAdd(inQuad, inTileSet, inFacet, inSq)
 			gfx = "floor"
 		end
 	else
-		local xxx_swap_walls_and_doors = true
-
 		if ((inSq.secret) and (party.light.seeSecret)) then
 			gfx = "door"
 		else
 			gfx = inSq.gfx
+		end
+
+		if (globals.swapWallsAndDoors) then
+			if (gfx == "door") then
+				gfx = "wall"
+			else
+				gfx = "door"
+			end
 		end
 	end
 

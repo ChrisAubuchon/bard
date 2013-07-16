@@ -28,6 +28,7 @@ globals.isPaused	= false
 globals.colors		= colors
 globals.debug		= true
 globals.partyDied	= false
+globals.swapWallsAndDoors	= false
 
 m_window		= gfxScreen:new()
 globals.fonts		= {}
@@ -99,6 +100,8 @@ btkeys = {
 	BTKEY_F4 = ":M:",
 	BTKEY_F5 = ":N:",
 	BTKEY_F6 = ":O:",
-	BTKEY_F7 = ":P:"
+	BTKEY_F7 = ":P:",
+	BTKEY_RANDOMBATTLE	= ":Q:",
+	BTKEY_WANDERING		= ":R:"
 }
 

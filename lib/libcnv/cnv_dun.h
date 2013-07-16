@@ -25,12 +25,14 @@ typedef struct {
 	uint8_t		secret1;
 	uint8_t		canPhase1;
 	uint8_t		isWall1;
+	uint8_t		isDoor1;
 
 	btstring_t	*sq2;
 	btstring_t	*gfx2;
 	uint8_t		secret2;
 	uint8_t		canPhase2;
 	uint8_t		isWall2;
+	uint8_t		isDoor2;
 } dunEdge_t;
 
 typedef struct {

@@ -32,7 +32,7 @@ function funcs.selectOption()
 	until (inkey == "E")
 
 	text:clear()
-	currentLevel.turnParty("back")
+	currentLevel:turnParty("back")
 end
 
 funcs.talk = {

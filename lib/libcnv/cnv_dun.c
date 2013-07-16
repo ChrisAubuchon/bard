@@ -206,6 +206,7 @@ static json_t *edges_to_json(dunLevel_t *dl)
 		JSON_STRING(sqNode,	"path",		edge->sq2->buf);
 		JSON_TRUE_IF(sqNode,	"secret",	edge->secret1);
 		JSON_TRUE_IF(sqNode,	"isWall",	edge->isWall1);
+		JSON_TRUE_IF(sqNode,	"isDoor",	edge->isDoor1);
 		JSON_TRUE_IF(sqNode,	"canPhase",	edge->canPhase1);
 		json_object_set_new(edgeNode,	edge->sq1->buf, sqNode);
 
@@ -218,6 +219,7 @@ static json_t *edges_to_json(dunLevel_t *dl)
 		JSON_STRING(sqNode,	"path",		edge->sq1->buf);
 		JSON_TRUE_IF(sqNode,	"secret",	edge->secret2);
 		JSON_TRUE_IF(sqNode,	"isWall",	edge->isWall2);
+		JSON_TRUE_IF(sqNode,	"isDoor",	edge->isDoor2);
 		JSON_TRUE_IF(sqNode,	"canPhase",	edge->canPhase2);
 		json_object_set_new(edgeNode,	edge->sq2->buf, sqNode);
 

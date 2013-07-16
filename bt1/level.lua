@@ -21,6 +21,7 @@ function level:getSq()		overloadError("getSq()")	end
 function level:getBattleReward() overloadError("getBattleReward()")	end
 function level:getBattleOpponents() overloadError("getBattleOpponents()") end
 function level:getPoisonDamage() overloadError("getPoisonDamage()") end
+function level:doLifeDrain()	return true			end
 
 
 function level:isDungeon()	return false	end

@@ -151,11 +151,13 @@ static void setEdgeWall(dungeonLevel_t *l, dunEdge_t *edge,
 			if (square & WALL_NORTH) {
 				edge->gfx1 = bts_strcpy("wall");
 				if (square & DOOR_NORTH) {
+					edge->isDoor1 = 1;
 					edge->secret1 = 1;
 				} else {
 					edge->isWall1 = 1;
 				}
 			} else {
+				edge->isDoor1 = 1;
 				edge->gfx1 = bts_strcpy("door");
 			}
 		} else {
@@ -169,11 +171,13 @@ static void setEdgeWall(dungeonLevel_t *l, dunEdge_t *edge,
 			if (square & WALL_SOUTH) {
 				edge->gfx2 = bts_strcpy("wall");
 				if (square & DOOR_SOUTH) {
+					edge->isDoor2 = 1;
 					edge->secret2 = 1;
 				} else {
 					edge->isWall2 = 1;
 				}
 			} else {
+				edge->isDoor2 = 1;
 				edge->gfx2 = bts_strcpy("door");
 			}
 		} else {
@@ -187,11 +191,13 @@ static void setEdgeWall(dungeonLevel_t *l, dunEdge_t *edge,
 			if (square & WALL_WEST) {
 				edge->gfx1 = bts_strcpy("wall");
 				if (square & DOOR_WEST) {
+					edge->isDoor1 = 1;
 					edge->secret1 = 1;
 				} else {
 					edge->isWall1 = 1;
 				}
 			} else {
+				edge->isDoor1 = 1;
 				edge->gfx1 = bts_strcpy("door");
 			}
 		} else {
@@ -205,11 +211,13 @@ static void setEdgeWall(dungeonLevel_t *l, dunEdge_t *edge,
 			if (square & WALL_EAST) {
 				edge->gfx2 = bts_strcpy("wall");
 				if (square & DOOR_EAST) {
+					edge->isDoor2 = 1;
 					edge->secret2 = 1;
 				} else {
 					edge->isWall2 = 1;
 				}
 			} else {
+				edge->isDoor2 = 1;
 				edge->gfx2 = bts_strcpy("door");
 			}
 		} else {

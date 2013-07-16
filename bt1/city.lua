@@ -193,6 +193,11 @@ function city:new(inName)
 	self.title	= cities[inName].title
 	self.day	= cities[inName].day
 	self.night	= cities[inName].night
+	if (globals.isNight) then
+		self.level = 2
+	else
+		self.level	= 1
+	end
 
 	local function __initSquares()
 		local label

@@ -22,9 +22,6 @@ spells.passive.light = function(inAction)
 	local inData	= inAction.inData
 	local duration	= getPassiveDuration(inAction.inData)
 
-	if (inData.isBardSong) then
-		local XXX_StopBardSong
-	end
 	party.light:activate(duration, inData.distance, inData.detectSecret)
 end
 
@@ -79,13 +76,13 @@ end
 spells.scrySite = function()
 	local outString = "You face "
 
-	if (currentLevel.isCity()) then
+	if (currentLevel:isCity()) then
 		text:splashMessage(outString .. currentLevel.direction .. " and are in Skara Brae.")
 	else
 		local east
 		local north
 
-		east,north = currentLevel.getCoordinates()
+		east,north = currentLevel:getCoordinates()
 
 		outString = outString .. currentLevel.direction .. ", and are " 
 		outString = outString .. tostring(currentLevel.dungeonLevel)
@@ -206,19 +203,19 @@ spells.teleport = function()
 					return
 				end
 
-				x,y = currentLevel.getCoordinates()
+				x,y = currentLevel:getCoordinates()
 				x = (x + deltas[3]) % 22
 				y = (y + deltas[2]) % 22
 
-				currentLevel.currentSquare = currentLevel.getSq(string.format("x%02x%02x", x, y))
+				currentLevel.currentSquare = currentLevel:getSq(string.format("x%02x%02x", x, y))
 				currentLevel.squareFlags = {}
-				currentLevel.runSquareCode()
+				currentLevel:runSquareCode()
 				return
 			else
 				local x
 				local y
 				local newLevel = currentLevel.currentLevel
-				local numLevels = currentLevel.getNumLevels()
+				local numLevels = currentLevel:getNumLevels()
 
 				if (currentLevel.dungeonDirection == "below") then
 					newLevel = newLevel - deltas[4]
@@ -233,13 +230,13 @@ spells.teleport = function()
 
 				newLevel = (newLevel % numLevels) + 1
 
-				x,y = currentLevel.getCoordinates()
+				x,y = currentLevel:getCoordinates()
 				x = (x + deltas[3]) % 22
 				y = (y + deltas[2]) % 22
 
-				if (currentLevel.canTeleportTo(newLevel)) then
+				if (currentLevel:canTeleportTo(newLevel)) then
 					currentLevel.currentLevel = newLevel
-					currentLevel.currentSquare = currentLevel.getSq(string.format("x%02x%02x", x, y))
+					currentLevel.currentSquare = currentLevel:getSq(string.format("x%02x%02x", x, y))
 					btapi.dun.changeLevel(0)
 					currentLevel.clearFlags = true
 				end

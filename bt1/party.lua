@@ -390,6 +390,7 @@ end
 function party:isLive()
 	local c
 
+	dprint("isLive() called")
 	for c in self:characterIterator() do
 		if ((not c:isDisabled()) and
 		    (not c.isDoppelganger)) then
@@ -397,6 +398,8 @@ function party:isLive()
 		end
 	end
 
+	globals.partyDied = true
+	self:died()
 	return false
 end
 
@@ -414,7 +417,7 @@ function party:doPoison()
 		if (c.isPoisoned) then
 			doResort = true
 
-			c.cur_hp = c.cur_hp - currentLevel.getPoisonDamage()
+			c.cur_hp = c.cur_hp - currentLevel:getPoisonDamage()
 
 			if (c.cur_hp <= 0) then
 				c.cur_hp = 0
@@ -778,7 +781,7 @@ end
 -- Called when the party has died
 ----------------------------------------
 function party:died()
-	timer:delay(5)
+--	timer:delay(5)
 	bigpic:drawImage("PIC_GAMEOVER")
 	bigpic:setTitle("Sorry, bud")
 	text:clear()

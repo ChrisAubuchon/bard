@@ -51,7 +51,7 @@ function lightEffect:activate(inDuration, inDistance, inSeeSecret)
 		party.song.singer:songTimeout()
 	end
 
-	if (currentLevel.isDungeon()) then
+	if (currentLevel:isDungeon()) then
 		currentLevel:buildView()
 	end
 	text:printEllipsis()
@@ -62,7 +62,7 @@ function lightEffect:deactivate()
 	self.distance	= 0
 	self.seeSecret	= false
 	self.effect:__deactivate()
-	if (currentLevel and currentLevel.isDungeon() 
+	if (currentLevel and currentLevel:isDungeon() 
 			 and globals.doTimeEvents) then
 		currentLevel:buildView()
 	end

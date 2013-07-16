@@ -667,10 +667,9 @@ end
 function character:unequipItem(slot)
 	self.inventory:unequipItem(slot)
 
-	-- XXX Check if bard and stop the song. In the DOS version
-	-- it doesn't check if the unequipped item is the instrument.
-	-- It looks like it stops the song regardless of what item is
-	-- unequipped.
+	if (not self:isTypeEquipped("Instrument")) then
+		self:songTimeout()
+	end
 
 	party:display()
 end
