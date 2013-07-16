@@ -176,272 +176,280 @@ dunSq.new = function(inLabel, inSquare)
 	return self
 end
 
-----------------------------------------
--- Dungeon class
-----------------------------------------
-dun	= {}
-dun.new = function(inName, startLevel, startX, startY, startDirection)
-	local self		= level.new()
-	local squares		= {}
-	local edges		= {}
+dun = {}
+function dun:new(inName, inLevel, inX, inY, inDirection)
+	local self = {
+		currentLevel	= inLevel,
+		isPhasedFlag	= false,
+		squareFlags	= btDefaultTable:new(false),
+		squares		= {},
+		edges		= {}
+	}
 
-	local function __init()
+	btTable.addParent(self, dun, level)
+	btTable.setClassMetatable(self)
+
+	self.name		= inName
+	self.direction		= inDirection
+
+	if (type(dunData[inName][inLevel].level) == "string") then
+		dunData[inName][inLevel].level = read_table(
+				dunData[inName][inLevel].level, false
+				)
+	end
+
+	local dunLevel = dunData[inName][inLevel].level
+
+	local function __initSquares()
 		local label
 		local object
-		local dunLevel
-
-		self.name		= inName
-		self.currentLevel	= startLevel
-		self.direction		= startDirection
-		self.isPhasedFlag	= false
-		self.squareFlags	= {}
-		
-
-		assert(dunData[inName] ~= nil, "Unknown dungeon name: ", 
-			tostring(inName))
-
-		if (type(dunData[inName][startLevel].level) == "string") then
-			dunData[inName][startLevel].level = read_table(dunData[inName][startLevel].level, false)
-		end
-
-		dunLevel = dunData[inName][startLevel].level
 
 		for label, object in pairs(dunLevel.squares) do
-			squares[label] = dunSq.new(label, object)
+			self.squares[label] = dunSq.new(label, object)
 		end
+	end
 
-		for label, object in pairs(squares) do
-			object.north = dunEdge.new(label, 
-				dunLevel.edges[object.north], squares)
+	local function __initEdges()
+		local label
+		local object
+
+		for label, object in pairs(self.squares) do
+			object.north = dunEdge.new(label,
+				dunLevel.edges[object.north], self.squares)
 			object.south = dunEdge.new(label,
-				dunLevel.edges[object.south], squares)
+				dunLevel.edges[object.south], self.squares)
 			object.east = dunEdge.new(label,
-				dunLevel.edges[object.east], squares)
+				dunLevel.edges[object.east], self.squares)
 			object.west = dunEdge.new(label,
-				dunLevel.edges[object.west], squares)
+				dunLevel.edges[object.west], self.squares)
 		end
+	end
+
+	local function __initVars()
+		local label
+		local object
 
 		for label, object in pairs(dunLevel) do
 			if ((label ~= "squares") and (label ~= "edges")) then
 				self[label] = object
 			end
 		end
-
-		self.currentSquare = string.format("x%02d%02s", startX, startY)
-		self.currentSquare = squares[self.currentSquare]
-		setmetatable(self.squareFlags, { __index = __false_mt })
 	end
 
-	function self.isDungeon()
-		return true
-	end
+	__initSquares()
+	__initEdges()
+	__initVars()
 
-	function self.getSq(label)
-		return squares[label]
-	end
-
-	function self.resetBigpic()
-		self.buildView()
-		self.setTitle()
-	end
-
-	function self.setTitle()
-		bigpic:setTitle(self.title)
-	end
-
-	function self.getCoordinates()
-		return self.currentSquare.toCoordinates()
-	end
-
-	function self.getNumLevels()
-		return #dunData[self.name]
-	end
-
-	function self.canTeleportTo(inLevel)
-		return dunData[self.name][inLevel].canTeleportTo
-	end
-
-	local function doDetect()
-		local found = {}
-		local i
-		local sq
-		
-		sq = self.currentSquare[self.direction].path
-		for i = 1,3 do
-			if (sq.isStairs) then	found.stairs  = true end
-			if (sq.isTrap) then	found.traps   = true end
-			if (sq.isSpecial) then	found.special = true end
-			sq = sq[self.direction].path
-		end
-
-		if (next(found) ~= nil) then
-			text:print("\n")
-			if ((found.stairs) and (party.detect.stairs)) then
-				text:print("\nThere are stairs near.\n")
-			end
-			if ((found.traps) and (party.detect.traps)) then
-				text:print("\nThere is a trap near.\n")
-			end
-			if ((found.special) and (party.detect.special)) then
-				text:print("\nThere is something special near.\n")
-			end
-			text:print("\n")
-		end
-	end
-
-	function self.buildView()
-		bigpic:dunBackground(self.tileSet)
-		bigpic:dunDisplay()
-		if (party.light.active) then
-			__buildView(self.currentSquare, self.direction, 
-				self.tileSet, party.light.distance, 1)
-		end
-		bigpic:dunDisplay()
-
-		if (party.detect.active) then
-			doDetect()
-		end
-	end
-
-	function self.turnParty(inRelDirection)
-		self.direction = directions[inRelDirection][self.direction]
-		self.isPhasedFlag = false
-		text:clear()
-		if (self.currentSquare.isSpinner) then
-			local r = rnd_xdy(1, 4)
-			if (r == 1) then
-				self.direction = "north"
-			elseif (r == 2) then
-				self.direction = "south"
-			elseif (r == 3) then	
-				self.direction = "east"
-			else
-				self.direction = "west"
-			end
-		else
-			party.compass:update(self.direction)
-		end
-
-		if (self.currentSquare.isPhased) then
-			self.currentSquare.isPhased = nil
-		end
-
-		if (self.currentSquare.isLifeDrain) then
-			local XXX = "doLifeDrain"
-		end
-
-		self.buildView()
-	end
-
-	--function self.moveToNewSquare(direction)
-	function self.moveForward()
-		local curSq = self.currentSquare
-		local edge = curSq[self.direction]
-
-		text:clear()
-		self.squareFlags = {}
-		if (curSq.isStuck) then
-			return
-		end
-
-		if ((edge.isWall) and not (curSq.isPhased)) then
-			text:print("\n\nOuch!!")
-			return
-		end
-
-		self.currentSquare.isPhased = nil
-
-		self.currentSquare = edge.path
-		self.runSquareCode()
-	end
-
-	function self.runSquareCode()
-		local curSq = self.currentSquare
-
-		self.buildView()
-
-		if (curSq.isRandomBattle) then
-			text:cdprint(true, false, "Random battle")
-			curSq.isRandomBattle = false
-		end
-		if (not (self.squareFlags["seenDarkness"]) and curSq.isDarkness) then
-			party.light.deactivate()
-			text:print("\n\nDarkness!")
-			self.buildView()
-			self.squareFlags["seenDarkness"] = true
-		end
-		if (curSq.onEnter) then
-			text:cdprint(true, false, "onEnter")
-		end
-		if (curSq.isAntiMagic) then
-			party.levitate.deactivate()
-			party.compass.deactivate()
-			party.detect.deactivate()
-			party.shield.deactivate()
-		end
-		if (not (self.squareFlags["seenSmoke"]) and curSq.isSmoke) then
-			if (party.light.active) then
-				party.light.distance = 1
-			end
-			text:print("\nSmoke in your eyes!")
-			self.buildView()
-			self.squareFlags["seenSmoke"] = true
-		end
-		if (curSq.isTeleport) then
-			self.currentSquare = self.getSq(curSq.isTeleport)
-			text:clear()
-			bigpic:setTitle(self.title)
-			self.buildView()
-			self.runSquareCode()
-			return
-		end
-		if (curSq.isLifeDrain) then
-			text:cdprint(true, false, "isLifeDrain")
-		end
-		if (curSq.isMessage) then
-			if not (self.squareFlags["seenMessage"]) then
-				text:print(curSq.isMessage)
-				
-				self.squareFlags.seenMessage = true
-			end
-		end
-		if (curSq.isForcedBattle) then
-			text:cdprint(true, false, "isForcedBattle")
-		end
-		if (curSq.isTrap) then
-			text:cdprint(true, false, "isTrap")
-		end
-		if (curSq.isStairs) then
-			if not (self.squareFlags["seenStairs"]) then
-				executeString(curSq.isStairs)
-			end
-		end
-	end
-
-	function self.main()
-		local inkey
-
-		text:clear()
-		self.resetBigpic()
-
-		repeat
-			globals.doTimeEvents = true
-			inkey = getkey()
-			globals.doTimeEvents = false
-
-			if (not keyboardCommand(inkey)) then
-				if (inkey == "D") then
-					if (globals.debug) then	
-						btdebug.dunDebug()
-					end
-				end
-			end
-		until (self.exit)
-	end
-
-	__init()
+	self.currentSquare = string.format("x%02d%02d", inX, inY)
+	self.currentSquare = self.squares[self.currentSquare]
 
 	return self
+end
+
+function dun:isDungeon()
+	return true
+end
+
+function dun:getSq(label)
+	return self.squares[label]
+end
+
+function dun:resetBigpic()
+	self:buildView()
+	self:setTitle()
+end
+
+function dun:setTitle()
+	bigpic:setTitle(self.title)
+end
+
+function dun:getCoordinates()
+	return self.currentSquare.toCoordinates()
+end
+
+function dun:getNumLevels()
+	return #dunData[self.name]
+end
+
+function dun:canTeleportTo(inLevel)
+	return dunData[self.name][inLevel].canTeleportTo
+end
+
+local function doDetect()
+	local found = {}
+	local i
+	local sq
+	
+	sq = self.currentSquare[self.direction].path
+	for i = 1,3 do
+		if (sq.isStairs) then	found.stairs  = true end
+		if (sq.isTrap) then	found.traps   = true end
+		if (sq.isSpecial) then	found.special = true end
+		sq = sq[self.direction].path
+	end
+
+	if (next(found) ~= nil) then
+		text:print("\n")
+		if ((found.stairs) and (party.detect.stairs)) then
+			text:print("\nThere are stairs near.\n")
+		end
+		if ((found.traps) and (party.detect.traps)) then
+			text:print("\nThere is a trap near.\n")
+		end
+		if ((found.special) and (party.detect.special)) then
+			text:print("\nThere is something special near.\n")
+		end
+		text:print("\n")
+	end
+end
+
+function dun:buildView()
+	bigpic:dunBackground(self.tileSet)
+	bigpic:dunDisplay()
+	if (party.light.active) then
+		__buildView(self.currentSquare, self.direction, 
+			self.tileSet, party.light.distance, 1)
+	end
+	bigpic:dunDisplay()
+
+	if (party.detect.active) then
+		doDetect()
+	end
+end
+
+function dun:turnParty(inRelDirection)
+	self.direction = directions[inRelDirection][self.direction]
+	self.isPhasedFlag = false
+	text:clear()
+	if (self.currentSquare.isSpinner) then
+		local r = rnd_xdy(1, 4)
+		if (r == 1) then
+			self.direction = "north"
+		elseif (r == 2) then
+			self.direction = "south"
+		elseif (r == 3) then	
+			self.direction = "east"
+		else
+			self.direction = "west"
+		end
+	else
+		party.compass:update(self.direction)
+	end
+
+	if (self.currentSquare.isPhased) then
+		self.currentSquare.isPhased = nil
+	end
+
+	if (self.currentSquare.isLifeDrain) then
+		local XXX = "doLifeDrain"
+	end
+
+	self:buildView()
+end
+
+function dun:moveForward()
+	local curSq = self.currentSquare
+	local edge = curSq[self.direction]
+
+	text:clear()
+	self.squareFlags = btDefaultTable:new(false)
+	if (curSq.isStuck) then
+		return
+	end
+
+	if ((edge.isWall) and not (curSq.isPhased)) then
+		text:print("\n\nOuch!!")
+		return
+	end
+
+	self.currentSquare.isPhased = nil
+
+	self.currentSquare = edge.path
+	self:runSquareCode()
+end
+
+function dun:runSquareCode()
+	local curSq = self.currentSquare
+
+	self:buildView()
+
+	if (curSq.isRandomBattle) then
+		text:cdprint(true, false, "Random battle")
+		curSq.isRandomBattle = false
+	end
+	if (not (self.squareFlags["seenDarkness"]) and curSq.isDarkness) then
+		party.light.deactivate()
+		text:print("\n\nDarkness!")
+		self:buildView()
+		self.squareFlags["seenDarkness"] = true
+	end
+	if (curSq.onEnter) then
+		text:cdprint(true, false, "onEnter")
+	end
+	if (curSq.isAntiMagic) then
+		party.levitate.deactivate()
+		party.compass.deactivate()
+		party.detect.deactivate()
+		party.shield.deactivate()
+	end
+	if (not (self.squareFlags["seenSmoke"]) and curSq.isSmoke) then
+		if (party.light.active) then
+			party.light.distance = 1
+		end
+		text:print("\nSmoke in your eyes!")
+		self:buildView()
+		self.squareFlags["seenSmoke"] = true
+	end
+	if (curSq.isTeleport) then
+		self.currentSquare = self.getSq(curSq.isTeleport)
+		text:clear()
+		bigpic:setTitle(self.title)
+		self:buildView()
+		self:runSquareCode()
+		return
+	end
+	if (curSq.isLifeDrain) then
+		text:cdprint(true, false, "isLifeDrain")
+	end
+	if (curSq.isMessage) then
+		if not (self.squareFlags["seenMessage"]) then
+			text:print(curSq.isMessage)
+			
+			self.squareFlags.seenMessage = true
+		end
+	end
+	if (curSq.isForcedBattle) then
+		text:cdprint(true, false, "isForcedBattle")
+	end
+	if (curSq.isTrap) then
+		text:cdprint(true, false, "isTrap")
+	end
+	if (curSq.isStairs) then
+		if not (self.squareFlags["seenStairs"]) then
+			executeString(curSq.isStairs)
+		end
+	end
+end
+
+function dun:main()
+	local inkey
+
+	text:clear()
+	self:resetBigpic()
+
+	repeat
+		globals.doTimeEvents = true
+		inkey = getkey()
+		globals.doTimeEvents = false
+
+		if (not keyboardCommand(inkey)) then
+			if (inkey == "D") then
+				if (globals.debug) then	
+					btdebug.dunDebug()
+				end
+			end
+		end
+	until (self.exit)
 end
 
 local function __init()

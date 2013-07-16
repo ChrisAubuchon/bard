@@ -25,7 +25,6 @@ spells.passive.light = function(inAction)
 	if (inData.isBardSong) then
 		local XXX_StopBardSong
 	end
-	dprint(duration)
 	party.light:activate(duration, inData.distance, inData.detectSecret)
 end
 
@@ -122,7 +121,7 @@ spells.phaseDoor = function()
 
 		if (sq[currentLevel.direction].canPhase) then
 			currentLevel.currentSquare.isPhased = true
-			currentLevel.buildView()
+			currentLevel:buildView()
 		end
 	end
 	text:printEllipsis()

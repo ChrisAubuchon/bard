@@ -1,3 +1,5 @@
+require "dataio"
+
 ----------------------------------------
 -- Local variables
 ----------------------------------------
@@ -173,234 +175,252 @@ local function __buildView(maxdepth, sq, dir, depth, cycle, prevleft, prevright)
 		end
 	end
 end
-			
 
-----------------------------------------
--- city base class
-----------------------------------------
 city = {}
-city.new = function (inName, startX, startY, startDirection)
-	local self = level.new()
-	local sqs		= {}
-	local bldgs		= {}
+function city:new(inName)
+	local self = {
+		sqs	= {},
+		bldgs	= {},
+		day	= false,
+		night	= false,
+	}
 
-	
-	----------------------------------------
-	-- __init
-	--
-	-- Initialize the internal data
-	-- structures. In Bard's Tale, the city
-	-- data is read from disk every time the
-	-- party enters the city. We accomplish
-	-- this by recreating the object from
-	-- JSON table
-	----------------------------------------
-	local function __init()
+
+	btTable.addParent(self, city, level)
+	btTable.setClassMetatable(self)
+
+	self.name	= inName
+	self.title	= cities[inName].title
+	self.day	= cities[inName].day
+	self.night	= cities[inName].night
+
+	local function __initSquares()
 		local label
 		local square
 
-		self.name	= inName
-		self.title	= "Skara Brae"
-		self.direction	= startDirection
-		self.level	= 1
-		self.day	= cities[inName].day
-		self.night	= cities[inName].night
-
 		for label, square in pairs(cities[inName].squares) do
-			sqs[label] = citysq.new(label, square)
+			self.sqs[label] = citysq.new(label, square)
 		end
+	end
+
+	local function __initBuildings()
+		local label
+		local square
 
 		for label, square in pairs(cities[inName].buildings) do
-			bldgs[label] = citybldg.new(label, square)
-		end
-
-		for label, square in pairs(sqs) do
-			square.north = self.getSq(square.north)
-			square.south = self.getSq(square.south)
-			square.east = self.getSq(square.east)
-			square.west = self.getSq(square.west)
-		end
-
-		self.currentSquare = self.getSq(startX.."-"..startY)
-	end
-
-	function self.isCity()
-		return true
-	end
-
-	----------------------------------------
-	-- newSq()
-	--
-	-- Create a new path square
-	----------------------------------------
-	function self.newSq(label, location, onEnter)
-		sqs[label] = citysq.new(label, location, onEnter)
-	end
-
-	----------------------------------------
-	-- getSq()
-	--
-	-- Get a path square
-	----------------------------------------
-	function self.getSq(label)
-		if (sqs[label] ~= nil) then
-			return sqs[label]
-		else
-			return bldgs[label]
+			self.sqs[label] = citybldg.new(label, square)
 		end
 	end
 
-	----------------------------------------
-	-- newBldg()
-	--
-	-- Create a new city building
-	----------------------------------------
-	function self.newBldg(label, df, nf, one)
-		bldgs[label] = citybldg.new(label, df, nf, one)
-	end
+	local function __linkSquares()
+		local label
+		local square
 
-	function self.buildView()
-		bigpic:cityBackground()
-		__buildView(4, self.currentSquare, self.direction, 1,
-				"base", true, true)
-		bigpic:cityDisplay()
-	end
-
-	----------------------------------------
-	-- animateMove
-	--
-	--   Animate the movement of the party
-	-- in the city. On fast processors you
-	-- don't even really notice.
-	----------------------------------------
-	function self.animateMove()
-		bigpic:cityBackground()
-		__buildView(4, self.currentSquare, self.direction, 1,
-				"1", true, true)
-		bigpic:cityDisplay()
-
-		bigpic:cityBackground()
-		__buildView(4, self.currentSquare, self.direction, 1,
-				"2", true, true)
-		bigpic:cityDisplay()
-
-		bigpic:cityBackground()
-		__buildView(4, self.currentSquare, self.direction, 1,
-				"3", true, true)
-		bigpic:cityDisplay()
-	end
-
-	function self.turnParty(inRelDirection) 
-		self.direction = directions[inRelDirection][self.direction]
-		self.buildView()
-		if (party.compass.active) then
-			party.compass:update(self.direction)
+		for label, square in pairs(self.sqs) do
+			square.north = self:getSq(square.north)
+			square.south = self:getSq(square.south)
+			square.east = self:getSq(square.east)
+			square.west = self:getSq(square.west)
 		end
 	end
 
-	function self.moveForward()
-		local front_sq = self.currentSquare[self.direction]
-
-		if (front_sq.isBuilding()) then
-			front_sq.onEnter(self)
-			if (self.exit) then
-				return true
-			end
-			bigpic:setTitle("Skara Brae")
-		else
-			self.animateMove()
-			if (not front_sq.onEnter(self)) then
-				self.currentSquare = front_sq
-			end
-			self.buildView()
-		end
-
-		text:clear()
-		text:print(self.currentSquare.label)
-	end
-
-	function self.getPoisonDamage()
-		if (globals.isNight) then	
-			return self.night.poisonDamage
-		else
-			return self.day.poisonDamage
-		end
-	end
-
-	function self.resetBigpic()
-		self.buildView()
-		self.setTitle()
-	end
-
-	function self.main()
-		local inkey
-
-		text:clear()
-		self.resetBigpic()
-
-		repeat
-			globals.doTimeEvents = true
-			inkey = getkey()
-			globals.doTimeEvents = false
-
-			if (keyboardCommand(inkey)) then
-				self.resetBigpic()
-			elseif (inkey == "?") then
-				self.printLocation()
-			elseif (inkey == "D") then
-				if (globals.debug) then
-					btdebug.cityDebug()
-				end
-			elseif (inkey == "Z") then
-				party:doSummon("M_STONE_ELEMENTAL")
-			end
-
-			if (globals.partyDied) then
-				globals.gameState = globals.STATE_PARTYDIED
-				self.exit = true
-			end
-		until (self.exit)
-	end
-
-	function self.printLocation()
-		if (self.currentSquare.location == "grand") then
-			text:print("\n\nYou're in the Grand Plaz.")
-		else
-			text:print("\n\nYou are on " .. 
-					self.currentSquare.location .. 
-					" facing " .. self.direction
-				)
-		end
-
-		text:print("\n\nIt's now " .. timeOfDay[globals.gameHour])
-	end
-
-	function self.getBattleReward()
-		if (globals.isNight) then
-			return self.night.items[rnd_xdy(1,#self.night.items)]
-		else
-			return self.day.items[rnd_xdy(1,#self.day.items)]
-		end
-	end
-
-	function self.getBattleOpponents()
-		local timeTable
-		local monGroup = {}
-
-		if (globals.isNight) then
-			timeTable = self.night
-		else
-			timeTable = self.day
-		end
-
-		monGroup[1] = timeTable.monsters[rnd_xdy(1,#timeTable.monsters)]
-
-		return monGroup
-	end
-
-	__init()
+	__initSquares()
+	__initBuildings()
+	__linkSquares()
 
 	return self
+end
+
+----------------------------------------
+-- getSq()
+----------------------------------------
+function city:getSq(inLabel)
+	if (self.sqs[inLabel] ~= nil) then
+		return self.sqs[inLabel]
+	else
+		return self.bldgs[inLabel]
+	end
+end
+
+----------------------------------------
+-- isCity()
+----------------------------------------
+function city:isCity()
+	return true
+end
+
+----------------------------------------
+-- buildView()
+----------------------------------------
+function city:buildView()
+	bigpic:cityBackground()
+	__buildView(4, self.currentSquare, self.direction, 1,
+			"base", true, true)
+	bigpic:cityDisplay()
+end
+
+----------------------------------------
+-- animateMove()
+--
+-- Animate the movement of the party in
+-- the city. Very fast. Probably won't
+-- notice.
+----------------------------------------
+function city:animateMove()
+	bigpic:cityBackground()
+	__buildView(4, self.currentSquare, self.direction, 1,
+			"1", true, true)
+	bigpic:cityDisplay()
+
+	bigpic:cityBackground()
+	__buildView(4, self.currentSquare, self.direction, 1,
+			"2", true, true)
+	bigpic:cityDisplay()
+
+	bigpic:cityBackground()
+	__buildView(4, self.currentSquare, self.direction, 1,
+			"3", true, true)
+	bigpic:cityDisplay()
+end
+
+----------------------------------------
+-- turnParty()
+----------------------------------------
+function city:turnParty(inRelDirection) 
+	self.direction = directions[inRelDirection][self.direction]
+	self:buildView()
+	if (party.compass.active) then
+		party.compass:update(self.direction)
+	end
+end
+
+----------------------------------------
+-- moveForward
+----------------------------------------
+function city:moveForward()
+	local front_sq = self.currentSquare[self.direction]
+
+	if (front_sq.isBuilding()) then
+		front_sq.onEnter(self)
+		if (self.exit) then
+			return true
+		end
+		bigpic:setTitle("Skara Brae")
+	else
+		self:animateMove()
+		if (not front_sq.onEnter(self)) then
+			self.currentSquare = front_sq
+		end
+		self:buildView()
+	end
+
+	text:clear()
+	text:print(self.currentSquare.label)
+end
+
+----------------------------------------
+-- getPoisonDamage()
+----------------------------------------
+function city:getPoisonDamage()
+	if (globals.isNight) then	
+		return self.night.poisonDamage
+	else
+		return self.day.poisonDamage
+	end
+end
+
+----------------------------------------
+-- resetBigpic()
+----------------------------------------
+function city:resetBigpic()
+	self:buildView()
+	self:setTitle()
+end
+
+----------------------------------------
+-- enter()
+----------------------------------------
+function city:enter(inX, inY, inDirection)
+	self.direction = inDirection
+	self.currentSquare = self:getSq(inX .. "-" .. inY)
+end
+
+----------------------------------------
+-- main()
+----------------------------------------
+function city:main()
+	local inkey
+
+	text:clear()
+	self:resetBigpic()
+
+	repeat
+		globals.doTimeEvents = true
+		inkey = getkey()
+		globals.doTimeEvents = false
+
+		if (keyboardCommand(inkey)) then
+			self:resetBigpic()
+		elseif (inkey == "?") then
+			self:printLocation()
+		elseif (inkey == "D") then
+			if (globals.debug) then
+				btdebug.cityDebug()
+			end
+		elseif (inkey == "Z") then
+			party:doSummon("M_STONE_ELEMENTAL")
+		end
+
+		if (globals.partyDied) then
+			globals.gameState = globals.STATE_PARTYDIED
+			self.exit = true
+		end
+	until (self.exit)
+end
+
+----------------------------------------
+-- printLocation()
+----------------------------------------
+function city:printLocation()
+	if (self.currentSquare.location == "grand") then
+		text:print("\n\nYou're in the Grand Plaz.")
+	else
+		text:print("\n\nYou are on " .. 
+				self.currentSquare.location .. 
+				" facing " .. self.direction
+			)
+	end
+
+	text:print("\n\nIt's now " .. timeOfDay[globals.gameHour])
+end
+
+----------------------------------------
+-- getBattleReward()
+----------------------------------------
+function city:getBattleReward()
+	if (globals.isNight) then
+		return self.night.items[rnd_xdy(1,#self.night.items)]
+	else
+		return self.day.items[rnd_xdy(1,#self.day.items)]
+	end
+end
+
+----------------------------------------
+-- getBattleOpponents()
+----------------------------------------
+function city:getBattleOpponents()
+	local timeTable
+	local monGroup = {}
+
+	if (globals.isNight) then
+		timeTable = self.night
+	else
+		timeTable = self.day
+	end
+
+	monGroup[1] = timeTable.monsters[rnd_xdy(1,#timeTable.monsters)]
+
+	return monGroup
 end
 
 local function __init()

@@ -12,6 +12,7 @@ typedef struct {
 
 typedef struct {
 	btstring_t 	*name;
+	btstring_t	*title;
 	citydata_t	*day;
 	citydata_t	*night;
 	cnvList_t	*sqs;

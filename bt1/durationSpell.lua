@@ -18,7 +18,6 @@ function durationSpell:__activate(inDuration)
 		self.duration = inDuration
 	end
 	self.icon:activate()
-	text:printEllipsis()
 end
 
 function durationSpell:__deactivate()
@@ -53,8 +52,9 @@ function lightEffect:activate(inDuration, inDistance, inSeeSecret)
 	end
 
 	if (currentLevel.isDungeon()) then
-		currentLevel.buildView()
+		currentLevel:buildView()
 	end
+	text:printEllipsis()
 end
 
 function lightEffect:deactivate()
@@ -64,7 +64,7 @@ function lightEffect:deactivate()
 	self.effect:__deactivate()
 	if (currentLevel and currentLevel.isDungeon() 
 			 and globals.doTimeEvents) then
-		currentLevel.buildView()
+		currentLevel:buildView()
 	end
 end
 
@@ -87,6 +87,7 @@ function shieldEffect:activate(inDuration, inBonus)
 	self.bonus	= inBonus
 	self.effect:__activate(inDuration)
 	party:display()
+	text:printEllipsis()
 end
 
 function shieldEffect:deactivate()
@@ -118,6 +119,7 @@ function detectEffect:activate(inDuration, inStairs, inTraps, inSpecial)
 	self.traps	= inTraps
 	self.special	= inSpecial
 	self.effect:__activate(inDuration)
+	text:printEllipsis()
 end
 
 function detectEffect:deactivate()
@@ -144,6 +146,7 @@ end
 function levitateEffect:activate(inDuration)
 	self.active	= true
 	self.effect:__activate(inDuration)
+	text:printEllipsis()
 end
 
 function levitateEffect:deactivate()
@@ -171,6 +174,7 @@ function compassEffect:activate(inDuration)
 	else
 		self.duration = inDuration
 	end
+	text:printEllipsis()
 end
 
 function compassEffect:deactivate()

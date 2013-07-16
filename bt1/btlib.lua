@@ -34,7 +34,7 @@ function keyboardCommand(inkey)
 		inkey = tonumber(inkey) 
 		if (party:isOccupied(inkey)) then
 			party[inkey]:printCharacter()
-			currentLevel.resetBigpic()
+			currentLevel:resetBigpic()
 			text:clear()
 		end
 	elseif (inkey == "B") then
@@ -69,13 +69,13 @@ function keyboardCommand(inkey)
 		text:clear()
 		return true
 	elseif (inkey == btkeys.BTKEY_LEFT) then
-		currentLevel.turnParty("left")
+		currentLevel:turnParty("left")
 	elseif (inkey == btkeys.BTKEY_RIGHT) then
-		currentLevel.turnParty("right")
+		currentLevel:turnParty("right")
 	elseif (inkey == btkeys.BTKEY_DOWN) then
-		currentLevel.turnParty("back")
+		currentLevel:turnParty("back")
 	elseif (inkey == btkeys.BTKEY_UP) then
-		currentLevel.moveForward()
+		currentLevel:moveForward()
 	elseif (inkey == "Q") then
 		os.exit()
 	else

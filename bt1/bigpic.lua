@@ -226,7 +226,6 @@ function bigpic:dunBackground(inTileSet)
 	end
 
 	self.surface:Draw(nil, self.dun.bg[inTileSet], nil)
-	dprint(party.light.distance)
 	if (party.light.distance < 4) then
 		self.surface:Fill(self.dun.lightRect[party.light.distance],
 				globals.colors[1])

@@ -17,7 +17,7 @@ function battle:random()
 
 	b.isPartyAttack = false
 	b.monGroups = monsterParty.new()
-	mgroups = currentLevel.getBattleOpponents()
+	mgroups = currentLevel:getBattleOpponents()
 	for _,mgroup in ipairs(mgroups) do
 		b.monGroups:addMonsterGroup(monsterGroup:new(mgroup, false))
 	end

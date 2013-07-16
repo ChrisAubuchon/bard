@@ -212,8 +212,9 @@ local function enter()
 				globals.isNight = false
 				globals.gameHour = 7
 
-				currentLevel = city.new("skara", 17, 16, "east")
-				--currentLevel = city.new("skara", 25, 15, "west")
+				currentLevel = city:new("skara")
+				currentLevel:enter(17, 16, "east")
+				--currentLevel:enter(25, 15, "east")
 				globals.gameState = globals.STATE_CITY
 				return
 			end

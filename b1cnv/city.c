@@ -355,6 +355,7 @@ void convertLevels(void)
 	pat = dehufFile(mkBardOnePath("city.pat"), 0x384);
 
 	skara = btcity_new(bts_strcpy("skara"));
+	skara->title = bts_strcpy("Skara Brae");
 
 	for (y = 29; y >= 0; y--) {
 		for (x = 0; x < 30; x++) {

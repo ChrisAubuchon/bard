@@ -64,7 +64,7 @@ _race.init = function ()
 			text:print("\n%d) %s", i, r)
 		end
 
-		printCancel()
+		text:printCancel()
 
 		repeat
 			inkey = getkey()

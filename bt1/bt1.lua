@@ -97,9 +97,9 @@ repeat
 		party.compass:deactivate()
 		guild.enter()
 	elseif (globals.gameState == globals.STATE_CITY) then
-		currentLevel.main()
+		currentLevel:main()
 	elseif (globals.gameState == globals.STATE_DUNGEON) then
-		currentLevel.main()
+		currentLevel:main()
 	elseif (globals.gameState == globals.STATE_PARTYDIED) then
 		globals.gameState = globals.STATE_GUILD
 	end

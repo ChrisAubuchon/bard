@@ -90,7 +90,7 @@ local function bt1_2048()
 
 				if (globals.doTimeEvents) then
 					if (currentLevel.isCity()) then
-						currentLevel.buildView()
+						currentLevel:buildView()
 					end
 				end
 			end
@@ -101,7 +101,7 @@ local function bt1_2048()
 				currentLevel.level = 1
 				if (globals.doTimeEvents) then
 					if (currentLevel.isCity()) then
-						currentLevel.buildView()
+						currentLevel:buildView()
 					end
 				end
 			end

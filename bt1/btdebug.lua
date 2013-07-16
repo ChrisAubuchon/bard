@@ -85,7 +85,7 @@ function btdebug.cityDebug()
 			else
 				globals.isNight = true
 			end
-			currentLevel.buildView()
+			currentLevel:buildView()
 		elseif (inkey == "2") then
 			if (btdebug.enterDungeon()) then
 				return 
@@ -123,7 +123,7 @@ function btdebug.enterBuilding()
 end
 
 function btdebug.toggleSquareFlag(inSqFlag)
-	if (not currentLevel.isDungeon()) then
+	if (not currentLevel:isDungeon()) then
 		return
 	end
 
@@ -233,9 +233,9 @@ function btdebug.moveToSquare()
 				cursor = 3
 			end
 		elseif (inkey == "D") then
-			currentLevel.currentSquare = currentLevel.getSq(string.format("x%02x%02x", newCoords[3], newCoords[2]))
-			currentLevel.buildView()
-			currentLevel.runSquareCode()
+			currentLevel.currentSquare = currentLevel:getSq(string.format("x%02x%02x", newCoords[3], newCoords[2]))
+			currentLevel:buildView()
+			currentLevel:runSquareCode()
 			return
 		end
 	until (inkey == "C")

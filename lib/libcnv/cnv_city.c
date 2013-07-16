@@ -188,6 +188,7 @@ void btcity_free(btcity_t *btc)
 	citydata_free(btc->night);
 
 	bts_free(btc->name);
+	bts_free(btc->title);
 	free(btc);
 }
 
@@ -235,6 +236,7 @@ void btcity_to_json(btstring_t *fname, btcity_t *btc)
 
 	root = json_object();
 
+	JSON_BTSTRING(root, "title", btc->title);
 	json_object_set_new(root, "squares", cnvList_toJsonObject(btc->sqs));
 	json_object_set_new(root, "buildings", cnvList_toJsonObject(btc->bls));
 
