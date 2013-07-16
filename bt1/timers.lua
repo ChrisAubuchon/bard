@@ -6,11 +6,20 @@ end
 
 local function bt1_256()
 	if ((not globals.isPaused) and (globals.doTimeEvents)) then
-		local xxx_bt1_256 = true
+		party:doPoison()
+
+		if (not party:isLive()) then
+			globals.doTimeEvents = false
+			globals.partyDied = true
+
+			party:died()
+			return false
+		end
 	end
 end
 
 local function bt1_512()
+	dprint("bt1_512()")
 	if (not globals.isPaused) then
 		if ((party.song.active) and (party.song.timer > 0)) then
 			party.song.timer = party.song.timer - 1
@@ -51,6 +60,18 @@ local function bt1_512()
 				party.compass.deactivate()
 			end
 		end
+
+		if (globals.doTimeEvents) then
+			if ((currentLevel.currentSquare.isSpptRegen) or
+			    (currentLevel.isCity() and not globals.isNight))
+			    then
+				party:regenSpellPoints()
+			end
+
+			party:doEquippedEffects()
+
+			local xxx_on_dungeon_life_drain_square
+		end
 	end
 end
 
@@ -89,7 +110,7 @@ local function bt1_2048()
 end
 
 local function __init()
-	timer:new(bt1_16,	880)
+	--timer:new(bt1_16,	880)
 	timer:new(bt1_256,	14080)
 	timer:new(bt1_512,	28160)
 	timer:new(bt1_2048,	112640)

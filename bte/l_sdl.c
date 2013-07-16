@@ -96,9 +96,12 @@ static int l_get_key(lua_State *L)
 {
 	int key;
 
+	_l_io_loop(L);
+#if 0
 	key = _l_io_loop(L);
 
 	lua_pushnumber(L, key);
+#endif
 
 	return 1;
 }
@@ -127,13 +130,18 @@ static int _l_io_loop(lua_State *L)
 				break;
 			}
 			case BT_SLEEP_EVENT:
+				lua_pushnumber(L, 0);
 				return 0;
 			case BT_CB_EVENT:
 			{
 				lua_rawgeti(L, LUA_REGISTRYINDEX, (int)sdlevent.user.data1);
 				if (!lua_isfunction(L,1))
-					luaL_error(L, "Stack corruption. Not a function");
-				lua_call(L, 0, 0);
+					luaL_error(L, "Stack corruption. Not a function: %d", lua_type(L, 1));
+				lua_call(L, 0, 1);
+				if (!lua_isnil(L, 1)) {
+					return;
+				}
+				lua_pop(L, 1);
 				break;
 			}
 			case SDL_KEYDOWN:
@@ -142,6 +150,7 @@ static int _l_io_loop(lua_State *L)
 
 				key = keyDownEventHandler(L, &sdlevent);
 				if (key != 0)
+					lua_pushnumber(L, key);
 					return key;
 				break;
 			}

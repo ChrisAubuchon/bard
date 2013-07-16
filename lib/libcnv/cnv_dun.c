@@ -246,6 +246,7 @@ static json_t *vertices_to_json(dunLevel_t *dl)
 		JSON_TRUE_IF(vertexNode,"isSpinner",	vertex->isSpinner);
 		JSON_TRUE_IF(vertexNode,"isSmoke",	vertex->isSmoke);
 		JSON_TRUE_IF(vertexNode,"isNoSpptRegen",vertex->isNoSpptRegen);
+		JSON_TRUE_IF(vertexNode,"isSpptRegen",	vertex->isSpptRegen);
 		JSON_TRUE_IF(vertexNode,"isAntiMagic",	vertex->isAntiMagic);
 		JSON_TRUE_IF(vertexNode,"isLifeDrain",	vertex->isLifeDrain);
 		JSON_TRUE_IF(vertexNode,"isDarkness",	vertex->isDarkness);

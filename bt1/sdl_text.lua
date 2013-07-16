@@ -202,10 +202,6 @@ end
 ----------------------------------------
 -- scrollingSelect()
 --
--- xxx - inTable can be an array or an
--- object with a "toArray" method. Look
--- in to converting callers to only use
--- objects with "toArray"
 ----------------------------------------
 function textBox:scrollingSelect(inTable, inFunc)
 	local topIndex		= 1

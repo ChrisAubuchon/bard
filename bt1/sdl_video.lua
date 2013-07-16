@@ -209,19 +209,6 @@ function gfxFont:Render(inText, inColor)
 	return rval
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ----------------------------------------
 -- getkey()
 --
@@ -233,7 +220,9 @@ function getkey()
 	while true do
 		inkey = sdl.GetKey()
 
-		if (inkey == sdl.SDLK_BACKSPACE) then
+		if (not inkey) then
+			return nil
+		elseif (inkey == sdl.SDLK_BACKSPACE) then
 			return btkeys.BTKEY_BACKSPACE
 		elseif (inkey == sdl.SDLK_RETURN) then
 			return btkeys.BTKEY_RETURN

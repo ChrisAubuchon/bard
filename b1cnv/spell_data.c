@@ -230,16 +230,3 @@ uint8_t wordoffear[] = {
 	1, 3, 0
 };
 
-uint8_t songBonusList[] = {
-	1, 1, 2, 2,
-	2, 3, 3, 4
-};
-
-uint8_t *songName[] = {
-	"Falkens Fury",
-	"Seekers Ballad",
-	"Waylands Watch",
-	"Badhr Kilnfest",
-	"Traveller tune",
-	"Lucklaran"
-};

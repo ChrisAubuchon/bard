@@ -43,6 +43,7 @@ typedef struct {
 	uint8_t		isSpinner;
 	uint8_t		isSmoke;
 	uint8_t		isNoSpptRegen;
+	uint8_t		isSpptRegen;
 	uint8_t		isAntiMagic;
 	uint8_t		isLifeDrain;
 	uint8_t		isDarkness;

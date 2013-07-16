@@ -26,6 +26,10 @@ end
 function keyboardCommand(inkey)
 	local rval
 
+	if (inkey == nil) then
+		return false
+	end
+
 	if ((inkey > "0") and (inkey < "7")) then
 		inkey = tonumber(inkey) 
 		if (party:isOccupied(inkey)) then

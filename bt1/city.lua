@@ -223,7 +223,10 @@ city.new = function (inName, startX, startY, startDirection)
 
 		self.currentSquare = self.getSq(startX.."-"..startY)
 	end
-			
+
+	function self.isCity()
+		return true
+	end
 
 	----------------------------------------
 	-- newSq()

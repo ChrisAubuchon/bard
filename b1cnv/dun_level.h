@@ -134,7 +134,7 @@ typedef struct {
   _dunCoord_t dun_spinner[8];
   _dunCoord_t dun_smoke[8];
   _dunCoord_t dun_lifeDrain[16];
-  _dunCoord_t dun_noSpptRegen[8];
+  _dunCoord_t dun_spptRegen[8];
   _dunCoord_t dun_teleonly[8];
   _dunCoord_t dun_infoMess[8];
   _dunCoord_t dun_reqBattle[8];

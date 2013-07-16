@@ -405,8 +405,6 @@ end
 --
 -- Do damage to each poisoned party
 -- member
---
--- xxx - might not belong here
 ----------------------------------------
 function party:doPoison()
 	local c
@@ -418,7 +416,7 @@ function party:doPoison()
 
 			c.cur_hp = c.cur_hp - currentLevel.getPoisonDamage()
 
-			if (c.cur_hp < 0) then
+			if (c.cur_hp <= 0) then
 				c.cur_hp = 0
 				c.isDead = true
 			end
@@ -431,6 +429,25 @@ function party:doPoison()
 end
 
 ----------------------------------------
+-- regenSpellPoints()
+----------------------------------------
+function party:regenSpellPoints()
+	local c
+	local update = false
+
+	for c in self:characterIterator() do
+		if (c.cur_sppt < c.max_sppt) then
+			c.cur_sppt = c.cur_sppt + 1
+			update = true
+		end
+	end
+
+	if (update) then
+		self:display()
+	end
+end
+
+----------------------------------------
 -- doEquippedEffects()
 --
 -- Loop through the party and perform
@@ -438,23 +455,28 @@ end
 ----------------------------------------
 function party:doEquippedEffects()
 	local c
+	local update = false
 
 	for c in self:characterIterator() do
 		if (c:isEffectEquipped("hasSpptRegen")) then
 			if (c.cur_sppt < c.max_sppt) then
 				c.cur_sppt = c.cur_sppt + 1
+				update = true
 			end
 		end
 
-		local xxx_song_regen_hp = true
-
-		if (c:isEffectEquipped("hasRegenHP")) then
+		if (self.song.regenHp or c:isEffectEquipped("hasRegenHP")) then
 			if (not c:isDisabled()) then
 				if (c.cur_hp < c.max_hp) then
 					c.cur_hp = c.cur_hp + 1
+					update = true
 				end
 			end
 		end
+	end
+
+	if (update) then
+		self:display()
 	end
 end
 
@@ -750,7 +772,18 @@ function party:singSong()
 	char.song		= tune
 end
 
-
+----------------------------------------
+-- died()
+--
+-- Called when the party has died
+----------------------------------------
+function party:died()
+	timer:delay(5)
+	bigpic:drawImage("PIC_GAMEOVER")
+	bigpic:setTitle("Sorry, bud")
+	text:clear()
+	text:splashMessage("Alas, your party has expired, but has gone to adventurer heaven.")
+end
 
 
 

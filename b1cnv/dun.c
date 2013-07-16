@@ -360,10 +360,10 @@ static dunLevel_t *convertDunLevel(btstring_t *data, uint32_t dunIndex)
 			setSquareFlag(dl, l->dun_smoke[i].sqEast,
 					l->dun_smoke[i].sqNorth, isSmoke);
 		}
-		if (l->dun_noSpptRegen[i].sqNorth != 0xff) {
-			setSquareFlag(dl, l->dun_noSpptRegen[i].sqEast,
-					l->dun_noSpptRegen[i].sqNorth,
-					isNoSpptRegen);
+		if (l->dun_spptRegen[i].sqNorth != 0xff) {
+			setSquareFlag(dl, l->dun_spptRegen[i].sqEast,
+					l->dun_spptRegen[i].sqNorth,
+					isSpptRegen);
 		}
 		if (l->dun_antiMagic[i].sqNorth != 0xff) {
 			setSquareFlag(dl, l->dun_antiMagic[i].sqEast,

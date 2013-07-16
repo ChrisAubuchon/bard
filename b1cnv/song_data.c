@@ -13,7 +13,7 @@ uint8_t *song_activateStrings[] = {
 	"",
 	"spells.passive.light(inAction); party.song.lightSong = true",
 	"",
-	"", 
+	"party.song.regenHp = true", 
 	"party.song.acBonus = party.song.acBonus + inAction.inData.data; party:display()",
 	""
 };
@@ -22,7 +22,21 @@ uint8_t *song_deactivateStrings[] = {
 	"",
 	"party.light:deactivate(); party.song.lightSong = false",
 	"",
-	"",
+	"party.song.regenHp = false",
 	"party.song.acBonus = 0; party:display()",
 	"",
+};
+
+uint8_t *songName[] = {
+	"Falkens Fury",
+	"Seekers Ballad",
+	"Waylands Watch",
+	"Badhr Kilnfest",
+	"Traveller tune",
+	"Lucklaran"
+};
+
+uint8_t songBonusList[] = {
+	1, 1, 2, 2,
+	2, 3, 3, 4
 };

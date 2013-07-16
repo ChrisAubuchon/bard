@@ -87,7 +87,9 @@ m_window:Draw(nil, gfxImage:new("images/screen.png", "png"), nil)
 repeat
 	if (globals.gameState == globals.STATE_GUILD) then
 		globals.partyDied = false
-		local xxx_bard_song_timeout
+		if (party.song.singer) then
+			party.song.singer:songTimeout()
+		end
 		party.detect:deactivate()
 		party.shield:deactivate()
 		party.levitate:deactivate()

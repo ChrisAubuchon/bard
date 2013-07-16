@@ -92,12 +92,12 @@ void convertSongs(void)
 			/* Fall through */
 		case 0:
 		case 2:
-		case 3:
 		case 5:
 			b->combatFunction = btFunction_new(FUNC_STRING,
 					bts_strcpy(song_combatStrings[i]));
 			song_generic(b->combatData);
 			break;
+		case 3:
 		case 4:
 			b->activate = btFunction_new(FUNC_STRING,
 					bts_strcpy(song_activateStrings[i]));
