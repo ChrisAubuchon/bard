@@ -12,6 +12,7 @@ typedef struct {
 	btstring_t	*pic;
 	uint32_t	hpDice;
 	uint32_t	meleeBonus;
+	uint32_t	saveBonus;
 	cnvList_t	*xpReq;
 } btClass_t;
 

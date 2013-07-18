@@ -78,6 +78,7 @@ function battleData:new()
 		isPartyAttack		= false,
 		isPartyBigpicDone	= false,
 		skipParty		= false,
+		monDisbelieve		= false,
 		numGroups		= 0,
 		monGroups	 	= false,
 		actionHead		= false,
@@ -245,7 +246,7 @@ function battleData:start()
 			text:cdprint(true, false, "\nYou still face ")
 			self:printMonsterGroups()
 
-			local xxx_monsters_advance = true
+			self.monGroups:advance()
 		else
 			break
 		end
@@ -369,7 +370,7 @@ function battleData:endRound()
 		end
 	end
 
-	local xxx_party_checkDisbelieve = true
+	party:disbelieve(self)
 	if (globals.partyDied) then
 		return
 	end
@@ -378,7 +379,13 @@ function battleData:endRound()
 	-- It is triggered by "cmp byte_3B76E, 0" but byte_3B76E
 	-- is never set anywhere...
 	--
-	local xxx_monster_disbelieve = true
+	--if (self.monGroups) then
+		-- The DOS code for a successful disbelieve doesn't
+		-- even remove the summoned illusion. Hence this
+		-- entire check is commented out.
+		--
+		--self.monGroups:disbelieve(self)
+	--end
 
 	party:doPoison()
 	party:doEquippedEffects()
@@ -519,8 +526,25 @@ function battleData:getRunFightOption()
 		inkey = getkey()
 
 		if (inkey == "R") then
-			local xxx_run_check = true
-			return true
+			local saveAction = btAction:new()
+			saveAction.target = party[1]
+			saveAction.source = self.monGroups:getLeadGroup()
+			if (saveAction:savingThrow()) then
+				return true
+			end
+
+			if (rnd_and_x(7) == 0) then
+				dprint("rnd_and_x(7) == true")
+				return true
+			end
+			if (currentLevel:isCity() and not globals.isNight) then
+				if (rnd_and_x(3) == 0) then
+					dprint("rnd_and_x(3) == true")
+					return true
+				end
+			end
+
+			return false
 		end
 	until (inkey == "F")
 

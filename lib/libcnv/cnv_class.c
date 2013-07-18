@@ -44,6 +44,7 @@ static json_t *btClass_toJson(const void *vbc)
 	JSON_BTSTRING(root, "pic", bc->pic);
 	JSON_NUMBER(root, "hpDice", bc->hpDice + 1);
 	JSON_NUMBER(root, "meleeBonus", bc->meleeBonus);
+	JSON_NUMBER_IF_NOT_ZERO(root, "saveBonus", bc->saveBonus);
 	json_object_set_new(root, "xpreq", cnvList_toJsonArray(bc->xpReq));
 
 	return root;

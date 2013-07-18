@@ -789,7 +789,32 @@ function party:died()
 end
 
 
+----------------------------------------
+-- disbelieve()
+----------------------------------------
+function party:disbelieve(inBattle)
+	local mgroup
 
+	if (not inBattle.monGroups) then
+		return
+	end
+
+	for mgroup in inBattle.monGroups:iterator() do
+		if (mgroup.isIllusion) then
+			local action = btAction:new()
+			action.source = party[1]
+			action.target = mgroup
+			action.inBattle = inBattle
+
+			if (not action:savingThrow()) then
+				mgroup:truncate(2)
+				action.outData.specialAttack = "stone"
+				mgroup:doDamage(action)
+				text:cdprint(false, true, "\nThe party disbelieves!")
+			end
+		end
+	end
+end
 
 
 

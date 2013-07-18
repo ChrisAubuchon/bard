@@ -53,6 +53,19 @@ static uint8_t classMeleeBonus[] = {
 	0
 };
 
+static uint8_t classSaveBonus[] = {
+	1,
+	3,
+	1,
+	1,
+	1,
+	1,
+	2,
+	2,
+	2,
+	3
+};
+
 static uint32_t classXpReq[][13] = {
 	{
         0, 2000, 4000, 7000, 10000, 15000, 20000, 30000, 50000, 80000,
@@ -111,6 +124,7 @@ void convertClasses(void)
 		bc->pic = bts_strcpy(classPic[i]);
 		bc->hpDice = classHpDice[i];
 		bc->meleeBonus = classMeleeBonus[i];
+		bc->saveBonus = classSaveBonus[i];
 
 		for (j = 0; j < 13; j++) {
 			cnvList_add(bc->xpReq, (void *)classXpReq[i][j]);

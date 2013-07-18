@@ -135,6 +135,14 @@ function btArray:__remove(inIndex)
 	self.size = #self
 end
 
+function btArray:truncate(inPos)
+	local i
+
+	for i = #self,inPos,-1 do
+		table.remove(self, i)
+	end
+end
+
 function btArray:iterator()
 	local n = 0
 	local function f(_)

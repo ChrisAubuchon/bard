@@ -62,6 +62,7 @@ function monsterGroup:new(inName, inSize)
 		inMeleeRange	= false,
 		inName		= inName,
 		name		= inName,
+		isIllusion	= false
 	}
 
 	btTable.addParent(self, monsterGroup, monster, btArray, 
@@ -167,6 +168,37 @@ end
 
 function monsterParty:getLeadGroup()
 	return self[1]
+end
+
+function monsterParty:disbelieve(inBattle)
+	if (party.summon and party.summon.isIllusion and self.doDisbelieve) then
+		local action = btAction:new()
+		action.source = party[1]
+		action.target = self[1]
+		if (not action:savingThrow()) then
+			text_cdprint(false, true, "Your foes see through your illusion!\n\n")
+		end
+	end
+end
+
+function monsterParty:advance()
+	local i
+
+	for i = #self,2,-1 do
+		if (self[i].advanceSpeed > self[i-1].advanceSpeed) then
+			local tmp
+
+			text:print("The %s", monster.pluralizeName(self[i].name, self[i].size))
+			if (self[i].size == 1) then
+				text:cdprint(false, true, " advances!\n\n")
+			else
+				text:cdprint(false, true, " advance!\n\n")
+			end
+			tmp = self[i - 1]
+			self[i - 1] = self[i]
+			self[i] = tmp
+		end
+	end
 end
 
 --------------------------------------------------------------------------------

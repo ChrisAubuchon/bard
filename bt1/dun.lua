@@ -479,6 +479,27 @@ function dun:doLifeDrain()
 	party:display()
 end
 
+function dun:getBattleOpponents()
+	local numGroups
+	local monGroups = {}
+	local i
+
+	numGroups = rnd_xdy(1,4)
+	for i = 1,numGroups do
+		monGroups[i]  = self.monsters[rnd_xdy(1,#self.monsters)]
+	end
+
+	return monGroups
+end
+
+function dun:getPoisonDamage()
+	return self.poisonDamage
+end
+
+function dun:getBattleReward()
+	return self.items[rnd_xdy(1,#self.items)]
+end
+
 local function __init()
 	dunData = read_table("dungeons", false)
 end

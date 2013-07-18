@@ -125,6 +125,7 @@ function battleMonster:doDamage(inAction)
 	local m
 
 	dprint(self.singular)
+	dprint(self.size)
 	for m in self:iterator() do
 		if (not m.beenAttacked) then
 			target = m
@@ -158,3 +159,29 @@ function battleMonster:doDamage(inAction)
 
 	return true
 end
+
+function battleMonster:calculateSavingThrow()
+	return rnd_between_xy_inc(self.spellSaveLo, self.spellSaveHi)
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

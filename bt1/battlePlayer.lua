@@ -358,7 +358,38 @@ function battlePlayer:doBardSong(inAction)
 	end
 end
 
+local paladinSavingBonus = {
+	1,1,2,2,2,3,3,3,3,4,4,4,4,5,5,6
+}
 
+function battlePlayer:calculateSavingThrow()
+	local value = 0
+
+	value = bit32.rshift(self.cur_level, 1)
+	if (value > 18) then
+		value = 18
+	end
+
+	if (self:isEffectEquipped("hasAlwaysHide")) then
+		value = value + 2
+	end
+
+	if (self.class == "Paladin") then
+		local plevel = bit32.rshift(self.cur_level, 1)
+		if (plevel > 15) then
+			plevel = 15
+		end
+		value = value + paladinSavingBonus[plevel]
+	else
+		value = value + classes.get(self.class, "saveBonus")
+	end
+
+	if (self.lk > 15) then
+		value = value + (self.lk - 15)
+	end
+
+	return value
+end
 
 
 
