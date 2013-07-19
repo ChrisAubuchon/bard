@@ -89,6 +89,7 @@ function getActionTarget(inTargetOptions, inTargets)
 	local inkey
 	local i
 	local optionKeys = btTable.new()
+	dprint("getActionTarget() called")
 
 	if (inTargetOptions.party) then
 		for i = 1,party.size do
@@ -110,6 +111,7 @@ function getActionTarget(inTargetOptions, inTargets)
 		local monGroup
 
 		if ((not inTargetOptions.party) and (inTargets.size == 1)) then
+			dprint("returning lead group")
 			return inTargets:getLeadGroup()
 		end
 		

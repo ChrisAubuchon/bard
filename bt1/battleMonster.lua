@@ -89,13 +89,19 @@ function battleMonster:checkMeleeHits(inAction)
 
 	targetAC = target.ac
 
-	targetAC = targetAC + inBattle.fearPenalty[self.parentGroup.key]
+	targetAC = targetAC - self.parentGroup.toHitPenalty
+
+	-- The DOS version has this backwards. It adds the toHitPenalty
+	-- to the target's AC. This actually makes it easier to hit
+	-- the party.
+	--
+	--targetAC = targetAC + self.parentGroup.toHitPenalty
+
 	if (targetAC >  10) then targetAC =  10 end
 	if (targetAC < -10) then targetAC = -10 end
 
 	sourceAttack = rnd_between_xy_inc(self.toHitLo, self.toHitHi)
-	sourceAttack = sourceAttack + 2 +
-			inBattle.battleSkillBonus[self.parentGroup.key]
+	sourceAttack = sourceAttack + 2 + self.parentGroup.toHitBonus
 	sourceAttack = 10 - sourceAttack
 
 	if (sourceAttack > targetAC) then
@@ -111,8 +117,7 @@ function battleMonster:getMeleeDamage(inAction)
 	local inBattle	= inAction.inBattle
 
 	outData.damage = rnd_xdy(inData.ndice, inData.dieval)
-	outData.damage = outData.damage +
-		inBattle.battleSkillBonus[self.parentGroup.key]
+	outData.damage = outData.damage + self.parentGroup.damageBonus
 
 	outData.specialAttack = inData.specialAttack
 end
@@ -164,6 +169,68 @@ function battleMonster:calculateSavingThrow()
 	return rnd_between_xy_inc(self.spellSaveLo, self.spellSaveHi)
 end
 
+function battleMonster:battleBonus(inAction)
+	local inData		= inAction.inData
+	local inBattle		= inAction.inBattle
+	local inSource		= inAction.source
+	local inTarget		= inAction.target
+	local updateParty	= false
+
+	dprint("battleMonster:battleBonus()")
+
+	if (inData.acBonus) then
+		if (inData.group) then
+			self.parentGroup:addBattleBonus("acBonus",
+						inData.acAmount,
+						inData.acStack)
+		else
+			local none = true
+		end
+	end
+
+	if (inData.acPenalty) then
+		inAction.target = party[1]
+		if (inAction:savingThrow()) then
+			text:cdprint("false, true, " but it had no effect!\n\n")
+			return
+		end
+		updateParty = true
+		party:addBattleBonus("acPenalty", inAction.toHitAmount,
+						  inAction.toHitStack)
+	end
+
+	if (inData.toHitPenalty) then
+		if (inData.group) then
+			party:addBattleBonus("toHitPenalty",
+						inData.toHitAmount,
+						inData.toHitStack)
+		else
+			local none = true
+		end
+	end
+
+	if (inData.damagePenalty) then
+		if (inData.group) then
+			party:addBattleBonus("damagePenalty",
+						inData.damageAmount,
+						inData.damageStack)
+		else
+			local none = true
+		end
+	end
+
+	-- Monsters use the damageBonus value for both damage
+	-- and toHit values
+	--
+	if (inData.damageBonus) then
+		self.parentGroup:addBattleBonus("damageBonus",
+						inData.damageAmount,
+						inData.damageStack)
+		self.parentGroup:addBattleBonus("toHitBonus",
+						inData.damageAmount,
+						inData.damageStack)
+	end
+end
 
 
 

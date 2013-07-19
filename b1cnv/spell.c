@@ -174,11 +174,18 @@ static btAction_t *spell_bonus(uint32_t index)
 		bb->damageAmount = wordoffear[spellDuration[index]];
 		break;
 	case sp_VorpalPlating:
+#if 0
 		bb->toHitBonus = 1;
 		bb->toHitStack = 1;
 		bb->toHitRandom = 1;
 		bb->toHitAmount = spellDuration[index];
 		bb->toHitDice = 8;
+#endif
+		bb->damageBonus = 1;
+		bb->damageStack = 1;
+		bb->damageRandom = 1;
+		bb->damageAmount = spellDuration[index];
+		bb->damageDice = 8;
 		break;
 	}
 

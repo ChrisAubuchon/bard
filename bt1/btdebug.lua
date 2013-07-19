@@ -1,6 +1,9 @@
 btdebug = {}
 
 local __debug = true
+local __debugLog = "output.log"
+--local __debugFile = io.open(__debugLog, "w+")
+local __debugFile = io.stdout
 
 function dprint(format, ...)
 	if (__debug) then
@@ -12,10 +15,13 @@ function dprint(format, ...)
 			.. ":" .. tostring(dinfo.currentline) .. " "
 
 		if (select("#", ...) == 0) then
-			print(dstring .. tostring(format))
+			__debugFile:write(dstring .. tostring(format).."\n")
+			--print(dstring .. tostring(format))
 		else
-			print(dstring .. string.format(format, ...))
+			__debugFile:write(dstring .. string.format(format,...).."\n")
+			--print(dstring .. string.format(format, ...))
 		end
+		__debugFile:flush()
 	end
 end
 

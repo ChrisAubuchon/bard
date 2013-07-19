@@ -389,7 +389,7 @@ function textBox:getYesNo()
 end
 
 function textBox:printEllipsis()
-	self:print("...\n")	
+	self:print("...\n\n")	
 	party:display()
 	timer:delay(3)
 	local xxx_text_table_delay = true

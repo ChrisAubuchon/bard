@@ -216,9 +216,9 @@ function battleData:start()
 
 	self:printEncounter()
 
-	dprint("party.battle.antiMagic = %d", party.battle.antiMagic)
 	dprint("self.songDamageBonus = %d", self.songDamageBonus)
 	repeat
+		dprint("party.battle.antiMagic = %d", party.battle.antiMagic)
 		self:updateBigpic()
 		if (not self:getPlayerOptions()) then
 			partyRan = true
@@ -251,6 +251,8 @@ function battleData:start()
 			break
 		end
 	until (continue == false)
+
+	self:postCleanup()
 
 	if ((not partyRan) and (not self.isPartyAttack)) then
 		self:doReward()
@@ -545,6 +547,10 @@ function battleData:getRunFightOption()
 			end
 
 			return false
+		elseif (inkey == "D") then
+			self:dumpBattleBonus()
+		elseif (inkey == "Q") then
+			os.exit(0)
 		end
 	until (inkey == "F")
 
@@ -564,6 +570,7 @@ function battleData:getPlayerOption(partySlot, c)
 
 	action = btAction.new()
 	action.source = c
+	action.inBattle = self
 
 	if ((c.isPossessed) or (c.isNuts)) then
 		local xxx_possessedAttack = true
@@ -609,6 +616,7 @@ function battleData:getPlayerOption(partySlot, c)
 		while true do
 			inkey = getkey()
 
+			if (inkey == "Q") then os.exit(0) end
 			if (options[inkey]) then
 				if (inkey == "A") then
 					action.action = "melee"
@@ -777,3 +785,62 @@ function battleData:convertPreBattleSong()
 		end
 	end
 end
+
+function battleData:postCleanup()
+	local c
+
+	party:resetBattleBonus()
+
+	for c in party:characterIterator() do
+		c:resetBattleBonus()
+	end
+end
+
+function battleData:dumpBattleBonus()
+	local c
+	dprint("Party battle bonus:")
+	party:dumpBattleBonus()
+	dprint("----------------------------")
+	dprint("Character battle bonus")
+	dprint("----------------------------")
+	for c in party:iterator() do
+		dprint("%s Bonus", c.name)
+		c:dumpBattleBonus()
+	end
+	dprint("----------------------------")
+	if (self.monGroups) then
+		dprint("Monster Party battle bonus")
+		self.monGroups:dumpBattleBonus()
+		dprint("----------------------------")
+		for c in self.monGroups:iterator() do
+			dprint("%s Bonus", c.singular)
+			c:dumpBattleBonus()
+		end
+	end
+end
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	

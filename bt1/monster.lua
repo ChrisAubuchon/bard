@@ -67,7 +67,7 @@ function monsterGroup:new(inName, inSize)
 
 	btTable.addParent(self, monsterGroup, monster, btArray, 
 				entity, _monsters[inName], objectHash:new(self),
-				battleMonster
+				battleMonster, battleBonus
 				)
 	btTable.setClassMetatable(self)
 
@@ -120,7 +120,7 @@ end
 function monsterParty:new()
 	local self = {
 	}
-	btTable.addParent(self, monsterParty, btArray)
+	btTable.addParent(self, monsterParty, btArray, battleBonus)
 	btTable.setClassMetatable(self)
 
 	self.__index = self

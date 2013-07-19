@@ -349,7 +349,8 @@ function spells.attack(inAction)
 end
 
 function spells.battleBonus(inAction)
-	local xxx_battle_bonus = true
+	inAction.source:battleBonus(inAction)
+	text:printEllipsis()
 end
 
 function spells.disbelieve(inAction)
@@ -391,22 +392,6 @@ local function __initSpellList()
 		if (s.action) then
 			compileAction(s.action)
 		end
-if false then
-		if ((s.action) and (s.action.func)) then
-			inFunc = s.action.func
-			s.action.func,mesg = load(inFunc)
-			if (s.action.func == nil) then
-				error("Compilation error: " .. inFunc, 2)
-			end
-		end
-		if ((s.action) and (s.action.func)) then
-			func = _G
-			for w in s.action.func:gmatch("%a+") do
-				func = func[w]
-			end
-			s.action.func = func
-		end
-	end
 end
 
 end

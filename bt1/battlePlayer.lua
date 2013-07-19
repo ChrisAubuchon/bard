@@ -140,7 +140,7 @@ function battlePlayer:checkMeleeHits(inAction)
 	sourceAttack = self.ac
 	sourceAttack = sourceAttack - classes.get(self.class, "meleeBonus")
 	sourceAttack = sourceAttack - inBattle.songToHitBonus
-	sourceAttack = sourceAttack + inBattle.fearPenalty[self.key]
+	sourceAttack = sourceAttack + self.toHitPenalty
 
 	if (sourceAttack >  10) then sourceAttack =  10 end
 	if (sourceAttack < -10) then sourceAttack = -10 end
@@ -191,11 +191,9 @@ function battlePlayer:getMeleeDamage(inAction)
 	for i = 1,self.numAttacks do
 		outData.damage = outData.damage + damageBonus
 		outData.damage = outData.damage + rnd_xdy(ndice, dieValue)
-		outData.damage = outData.damage +
-			inBattle.battleSkillBonus[self.key]
-		outData.damage = outData.damage +
-			rnd_xdy(inBattle.vorpalBonus[self.key], 8)
-		outData.damage = outData.damage - inBattle.fearPenalty[self.key]
+		outData.damage = outData.damage + self.damageBonus
+		outData.damage = outData.damage + rnd_xdy(self.damageRandom,8)
+		outData.damage = outData.damage - self.damagePenalty
 	end
 
 	if (self.class == "Hunter") then
@@ -316,7 +314,8 @@ function battlePlayer:getCombatSpell(inAction)
 
 	if (s.targetted) then
 		text:cdprint(true, false, "Use on:")
-		inAction.target = getActionTarget(s.targetted, false)
+		inAction.target = getActionTarget(s.targetted, 
+					inAction.inBattle.monGroups)
 		if (not inAction.target) then
 			return false
 		end
@@ -391,7 +390,122 @@ function battlePlayer:calculateSavingThrow()
 	return value
 end
 
+----------------------------------------
+-- battleBonus()
+----------------------------------------
+function battlePlayer:battleBonus(inAction)
+	local inData		= inAction.inData
+	local inBattle		= inAction.inBattle
+	local inSource		= inAction.source
+	local inTarget		= inAction.target
+	local updateParty	= false
 
+	----------------------------------------
+	-- antiMagic battle bonus
+	----------------------------------------
+	if (inData.antiMagic) then
+		party.antiMagic = party.antiMagic + 2
+		if (party.antiMagic > 6) then
+			party.antiMagic = 6
+		end
+	end
+
+	----------------------------------------
+	-- AC Bonus
+	----------------------------------------
+	if (inData.acBonus) then
+		if (inData.group) then
+			party:addBattleBonus("acBonus", inData.acAmount,
+					inData.acStack)
+		else
+			inSource:addBattleBonus("acBonus", inData.acAmount, 
+					inData.acStack)
+			updateParty = true
+		end
+	end
+
+	----------------------------------------
+	-- AC Penalty
+	----------------------------------------
+	if (inData.acPenalty) then
+		if (inData.group) then
+			if (inAction:savingThrow()) then
+				text:cdprint(false, true, " but it had no effect!\n\n")
+				party:display()
+				return
+			end
+
+			inTarget:addBattleBonus("acPenalty", inData.acAmount,
+					inData.acStack)
+		else
+			-- No single AC penalty spells in BT1
+			local none = true
+		end
+	end
+
+	----------------------------------------
+	-- Damage Bonus
+	----------------------------------------
+	if (inData.damageBonus) then
+		if (inData.group) then
+			if (inData.damageRandom) then
+				party:addBattleBonus("damageRandom",
+						inData.damageAmount,
+						inData.damageStack)
+			else
+				inTarget:addBattleBonus("damageBonus", 
+						inData.damageAmount,
+						inData.damageStack)
+			end
+		else
+			if (inData.damageRandom) then
+				inTarget:addBattleBonus("damageRandom",
+						inData.damageAmount,
+						inData.damageStack)
+			else
+				inTarget:addBattleBonus("damageBonus",
+						inData.damageAmount,
+						inData.damageStack)
+			end
+		end
+	end
+
+	if (inData.damagePenalty) then
+		if (inData.group) then
+			inTarget:addBattleBonus("damagePenalty",
+						inData.damageAmount,
+						inData.damageStack)
+		else
+			local none = true
+		end
+	end
+
+	if (inData.toHitBonus) then
+		if (inData.group) then
+			party:addBattleBonus("toHitBonus",
+						inData.toHitAmount,
+						inData.toHitStack)
+		else
+			inTarget:addBattleBonus("toHitBonus",	
+						inData.toHitAmount,
+						inData.toHitStack)
+		end
+	end
+
+	if (inData.toHitPenalty) then
+		if (inData.group) then
+			inTarget:addBattleBonus("toHitPenalty",
+						inData.toHitAmount,
+						inData.toHitStack)
+		else
+			local none = true
+		end
+	end
+
+	if (updateParty) then
+		party:display()
+	end
+end
 
 
 

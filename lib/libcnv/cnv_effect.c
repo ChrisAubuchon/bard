@@ -412,7 +412,7 @@ static json_t *bteBonus_toJson(const void *vbb)
 	inData = json_object();
 
 	JSON_TRUE_IF(inData, "group", bb->group);
-	JSON_NUMBER_IF_NOT_ZERO(inData, "antimagic", bb->antiMagic);
+	JSON_NUMBER_IF_NOT_ZERO(inData, "antiMagic", bb->antiMagic);
 
 	JSON_TRUE_IF(inData, "acBonus", bb->acBonus);
 	JSON_TRUE_IF(inData, "acPenalty", bb->acPenalty);

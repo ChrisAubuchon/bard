@@ -24,7 +24,7 @@ party = {
 	}
 }
 
-btTable.addParent(party, btArray)
+btTable.addParent(party, btArray, battleBonus)
 btTable.setClassMetatable(party)
 party.__index = party
 

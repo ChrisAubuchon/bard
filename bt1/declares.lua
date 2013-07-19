@@ -12,6 +12,7 @@ declare_global("doDamage")
 declare_global("battlePlayer")
 declare_global("battleSummon")
 declare_global("battleMonster")
+declare_global("battleBonus")
 
 -- bigpic.lua
 declare_global("bigpic")

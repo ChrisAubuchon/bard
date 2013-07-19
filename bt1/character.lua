@@ -148,7 +148,7 @@ function character:new()
 	}
 
 	btTable.addParent(self, baseCharacter, character, entity, 
-			objectHash:new(self), battlePlayer
+			objectHash:new(self), battlePlayer, battleBonus
 			)
 	btTable.setClassMetatable(self)
 
@@ -193,9 +193,8 @@ function character:calcAC()
 		self.ac = self.ac - party.song.acBonus
 	end
 
-	if (party.battle.acBonus) then
-		self.ac = self.ac - party.battle.acBonus
-	end
+	self.ac = self.ac - party.acBonus
+	self.ac = self.ac - self.acBonus
 
 	if (self.ac < -10) then
 		self.ac = -10
