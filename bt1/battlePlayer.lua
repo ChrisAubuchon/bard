@@ -308,7 +308,7 @@ function battlePlayer:getCombatSpell(inAction)
 	if (s.targetted) then
 		text:cdprint(true, false, "Use on:")
 		inAction.target = getActionTarget(s.targetted, 
-					inAction.inBattle.monGroups)
+					inAction.inBattle.monParty)
 		if (not inAction.target) then
 			return false
 		end
@@ -522,11 +522,23 @@ function battlePlayer:attackSpell(inAction)
 		local xxx_not_level_mult = true
 	elseif (inData.allFoes) then
 		local mgroup
-		for mgroup in inBattle.monGroups:iterator() do
+		if (inBattle.monParty.size == 0) then
+			text:printEllipsis()
+			return
+		end
+
+		for mgroup in inBattle.monParty:iterator() do
 			inAction.target = mgroup
 			self:multipleTargetSpell(inAction)
+			if (mgroup.next) then
+				text:print("and")
+			end
 		end
 	elseif (inData.group) then
+		if (target.size == 0) then
+			text:printEllipsis()
+			return
+		end
 		self:multipleTargetSpell(inAction)
 	end
 end
@@ -567,7 +579,7 @@ function battlePlayer:singleTargetSpell(inAction)
 		end
 	else
 		if (target.size == 0) then
-			dprint("Dead monster group")
+			text:printEllipsis()
 			return
 		end
 	end
@@ -611,7 +623,7 @@ function battlePlayer:multipleTargetSpell(inAction)
 					target.plural)
 		)
 
-	for m in target:reverseIterator() do
+	for m in target:iterator() do
 		local save
 		local half
 

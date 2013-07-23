@@ -90,8 +90,8 @@ end
 ----------------------------------------
 -- writeParty()
 ----------------------------------------
-function roster:writeParty(inName, inParty)
-	self.parties[name] = inParty:toTable()
+function roster:writeParty(inName)
+	self.parties[inName] = party:toTable()
 	self:write()
 end
 

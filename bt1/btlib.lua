@@ -93,12 +93,12 @@ function getActionTarget(inTargetOptions, inTargets)
 
 	if (inTargetOptions.party) then
 		for i = 1,party.size do
-			optionKeys[tostring(i)] = true
+			optionKeys[tostring(i)] = party[i]
 		end
 
 		text:print("\nMember #[1-%d", party.size)
 		if ((inTargetOptions.summon) and party.summon) then
-			optionKeys["S"] = true
+			optionKeys["S"] = party.summon
 			text:print("S]")
 		else
 			text:print("]")
@@ -121,7 +121,7 @@ function getActionTarget(inTargetOptions, inTargets)
 				break
 			end
 
-			optionKeys[string.char((i-1) + string.byte("A"))] = true
+			optionKeys[string.char((i-1) + string.byte("A"))] = mgroup
 			text:print("[%s] %d %s\n", 
 				string.char((i - 1) + string.byte("a")), 
 				mgroup.size,
@@ -135,21 +135,7 @@ function getActionTarget(inTargetOptions, inTargets)
 		return false
 	end
 
-	if ((inkey > "0") and (inkey < "7")) then
-		return party[tonumber(inkey)]
-	elseif (inkey == "S") then
-		return party[1]
-	elseif (inkey == "A") then
-		return inTargets[1]
-	elseif (inkey == "B") then
-		return inTargets[2]
-	elseif (inkey == "C") then
-		return inTargets[3]
-	elseif (inkey == "D") then
-		return inTargets[4]
-	end
-
-	return false
+	return optionKeys[inkey]
 end
 
 function pluralize(count, singular, plural)

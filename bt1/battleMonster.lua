@@ -152,7 +152,7 @@ function battleMonster:doDamage(inAction)
 	end
 
 	if (not target) then
-		target = self[1]
+		target = self.head
 	end
 
 	dprint(outData.specialAttack)
@@ -172,7 +172,7 @@ function battleMonster:doDamage(inAction)
 	inBattle:removePriority(target)
 	inBattle.killCount[self.name] = inBattle.killCount[self.name] + 1
 	if (self.size == 0) then
-		inBattle.monGroups:removeMonsterGroup(self)
+		inBattle.monParty:removeMonsterGroup(self)
 	end
 
 	return true

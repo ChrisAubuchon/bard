@@ -16,10 +16,10 @@ function battle:random()
 	local mgroup
 
 	b.isPartyAttack = false
-	b.monGroups = monsterParty.new()
+	b.monParty = monsterParty.new()
 	mgroups = currentLevel:getBattleOpponents()
 	for _,mgroup in ipairs(mgroups) do
-		b.monGroups:addMonsterGroup(monsterGroup:new(mgroup, false))
+		b.monParty:addMonsterGroup(monsterGroup:new(mgroup, false))
 	end
 
 	return b:start()
@@ -42,7 +42,7 @@ function battle:new(...)
 
 	b.isPartyAttack = false
 
-	b.monGroups = monsterParty:new()
+	b.monParty = monsterParty:new()
 
 	for i = 1,select('#', ...),2 do
 		name,count = select(i, ...)
@@ -56,7 +56,7 @@ function battle:new(...)
 		end
 
 		local g = monsterGroup:new(name, count)
-		b.monGroups:addMonsterGroup(g)
+		b.monParty:addMonsterGroup(g)
 	end
 
 	return b:start()
@@ -80,7 +80,7 @@ function battleData:new()
 		skipParty		= false,
 		monDisbelieve		= false,
 		numGroups		= 0,
-		monGroups	 	= false,
+		monParty		= false,
 		actionHead		= false,
 		actionTail		= false,
 		songToHitBonus		= 0,
@@ -122,8 +122,6 @@ end
 function battleData:addPriority(inSource, inPriority)
 	local action = self.battleDataBySource[inSource.key]
 
-	dprint("inSource.singular: " .. tostring(inSource:getSingularName()))
-	dprint("inSource.key: " .. inSource.key)
 	action.priority = inPriority
 
 	self.battleDataBySource[inSource.key] = action
@@ -204,7 +202,7 @@ function battleData:start()
 	self:convertPreBattleSong()
 
 	if (not self.isPartyAttack) then
-		for mgroup in self.monGroups:iterator() do
+		for mgroup in self.monParty:iterator() do
 			self.killCount[mgroup:getSingularName()] = 0
 		end
 	end
@@ -220,6 +218,7 @@ function battleData:start()
 			break
 		end
 
+		self.monParty:adjustMeleeGroups()
 		self:getMonsterActions()
 		self:getPriorities()
 
@@ -237,11 +236,11 @@ function battleData:start()
 					break
 				end
 			end
-		elseif (self.monGroups.size >= 1) then
+		elseif (self.monParty:isAlive()) then
 			text:cdprint(true, false, "\nYou still face ")
 			self:printMonsterGroups()
 
-			self.monGroups:advance()
+			self.monParty:advance()
 		else
 			break
 		end
@@ -271,7 +270,7 @@ function battleData:updateBigpic()
 			self.isPartyBigpicDone = true
 		end
 	else
-		local leadGroup = self.monGroups:getLeadGroup()
+		local leadGroup = self.monParty:getLeadGroup()
 		if (leadGroup.size == 1) then
 			bigpic:setTitle(leadGroup.singular)
 		else
@@ -300,31 +299,12 @@ function battleData:printEncounter()
 end
 
 function battleData:printMonsterGroups()
-	local i
-	local mgroup
-
 	if (self.isPartyAttack) then
 		text:print("\nhostile party members!\n\n")
 		return
 	end
 
-	for i,mgroup in self.monGroups:ipairs() do
-		if (i ~= 1) then
-			if ((i == 4) or (not self.monGroups:isGroup(i+1))) then
-				text:print(", and ")
-			else
-				text:print(", ")
-			end
-		end
-
-		text:print("%d ", mgroup.size)
-		if (mgroup.size == 1) then
-			text:print(mgroup.singular)
-		else
-			text:print(mgroup.plural)
-		end
-	end
-	text:print(".\n\n")
+	self.monParty:printGroups()
 end
 
 ----------------------------------------
@@ -349,8 +329,8 @@ function battleData:doRound()
 
 		currentAction = currentAction.next
 	end
-	if (self.monGroups) then
-		self.monGroups:adjustMeleeGroups()
+	if (self.monParty) then
+		self.monParty:adjustMeleeGroups()
 	end
 end
 
@@ -361,8 +341,8 @@ function battleData:endRound()
 	self.actionTail = false
 	self.battleDataBySource = {}
 
-	if (self.monGroups) then
-		for mgroup in self.monGroups:iterator() do
+	if (self.monParty) then
+		for mgroup in self.monParty:iterator() do
 			mgroup.missTurn = false
 		end
 	end
@@ -376,12 +356,12 @@ function battleData:endRound()
 	-- It is triggered by "cmp byte_3B76E, 0" but byte_3B76E
 	-- is never set anywhere...
 	--
-	--if (self.monGroups) then
+	--if (self.monParty) then
 		-- The DOS code for a successful disbelieve doesn't
 		-- even remove the summoned illusion. Hence this
 		-- entire check is commented out.
 		--
-		--self.monGroups:disbelieve(self)
+		--self.monParty:disbelieve(self)
 	--end
 
 	party:doPoison()
@@ -452,7 +432,7 @@ function battleData:getPriorities()
 		return
 	end
 
-	for p in self.monGroups:iterator() do
+	for p in self.monParty:iterator() do
 		for c in p:iterator() do
 			self:addPriority(c, c:getBattlePriority())
 			c.beenAttacked = false
@@ -525,7 +505,7 @@ function battleData:getRunFightOption()
 		if (inkey == "R") then
 			local saveAction = btAction:new()
 			saveAction.target = party[1]
-			saveAction.source = self.monGroups:getLeadGroup()
+			saveAction.source = self.monParty:getLeadGroup()
 			if (saveAction:savingThrow()) then
 				return true
 			end
@@ -635,7 +615,7 @@ function battleData:getPlayerOption(partySlot, c)
 					action.action = "hide"
 					return action
 				elseif (inkey == "P") then
-					action.action = "melee"
+					action.action = "partyAttack"
 					if (self:meleeTarget(action)) then
 						return action
 					end
@@ -651,20 +631,21 @@ function battleData:getPlayerOption(partySlot, c)
 end
 
 function battleData:meleeTarget(inAction)
-	if (self.isPartyAttack) then
+	if (self.isPartyAttack or inAction.action == "partyAttack") then
+		inAction.action = "melee"
 		text:cdprint(true, false, "Attack:")
 		inAction.target = getActionTarget({party = true, summon = true},
-						self.monGroups)
+						self.monParty)
 		if (not inAction.target) then
 			return false
 		end
 	else
-		if (self.monGroups.size > 1) then
+		if (self.monParty.size > 1) then
 			text:cdprint(true, false, "Attack:")
 		end
 
 		inAction.target = getActionTarget({melee = true}, 
-							self.monGroups)
+							self.monParty)
 		if (not inAction.target) then
 			return false
 		end
@@ -682,7 +663,7 @@ function battleData:getMonsterActions()
 		return
 	end
 
-	for mgroup in self.monGroups:iterator() do
+	for mgroup in self.monParty:iterator() do
 		for m in mgroup:iterator() do
 			action = btAction.new()
 			action.source = m
@@ -803,11 +784,11 @@ function battleData:dumpBattleBonus()
 		c:dumpBattleBonus()
 	end
 	dprint("----------------------------")
-	if (self.monGroups) then
+	if (self.monParty) then
 		dprint("Monster Party battle bonus")
-		self.monGroups:dumpBattleBonus()
+		self.monParty:dumpBattleBonus()
 		dprint("----------------------------")
-		for c in self.monGroups:iterator() do
+		for c in self.monParty:iterator() do
 			dprint("%s Bonus", c.singular)
 			c:dumpBattleBonus()
 		end

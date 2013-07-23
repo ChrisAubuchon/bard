@@ -93,6 +93,10 @@ declare_global("items")
 -- level.lua
 declare_global("level")
 
+-- linkedList.lua
+declare_global("linkedList")
+declare_global("linkedListNode")
+
 -- monster.lua
 declare_global("monster")
 declare_global("monsterGroup")

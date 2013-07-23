@@ -253,6 +253,11 @@ end
 function spells.summon(inAction)
 	local inData = inAction.inData
 
+	if (inAction.source:isMonster()) then
+		local xxx_monster_summon_monster = true
+		return
+	end
+
 	if (inData.randomFlag) then
 		if (bit32.band(rnd(),1) == 1) then
 			party:doSummon(inData.sumOne, inData.illusionFlag)

@@ -796,11 +796,11 @@ end
 function party:disbelieve(inBattle)
 	local mgroup
 
-	if (not inBattle.monGroups) then
+	if (not inBattle.monParty) then
 		return
 	end
 
-	for mgroup in inBattle.monGroups:iterator() do
+	for mgroup in inBattle.monParty:iterator() do
 		if (mgroup.isIllusion) then
 			local action = btAction:new()
 			action.source = party[1]
@@ -808,7 +808,7 @@ function party:disbelieve(inBattle)
 			action.inBattle = inBattle
 
 			if (not action:savingThrow()) then
-				mgroup:truncate(2)
+				mgroup:truncate()
 				action.outData.specialAttack = "stone"
 				mgroup:doDamage(action)
 				text:cdprint(false, true, "\nThe party disbelieves!")

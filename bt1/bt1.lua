@@ -43,6 +43,7 @@ m_window:Draw(nil, gfxImage:new("images/title.png", "png"), nil)
 m_window:Update()
 
 require "bttable"
+require "linkedList"
 require "entity"
 require "btapi"
 require "btdebug"
@@ -75,6 +76,7 @@ require "inventory"
 require "timers"
 require "songs"
 require "monster"
+require "monsterGroup"
 require "monsterParty"
 require "summon"
 require "api-monster"

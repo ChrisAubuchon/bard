@@ -1,16 +1,10 @@
-require "dataio"
-require "bttable"
-require "entity"
-require "random"
-require "objectHash"
-require "battleMonster"
-
 monsterParty = {}
-
 function monsterParty:new()
 	local self = {
+		size = 0
 	}
-	btTable.addParent(self, monsterParty, btArray, battleBonus)
+
+	btTable.addParent(self, monsterParty, battleBonus, linkedList)
 	btTable.setClassMetatable(self)
 
 	self.__index = self
@@ -18,76 +12,124 @@ function monsterParty:new()
 	return self
 end
 
-function monsterParty:addMonsterGroup(inGroup)
-	self:__add(inGroup)
-	self:adjustMeleeGroups()
+----------------------------------------
+-- printGroups()
+----------------------------------------
+function monsterParty:printGroups()
+	local node
+	local first	= true
+
+	for node in self:iterator() do
+		if (not first) then
+			if (not node.next) then
+				text:print(", and ")
+			else
+				text:print(", ")
+			end
+		else
+			first = false
+		end
+
+		text:print("%d %s", node.size,
+			pluralize(node.size, node.singular, node.plural)
+			)
+	end
+	text:print(".\n\n")
 end
 
-function monsterParty:removeMonsterGroup(inGroup)
-	local mgroup
-	local i
-	local groupIndex
+----------------------------------------
+-- addMonsterGroup()
+----------------------------------------
+function monsterParty:addMonsterGroup(inGroup)
+	self.size = self.size + 1
+	self:insertTail(inGroup)
+end
 
-	for i,mgroup in self:ipairs() do
-		if (mgroup == inGroup) then
-			mgroup:deleteKey()
-			groupIndex = i
-			break
+----------------------------------------
+-- removeMonsterGroup()
+----------------------------------------
+function monsterParty:removeMonsterGroup(inGroup)
+	self.size = self.size - 1
+	inGroup:deleteKey()
+	self:remove(inGroup)
+end
+
+----------------------------------------
+-- adjustMeleeGroups()
+----------------------------------------
+function monsterParty:adjustMeleeGroups()
+	local i		= 1
+	local mgroup
+
+	for mgroup in self:iterator() do
+		if (i < 3) then
+			mgroup.inMeleeRange = true
+		else
+			mgroup.inMeleeRange = false
 		end
 	end
-
-	dprint("Group index to delete: %d", groupIndex)
-	self:__remove(groupIndex)
 end
 
-function monsterParty:adjustMeleeGroups()
-	local i
-
-	for i = 1,2 do
-		if (self[i]) then self[i].inMeleeRange = true end
-	end
-
-	for i = 3,self.size do
-		self[i].inMeleeRange = false
-	end
-end
-
-function monsterParty:isGroup(inIndex)
-	return self[inIndex]
-end
-
+----------------------------------------
+-- getLeadGroup()
+----------------------------------------
 function monsterParty:getLeadGroup()
-	return self[1]
+	return self.head
 end
 
+----------------------------------------
+-- disbelieve()
+----------------------------------------
 function monsterParty:disbelieve(inBattle)
 	if (party.summon and party.summon.isIllusion and self.doDisbelieve) then
 		local action = btAction:new()
 		action.source = party[1]
-		action.target = self[1]
+		action.target = self.head
 		if (not action:savingThrow()) then
-			text_cdprint(false, true, "Your foes see through your illusion!\n\n")
+			text:cdprint(false, true, "Your foes see through your illusion!\n\n")
 		end
 	end
 end
 
+----------------------------------------
+-- advance()
+----------------------------------------
 function monsterParty:advance()
-	local i
+	local mgroup
 
-	for i = #self,2,-1 do
-		if (self[i].advanceSpeed > self[i-1].advanceSpeed) then
-			local tmp
+	for mgroup in self:reverseIterator() do
+		if (not mgroup.prev) then return end
 
-			text:print("The %s", monster.pluralizeName(self[i].name, self[i].size))
-			if (self[i].size == 1) then
-				text:cdprint(false, true, " advances!\n\n")
-			else
-				text:cdprint(false, true, " advance!\n\n")
-			end
-			tmp = self[i - 1]
-			self[i - 1] = self[i]
-			self[i] = tmp
+		if (mgroup.advanceSpeed > mgroup.prev.advanceSpeed) then
+			self:remove(mgroup)
+			self:insertBefore(mgroup, mgroup.prev)
+
+			text:print("The %s advance%s!\n\n",
+				pluralize(mgroup.size, mgroup.singular, 
+						       mgroup.plural),
+				pluralize(mgroup.size, "", "s")
+				)
 		end
 	end
 end
+
+----------------------------------------
+-- isAlive()
+----------------------------------------
+function monsterParty:isAlive()
+	return self.head
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
 
