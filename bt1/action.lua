@@ -51,3 +51,29 @@ function btAction:savingThrow()
 
 	return true, false
 end
+
+function btAction:groupSavingThrow()
+	if (self.source:isMonster()) then
+		self.target = party[1]
+	end
+
+	return self:savingThrow()
+end
+
+function btAction:printDamage()
+	text:print("for %d point%s of damage",
+		self.outData.damage,
+		pluralize(self.outData.damage, "", "s")
+		)
+end
+
+function btAction:doDamage()
+	if (self.target:doDamage(self)) then
+		if (not globals.partyDied) then
+			text:print(stringTables.effects[self.outData.specialAttack])
+			text:print("%s!\n\n", self.target:getPronoun())
+		end
+	else
+		text:print(".\n\n")
+	end
+end

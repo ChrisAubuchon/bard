@@ -98,26 +98,14 @@ function battlePlayer:doMeleeAttack(inAction)
 		end
 
 		self:getMeleeDamage(inAction)
-		text:print("for %d ", outData.damage)
-		if (outData.damage == 1) then
-			text:print("point ")
-		else
-			text:print("points ")
-		end
-		text:print("of damage")
-
-		if (target:doDamage(inAction)) then
-			text:print(stringTables.effects[outData.specialAttack])
-			text:print("%s!\n\n", target:getPronoun())
-		else
-			text:print(".\n\n")
-		end
+		inAction:printDamage()
+		inAction:doDamage()
 
 		if (target:isCharacter()) then
 			party:display()
 		end
 
-		if (not party:isLive()) then
+		if (globals.partyDied) then
 			return
 		end
 	end
@@ -134,7 +122,10 @@ function battlePlayer:checkMeleeHits(inAction)
 
 	targetAC = target.ac
 	if (not target:isCharacter()) then
-		targetAC = targetAC + inBattle.freezeFoePenalty[target.key]
+		targetAC = targetAC + target.acPenalty
+		if (targetAC > 10) then
+			targetAC = 10
+		end
 	end
 
 	sourceAttack = self.ac
@@ -237,6 +228,8 @@ function battlePlayer:doDamage(inAction)
 	end
 
 	self:inflictStatus(inAction)
+
+	party:isLive()
 
 	return true
 end
@@ -504,6 +497,139 @@ function battlePlayer:battleBonus(inAction)
 
 	if (updateParty) then
 		party:display()
+	end
+end
+
+function battlePlayer:mageStar(inAction)
+	inAction.target.missTurn = true
+end
+
+function battlePlayer:attackSpell(inAction)
+	local inData		= inAction.inData
+	local outData		= inAction.outData
+	local source		= inAction.source
+	local target		= inAction.target
+	local inBattle		= inAction.inBattle
+
+	if (inData.levelMultiply) then
+		outData.damage = rnd_xdy(self.cur_level * inData.ndice,
+						inData.dieval)
+		self:singleTargetSpell(inAction)
+	elseif (inData.specialAttack) then
+		outData.specialAttack = inData.specialAttack
+		outData.damage = 0
+		self:singleTargetSpell(inAction)
+		local xxx_not_level_mult = true
+	elseif (inData.allFoes) then
+		local mgroup
+		for mgroup in inBattle.monGroups:iterator() do
+			inAction.target = mgroup
+			self:multipleTargetSpell(inAction)
+		end
+	elseif (inData.group) then
+		self:multipleTargetSpell(inAction)
+	end
+end
+
+function battlePlayer:singleTargetSpell(inAction)
+	local inData		= inAction.inData
+	local outData		= inAction.outData
+	local source		= inAction.source
+	local target		= inAction.target
+	local possessFlag	= false
+	local save
+	local half
+
+	if (target:isSummon()) then
+		party.summon.isHostile = true
+	end
+
+	if (target:isCharacter()) then
+		if (target.isStoned or target.isParalyzed) then
+			text:printEllipsis()
+			return
+		end
+
+		if (target.isDead) then
+			if (inData.specialAttack == "possess") then
+				possessFlag = true
+			else
+				text:printEllipsis()
+				return
+			end
+		end
+
+		if (inData.specialAttack == "possess" and
+		    source:isCharacter() and
+		    not possessFlag) then
+			text:printEllipsis()
+			return
+		end
+	else
+		if (target.size == 0) then
+			dprint("Dead monster group")
+			return
+		end
+	end
+
+	text:print(" at %s", target:getSingularName())
+	save, half = inAction:savingThrow()
+	if (save) then 
+		if (half) then
+			bit32.rshift(outData.damage, 1)
+		else
+			text:print(" but it had no effect!\n\n")
+			return
+		end
+	end
+
+	if (not outData.specialAttack) then
+		text:print(" and %s %s ",
+				stringTables.andEffects[inData.atype],
+				target:getPronoun())
+		inAction:printDamage()
+	end
+
+	inAction:doDamage(inAction)
+	if (globals.partyDied) then
+		return
+	end
+
+	party:display()
+	timer:delay(3)
+end
+
+function battlePlayer:multipleTargetSpell(inAction)
+	local inData		= inAction.inData
+	local outData		= inAction.outData
+	local target		= inAction.target
+	local m
+
+	text:print(" at %s %s...\n\n",
+		pluralize(target.size, "a", "some"),
+		pluralize(target.size, target.singular, 
+					target.plural)
+		)
+
+	for m in target:reverseIterator() do
+		local save
+		local half
+
+		outData.damage = rnd_xdy(inData.ndice, inData.dieval)
+		text:print("One")
+		save, half = inAction:savingThrow()
+		if (save and not half) then
+			text:print(" repelled the spell!\n\n")
+		else
+			if (half) then 
+				bit32.rshift(outData.damage, 1)
+			end
+			text:print(" is %s ", 
+				stringTables.isEffects[inData.atype])
+			inAction:printDamage()
+			inAction:doDamage()
+		end
+		timer:delay(3)
 	end
 end
 

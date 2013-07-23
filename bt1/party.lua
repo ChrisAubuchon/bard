@@ -131,6 +131,7 @@ function party:iterator()
 	end
 	return f, nil, state
 end
+party.reverseIterator = party.iterator
 
 ----------------------------------------
 -- characterIterator()

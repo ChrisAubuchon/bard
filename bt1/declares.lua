@@ -35,6 +35,7 @@ declare_global("btkeys")
 declare_global("key_in_num_range")
 declare_global("keyboardCommand")
 declare_global("getActionTarget")
+declare_global("pluralize")
 
 -- character.lua
 declare_global("baseCharacter")

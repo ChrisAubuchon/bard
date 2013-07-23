@@ -151,3 +151,11 @@ function getActionTarget(inTargetOptions, inTargets)
 
 	return false
 end
+
+function pluralize(count, singular, plural)
+	if (count == 1) then
+		return singular
+	else
+		return plural
+	end
+end

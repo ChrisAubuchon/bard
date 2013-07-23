@@ -143,6 +143,22 @@ function btArray:truncate(inPos)
 	end
 end
 
+function btArray:reverseIterator()
+	local n = self.size + 1
+	local function f(_)
+		if (self == nil) then
+			error("Bad self reference", 2)
+		end
+		while (n > 1) do
+			n = n - 1
+			return self[n]
+		end
+		return
+	end
+
+	return f, nil, n
+end
+
 function btArray:iterator()
 	local n = 0
 	local function f(_)

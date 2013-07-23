@@ -5,7 +5,15 @@ function battleMonster:doAction(inAction)
 	local attackIndex
 	local i
 
+	-- Check here if this monster groups turn is
+	-- skipped
+	--
+	if (self.parentGroup.missTurn) then
+		return
+	end
+
 	attackIndex = rnd_xdy(1,4)
+	dprint(attackIndex)
 	for i = 1,4 do
 		local attacks = self.attacks
 
@@ -26,6 +34,11 @@ function battleMonster:doAction(inAction)
 				self:meleeAttack(inAction)
 				return
 			end
+		elseif (attacks[attackIndex].type == "spell") then
+			dprint(attackIndex)
+			dprint(attacks[attackIndex].action.inFunction)
+			self:combatSpell(attacks[attackIndex].action)
+			return 
 		else
 			local xxx_otherMonsterAttackTypes = true
 		end
@@ -191,7 +204,7 @@ function battleMonster:battleBonus(inAction)
 	if (inData.acPenalty) then
 		inAction.target = party[1]
 		if (inAction:savingThrow()) then
-			text:cdprint("false, true, " but it had no effect!\n\n")
+			text:cdprint(false, true, " but it had no effect!\n\n")
 			return
 		end
 		updateParty = true
@@ -230,6 +243,36 @@ function battleMonster:battleBonus(inAction)
 						inData.damageAmount,
 						inData.damageStack)
 	end
+end
+
+function battleMonster:mageStar(inAction)
+	text:print(" and the party misses an attack")
+	party.missTurn = true
+end
+
+function battleMonster:combatSpell(inSpell)
+	local action = btAction:new()
+
+	if (not inSpell.func) then
+		compileAction(inSpell)
+	end
+
+	dprint(inSpell.func)
+	action.func = inSpell.func
+	action.inData = inSpell.inData
+	action.source = self
+	action.target = party:randomMeleeCharacter()
+
+	if (action.target:isDisabled()) then
+		return
+	end
+
+	text:print("%s casts a spell", self.singular)
+	action.func(action)
+end
+
+function battleMonster:attackSpell(inAction)
+	dprint("battleMonster:attackSpell")
 end
 
 

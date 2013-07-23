@@ -86,12 +86,7 @@ function battleData:new()
 		songToHitBonus		= 0,
 		songDamageBonus		= 0,
 		battleDataBySource	= {},
-		fearPenalty		= btTable.new(true),
-		battleSkillBonus	= btTable.new(true),
-		freezeFoePenalty	= btTable.new(true),
-		vorpalBonus		= btTable.new(true),
 		killCount		= btTable.new(true),
-		mageStarFlag		= {},
 
 		--
 		-- The songToHitPenalty isn't used in the DOS version
@@ -368,7 +363,7 @@ function battleData:endRound()
 
 	if (self.monGroups) then
 		for mgroup in self.monGroups:iterator() do
-			self.mageStarFlag[mgroup.key] = false
+			mgroup.missTurn = false
 		end
 	end
 
@@ -439,7 +434,7 @@ function battleData:getPriorities()
 	local p
 	local c
 
-	if (not self.skipParty) then
+	if (not party.missTurn) then
 		for c in party:characterIterator() do
 			if (not c:isDisabled()) then
 				p = c:getBattlePriority()

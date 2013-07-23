@@ -84,6 +84,27 @@ stringTables.effects = {
 	critical= " and critically hits "
 }
 
+stringTables.andEffects = {
+	fry	= "fries",
+	froze	= "froze",
+	shock	= "shocks",
+	drain	= "drains",
+	burn	= "burns",
+	choke	= "chokes",
+	steam	= "steams"
+}
+
+stringTables.isEffects = {
+	fry	= "fried",
+	froze	= "frozen",
+	shock	= "shocked",
+	drain	= "drained",
+	burn	= "burnt",
+	choke	= "choked",
+	steam	= "steamed"
+}
+	
+
 btkeys = {
 	BTKEY_RETURN = ":A:",
 	BTKEY_ESCAPE = ":B:",

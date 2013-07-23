@@ -7,6 +7,7 @@ battleBonus = {
 	damageRandom	= 0,
 	damageBonus	= 0,
 	damagePenalty	= 0,
+	missTurn	= false
 }
 
 function battleBonus:resetBattleBonus()
@@ -17,6 +18,7 @@ function battleBonus:resetBattleBonus()
 	self.toHitPenalty	= 0
 	self.damageBonus	= 0
 	self.damagePenalty	= 0
+	self.missTurn		= false
 end
 
 function battleBonus:addBattleBonus(inStat, inAmount, inStack)

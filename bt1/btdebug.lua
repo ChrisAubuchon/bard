@@ -82,6 +82,7 @@ function btdebug.cityDebug()
 		text:print("2. Enter dungeon\n")
 		text:print("3. Random battle\n")
 		text:print("4. Enter building\n")
+		text:print("5. Battle\n")
 		text:printExit()
 		inkey = getkey()
 
@@ -98,10 +99,11 @@ function btdebug.cityDebug()
 			end
 		elseif (inkey == "3") then
 			battle:random()
-			return
 		elseif (inkey == "4") then
 			btdebug.enterBuilding()
 			return
+		elseif (inkey == "5") then
+			btdebug.doBattle()
 		end
 
 	until (inkey == "E")
@@ -247,4 +249,39 @@ function btdebug.moveToSquare()
 	until (inkey == "C")
 
 	text:clear()
+end
+
+function btdebug.doBattle()
+	local ngroups
+	local groups = {}
+	local i
+	local g
+	local count
+
+	text:cdprint(true, false, "Number of groups [1-4]:")
+	ngroups = text:readNumber()
+	if (not ngroups) then
+		return
+	end
+
+	local function printItem(_,inItem)
+		if (#inItem > 14) then
+			text:print(string.sub(inItem,1,14))
+		else
+			text:print(inItem)
+		end
+	end
+
+	for i = 1,ngroups do
+		g = text:scrollingSelect(monster.typeTable(), printItem)
+		if (not g) then return end
+
+		text:cdprint(true, false, "Enter group size:")
+		count = text:readNumber()
+
+		table.insert(groups, g)
+		table.insert(groups, count)
+	end
+
+	battle:new(table.unpack(groups))
 end

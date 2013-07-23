@@ -340,12 +340,22 @@ function spells.spellBind(inAction)
 end
 
 function spells.mageStar(inAction)
-	local xxx_magestar = true
+	dprint("spells.mageStar")
+
+	if (inAction:groupSavingThrow()) then
+		text:cdprint(false, true, " but it had no effect!\n\n")
+		party:display()
+		return
+	end
+	inAction.source:mageStar(inAction)
+	text:printEllipsis()
 end
 
 
 function spells.attack(inAction)
 	local xxx_attack_spell = true
+	dprint("spells.attack()")
+	inAction.source:attackSpell(inAction)
 end
 
 function spells.battleBonus(inAction)

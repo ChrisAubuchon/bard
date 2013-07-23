@@ -191,7 +191,7 @@ function textBox:readNumber()
 
 	self:print("\n")
 	t = self:readString()
-	t = string.match(t, "^$d+$")
+	t = string.match(t, "^%d+$")
 	if (t ~= nil) then
 		return tonumber(t)
 	else

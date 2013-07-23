@@ -216,3 +216,21 @@ function monster.pluralizeName(inType, numMonsters)
 		return _monsters[inType].plural
 	end
 end
+
+
+function monster.typeTable()
+	local t = {}
+
+	function t:toArray() 
+		local r = {}
+
+		for i,_ in pairs(_monsters) do
+			table.insert(r, i)
+		end
+
+		table.sort(r)
+		return r
+	end
+
+	return t
+end
