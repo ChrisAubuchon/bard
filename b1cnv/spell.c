@@ -226,8 +226,9 @@ static btAction_t *spell_attack(uint32_t index)
 			break;
 		case sp_MindBlade:
 			ba->allFoes = 1;
-			/* Fall Through */
+			break;
 		case sp_SpectreTouch:
+			ba->ndice++;
 			break;
 		}
 	}

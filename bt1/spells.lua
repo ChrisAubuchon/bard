@@ -364,8 +364,9 @@ function spells.attack(inAction)
 end
 
 function spells.battleBonus(inAction)
-	inAction.source:battleBonus(inAction)
-	text:printEllipsis()
+	if (inAction.source:battleBonus(inAction)) then
+		text:printEllipsis()
+	end
 end
 
 function spells.disbelieve(inAction)

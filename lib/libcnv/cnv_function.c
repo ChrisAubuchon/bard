@@ -90,7 +90,8 @@ json_t *btFunction_toJson(const void *vbf)
 	if (bf->type == FUNC_STRING) {
 		JSON_BTSTRING(root, "inCode", bf->string);
 	} else {
-		JSON_STRING(root, "inFunction", functionList[bf->type]);
+		if (bf->type != FUNC_NONE)
+			JSON_STRING(root, "inFunction", functionList[bf->type]);
 	}
 
 	return root;

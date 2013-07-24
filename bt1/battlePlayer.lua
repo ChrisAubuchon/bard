@@ -40,6 +40,7 @@ function battlePlayer:doAction(inAction)
 		return
 	end
 
+
 	if (inAction.action == "melee") then
 		dprint("Performing melee attack")
 		self:doMeleeAttack(inAction)
@@ -209,18 +210,20 @@ function battlePlayer:doDamage(inAction)
 		return false
 	end
 
-	if (self.cur_hp > outData.damage) then
-		self.cur_hp = self.cur_hp - outData.damage
-	else
-		self.cur_hp = 0
-		self.possessed = false
-		self.isDead = true
+	if (outData.damage > 0) then
+		if (self.cur_hp > outData.damage) then
+			self.cur_hp = self.cur_hp - outData.damage
+		else
+			self.cur_hp = 0
+			self.possessed = false
+			self.isDead = true
 
-		self:songTimeout()
+			self:songTimeout()
 
-		outData.specialAttack = "kill"
+			outData.specialAttack = "kill"
 
-		return true
+			return true
+		end
 	end
 
 	if (not outData.specialAttack) then
@@ -291,6 +294,10 @@ function battlePlayer:getCombatSpell(inAction)
 	local s
 
 	s = self:getSpell(false)
+	if (not s) then
+		return false
+	end
+
 	if (not s.combat) then
 		text:cdprint(false, true, "\nNot a combat spell.")
 		return false
@@ -425,7 +432,7 @@ function battlePlayer:battleBonus(inAction)
 			if (inAction:savingThrow()) then
 				text:cdprint(false, true, " but it had no effect!\n\n")
 				party:display()
-				return
+				return false
 			end
 
 			inTarget:addBattleBonus("acPenalty", inData.acAmount,
@@ -498,6 +505,8 @@ function battlePlayer:battleBonus(inAction)
 	if (updateParty) then
 		party:display()
 	end
+
+	return true
 end
 
 function battlePlayer:mageStar(inAction)
@@ -511,110 +520,71 @@ function battlePlayer:attackSpell(inAction)
 	local target		= inAction.target
 	local inBattle		= inAction.inBattle
 
-	if (inData.levelMultiply) then
-		outData.damage = rnd_xdy(self.cur_level * inData.ndice,
-						inData.dieval)
-		self:singleTargetSpell(inAction)
-	elseif (inData.specialAttack) then
-		outData.specialAttack = inData.specialAttack
-		outData.damage = 0
-		self:singleTargetSpell(inAction)
-		local xxx_not_level_mult = true
-	elseif (inData.allFoes) then
-		local mgroup
-		if (inBattle.monParty.size == 0) then
-			text:printEllipsis()
+	dprint("battlePlayer:attackSpell()")
+	-- printEllipsis if a group or allFoes spell was cast
+	-- and all of the monster groups are dead.
+	--
+	if ((inData.group and target.size == 0) or
+	    (inData.allFoes and not inBattle.monParty:isAlive())) then
+		text:printEllipsis()
+		return
+	end
+
+	-- Fizzle the spell if the target is a character or doesn't
+	-- match the repel type of the spell
+	--
+	if (next(inData.repel)) then
+		local repelType
+
+		repelType = next(inData.repel)
+		if (target:isCharacter() or not target.repel[repelType]) then
+			text:print(" but it fizzles!\n\n")
+			party:display()
+			timer:delay(3)
 			return
 		end
+	end
+
+	if (inData.allFoes) then
+		local mgroup
 
 		for mgroup in inBattle.monParty:iterator() do
 			inAction.target = mgroup
-			self:multipleTargetSpell(inAction)
-			if (mgroup.next) then
+			inAction:multiTargetSpell()
+			--self:multipleTargetSpell(inAction)
+			if (not mgroup:isLast()) then
 				text:print("and")
 			end
 		end
 	elseif (inData.group) then
-		if (target.size == 0) then
-			text:printEllipsis()
-			return
-		end
-		self:multipleTargetSpell(inAction)
-	end
-end
-
-function battlePlayer:singleTargetSpell(inAction)
-	local inData		= inAction.inData
-	local outData		= inAction.outData
-	local source		= inAction.source
-	local target		= inAction.target
-	local possessFlag	= false
-	local save
-	local half
-
-	if (target:isSummon()) then
-		party.summon.isHostile = true
-	end
-
-	if (target:isCharacter()) then
-		if (target.isStoned or target.isParalyzed) then
-			text:printEllipsis()
-			return
-		end
-
-		if (target.isDead) then
-			if (inData.specialAttack == "possess") then
-				possessFlag = true
-			else
-				text:printEllipsis()
-				return
-			end
-		end
-
-		if (inData.specialAttack == "possess" and
-		    source:isCharacter() and
-		    not possessFlag) then
-			text:printEllipsis()
-			return
-		end
+		--self:multipleTargetSpell(inAction)
+		inAction:multiTargetSpell()
 	else
-		if (target.size == 0) then
-			text:printEllipsis()
-			return
-		end
-	end
-
-	text:print(" at %s", target:getSingularName())
-	save, half = inAction:savingThrow()
-	if (save) then 
-		if (half) then
-			bit32.rshift(outData.damage, 1)
+		-- Single target spell
+		--
+		if (inData.levelMultiply) then
+			local i
+			outData.damage = 0
+			for i = 1,inData.ndice do
+				outData.damage = outData.damage +
+					rnd_xdy(self.cur_level + 1, inData.dieval)
+			end
+		elseif (inData.specialAttack) then
+			outData.specialAttack = inData.specialAttack
+			outData.damage = 0
 		else
-			text:print(" but it had no effect!\n\n")
-			return
+			outData.damage = rnd_xdy(inData.ndice, inData.dieval)
 		end
-	end
 
-	if (not outData.specialAttack) then
-		text:print(" and %s %s ",
-				stringTables.andEffects[inData.atype],
-				target:getPronoun())
-		inAction:printDamage()
+		inAction:singleTargetSpell()
 	end
-
-	inAction:doDamage(inAction)
-	if (globals.partyDied) then
-		return
-	end
-
-	party:display()
-	timer:delay(3)
 end
 
 function battlePlayer:multipleTargetSpell(inAction)
 	local inData		= inAction.inData
 	local outData		= inAction.outData
 	local target		= inAction.target
+	local lastDamage	= 0
 	local m
 
 	text:print(" at %s %s...\n\n",
@@ -627,7 +597,14 @@ function battlePlayer:multipleTargetSpell(inAction)
 		local save
 		local half
 
-		outData.damage = rnd_xdy(inData.ndice, inData.dieval)
+		-- Prevent consecutive targets from receiving
+		-- the same damage.
+		--
+		repeat
+			outData.damage = rnd_xdy(inData.ndice, inData.dieval)
+		until (outData.damage ~= lastDamage)
+		lastDamage = outData.damage
+
 		text:print("One")
 		save, half = inAction:savingThrow()
 		if (save and not half) then

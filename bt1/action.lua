@@ -19,6 +19,25 @@ function btAction:new()
 	return self
 end
 
+function btAction:dump()
+	local k
+	local v
+	dprint("===========================")
+	dprint("Source: %s", self.source:getSingularName())
+	dprint("Target: %s", self.target:getSingularName())
+	dprint("inData: {")
+	for k,v in pairs(self.inData) do
+		dprint("  %s: %s", k, v)
+	end
+	dprint("}")
+	dprint("outData: {")
+	for k,v in pairs(self.outData) do
+		dprint("  %s: %s", k, v)
+	end
+	dprint("}")
+	dprint("===========================")
+end
+
 ----------------------------------------
 -- savingThrow
 --
@@ -77,3 +96,155 @@ function btAction:doDamage()
 		text:print(".\n\n")
 	end
 end
+
+function btAction:singleTargetSpell()
+	local target		= self.target
+	local source		= self.source
+	local inData		= self.inData
+	local outData		= self.outData
+	local possessFlag	= false
+	local save
+	local half
+
+	dprint("btAction:singleTargetSpell()")
+
+	if (target:isSummon() and source:isCharacter()) then
+		party.summon.isHostile = true
+	end
+
+	if (target:isMonster()) then
+		if (target.size == 0) then
+			text:printEllipsis()
+			return
+		end
+	else
+		if (target.isStoned or target.isParalyzed) then
+			text:printEllipsis()
+			return
+		end
+
+		if (target.isDead) then
+			if (inData.specialAttack == "possess") then
+				possessFlag = true
+			else
+				text:printEllipsis()
+				return	
+			end
+		end
+
+		if (inData.specialAttack == "possess" and
+				source:isCharacter() and
+				not possessFlag) then
+			text:printEllipsis()
+			return
+		end
+	end
+
+	text:print(" at %s", target:getSingularName())
+	save, half = self:savingThrow()
+	if (save) then
+		if (half) then
+			bit32.rshift(outData.damage, 1)
+		else
+			text:print(" but it had no effect!\n\n")
+			timer:delay(3)
+			return
+		end
+	end
+
+	if (not outData.specialAttack) then
+		text:print(" and %s %s ",
+			stringTables.andEffects[inData.atype],
+			target:getPronoun()
+			)
+		self:printDamage()
+	end
+
+	self:doDamage()
+	if (globals.partyDied) then
+		return
+	end
+
+	party:display()
+	timer:delay(3)
+end
+
+function btAction:multiTargetSpell()
+	local source		= self.source
+	local target		= self.target
+	local inData		= self.inData
+	local outData		= self.outData
+	local iter
+	local t
+	local lastDamage	= 0
+
+	if (target:isCharacter()) then
+		text:print(" at the party...\n\n")
+		target = party
+	else
+		text:print(" at %s %s...\n\n",
+			pluralize(target.size, "a", "some"),
+			pluralize(target.size, target.singular, target.plural)
+			)
+		iter = target
+	end
+
+	for t in target:iterator() do
+		local save
+		local half
+
+		repeat
+			outData.damage = rnd_xdy(inData.ndice, inData.dieval)
+		until (outData.damage ~= lastDamage)
+		lastDamage = outData.damage
+
+		if (t:isCharacter() or t:isSummon()) then
+			text:print(t:getSingularName())
+		else
+			text:print("One")
+		end
+
+		if (t:isCharacter()) then
+			self.target = t
+		end
+		save, half = self:savingThrow()
+		if (save and not half) then
+			text:print(" repelled the spell!\n\n")
+		else
+			if (half) then
+				bit32.rshift(outData.damage, 1)
+			end
+			text:print(" is %s ",
+				stringTables.isEffects[inData.atype])
+			self:printDamage()
+			self:doDamage()
+		end
+		timer:delay(3)
+	end
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

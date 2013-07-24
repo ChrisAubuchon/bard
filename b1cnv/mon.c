@@ -272,7 +272,7 @@ void convertMonsters(void)
 				bteAttack_t *ba;
 
 				ma = monsterAttack_new(ACT_MELEE);
-				ma->action = btAction_new(FUNC_ATTACK,
+				ma->action = btAction_new(FUNC_NONE,
 							EFFECT_ATTACK);
 				ba = btEffect_attack(ma->action->effect);
 
@@ -285,7 +285,16 @@ void convertMonsters(void)
 				ma = monsterAttack_new(ACT_SPELL);
 				ma->action = getSpellAction(monSpellTrans[att]);
 			} else if (att == 0xfe) {
+				bteAttack_t *ba;
 				ma = monsterAttack_new(ACT_DOPPEL);
+				ma->action = btAction_new(FUNC_NONE,
+							EFFECT_ATTACK);
+				ba = btEffect_attack(ma->action->effect);
+				ba->ndice = (monPri[i] & 0x1f) + 1;
+				ba->dieval = 4;
+				ba->spAttack = monPri[i] >> 5;
+				ba->attype = 8;
+				ba->meleeString = monAttType[i] + 1;
 			} else {
 				bteAttack_t *ba;
 

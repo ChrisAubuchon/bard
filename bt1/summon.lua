@@ -29,6 +29,10 @@ function summon:isCharacter()
 	return true
 end
 
+function summon:getMultiString()
+	return self.singular
+end
+
 function summon:getStatusLine()
 	local hpstring
 	local outString

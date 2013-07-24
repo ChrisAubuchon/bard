@@ -10,6 +10,15 @@ monster = {}
 local _monsters
 _monsters = read_table("monsters")
 
+local m
+local a
+
+for _,m in pairs(_monsters) do
+	for _,a in ipairs(m.attacks) do
+		compileAction(a.action)
+	end
+end
+
 function monster:new(inName)
 	local self = {
 		beenAttacked	= false,
@@ -34,6 +43,10 @@ function monster:new(inName)
 	self.__index = self
 
 	return self
+end
+
+function monster:getMultiString()
+	return "One"
 end
 
 function monster:compare(inValue)

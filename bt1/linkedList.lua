@@ -12,6 +12,14 @@ function linkedListNode:compare(inValue)
 	return false
 end
 
+function linkedListNode:isLast()
+	if (self.next) then
+		return false
+	else
+		return true
+	end
+end
+
 function linkedList:insertTail(inNode)
 	if (not self.head) then
 		self.head = inNode

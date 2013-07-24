@@ -81,6 +81,8 @@ function character:getStatusLine()
 		hpstring = "OLD"
 	elseif (self.isParalyzed) then
 		hpstring = "PARA"
+	elseif (self.isPossessed) then
+		hpstring = "POSS"
 	else
 		hpstring = string.format("%4d", self.max_hp)
 	end
@@ -935,6 +937,10 @@ function character:songTimeout()
 	party.song.timer = 0
 	self.isSinging = false
 	self.song = false
+end
+
+function character:getMultiString()
+	return self.name
 end
 
 

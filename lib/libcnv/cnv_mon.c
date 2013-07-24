@@ -84,6 +84,7 @@ static json_t *monster_toJson(const void *vm)
 	JSON_NUMBER(monRoot, "advanceSpeed",	m->advSpeed);
 	JSON_BOOL(monRoot, "isIllusion",	m->isIllusion);
 
+	json_object_update(monRoot, repel_toJson(&m->repel));
 	json_object_set_new(monRoot, "attacks", cnvList_toJsonArray(m->attacks));
 	
 	return monRoot;

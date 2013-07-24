@@ -508,7 +508,6 @@ function party:randomMeleeCharacter()
 
 	if (self.summon) then
 		maxSize = maxSize + 1
-		--minSize = minSize + 1
 	end
 
 	randomCharacter = rnd_xdy(1,maxSize)
@@ -530,6 +529,8 @@ function party:randomMeleeCharacter()
 			randomCharacter = 1
 		end
 	end
+
+	return self[1]
 end
 
 ----------------------------------------

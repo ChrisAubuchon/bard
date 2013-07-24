@@ -218,7 +218,9 @@ function battleData:start()
 			break
 		end
 
-		self.monParty:adjustMeleeGroups()
+		if (self.monParty) then
+			self.monParty:adjustMeleeGroups()
+		end
 		self:getMonsterActions()
 		self:getPriorities()
 
@@ -320,7 +322,6 @@ function battleData:doRound()
 	text:setCursor(0, 11)
 	while (currentAction) do
 		currentAction.inBattle = self
-		dprint(tostring(currentAction.source))
 		currentAction.source:doAction(currentAction)
 
 		if (globals.partyDied) then
@@ -588,7 +589,8 @@ function battleData:getPlayerOption(partySlot, c)
 
 		text:print("\nSelect an option.")
 
-		while true do
+		local continue = true
+		while continue do
 			inkey = getkey()
 
 			if (inkey == "Q") then os.exit(0) end
@@ -598,16 +600,19 @@ function battleData:getPlayerOption(partySlot, c)
 					if (self:meleeTarget(action)) then
 						return action
 					end
+					continue = false
 				elseif (inkey == "B") then
 					action.action = "sing"
 					if (action.source:getTune(action, true)) then
 						return action
 					end
+					continue = false
 				elseif (inkey == "C") then
 					action.action = "cast"
 					if (action.source:getCombatSpell(action)) then
 						return action
 					end
+					continue = false
 				elseif (inkey == "D") then
 					action.action = "defend"
 					return action
@@ -619,11 +624,13 @@ function battleData:getPlayerOption(partySlot, c)
 					if (self:meleeTarget(action)) then
 						return action
 					end
+					continue = false
 				elseif (inkey == "U") then
 					action.action = "use"
 					if (c:getUseItem(action)) then
 						return action
 					end
+					continue = false
 				end
 			end
 		end
@@ -667,7 +674,6 @@ function battleData:getMonsterActions()
 		for m in mgroup:iterator() do
 			action = btAction.new()
 			action.source = m
-			action.action = self.doMonsterAttack
 			self:addAction(m, action)
 		end
 	end

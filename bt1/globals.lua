@@ -86,7 +86,7 @@ stringTables.effects = {
 
 stringTables.andEffects = {
 	fry	= "fries",
-	froze	= "froze",
+	freeze	= "froze",
 	shock	= "shocks",
 	drain	= "drains",
 	burn	= "burns",
@@ -96,7 +96,7 @@ stringTables.andEffects = {
 
 stringTables.isEffects = {
 	fry	= "fried",
-	froze	= "frozen",
+	freeze	= "frozen",
 	shock	= "shocked",
 	drain	= "drained",
 	burn	= "burnt",
