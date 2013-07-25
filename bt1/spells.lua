@@ -251,24 +251,21 @@ spells.teleport = function()
 end
 
 function spells.summon(inAction)
-	local inData = inAction.inData
+	local inData	= inAction.inData
+	local summon	= {}
 
-	if (inAction.source:isMonster()) then
-		local xxx_monster_summon_monster = true
+	summon.illusionFlag = inData.illusionFlag
+	summon.type = inData.summons[rnd_xdy(1,#inData.summons)]
+
+	if (inAction.source:isCharacter()) then
+		party:doSummon(summon)
+		text:printEllipsis()
+	elseif (inAction.source:isSummon()) then
+		text:printEllipsis()
 		return
-	end
-
-	if (inData.randomFlag) then
-		if (bit32.band(rnd(),1) == 1) then
-			party:doSummon(inData.sumOne, inData.illusionFlag)
-		else
-			party:doSummon(inData.sumTwo, inData.illusionFlag)
-		end
 	else
-		party:doSummon(inData.sumOne, inData.illusionFlag)
-	end	
-
-	text:printEllipsis()
+		inAction.inBattle.monParty:doSummon(summon)
+	end
 end
 
 local function __doHeal(inAction, inTarget)
@@ -340,8 +337,34 @@ function spells.heal(inAction)
 
 end
 
+----------------------------------------
+-- spellBind()
+----------------------------------------
 function spells.spellBind(inAction)
-	local xxx_spellBind = true
+	local target		= inAction.target
+	local inBattle		= inAction.inBattle
+	local last
+
+	if (inAction:savingThrow() 
+			or target.size == 0
+			or target.isIllusion
+		) then
+
+		text:cdprint(false, true, " but it had no effect!\n\n")
+		return
+	end
+
+	party:doSummon({ type = target.name })
+
+	-- Remove the last monster from the group
+	--
+	last = target:getLast()
+	target:removeMonster(last)
+	inBattle:removePriority(last)
+	if (target.size == 0) then
+		inAction.inBattle.monParty:removeMonsterGroup(target)
+	end
+	text:printEllipsis()
 end
 
 function spells.mageStar(inAction)
@@ -370,6 +393,11 @@ function spells.battleBonus(inAction)
 end
 
 function spells.disbelieve(inAction)
+	-- disbelieve is broken in the DOS version of BT1
+	--
+	if (inAction.source:isMonster()) then
+		text:printEllipsis()
+	end
 	local xxx_disbelieve = true
 end
 

@@ -224,10 +224,8 @@ typedef struct {
 #define btEffect_heal(be) (bteHeal_t *)btEffect_getDataPointer(be)
 
 typedef struct {
-	uint8_t		isRandom;
 	uint8_t		isIllusion;
-	btstring_t	*sumZero;
-	btstring_t	*sumOne;
+	cnvList_t	*monsters;
 } bteSummon_t;
 #define btEffect_summon(be) (bteSummon_t *)btEffect_getDataPointer(be);
 

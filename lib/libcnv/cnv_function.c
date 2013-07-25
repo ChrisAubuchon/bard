@@ -35,7 +35,7 @@ static uint8_t *functionList[] = {
 	"spells.reEnergize(...)",
 	"spells.summonHelp(...)",
 	"spells.tarjan(...)",
-	"spells.doppel(...)",
+	"spells.dopple(...)",
 	"spells.passive.light(...)",
 	"spells.passive.compass(...)",
 	"spells.passive.levitate(...)",

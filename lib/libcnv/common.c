@@ -25,7 +25,7 @@ static uint8_t *pronoun[] = {
 };
 
 static uint8_t *actTypes[] = {
-	"", "melee", "spell", "doppel",
+	"", "melee", "spell", "dopple",
 	"breath", "fire", "summonhelp", "tarjan",
 	"unused"
 };

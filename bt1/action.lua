@@ -189,7 +189,7 @@ function btAction:multiTargetSpell()
 		iter = target
 	end
 
-	for t in target:iterator() do
+	for t in target:iterator(true) do
 		local save
 		local half
 

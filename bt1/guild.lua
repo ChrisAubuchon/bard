@@ -12,7 +12,7 @@ require "character"
 local function add_member()
 	local member
 
-	if (party:isOccupied(7)) then
+	if (not party:hasRoom()) then
 		text:splashMessage("\n\nNo room to add new members.");
 
 		return

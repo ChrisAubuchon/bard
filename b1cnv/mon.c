@@ -30,7 +30,6 @@ static void getSummonData(cnvList_t *mlist)
 
 	for (i = 0; i < 3; i++) {
 		m = monster_new();
-
 		m->macro = bts_strcpy(monMacro[i + 127]);
 		m->singular = bts_strcpy(sumlist[i].name);
 		m->plural = bts_strcpy(sumlist[i].name);
@@ -204,7 +203,11 @@ void convertMonsters(void)
 		m->priorityHi = CAP((monPri[i] << 2) + 31, 0xff);
 
 		m->rndGroupSize = (i < 123) ? 1 : 0;
-		m->groupSize = CAP(diceMask[monMask[i] & 7], 99);
+		if (monMask[i] & 7) {
+			m->groupSize = CAP(diceMask[monMask[i] & 7], 99);
+		} else {
+			m->groupSize = 1;
+		}
 #undef CAP
 
 		m->numAttacks = 1;
@@ -299,7 +302,7 @@ void convertMonsters(void)
 				bteAttack_t *ba;
 
 				ma = monsterAttack_new(ACT_BREATH);
-				ma->action = btAction_new(FUNC_ATTACK,
+				ma->action = btAction_new(FUNC_NONE,
 							EFFECT_ATTACK);
 				ba = btEffect_attack(ma->action->effect);
 

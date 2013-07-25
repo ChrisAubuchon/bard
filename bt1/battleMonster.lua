@@ -1,7 +1,7 @@
 battleMonster	= {}
 
 function battleMonster:doAction(inAction)
-	local attackIndex
+	local attack
 	local i
 
 	-- Check here if this monster groups turn is
@@ -11,24 +11,11 @@ function battleMonster:doAction(inAction)
 		return
 	end
 
-	attackIndex = rnd_xdy(1,4)
 	inAction.target = party:randomMeleeCharacter()
 
-	for i = 1,4 do
-		local attack = self.attacks[attackIndex]
-
-		local xxx_delete_block_when_all_attacks_are_filled = true
-		if (not attack) then
-			return
-		end
-
+	for attack in self:attackIterator() do
 		if (attack.type == "melee") then
-			if (not self:inMeleeRange()) then
-				attackIndex = attackIndex + 1
-				if (attackIndex > 4) then
-					attackIndex = 1
-				end
-			else
+			if (self:inMeleeRange()) then
 				inAction.inData = attack.action.inData
 				if (inAction.target:isDisabled()) then
 					return
@@ -47,9 +34,8 @@ function battleMonster:doAction(inAction)
 			self:combatSpell(inAction)
 
 			return 
-		elseif (attack.type == "doppel") then
-			local xxx_add_doppelganger_check = true
-			if (not false) then
+		elseif (attack.type == "dopple") then
+			if (self:doDoppleganger(inAction)) then
 				if (inAction.target:isDisabled()) then
 					return
 				end
@@ -58,7 +44,12 @@ function battleMonster:doAction(inAction)
 				return	
 			end
 		elseif (attack.type == "breath") then
-			local xxx_breath_attack = true
+			text:print("%s breathes", self.singular)
+			inAction.inData = attack.action.inData
+			inAction.func = attack.action.func
+			inAction:multiTargetSpell()
+			
+			return
 		else
 			error("Unknown monster attack type: " .. 
 				tostring(attack.type))
@@ -287,6 +278,12 @@ function battleMonster:attackSpell(inAction)
 			outData.damage = rnd_xdy(inData.ndice, inData.dieval)
 		end
 		inAction:singleTargetSpell()
+	end
+end
+
+function battleMonster:doDoppleganger(inAction)
+	if (not party:hasRoom()) then
+		return false
 	end
 end
 

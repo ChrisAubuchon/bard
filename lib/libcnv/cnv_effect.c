@@ -504,6 +504,7 @@ static bteSummon_t *bteSummon_new(void)
 	bteSummon_t	*rval;
 
 	rval = (bteSummon_t *)xzalloc(sizeof(bteSummon_t));
+	rval->monsters = cnvList_btstring();
 
 	return rval;
 }
@@ -515,8 +516,7 @@ static void bteSummon_free(const void *vbs)
 	if (bs == NULL)
 		return;
 
-	bts_free(bs->sumOne);
-	bts_free(bs->sumZero);
+	cnvList_free(bs->monsters);
 
 	free(bs);
 }
@@ -529,10 +529,9 @@ static json_t *bteSummon_toJson(const void *vbs)
 	node = json_object();
 	inData = json_object();
 
-	JSON_TRUE_IF(inData, "isRandom", bs->isRandom);
 	JSON_TRUE_IF(inData, "isIllusion", bs->isIllusion);
-	JSON_BTSTRING_IF(inData, "sumOne", bs->sumZero);
-	JSON_BTSTRING_IF(inData, "sumTwo", bs->sumOne);
+	json_object_set_new(inData, "summons", 
+				cnvList_toJsonArray(bs->monsters));
 
 	json_object_set_new(node, "inData", inData);
 

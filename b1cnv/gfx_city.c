@@ -458,24 +458,6 @@ void flipRight(btstring_t *r, uint8_t height, uint8_t width)
 			r->buf[(h * width) + (width - w - 1)] = tmp;
 		}
 	}
-
-#if 0
-	for (h = 0; h < height; h++) {
-		for (w = 0; w < (width >> 1); w++) {
-			tmp = r->buf[(h * width) + w];
-			cnv = r->buf[(h * width) + (width - w - 1)];
-			cnv = (cnv >> 4) | (cnv << 4);
-			tmp = (tmp >> 4) | (tmp << 4);
-			r->buf[(h * width) + w] = cnv;
-			r->buf[(h * width) + (width - w - 1)] = tmp;
-		}
-
-		if ((width >> 1) & 1) {
-			r->buf[(h * width) + (width >> 1)] =
-			    ((r->buf[(h * width) + (width >> 1)] & 0xf0) >> 4) | ((r->buf[(h * width) + (width >> 1)] & 0x0f) << 4);
-		}
-	}
-#endif
 }
 
 static void city_gfxInit(void)

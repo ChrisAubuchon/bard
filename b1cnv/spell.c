@@ -20,11 +20,6 @@ static btAction_t	*spell_heal(uint32_t index);
 static btAction_t	*spell_summon(uint32_t index);
 static btAction_t	*spell_generic(uint32_t index);
 
-#if 0
-static void song_lightSpell(bardSong_t *bs);
-static void song_acBonus(bardSong_t *bs);
-#endif
-
 static void song_lightSpell(btSong_t *bs);
 static void song_generic(btSong_t *bs);
 
@@ -275,6 +270,7 @@ static btAction_t *spell_heal(uint32_t index)
 
 static btAction_t *spell_summon(uint32_t index)
 {
+	uint32_t	isRandom;
 	uint8_t		sum;
 	btAction_t	*rval;
 	bteSummon_t	*bs;
@@ -282,7 +278,7 @@ static btAction_t *spell_summon(uint32_t index)
 	rval = btAction_new(FUNC_SUMMON, EFFECT_SUMMON);
 	bs = btEffect_summon(rval->effect);
 
-	bs->isRandom = IFBIT(spellDuration[index], 0x40, 1, 0);
+	isRandom = IFBIT(spellDuration[index], 0x40, 1, 0);
 	bs->isIllusion = IFBIT(spellDuration[index], 0x80, 1, 0);
 
 	sum = summonIndex[spellDuration[index] & 0x3f];
@@ -291,14 +287,14 @@ static btAction_t *spell_summon(uint32_t index)
 	sum = (sum == 2) ? 128 : sum;
 	sum = (sum == 4) ? 129 : sum;
 
-	bs->sumZero = getMonsterName(sum);
-	if (bs->isRandom) {
+	cnvList_add(bs->monsters, getMonsterName(sum));
+	if (isRandom) {
 		sum = summonIndex[(spellDuration[index] & 0x3f) + 1];
 		sum = (sum > 4) ? sum - 1 : sum;
 		sum = (sum == 0) ? 127 : sum;
 		sum = (sum == 2) ? 128 : sum;
 		sum = (sum == 4) ? 129 : sum;
-		bs->sumOne = getMonsterName(sum);
+		cnvList_add(bs->monsters, getMonsterName(sum));
 	}
 
 	return rval;
@@ -320,59 +316,6 @@ static btAction_t *spell_disbelieve(uint32_t index)
 
 	return rval;
 }
-
-#if 0
-#if 0
-static void song_lightSpell(bardSong_t *bs)
-#endif
-static void song_lightSpell(btSong_t *bs)
-{
-	btEffect_t		*effect;
-	btePassive_t		*bp;
-	uint32_t 		i;
-	uint32_t		offset;
-
-	bs->activate = btFunction_new(FUNC_LIGHT);
-	bs->deactivate = btFunction_new(FUNC_STRING);
-	bs->deactivate->string = bts_strcpy("local xxx_holding=true");
-
-	for (i = 0; i < 8; i++) {
-		offset = songBonusList[i] + 7;
-
-		effect = btEffect_new(EFFECT_PASSIVE);
-		bp = btEffect_passive(effect);
-
-		bp->type = PASS_LIGHT;
-		bp->duration = lightDur[offset];
-		bp->lightDistance = lightDist[offset];
-		bp->detectSecret = (lightSDFlag[offset] != 0);
-
-#if DOSBUG
-		bp->duration = lightDur[spellDuration[offset]];
-		bp->lightDistance = lightDist[spellDuration[offset]];
-		bp->detectSecret = (lightSDFlag[spellDuration[offset]] != 0);
-#endif
-
-		cnvList_add(bs->nonCombatData, effect);
-	}
-}
-
-static void song_generic(cnvList_t *list)
-{
-	btEffect_t		*effect;
-	bteGeneric_t		*bg;
-	uint32_t		i;
-
-	for (i = 0; i < 8; i++) {
-		effect = btEffect_new(EFFECT_GENERIC);
-		bg = btEffect_generic(effect);
-
-		bg->flags = songBonusList[i];
-
-		cnvList_add(list, effect);
-	}
-}
-#endif
 
 /********************************/
 /*				*/
@@ -457,56 +400,3 @@ void convertSpells(void)
 	spellList_to_json(spells, mkJsonPath("spells.json"));
 	cnvList_free(spells);
 }
-
-#if 0
-void convertSongs(void)
-{
-	uint32_t	i, j;
-	cnvList_t	*songs;
-#if 0
-	bardSong_t	*b;
-#endif
-	btSong_t	*b;
-
-	songs = songList_new();
-
-	for (i = 0; i < 6; i++) {
-#if 0
-		b = bardSong_new();
-
-		b->full = bts_strcpy(songName[i]);
-#endif
-		b = btSong_new();
-		b->name = bts_strcpy(songName[i]);
-
-		switch (i) {
-		case 1:
-			song_lightSpell(b);
-			/* Fall through */
-		case 0:
-		case 2:
-		case 3:
-		case 5:
-			b->combatFunction = btFunction_new(FUNC_STRING,
-					bts_strcpy(song_combatString[i]));
-			song_generic(b->combatData);
-			break;
-		case 4:
-			b->activate = btFunction_new(FUNC_STRING,
-					bts_strcpy(song_acBonusString));
-			b->deactivate = btFunction_new(FUNC_STRING,
-					bts_strcpy("local xxx_hold = true"));
-			song_generic(b->nonCombat);
-			b->combatFunction = btFunction_new(FUNC_STRING,
-					bts_strcpy(song_combatString[i]));
-			song_generic(b->combat);
-			break;
-		}
-			
-		cnvList_add(songs, b);
-	}
-
-	songList_to_json(songs, mkJsonPath("songs.json"));
-	cnvList_free(songs);
-}
-#endif

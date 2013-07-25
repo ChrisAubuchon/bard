@@ -57,14 +57,8 @@ function monsterGroup:addMonster()
 end
 
 function monsterGroup:removeMonster(inMonster)
-	local mon
-
-	mon = self:find(inMonster.key)
-	if (not mon) then
-		error("monsterGroup:removeMonster(): Monster not found")
-	end
-	self:remove(mon)
-	mon:deleteKey()
+	self:remove(inMonster)
+	inMonster:deleteKey()
 	self.size = self.size - 1
 end
 

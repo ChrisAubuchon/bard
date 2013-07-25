@@ -77,6 +77,28 @@ function monster:inMeleeRange()
 	return self.parentGroup.inMeleeRange
 end
 
+function monster:attackIterator()
+	local count 	= 0
+	local index	= 0
+
+	local function f(_)
+		count = count + 1
+		if (count > 4) then
+			return
+		end
+		if (index == 0) then
+			index = rnd_xdy(1,4)
+		else
+			index = index + 1
+			if (index > 4) then	
+				index = 1
+			end
+		end
+		return self.attacks[index]
+	end
+	return f, nil, nil
+end
+
 function monster.getXPReward(inType)
 	assert(_monsters[inType])
 

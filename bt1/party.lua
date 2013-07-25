@@ -53,6 +53,10 @@ function party:removeCharacter(inCharacter)
 	return false
 end
 
+party:hasRoom()
+	return self:isOccupied(6)
+end
+
 ----------------------------------------
 -- addParty()
 --
@@ -111,7 +115,7 @@ end
 -- Special iterator function to include
 -- the "summon" slot
 ----------------------------------------
-function party:iterator()
+function party:iterator(inSkipDisabled)
 	local state = -1
 	local function f(_)
 		if (state == -1) then
@@ -123,7 +127,15 @@ function party:iterator()
 
 		while (state < 6) do
 			state = state + 1
-			if (self[state]) then
+			if (not self[state]) then
+				return
+			end
+
+			if (inSkipDisabled) then
+				if (not self[state]:isDisabled()) then
+					return self[state]
+				end
+			else
 				return self[state]
 			end
 		end
@@ -538,13 +550,13 @@ end
 --
 -- Summon a monster to the summon slot
 ----------------------------------------
-function party:doSummon(inName, inIllusion)
+function party:doSummon(inSummon)
 	if (self.summon) then
 		self.summon = false
 	end
 
-	self.summon = summon:new(inName)
-	self.summon.isIllusion = inIllusion or false
+	self.summon = summon:new(inSummon.type)
+	self.summon.isIllusion = inSummon.isIllusion or false
 	self:display()
 end
 

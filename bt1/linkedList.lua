@@ -20,6 +20,23 @@ function linkedListNode:isLast()
 	end
 end
 
+----------------------------------------
+-- getFirst()
+----------------------------------------
+function linkedList:getFirst()
+	return self.head
+end
+
+----------------------------------------
+-- getLast()
+----------------------------------------
+function linkedList:getLast()
+	return self.tail
+end
+
+----------------------------------------
+-- insertTail()
+----------------------------------------
 function linkedList:insertTail(inNode)
 	if (not self.head) then
 		self.head = inNode
@@ -33,6 +50,9 @@ function linkedList:insertTail(inNode)
 	self.tail = inNode
 end
 
+----------------------------------------
+-- insertHead()
+----------------------------------------
 function linkedList:insertHead(inNode)
 	if (not self.head) then
 		self.head = inNode
@@ -109,6 +129,24 @@ function linkedList:remove(inNode)
 
 	if (inNode.prev) then
 		inNode.prev.next = inNode.next
+	end
+end
+
+----------------------------------------
+-- removeHead()
+----------------------------------------
+function linkedList:removeHead()
+	self.head = self.head.next
+	self.head.prev = false
+end
+
+----------------------------------------
+-- removeTail()
+----------------------------------------
+function linkedList:removeTail()
+	if (self.tail) then
+		self.tail = self.tail.prev
+		self.tail.next = false
 	end
 end
 
