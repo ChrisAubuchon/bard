@@ -52,6 +52,7 @@ end
 ----------------------------------------
 function shoppe:enter()
 	local inkey
+	local c
 
 	self:setBigpic()
 	repeat
@@ -60,9 +61,9 @@ function shoppe:enter()
 		text:print("\nWhich of you is interested in my fine wares?")
 		text:printExit()
 		inkey = getkey()
-		if ((inkey > "0") and (inkey < "7")) then
-			inkey = tonumber(inkey)
-			self:selectOption(party[inkey])
+		c = party:readMember(inkey)
+		if (c) then
+			self:selectOption(c)
 		end
 	until (inkey == "E")
 end
@@ -94,9 +95,9 @@ function shoppe:selectOption(inChar)
 		elseif (inkey == "S") then
 			self:sellItem(inChar)
 		elseif ((inkey > "0") and (inkey < "7")) then
-			inkey = tonumber(inkey)
-			if (party:isOccupied(inkey)) then
-				party[inkey]:printCharacter()
+			local c = party:readMember(inkey)
+			if (c) then
+				c:printCharacter()
 				self:setBigpic()
 			end
 		end

@@ -31,9 +31,10 @@ function keyboardCommand(inkey)
 	end
 
 	if ((inkey > "0") and (inkey < "7")) then
-		inkey = tonumber(inkey) 
-		if (party:isOccupied(inkey)) then
-			party[inkey]:printCharacter()
+		local c
+		c = party:isOccupied(inkey)
+		if (c) then
+			c:printCharacter()
 			currentLevel:resetBigpic()
 			text:clear()
 		end
@@ -92,8 +93,10 @@ function getActionTarget(inTargetOptions, inTargets)
 	dprint("getActionTarget() called")
 
 	if (inTargetOptions.party) then
-		for i = 1,party.size do
-			optionKeys[tostring(i)] = party[i]
+		local count = 1
+		for i in party:characterIterator() do
+			optionKeys[tostring(count)] = i
+			count = count + 1
 		end
 
 		text:print("\nMember #[1-%d", party.size)

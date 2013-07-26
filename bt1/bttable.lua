@@ -7,7 +7,7 @@ local function classSearch(inKey, inClassList)
 		if ((type(c) ~= "table") and
 		    (type(c) ~= "userdata")) then
 			dprint(type(c))
-			error("Invalid class", 3)
+			error("Invalid class", 4)
 		end
 		local v = c[inKey]
 		if (v ~= nil) then return v end

@@ -73,7 +73,7 @@ end
 
 function btAction:groupSavingThrow()
 	if (self.source:isMonster()) then
-		self.target = party[1]
+		self.target = party:getFirstCharacter()
 	end
 
 	return self:savingThrow()

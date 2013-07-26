@@ -174,11 +174,8 @@ end
 ----------------------------------------
 function linkedList:iterator()
 	local function f(_, head)
+		if (not self.head) then return end
 		if (head == nil) then
-			if (not self.head) then
-				return
-			end
-
 			return self.head
 		end
 		if (head.next) then
@@ -188,6 +185,63 @@ function linkedList:iterator()
 	end
 
 	return f, nil, nil
+end
+
+----------------------------------------
+-- iterateFrom()
+----------------------------------------
+function linkedList:iterateFrom(inHead)
+	local function f(_, head)
+		if (not self.head) then return end
+
+		if (head == nil) then
+			return inHead
+		end
+		if (head.next) then
+			return head.next
+		end
+		return
+	end
+
+	return f, nil, nil
+end
+
+----------------------------------------
+-- conditionalIterator()
+----------------------------------------
+function linkedList:conditionalIterator(inConditionFunction)
+	local state = self.head
+	local function f(_)
+		while (state) do
+			if (inConditionFunction(state)) then
+				local rval = state
+				state = state.next
+				return rval
+			end
+			state = state.next
+		end
+		return
+	end
+	return f,nil,state
+end
+
+----------------------------------------
+-- conditionalIterateFrom()
+----------------------------------------
+function linkedList:conditionalIterateFrom(inHead, inConditionFunction)
+	local state	= inHead
+	local function f(_)
+		while (state) do
+			if (inConditionFunction(state)) then
+				local rval = state
+				state = state.next
+				return rval
+			end
+			state = state.next
+		end
+		return
+	end
+	return f,nil,state
 end
 
 ----------------------------------------

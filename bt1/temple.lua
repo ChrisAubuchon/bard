@@ -33,9 +33,9 @@ function temple:enter()
 		text:printExit()
 		inkey = getkey()
 		if ((inkey > "0") and (inkey < "7")) then
-			inkey = tonumber(inkey)
-			if (party:isOccupied(inkey)) then
-				self:doHealing(party[inkey])
+			local c = party:readMember(inkey)
+			if (c) then
+				self:doHealing(c)
 			end
 		end
 	until (inkey == "E")

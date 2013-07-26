@@ -203,7 +203,7 @@ function battleMonster:battleBonus(inAction)
 	end
 
 	if (inData.acPenalty) then
-		inAction.target = party[1]
+		inAction.target = party:getFirstCharacter()
 		if (inAction:savingThrow()) then
 			text:cdprint(false, true, " but it had no effect!\n\n")
 			return false
@@ -282,9 +282,12 @@ function battleMonster:attackSpell(inAction)
 end
 
 function battleMonster:doDoppleganger(inAction)
+	local randomCharacter
 	if (not party:hasRoom()) then
 		return false
 	end
+
+	randomCharacter = false
 end
 
 

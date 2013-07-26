@@ -373,7 +373,7 @@ function city:main()
 				btdebug.cityDebug()
 			end
 		elseif (inkey == "Z") then
-			party:doSummon("M_STONE_ELEMENTAL")
+			party:doSummon({ type = "M_STONE_ELEMENTAL"})
 		end
 
 		if (globals.partyDied) then

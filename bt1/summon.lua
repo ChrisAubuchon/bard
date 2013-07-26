@@ -1,6 +1,7 @@
 require "character"
 require "monster"
 require "battleSummon"
+require "linkedList"
 
 summon = {}
 
@@ -9,12 +10,13 @@ function summon:new(inName)
 	}
 
 	btTable.addParent(self, summon, battleSummon, monster:new(inName), 
-				character, baseCharacter
+				character, baseCharacter, linkedListNode
 			)
 	btTable.setClassMetatable(self)
 
-	self.cur_hp = self.curHP
-	self.max_hp = self.maxHP
+	self.cur_hp	= self.curHP
+	self.max_hp	= self.maxHP
+	self.name	= self.singular
 
 	self.__index = self
 

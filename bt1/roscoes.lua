@@ -6,20 +6,17 @@ function funcs.setRoscoesBigpic()
 	bigpic:setTitle("Roscoe's")
 end
 
-function funcs.doReenergize(characterNumber)
-	local char
+function funcs.doReenergize(inChar)
 	local payer
 	local rechargeCost
 
-	char = party[characterNumber]
-
-	text:cdprint(true, false, char.name)
-	if (char.cur_sppt >= char.max_sppt) then
+	text:cdprint(true, false, inChar.name)
+	if (inChar.cur_sppt >= inChar.max_sppt) then
 		text:cdprint(false, true, " does not require restoration")
 		return
 	end
 
-	rechargeCost = (char.max_sppt - char.cur_sppt) * 15
+	rechargeCost = (inChar.max_sppt - inChar.cur_sppt) * 15
 	text:print(" has some definite spell point problems. It will cost ")
 	text:print("%d in gold. Who will pay?", rechargeCost)
 
@@ -35,7 +32,7 @@ function funcs.doReenergize(characterNumber)
 	end
 
 	payer.gold = payer.gold - rechargeCost
-	char.cur_sppt = char.max_sppt
+	inChar.cur_sppt = inChar.max_sppt
 	text:cdprint(true, true, "\n\nRoscoe re-energizes him.")
 	party:display()
 end
@@ -49,9 +46,9 @@ function funcs.selectCharacter()
 
 		inkey = getkey()
 		if ((inkey > "0") and (inkey < "7")) then
-			inkey = tonumber(inkey)
-			if (party:isOccupied(inkey)) then
-				funcs.doReenergize(inkey)
+			local c = party:readMember(inkey)
+			if (c) then
+				funcs.doReenergize(c)
 			end
 		end
 	until (inkey == "E")

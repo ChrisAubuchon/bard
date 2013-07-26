@@ -87,6 +87,7 @@ require "api-city"
 getkey()
 
 m_window:Draw(nil, gfxImage:new("images/screen.png", "png"), nil)
+m_window:Update()
 
 repeat
 	if (globals.gameState == globals.STATE_GUILD) then

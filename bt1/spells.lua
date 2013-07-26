@@ -393,10 +393,11 @@ function spells.battleBonus(inAction)
 end
 
 function spells.disbelieve(inAction)
-	-- disbelieve is broken in the DOS version of BT1
+	-- disbelieve is kind of broken in the DOS version of BT1
 	--
 	if (inAction.source:isMonster()) then
 		text:printEllipsis()
+		local xxx_set_mon_disbelieve_flag = true
 	end
 	local xxx_disbelieve = true
 end

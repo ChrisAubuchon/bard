@@ -17,9 +17,9 @@ function funcs.selectOption()
 		inkey = getkey()
 
 		if ((inkey > "0") and (inkey < "7")) then
-			inkey = tonumber(inkey)
-			if (party:isOccupied(inkey)) then
-				party[inkey]:printCharacter()
+			local c = party:readMember(inkey)
+			if (c) then
+				c:printCharacter()
 				funcs.setTavernBigpic()
 			end
 		elseif (inkey == "O") then

@@ -266,8 +266,9 @@ function funcs.selectOption()
 
 		inkey = getkey()
 		if ((inkey > "0") and (inkey < "7")) then
-			if (party:isOccupied(inkey)) then
-				party[tonumber(inkey)]:printCharacter()
+			local c = party:readMember(inkey)
+			if (c) then
+				c:printCharacter()
 				funcs.setReviewBigpic()
 			end
 		elseif (inkey == "A") then

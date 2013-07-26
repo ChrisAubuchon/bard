@@ -371,11 +371,9 @@ function battleData:endRound()
 	if (party.songHpRegen) then
 		local char
 
-		for char in party:iterator() do
-			if (not char:isDisabled()) then
-				if (char.max_hp > char.cur_hp) then
-					char.cur_hp = char.cur_hp + 1
-				end
+		for char in party:iterator("skipDisabled") do
+			if (char.max_hp > char.cur_hp) then
+				char.cur_hp = char.cur_hp + 1
 			end
 		end
 	end
@@ -396,6 +394,14 @@ function battleData:postRoundCleanup()
 		party:removeSummon()
 	end
 
+	for c in party:iterator() do
+		if (c.isDoppelganger) then
+			if (c.isDead or c.isStoned or c.isParalyzed) then
+				party:removeCharacter(c)
+			end
+		end
+	end
+if false then
 	for i,c in party:ipairs() do
 		if (c.isDoppelganger) then
 			if (c.isDead or c.isStoned or c.isParalyzed) then
@@ -404,6 +410,7 @@ function battleData:postRoundCleanup()
 		end
 	end
 
+end
 	if (not party:isLive()) then
 		return
 	end
@@ -416,11 +423,9 @@ function battleData:getPriorities()
 	local c
 
 	if (not party.missTurn) then
-		for c in party:characterIterator() do
-			if (not c:isDisabled()) then
-				p = c:getBattlePriority()
-				self:addPriority(c, p)
-			end
+		for c in party:characterIterator("skipDisabled") do
+			p = c:getBattlePriority()
+			self:addPriority(c, p)
 		end
 	end
 
@@ -456,18 +461,24 @@ function battleData:getPlayerOptions()
 		return false
 	end
 
-	repeat
-		if (party.summon) then
-			dprint("Adding a summon option")
-			local a = btAction:new()
-			a.source = party.summon
-			a.action = battle.doSummonAttack
-			self:addAction(a.source, a)
-		end
+	if (party.summon) then
+		dprint("Adding a summon option")
+		local a = btAction:new()
+		a.source = party.summon
+		a.action = battle.doSummonAttack
+		self:addAction(a.source, a)
+	end
 
+	repeat
+		for c in party:characterIterator("skipDisabled") do
+			self:addAction(c, self:getPlayerOption(c))
+		end 
+
+if false then
 		for i,c in party:ipairs() do
 			self:addAction(c, self:getPlayerOption(i,c))
 		end
+end
 
 		text:cdprint(true, false, "Use these attack commands?")
 		if (not text:getYesNo()) then
@@ -505,7 +516,7 @@ function battleData:getRunFightOption()
 
 		if (inkey == "R") then
 			local saveAction = btAction:new()
-			saveAction.target = party[1]
+			saveAction.target = party:getFirstCharacter()
 			saveAction.source = self.monParty:getLeadGroup()
 			if (saveAction:savingThrow()) then
 				return true
@@ -533,16 +544,12 @@ function battleData:getRunFightOption()
 	return false
 end
 
-function battleData:getPlayerOption(partySlot, c)
+function battleData:getPlayerOption(c)
 	local action
 	local options = {}
 	local inkey
 
 	false_table(options)
-
-	if (c:isDisabled()) then
-		return false
-	end
 
 	action = btAction.new()
 	action.source = c
@@ -560,7 +567,7 @@ function battleData:getPlayerOption(partySlot, c)
 		text:print("Party attack\n")
 		options["P"] = true
 
-		if ((not self.isPartyAttack) and (partySlot < 4)) then
+		if ((not self.isPartyAttack) and (c.inMeleeRange)) then
 			text:print("Attack foes\n")
 			options["A"] = true
 		end
@@ -720,7 +727,7 @@ function battleData:doReward()
 
 	text:cdprint(true, false, "Each character receives %d experience points for valor and battle knowledge, and %d pieces of gold.\n\n", xp, au)
 
-	for i in party:liveCharacterIterator() do
+	for i in party:characterIterator("isLive") do
 		i.xp = i.xp + xp
 		i.gold = i.gold + au
 		i.battlesWon = i.battlesWon + 1

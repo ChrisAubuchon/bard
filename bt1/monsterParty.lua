@@ -83,7 +83,7 @@ end
 function monsterParty:disbelieve(inBattle)
 	if (party.summon and party.summon.isIllusion and self.doDisbelieve) then
 		local action = btAction:new()
-		action.source = party[1]
+		action.source = party:getFirstCharacter()
 		action.target = self.head
 		if (not action:savingThrow()) then
 			text:cdprint(false, true, "Your foes see through your illusion!\n\n")

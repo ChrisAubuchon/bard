@@ -150,7 +150,8 @@ function character:new()
 	}
 
 	btTable.addParent(self, baseCharacter, character, entity, 
-			objectHash:new(self), battlePlayer, battleBonus
+			objectHash:new(self), battlePlayer, battleBonus,
+			linkedListNode
 			)
 	btTable.setClassMetatable(self)
 

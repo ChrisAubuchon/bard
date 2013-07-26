@@ -109,7 +109,7 @@ local function remove_member()
 	local inkey
 	local member
 
-	if (not party:isOccupied(1)) then
+	if (not party:getFirstCharacter()) then
 		text:splashMessage("\nWhat party!")
 
 		return
@@ -122,7 +122,6 @@ local function remove_member()
 	inkey = getkey()
 	if ((inkey > "0") and (inkey < "7")) then
 		member = party:removeCharacter(tonumber(inkey))
-		dprint(member)
 
 		roster:writeCharacter(member)
 
@@ -138,7 +137,7 @@ end
 local function save_party()
 	local name
 
-	if (not party:isOccupied(1)) then
+	if (not party:getFirstCharacter()) then
 		text:splashMessage("\nWhat party!")
 
 		return
@@ -201,7 +200,7 @@ local function enter()
 		elseif (inkey == "D") then
 			delete_member()
 		elseif (inkey == "E") then
-			--if (not party:isOccupied(1)) then
+			--if (not party:getFirstCharacter()) then
 			if (false) then
 				text:clear()
 				text:print("You must have a party to enter the city.")
@@ -228,9 +227,12 @@ local function enter()
 			remove_member()
 		elseif (inkey == "S") then
 			save_party()
+		elseif (inkey == "T") then
+			dprint(party:randomMeleeCharacter().name)
 		elseif ((inkey > "0") and (inkey < "7")) then
-			if (party:isOccupied(inkey)) then
-				party[tonumber(inkey)]:printCharacter()
+			local c = party:isOccupied(inkey)
+			if (c) then
+				c:printCharacter()
 				bigpic:drawImage("PIC_GUILDINT")
 				bigpic:setTitle("The Guild")
 			end

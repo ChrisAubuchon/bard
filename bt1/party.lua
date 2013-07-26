@@ -3,13 +3,16 @@ require "btdebug"
 require "random"
 
 party = {
-	className	= "party",
+	summon			= false,
+	size			= 0,
+
+	-- Passive effects
+	--
 	detect		= detectEffect:new(),
 	shield		= shieldEffect:new(),
 	light		= lightEffect:new(),
 	compass		= compassEffect:new(),
 	levitate	= levitateEffect:new(),
-	summon		= false,
 
 	song		= {
 		active		= false,
@@ -24,37 +27,107 @@ party = {
 	}
 }
 
-btTable.addParent(party, btArray, battleBonus)
+btTable.addParent(party, battleBonus, linkedList)
 btTable.setClassMetatable(party)
 party.__index = party
 
-function party:addCharacter(inCharacter)
-	self:__add(inCharacter)
-	self:sort()
+----------------------------------------
+-- getFirstCharacter()
+----------------------------------------
+function party:getFirstCharacter()
+	local first
+
+	first = self:getFirst()
+	if (first and first:isSummon()) then
+		first = first.next
+	end
+
+	return first
 end
 
-function party:removeCharacter(inCharacter)
-	if (type(inCharacter) == "number") then
-		local rval = self[inCharacter]
-		self:__remove(inCharacter)
+----------------------------------------
+-- addCharacter()
+----------------------------------------
+function party:addCharacter(inCharacter)
+	-- Insert at the end of the list
+	--
+	self:insertTail(inCharacter)
+	self:sort()
+	self.size = self.size + 1
+end
 
-		return rval
-	else
-		local i
-		local c
-		for i,c in self:ipairs() do
-			if (c == inCharacter) then
-				self:__remove(i)
-				return c
-			end
+----------------------------------------
+-- removeCharacter()
+----------------------------------------
+function party:removeCharacter(inCharacter)
+	local c
+
+	if (type(inCharacter) == "number") then
+		c = self:isOccupied(inCharacter)
+		if (c) then
+			self:remove(c)
+			self.size = self.size - 1
 		end
+		return c
+	else
+		self:remove(inCharacter)
+		return inCharacter
 	end
 
 	return false
 end
 
-party:hasRoom()
-	return self:isOccupied(6)
+----------------------------------------
+-- updateIndices()
+----------------------------------------
+function party:updateIndices()
+	local index = 1
+	local node
+
+	for node in self:iterator() do
+		if (node:isSummon()) then
+			self.summon = node
+			self.summon.inMeleeRange = true
+		else
+			if (index < 4) then
+				node.inMeleeRange = true
+			else
+				node.inMeleeRange = false
+			end
+			index = index + 1
+		end
+	end
+end
+
+----------------------------------------
+-- hasRoom()
+----------------------------------------
+function party:hasRoom()
+	return (self.size <= 6)
+end
+
+----------------------------------------
+-- getNumber()
+----------------------------------------
+function party:isOccupied(inIndex)
+	local count		= 1
+	local head
+
+	if (type(inIndex) ~= "number") then
+		inIndex = tonumber(inIndex)
+	end
+
+	head = self:getFirstCharacter()
+	while (inIndex ~= count) do
+		count = count + 1
+		if (head.next) then
+			head = head.next
+		else
+			return false
+		end
+	end
+
+	return head
 end
 
 ----------------------------------------
@@ -67,7 +140,7 @@ function party:addParty(inParty)
 	local i,name
 
 	for i,name in ipairs(inParty) do
-		if (self[6]) then
+		if (not self:hasRoom()) then
 			break
 		end
 
@@ -80,34 +153,25 @@ function party:addParty(inParty)
 	self:display()
 end
 
-
-
 ----------------------------------------
--- ipairsSummon()
---
--- Special ipairs function to include 
--- "summon" slot
+-- Party iterator functions
 ----------------------------------------
-function party:ipairsSummon()
-	local state = -1
-	local function f(_)
-		if (state == -1) then
-			state = state + 1
-			if (self.summon) then
-				return "summon", self.summon
-			end
-		end
 
-		while (state < 6) do
-			state = state + 1
-			if (self[state]) then
-				return state, self[state]
-			end
-			return
-		end
-	end
-	return f, nil, state
-end
+local iteratorConditionals = {
+	default		= function () return true end,
+	skipDisabled	= function (c) return not c:isDisabled() end,
+	isLive		= function (c) 
+				return (not c:isDisabled() and 
+				        not c.isDoppelganger)
+			  end,
+	isHostile	= function (c)
+				return (c.isPossessed or c.isDoppelganger)
+			  end,
+	isAttackable	= function (c)
+				return (not c.isDead and not c.isStoned)
+			  end
+}
+	
 
 ----------------------------------------
 -- iterator()
@@ -115,99 +179,65 @@ end
 -- Special iterator function to include
 -- the "summon" slot
 ----------------------------------------
-function party:iterator(inSkipDisabled)
-	local state = -1
-	local function f(_)
-		if (state == -1) then
-			state = state + 1
-			if (self.summon) then
-				return self.summon
-			end
-		end
+function party:iterator(inCondition)
+	local condition	= inCondition or "default"
 
-		while (state < 6) do
-			state = state + 1
-			if (not self[state]) then
-				return
-			end
-
-			if (inSkipDisabled) then
-				if (not self[state]:isDisabled()) then
-					return self[state]
-				end
-			else
-				return self[state]
-			end
-		end
-		return
+	if (not iteratorConditionals[condition]) then
+		condition = "default"
 	end
-	return f, nil, state
+
+	return self:conditionalIterator(iteratorConditionals[condition])
 end
-party.reverseIterator = party.iterator
 
 ----------------------------------------
 -- characterIterator()
 -- 
 -- Iterate over the characters only
 ----------------------------------------
-function party:characterIterator()
-	local state = 0
-	local function f(_)
-		while (state < 6) do
-			state = state + 1
-			if (self[state]) then
-				return self[state]
-			end
-		end
-		return
-	end
-	return f, nil, state
-end
+function party:characterIterator(inCondition)
+	local condition = inCondition or "default"
 
-----------------------------------------
--- liveCharacterIterator()
---
--- Loop over the live characters in the
--- party
-----------------------------------------
-function party:liveCharacterIterator()
-	local state = 0
-	local function f(_)
-		while (state < 6) do
-			state = state + 1
-			if (
-			    (self[state]) and
-			    (not self[state]:isDisabled()) and
-			    (not self[state].isDoppelganger)
-			   ) then
-				return self[state]
-			end
-		end
-		return
+	if (not iteratorConditionals[condition]) then
+		condition = "default"
 	end
-	return f,nil,state
+
+	return self:conditionalIterateFrom(self:getFirstCharacter(),
+				iteratorConditionals[condition])
 end
 
 ----------------------------------------
 -- getLastLiveCharacter()
 --
--- Return the index of the last live
--- character
+-- Return the last live character
 ----------------------------------------
 function party:getLastLiveCharacter()
-	local i
+	local c
 
-	for i = #self,1,-1 do
-		if (
-		    (self[i]) and
-		    (not self[i]:isDisabled()) and
-		    (not self.isDoppelganger)
-		   ) then
-			return i
+	for c in self:reverseIterator() do
+		if ((not c:isDisabled()) and (not c.isDoppelganger)) then	
+			return c
 		end
 	end
 
 	error("party:getLastLiveCharacter() called with a dead party", 2)
+end
+
+----------------------------------------
+-- countLiveCharacters()
+----------------------------------------
+function party:countLiveCharacters()
+	local count = 0
+	local c
+
+	for c in self:characterIterator("isLive") do
+		count = count + 1
+	end
+
+	if (count == 0) then
+		error("party:countLiveCharacters() called with a dead party", 2)
+	end
+
+	return count
 end
 
 ----------------------------------------
@@ -220,12 +250,11 @@ end
 --   false if not found
 ----------------------------------------
 function party:findByName(inName)
-	local i
 	local c
 
-	for i,c in self:ipairs() do
-		if (inName == c.name) then
-			return i
+	for c in self:characterIterator() do
+		if (c.name == inName) then
+			return c
 		end
 	end
 
@@ -241,60 +270,24 @@ function party:display()
 	local i
 	local charString	= false
 	local hpString		= false
+	local member		= self:getFirst()
 
-	if (self.summon) then
-		dprint(self.summon)
-		charString,hpString = self.summon:getStatusLine()
+	if (not member) then return end
+
+	if (member:isSummon()) then
+		charString, hpString = member:getStatusLine()
+		self:printStatusLine(charString, hpString, 0)
+		member = member.next
 	end
-	self:printStatusLine(charString, hpString, 0)
 
 	for i = 1,6 do
-		if (self[i]) then
-			charString, hpString = self[i]:getStatusLine()
-		else
+		if (not member) then
 			charString = false
+		else
+			charString,hpString = member:getStatusLine()
+			member = member.next
 		end
-
 		self:printStatusLine(charString, hpString, i)
-	end
-end
-
-----------------------------------------
--- isOccupied()
-----------------------------------------
-function party:isOccupied(inSlot)
-	if (type(inSlot) ~= "number") then
-		inSlot = tonumber(inSlot)
-	end
-	return self[inSlot]
-end
-
-----------------------------------------
--- __sort()
---
--- Actual sorting algorithm
-----------------------------------------
-function party:__sort(inStatus)
-	local i
-	local j
-
-	for i = 1,5 do
-		if (not self[i]) then
-			return
-		end
-
-		if (self[i][inStatus]) then
-			for j = i+1,6 do
-				if (not self[j]) then
-					break
-				end
-				if (not party[j][inStatus]) then
-					local tmp = party[j]
-					party[j] = party[i]
-					party[i] = tmp
-				end
-			end
-		end
 	end
 end
 
@@ -306,9 +299,41 @@ end
 ----------------------------------------
 function party:sort()
 	dprint("party:sort() called")
-	self:__sort("isDead")
-	self:__sort("isStoned")
-	self:__sort("isParalyzed")
+	local function __sort(inAttr)
+		local tail
+		local current
+		local save
+
+		tail = self:getLast()
+		if (not tail[inAttr]) then
+			current = tail
+			tail = false
+		else
+			while (tail[inAttr]) do
+				tail = tail.prev
+			end
+			current = tail
+		end
+
+		while (current) do
+			save = current.prev
+			if (current[inAttr]) then
+				self:remove(current)
+				if (not tail) then
+					self:insertTail(current)
+					tail = current.prev
+				else
+					self:insertAfter(current, tail)
+				end
+			end
+			current = save
+		end
+	end
+
+	__sort("isDead")
+	__sort("isStoned")
+	__sort("isParalyzed")
+	self:updateIndices()
 	self:display()
 end
 
@@ -320,12 +345,10 @@ end
 ----------------------------------------
 function party:toTable()
 	local t = {}
-	local i
+	local c
 
-	for i = 1,6 do
-		if (self[i]) then
-			table.insert(t, self[i].name)
-		end
+	for c in self:characterIterator() do
+		table.insert(t, c.name)
 	end
 
 	return t
@@ -337,34 +360,44 @@ end
 -- Change the party order
 ----------------------------------------
 function party:reorder()
-	local fromNum
-	local toNum
+	local fromNode
+	local toNode
 	local tmp
+	local after = false
 
 	text:clear()
 	text:print("Move who?")
 
-	fromNum = self:readSlotNumber()
-	if (not fromNum) then
+	fromNode = self:readSlot()
+	if (not fromNode) then
 		return
 	end
 
 	text:clear()
 	text:print("\n\nTo where?")
 
-	toNum = getkey()
-	if ((toNum < "1") or (toNum > "6")) then
+	toNode = self:readSlot()
+	if (not toNode) then
 		return
 	end
 
-	toNum = tonumber(toNum)
-	if (toNum == fromNum) then
+	if (fromNode == toNode) then
 		return
 	end
 
-	tmp = self[fromNum]
-	table.remove(self, fromNum)
-	table.insert(self, toNum, tmp)
+	for tmp in self:iterateFrom(fromNode) do
+		if (tmp == toNode) then
+			after = true
+			break
+		end
+	end
+
+	self:remove(fromNode)
+	if (after) then
+		self:insertAfter(fromNode, toNode)
+	else
+		self:insertBefore(fromNode, toNode)
+	end
 
 	self:sort()
 	self:display()
@@ -385,10 +418,8 @@ function party:isHostile()
 		return true
 	end
 
-	for c in self:characterIterator() do
-		if ((c.isPossessed) or (c.isDoppelganger)) then
-			return true
-		end
+	for c in self:characterIterator("isHostile") do
+		return true
 	end
 
 	return false
@@ -404,11 +435,8 @@ function party:isLive()
 	local c
 
 	dprint("isLive() called")
-	for c in self:characterIterator() do
-		if ((not c:isDisabled()) and
-		    (not c.isDoppelganger)) then
-			return true
-		end
+	for c in self:characterIterator("isLive") do
+		return true
 	end
 
 	globals.partyDied = true
@@ -503,46 +531,65 @@ end
 -- can be attacked
 ----------------------------------------
 function party:randomMeleeCharacter()
-	local maxSize = self.size
-	local minSize = self.size
-	local randomCharacter
 	local c
-	local i
-	local f
+	local randomCharacter	= false
+	local numerator		= 1
+	local denominator	= 2
+	local comparator
 
-	if (maxSize > 3) then
-		maxSize = 3
+	for c in self:iterator("isAttackable") do
+		if (c.inMeleeRange) then
+			if (not randomCharacter) then
+				randomCharacter = c
+			else
+				comparator = (numerator / denominator) * 100000
+				if ((rnd() % 100000) > comparator) then
+					randomCharacter = c
+				end
+				numerator = numerator + 1
+				denominator = denominator + 1	
+			end
+		end
 	end
 
-	if (minSize > 3) then
-		minSize = 3
+	if (not randomCharacter) then
+		return self:getFirst()
+	else
+		return randomCharacter
 	end
+end
 
-	if (self.summon) then
-		maxSize = maxSize + 1
-	end
+----------------------------------------
+-- randomCharacter()
+----------------------------------------
+function party:randomCharacter(inSummonFlag)
+	local c
+	local randomCharacter	= false
+	local numerator		= 1
+	local denominator	= 2
+	local comparator
 
-	randomCharacter = rnd_xdy(1,maxSize)
-	for i = 1, maxSize do
-		dprint("Random character = %d", randomCharacter)
-		dprint("minSize = %d", minSize)
-		if (randomCharacter > minSize) then
-			c = self.summon
+	-- This is only used by the addDoppleganger()
+	-- function so we can skip the summon slot
+	--
+	for c in self:characterIterator("isAttackable") do
+		if (not randomCharacter) then
+			randomCharacter = c
 		else
-			c = self[randomCharacter]
-		end
-
-		if (c:canBeAttacked()) then
-			return c
-		end
-
-		randomCharacter = randomCharacter + 1
-		if (randomCharacter > maxSize) then
-			randomCharacter = 1
+			comparator = (numerator / denominator) * 100000
+			if ((rnd() % 100000) > comparator) then
+				randomCharacter = c
+			end
+			numerator = numerator + 1
+			denominator = denominator + 1
 		end
 	end
 
-	return self[1]
+	if (not randomCharacter) then
+		return self:getFirst()
+	else
+		return randomCharacter
+	end
 end
 
 ----------------------------------------
@@ -552,10 +599,11 @@ end
 ----------------------------------------
 function party:doSummon(inSummon)
 	if (self.summon) then
-		self.summon = false
+		self:removeSummon()
 	end
 
-	self.summon = summon:new(inSummon.type)
+	self:insertHead(summon:new(inSummon.type))
+	self.summon = self:getFirst()
 	self.summon.isIllusion = inSummon.isIllusion or false
 	self:display()
 end
@@ -566,7 +614,10 @@ end
 -- Remove the summoned monster
 ----------------------------------------
 function party:removeSummon()
-	self.summon = false
+	if (not self.summon) then return end
+
+	self:remove(self.summon)
+	self.summon	= false
 end
 
 ----------------------------------------
@@ -575,33 +626,29 @@ end
 -- Read a party slot from the player
 ----------------------------------------
 function party:readSlot()
-	local cnum
-
-	cnum = self:readSlotNumber()
-
-	return self[cnum]
-end
-
-----------------------------------------
--- readSlotNumber()
---
--- Read a party slot number from the
--- player
-----------------------------------------
-function party:readSlotNumber()
 	local inkey
 
 	text:printCancel()
 	inkey = getkey()
-	if ((inkey < "1") or (inkey > "6")) then	
+	if ((inkey < "1") or (inkey > "6")) then
 		return false
 	end
 
-	if (not self:isOccupied(inkey)) then
-		return false
+	inkey = tonumber(inkey)
+	return self:isOccupied(inkey)
+end
+
+----------------------------------------
+-- readMember()
+----------------------------------------
+function party:readMember(inkey)
+	if (not inkey) then return false end
+
+	if ((inkey > "0") and (inkey < "7")) then
+		return self:isOccupied(inkey)
 	end
 
-	return tonumber(inkey)
+	return false
 end
 
 ----------------------------------------
@@ -816,7 +863,7 @@ function party:disbelieve(inBattle)
 	for mgroup in inBattle.monParty:iterator() do
 		if (mgroup.isIllusion) then
 			local action = btAction:new()
-			action.source = party[1]
+			action.source = self:getFirstCharacter()
 			action.target = mgroup
 			action.inBattle = inBattle
 
@@ -829,6 +876,7 @@ function party:disbelieve(inBattle)
 		end
 	end
 end
+
 
 
 
