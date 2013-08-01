@@ -525,6 +525,24 @@ function party:doEquippedEffects()
 end
 
 ----------------------------------------
+-- isItemEquipped()
+--
+-- Return true if a party member has
+-- an item equipped
+----------------------------------------
+function party:isItemEquipped(inName)
+	local c
+
+	for c in self:characterIterator() do
+		if (c:isItemEquipped(inName)) then
+			return true
+		end
+	end
+
+	return false
+end
+
+----------------------------------------
 -- randomMeleeCharacter()
 --
 -- Return a random melee character that

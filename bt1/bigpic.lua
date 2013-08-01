@@ -169,7 +169,7 @@ function bigpic:drawImage(inName, inIsTimeAware)
 	end
 
 	self.activeBigpic = self.imgs[inName].img
-	if (globals.isNight) then
+	if (globals.isNight and isTimeAware) then
 		self.surface:Draw(nil, self.activeBigpic, nil)
 		self.surface:Update()
 		self.surface:SetColor(11, globals.colors[1])

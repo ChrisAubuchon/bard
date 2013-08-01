@@ -228,11 +228,11 @@ static void setEdgeWall(dungeonLevel_t *l, dunEdge_t *edge,
 }
 
 static uint8_t *stairCode[] = {
-	"if (doStairs(\"%s\")) then \
-		dun.changeLevel(%d)\
+	"if (currentLevel:doStairs(\"%s\")) then \
+		currentLevel:changeLevel(%d)\
 	end",
-	"if (doStairs(\"%s\")) then \
-		dun.exitToCity() \
+	"if (currentLevel:doStairs(\"%s\")) then \
+		currentLevel:exitToCity() \
 	end"
 };
 

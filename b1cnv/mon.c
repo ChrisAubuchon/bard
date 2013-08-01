@@ -166,6 +166,11 @@ btstring_t *getMonsterName(uint32_t index)
 	return bts_strcpy(monMacro[index]);
 }
 
+uint8_t *getMonMacro(uint32_t index)
+{
+	return monMacro[index];
+}
+
 void convertMonsters(void)
 {
 	int i;

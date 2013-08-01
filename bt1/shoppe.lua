@@ -1,14 +1,12 @@
 local shoppe = {}
 function shoppe:new(inTitle, inPic, inGreeting, inFileName)
 	local self = {
-		title		= inTitle,
-		pic		= inPic,
 		greeting	= inGreeting,
 		fileName	= inFileName,
 		inventory	= read_table(inFileName)
 	}
 
-	btTable.addParent(self, shoppe)
+	btTable.addParent(self, shoppe, building:new(inTitle, inPic))
 	btTable.setClassMetatable(self)
 
 	return self
@@ -41,12 +39,6 @@ function shoppe:printItem(inItem)
 	text:print("%7d", items.getItemValueByName(inItem))
 end
 
-function shoppe:setBigpic()
-	bigpic:drawImage(self.pic)
-	bigpic:setTitle(self.title)
-end
-
-
 ----------------------------------------
 -- enter()
 ----------------------------------------
@@ -54,7 +46,17 @@ function shoppe:enter()
 	local inkey
 	local c
 
-	self:setBigpic()
+	if (globals.isNight) then
+		text:clear()
+		text:print("\nThe shoppe is closed at night.")
+		text:printContinue()
+		getkey()
+		text:clear()
+		currentLevel:turnParty("back")
+		return
+	end
+
+	self:resetBigpic()
 	repeat
 		text:clear()
 		text:print(self.greeting)
@@ -66,6 +68,9 @@ function shoppe:enter()
 			self:selectOption(c)
 		end
 	until (inkey == "E")
+
+	text:clear()
+	currentLevel:turnParty("back")
 end
 
 ----------------------------------------
@@ -98,7 +103,7 @@ function shoppe:selectOption(inChar)
 			local c = party:readMember(inkey)
 			if (c) then
 				c:printCharacter()
-				self:setBigpic()
+				self:resetBigpic()
 			end
 		end
 	until (inkey == "D")

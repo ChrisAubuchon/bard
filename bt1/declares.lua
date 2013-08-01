@@ -18,10 +18,12 @@ declare_global("battleBonus")
 declare_global("bigpic")
 
 -- btapi.lua
-declare_global("btapi")
 declare_global("executeString")
-declare_global("executeFunction")
 declare_global("compileAction")
+declare_global("compileString")
+
+-- building.lua
+declare_global("building")
 
 -- btdebug.lua
 declare_global("dprint")
@@ -43,6 +45,9 @@ declare_global("character")
 
 -- city.lua
 declare_global("city")
+declare_global("cityBuildings")
+declare_global("cityGuardian")
+declare_global("cityIrongate")
 
 -- citylib.lua
 declare_global("citylib")

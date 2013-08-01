@@ -240,7 +240,7 @@ function dun:new(inName, inLevel, inX, inY, inDirection)
 	__initEdges()
 	__initVars()
 
-	self.currentSquare = string.format("x%02d%02d", inX, inY)
+	self.currentSquare = string.format("x%02x%02x", inX, inY)
 	self.currentSquare = self.squares[self.currentSquare]
 
 	return self
@@ -248,6 +248,10 @@ end
 
 function dun:isDungeon()
 	return true
+end
+
+function dun:getSqXY(inX, inY)
+	return self.squares[string.format("x%02x%02x", inX, inY)]
 end
 
 function dun:getSq(label)
@@ -273,6 +277,34 @@ end
 
 function dun:canTeleportTo(inLevel)
 	return dunData[self.name][inLevel].canTeleportTo
+end
+
+----------------------------------------
+-- exitToCity()
+----------------------------------------
+function dun:exitToCity()
+	self.exit = true
+
+	currentLevel = city:new("skara")
+	currentLevel.direction = globals.cityDirection
+	currentLevel.currentSquare = currentLevel:getSq(globals.citySquare)
+	globals.gameState = globals.STATE_CITY
+end
+
+----------------------------------------
+-- changeLevel()
+----------------------------------------
+function dun:changeLevel(inLevelDelta)
+	local newDun
+
+	self.exit = true
+	newDun = dun:new(currentLevel.name, 
+			currentLevel.currentLevel + inLevelDelta,
+			0, 0, "north"
+			)
+	newDun.currentSquare = newDun:getSq(currentLevel.currentSquare.label)
+	newDun.direction = currentLevel.direction
+	currentLevel = newDun
 end
 
 local function doDetect()

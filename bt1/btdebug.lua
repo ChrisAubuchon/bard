@@ -41,31 +41,31 @@ function btdebug.enterDungeon()
 			text:cdprint(true, false, "Enter level [1-4]:\n")
 			level = getkey()
 			if ((level > "0") and (level < "5")) then
-				btapi.city.enterDungeon("cellars", tonumber(level))
+				city:enterDungeon("cellars", tonumber(level))
 				return true
 			end 
 		elseif (inkey == "2") then
 			text:cdprint(true, false, "Enter level [1-3]:\n")
 			level = getkey()
 			if ((level > "0") and (level < "4")) then
-				btapi.city.enterDungeon("catacombs", tonumber(level))
+				city:enterDungeon("catacombs", tonumber(level))
 				return true
 			end 
 		elseif (inkey == "3") then
 			text:cdprint(true, false, "Enter level [1-3]:\n")
 			level = getkey()
 			if ((level > "0") and (level < "4")) then
-				btapi.city.enterDungeon("castle", tonumber(level))
+				city:enterDungeon("castle", tonumber(level))
 				return true
 			end 
 		elseif (inkey == "4") then
-			btapi.city.enterDungeon("kylr", 1)
+			city:enterDungeon("kylr", 1)
 			return true
 		elseif (inkey == "5") then
 			text:cdprint(true, false, "Enter level [1-5]:\n")
 			level = getkey()
 			if ((level > "0") and (level < "6")) then
-				btapi.city.enterDungeon("mangar", tonumber(level))
+				city:enterDungeon("mangar", tonumber(level))
 				return true
 			end 
 		end
@@ -117,14 +117,18 @@ function btdebug.enterBuilding()
 	repeat
 		text:cdprint(true, false, "1. Garth's\n")
 		text:print("2. Roscoe's\n")
+		text:print("3. Review\n")
 		text:printExit()
 		inkey = getkey()
 
 		if (inkey == "1") then
-			btapi.city.enterGarths()
+			garths:enter()
 			return
 		elseif (inkey == "2") then
-			btapi.city.enterRoscoes()
+			roscoes:enter()
+			return
+		elseif (inkey == "3") then
+			review:enter()
 			return
 		end
 	until (inkey == "E")

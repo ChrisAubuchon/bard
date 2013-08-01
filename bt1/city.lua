@@ -49,7 +49,7 @@ square.new = function(lab, inEnterFunction, inEnterArgs)
 	local enterFunction	= nil
 	local enterArgs		= inEnterArgs
 
-	enterFunction = inEnterFunction
+	enterFunction = compileString(inEnterFunction)
 
 	function self.isPath()		return false end
 	function self.isBuilding()	return false end
@@ -72,9 +72,13 @@ square.new = function(lab, inEnterFunction, inEnterArgs)
 			return false
 		end
 
-		executeString(enterFunction)
+		rval = enterFunction()
 
 		return rval
+	end
+
+	function self.clearEnter()
+		enterFunction = nil
 	end
 
 	return self
@@ -248,6 +252,13 @@ function city:getSq(inLabel)
 end
 
 ----------------------------------------
+-- getLabelXY()
+----------------------------------------
+function city:getLabelXY(inX, inY)
+	return string.format("%d-%d", inX, inY)
+end
+
+----------------------------------------
 -- isCity()
 ----------------------------------------
 function city:isCity()
@@ -306,20 +317,24 @@ function city:moveForward()
 	local front_sq = self.currentSquare[self.direction]
 
 	if (front_sq.isBuilding()) then
-		front_sq.onEnter(self)
+		front_sq.onEnter()
 		if (self.exit) then
 			return true
 		end
 		bigpic:setTitle("Skara Brae")
 	else
 		self:animateMove()
-		if (not front_sq.onEnter(self)) then
-			self.currentSquare = front_sq
+		local saveSq = self.currentSquare
+		self.currentSquare = front_sq
+		if (self.currentSquare.onEnter()) then
+			self.currentSquare = saveSq
 		end
 		self:buildView()
 	end
 
 	text:clear()
+
+	local xxx_debug_print_label = true
 	text:print(self.currentSquare.label)
 end
 
@@ -426,6 +441,23 @@ function city:getBattleOpponents()
 	monGroup[1] = timeTable.monsters[rnd_xdy(1,#timeTable.monsters)]
 
 	return monGroup
+end
+
+function city:printCredits()
+	text:splashMessage("Bard's Tale I: Reimplemented by me")
+end
+	
+
+----------------------------------------
+-- enterDungeon()
+----------------------------------------
+function city:enterDungeon(inName, inLevel)
+	currentLevel.exit = true
+	currentLevel.exitLocation = inName
+	globals.gameState = globals.STATE_DUNGEON
+	globals.citySquare = currentLevel.currentSquare.label
+	globals.cityDirection = currentLevel.direction
+	currentLevel = dun:new(inName, inLevel, 0, 0, "north")
 end
 
 local function __init()

@@ -1,12 +1,15 @@
 roscoes = {}
-local funcs = {}
 
-function funcs.setRoscoesBigpic()
-	bigpic:drawImage("PIC_ROSCOEINT")
-	bigpic:setTitle("Roscoe's")
+btTable.addParent(roscoes, building:new("Roscoe's", "PIC_ROSCOEINT"))
+btTable.setClassMetatable(roscoes)
+
+function roscoes:enter()
+	self:resetBigpic()
+	self:selectCharacter()
+	currentLevel:turnParty("back")
 end
 
-function funcs.doReenergize(inChar)
+function roscoes:doReenergize(inChar)
 	local payer
 	local rechargeCost
 
@@ -37,7 +40,7 @@ function funcs.doReenergize(inChar)
 	party:display()
 end
 
-function funcs.selectCharacter()
+function roscoes:selectCharacter()
 	local inkey
 
 	repeat
@@ -48,13 +51,9 @@ function funcs.selectCharacter()
 		if ((inkey > "0") and (inkey < "7")) then
 			local c = party:readMember(inkey)
 			if (c) then
-				funcs.doReenergize(c)
+				self:doReenergize(c)
 			end
 		end
 	until (inkey == "E")
 end
 
-function roscoes.enter()
-	funcs.setRoscoesBigpic()
-	funcs.selectCharacter()
-end

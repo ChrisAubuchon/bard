@@ -28,6 +28,7 @@ globals.isPaused	= false
 globals.colors		= colors
 globals.debug		= true
 globals.partyDied	= false
+globals.citySquare	= false
 globals.swapWallsAndDoors	= false
 
 m_window		= gfxScreen:new()

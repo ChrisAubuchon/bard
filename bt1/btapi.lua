@@ -1,14 +1,10 @@
-btapi	= {}
-btapi.city	= {}
-btapi.dun	= {}
-btapi.spellTarget = false
-
 ----------------------------------------
 -- executeString()
 --
 -- Function to run API code in a 
 -- sandbox
 ----------------------------------------
+if false then
 function executeString(inString)
 	local rval
 	local mesg
@@ -39,6 +35,39 @@ function executeFunction(inFunction)
 
 	return rval
 end
+end
+
+function executeString(inString)
+	local chunk
+	local rval, mesg
+
+	chunk = compileString(inString)
+	if (chunk == nil) then
+		error("Compilation error: \n" .. inString .. "\n", 2)
+	end
+
+	rval, mesg = pcall(chunk)
+	if (not rval) then
+		error("Code execution error: \n" .. inString.."\n"..mesg, 2)
+	end
+
+	return mesg
+end
+
+function compileString(inString)
+	local rval, mesg
+
+	if (type(inString) == "string") then
+		rval, mesg = load(inString)
+		if (rval == nil) then
+			error("Compilation error: \n" ..
+				inString .. "\n" .. mesg, 2)
+		end
+		return rval
+	end
+
+	return nil
+end
 
 function compileAction(inAction)
 	local mesg
@@ -64,6 +93,7 @@ end
 -- API functions
 ----------------------------------------
 
+if false then
 function btapi.doStairs(direction)
 	text:print("\nThere are stairs here, going " .. direction ..". Do you wish to take them?")
 	if (text:getYesNo()) then
@@ -75,4 +105,5 @@ end
 
 function btapi.inDungeon()
 	return (globals.gameState == globals.STATE_DUNGEON)
+end
 end

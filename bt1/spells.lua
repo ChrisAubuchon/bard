@@ -1,7 +1,6 @@
 require "dataio"
 require "bttable"
 require "btdebug"
-require "btapi"
 
 local spellList = {}
 
@@ -113,7 +112,7 @@ spells.scrySite = function()
 end
 
 spells.phaseDoor = function()
-	if (btapi.inDungeon()) then
+	if (currentLevel:isDungeon()) then
 		local sq = currentLevel.currentSquare
 
 		if (sq[currentLevel.direction].canPhase) then
@@ -144,7 +143,7 @@ spells.teleport = function()
 		[4] = 0			-- Z
 	}
 
-	if (not btapi.inDungeon()) then
+	if (not currentLevel:isDungeon()) then
 		text:cdprint(false, true, " but it fizzles!\n\n")
 		text:clear()
 		return
@@ -237,7 +236,7 @@ spells.teleport = function()
 				if (currentLevel:canTeleportTo(newLevel)) then
 					currentLevel.currentLevel = newLevel
 					currentLevel.currentSquare = currentLevel:getSq(string.format("x%02x%02x", x, y))
-					btapi.dun.changeLevel(0)
+					currentLevel:changeLevel(0)
 					currentLevel.clearFlags = true
 				end
 

@@ -38,28 +38,28 @@ static uint8_t *specFace[] = {
 };
 
 static uint8_t *specEvent[] = {
-	"city.emptyBuilding()",
-	"city.enterGuild()",
-	"city.enterTavern",
-	"city.enterGarths()",
-	"city.enterTemple",
-	"city.enterReview()",
-	"city.enterStables()",
+	"cityBuildings:enter(\"empty\")",
+	"cityBuildings:enter(\"guild\")",
+	"tavern:new",
+	"garths:enter()",
+	"temple:new",
+	"review:enter()",
+	"cityBuildings:enter(\"stables\")",
 	"",
 	"",
 	"",
 	"",
 	"",
-	"citylib.doGuardian",
-	"city.ironGate()",
-	"city.enterMadgod()",
-	"citylib.sewerPortal",
-	"citylib.printCredits",
-	"city.enterRoscoes()",
-	"citylib.enterKylearan",
-	"citylib.enterHarkyn",
-	"citylib.enterMangar",
-	"city.cityGates()"
+	"return cityGuardian:new",
+	"return cityIrongate:new",
+	"cityBuildings:enter(\"madgod\")",
+	"cityBuildings:enter(\"sewerPortal\")",
+	"city:printCredits()",
+	"roscoes:enter()",
+	"cityBuildings:enter(\"kylearan\")",
+	"cityBuildings:enter(\"harkyn\")",
+	"cityBuildings:enter(\"mangar\")",
+	"cityBuildings:enter(\"cityGates\")"
 };
 
 uint8_t *bldgFace[] = {
@@ -127,6 +127,32 @@ static uint8_t *temples[] = {
 /*28*/	NULL, NULL, NULL, NULL,
 };
 
+static uint8_t *guardianDir[] = {
+	"east",
+	"east",
+	"west",
+	"south",
+	"north",
+	"north",
+	"north",
+	"north",
+	"north",
+	"east"
+};
+
+static uint8_t guardianType[] = {
+	0x2b,
+	0x5d,
+	0x59,
+	0x5d,
+	0x4a,
+	0x4a,
+	0x4a,
+	0x19,
+	0x2b,
+	0x2b
+};
+
 /****************************************/
 /*					*/
 /* Output Function Prototypes		*/
@@ -141,6 +167,8 @@ static btstring_t *toLabel(int32_t x, int32_t y, uint8_t sq);
 static btstring_t *onEnter(int32_t x, int32_t y, uint8_t sq);
 static btstring_t *getStreet(uint8_t sq);
 static btstring_t *getFace(uint8_t hi, uint8_t lo);
+static btstring_t *doGuardian(int32_t x, int32_t y, uint8_t hi);
+static btstring_t *doIrongate(int32_t x, int32_t y, uint8_t hi);
 
 static void addBuilding(btcity_t *city, int32_t x, int32_t y, uint8_t sq);
 static void addItems(btcity_t *city);
@@ -262,6 +290,10 @@ static btstring_t *onEnter(int32_t x, int32_t y, uint8_t sq)
 						(uint8_t *)"Temple" :
 						temples[29 - y]);
 			break;
+		case 12:
+			return doGuardian(x, y, hi);
+		case 13:
+			return doIrongate(x, y, hi);
 		default:
 			rval = bts_strcpy(specEvent[hi]);
 			break;
@@ -326,7 +358,59 @@ static void addMonsters(btcity_t *city)
 			getMonsterName(b1dun_randomOffset[1] + i - 1));
 	}
 }
-		
+
+static uint8_t guardian_x[] = {  4,  6,  6,  6,  3,  3,  6, 27, 22, 21 };
+static uint8_t guardian_y[] = { 26, 26, 24, 22, 14,  6,  6,  6,  3,  2 };
+
+static btstring_t *doGuardian(int32_t x, int32_t y, uint8_t hi)
+{
+	uint32_t found = 0;
+	uint32_t index;
+
+	for (index = 0; index < 10; index++) {
+		if ((guardian_x[index] == x) && (guardian_y[index] == y)) {
+			found = 1;
+			break;
+		}
+	}
+
+	if (!found) 
+		index = 0;
+
+	return bts_sprintf("%s(\"%s\", \"%s\")",
+			specEvent[hi],
+			guardianDir[index],
+			getMonMacro(guardianType[index] - 1)
+			);
+}
+
+static uint8_t gate_x[] = { 25,  2, 27,  4 };
+static uint8_t gate_y[] = { 27,  4, 25,  2 };
+static uint8_t *gateDir[] = {
+	"east",
+	"south",
+	"north",
+	"west"
+};
+
+static btstring_t *doIrongate(int32_t x, int32_t y, uint8_t hi)
+{
+	uint32_t index;
+	uint32_t found	= 0;
+
+	for (index = 0; index < 4; index++) {
+		if ((gate_x[index] == x) && (gate_y[index] == y)) {
+			found = 1;
+			break;
+		}
+	}
+
+	return bts_sprintf("%s(\"%s\", \"%s\")",
+			specEvent[hi],
+			gateDir[index],
+			(x < 10) ? "Mangar's" : "Kylearan's"
+			);
+}
 
 /****************************************/
 /*					*/

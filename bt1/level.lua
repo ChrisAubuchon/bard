@@ -30,7 +30,15 @@ function level:setTitle()
 	bigpic:setTitle(self.title)
 end
 
-
+function level:doStairs(inDirection)
+	text:print("\nThere are stairs here, going %s. ", inDirection)
+	text:print("Do you wish to take them?")
+	if (text:getYesNo()) then
+		return true
+	else
+		text:clear()
+	end
+end
 
 
 

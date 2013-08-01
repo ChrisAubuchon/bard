@@ -1,12 +1,6 @@
 tavern = {}
-local funcs = {}
 
-function funcs.setTavernBigpic()
-	bigpic:drawImage("PIC_BARINT")
-	bigpic:setTitle(funcs.tavernName)
-end
-
-function funcs.selectOption()
+function tavern:selectOption()
 	local inkey
 
 	repeat 
@@ -20,14 +14,14 @@ function funcs.selectOption()
 			local c = party:readMember(inkey)
 			if (c) then
 				c:printCharacter()
-				funcs.setTavernBigpic()
+				self:resetBigpic()
 			end
 		elseif (inkey == "O") then
-			if (not funcs.orderDrink()) then
+			if (not self:orderDrink()) then
 				return
 			end
 		elseif (inkey == "T") then
-			funcs.talkToBarkeep()
+			self:talkToBarkeep()
 		end
 	until (inkey == "E")
 
@@ -35,7 +29,7 @@ function funcs.selectOption()
 	currentLevel:turnParty("back")
 end
 
-funcs.talk = {
+local talk = {
 	[1] = "\"The guardians can be deadly,\" the barkeep smirks.",
 	[2] = "\"A taste of wine might turn to ready adventure,\" the barkeep chuckles",
 	[3] = "\"Look for the Review Board on Trumpet Street,\" the barkeep whispers.",
@@ -44,7 +38,7 @@ funcs.talk = {
 	[6] = "\"The Spectre Snare can draw in even the mightiest,\" the barkeep grumbles.",
 }
 
-function funcs.talkToBarkeep()
+function tavern:talkToBarkeep()
 	local char
 	local tipAmount
 
@@ -75,23 +69,23 @@ function funcs.talkToBarkeep()
 	end
 
 	if (tipAmount < 200) then
-		text:cdprint(true, true, funcs.talk[1])
+		text:cdprint(true, true, talk[1])
 	elseif (tipAmount < 300) then
-		text:cdprint(true, true, funcs.talk[2])
+		text:cdprint(true, true, talk[2])
 	elseif (tipAmount < 400) then
-		text:cdprint(true, true, funcs.talk[3])
+		text:cdprint(true, true, talk[3])
 	elseif (tipAmount < 500) then
-		text:cdprint(true, true, funcs.talk[4])
+		text:cdprint(true, true, talk[4])
 	elseif (tipAmount < 600) then
-		text:cdprint(true, true, funcs.talk[5])
+		text:cdprint(true, true, talk[5])
 	elseif (tipAmount < 700) then
-		text:cdprint(true, true, funcs.talk[6])
+		text:cdprint(true, true, talk[6])
 	else
-		text:cdprint(true, true, funcs.talk[4])
+		text:cdprint(true, true, talk[4])
 	end
 end
 
-function funcs.orderDrink()
+function tavern:orderDrink()
 	local char
 	local inkey
 	local options = {
@@ -118,7 +112,7 @@ function funcs.orderDrink()
 	text:print("Mead\n")
 	text:print("Foul spirits\n")
 	text:print("Ginger Ale\n")
-	if (funcs.tavernName == "Scarlet Bard") then
+	if (self.title == "Scarlet Bard") then
 		text:print("Wine")
 		options["W"] = 3
 	end
@@ -142,7 +136,8 @@ function funcs.orderDrink()
 		text:cdprint(false, true, "The girls in the tavern are not impressed.")
 		return true
 	elseif (inkey == "W") then
-		btapi.city.enterDungeon("cellars", 1)
+		text:splashMessage("The barkeep says, \"Go down to the cellar and pick out a bottle.\"")
+		city:enterDungeon("cellars", 1)
 		return false
 	else
 		text:print("Not bad!!")
@@ -156,8 +151,17 @@ function funcs.orderDrink()
 	return true
 end
 
-function tavern.enter(tavernName)
-	funcs.tavernName = tavernName
-	funcs.setTavernBigpic()
-	funcs.selectOption()
+function tavern:enter()
+	self:resetBigpic()
+	self:selectOption()
+end
+
+function tavern:new(inTitle)
+	local self = {
+	}
+
+	btTable.addParent(self, tavern, building:new(inTitle, "PIC_BARINT"))
+	btTable.setClassMetatable(self)
+
+	self:enter()
 end

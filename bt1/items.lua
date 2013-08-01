@@ -1,6 +1,5 @@
 require "dataio"
 require "spells"
-require "btapi"
 
 local _items = read_table("items")
 

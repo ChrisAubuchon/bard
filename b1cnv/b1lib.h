@@ -58,6 +58,7 @@ btstring_t *getItemName(uint32_t index);
 /* mon.c */
 void convertMonsters(void);
 btstring_t *getMonsterName(uint32_t index);
+uint8_t *getMonMacro(uint32_t index);
 
 /* cnv.c */
 void cnv_printSpellHeader(void);

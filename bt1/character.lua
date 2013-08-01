@@ -220,11 +220,13 @@ function character:isAfflicted()
 end
 
 function character:getSpellLevel()
-	if (self.class == "Magician") then return self.magi_level end
-	if (self.class == "Conjurer") then return self.conj_level end
-	if (self.class == "Sorcerer") then return self.sorc_level end
-	if (self.class == "Wizard") then return self.wiza_level end
+	dprint(self.class)
+	if (self.class == "Magician") then return self.spellLevel.Magician end
+	if (self.class == "Conjurer") then return self.spellLevel.Conjurer end
+	if (self.class == "Sorcerer") then return self.spellLevel.Sorcerer end
+	if (self.class == "Wizard") then return self.spellLevel.Wizard end
 
+	dprint("getting here")
 	return false
 end
 
@@ -264,6 +266,21 @@ function character:isTypeEquipped(inType)
 	for i in self.inventory:iterator() do
 		if ((i.isEquipped) and (i.type == inType)) then
 			return i
+		end
+	end
+
+	return false
+end
+
+----------------------------------------
+-- isItemEquipped()
+----------------------------------------
+function character:isItemEquipped(inName)
+	local i
+
+	for i in self.inventory:iterator() do
+		if ((i.name == inName) and (i.isEquipped)) then
+			return true
 		end
 	end
 

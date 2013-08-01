@@ -254,9 +254,9 @@ function battleData:start()
 		self:doReward()
 	end
 
-	self:stop(partyRan)
+	self:stop()
 
-	return true
+	return not partyRan
 end
 
 function battleData:stop()
@@ -721,7 +721,7 @@ function battleData:doReward()
 		end
 	end
 
-	partySize = party:getLastLiveCharacter()
+	partySize = party:countLiveCharacters()
 	xp = xp / partySize
 	au = au / partySize
 

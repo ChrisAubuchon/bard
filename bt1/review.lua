@@ -1,7 +1,9 @@
 review = {}
-local funcs = {}
 
-function funcs.nightCheck()
+btTable.addParent(review, building:new("Review board", "PIC_REVINT"))
+btTable.setClassMetatable(review)
+
+function review:nightCheck()
 	if (globals.isNight) then
 		text:cdprint(true, false, "The review Board is closed for the evening.")
 		text:cdprint(false, true, " The guild leaders will meet with you in the morning.\n\n")
@@ -11,12 +13,7 @@ function funcs.nightCheck()
 	return false
 end
 
-function funcs.setReviewBigpic()
-	bigpic:drawImage("PIC_REVINT")
-	bigpic:setTitle("Review board")
-end
-
-function funcs.advanceRandomStat(char)
+function review:advanceRandomStat(char)
 	local canAdvance = {}
 	local rndStat
 
@@ -38,7 +35,7 @@ function funcs.advanceRandomStat(char)
 	end
 end
 
-function funcs.doAdvancement()
+function review:doAdvancement()
 	local char
 	local xpRequired
 
@@ -99,13 +96,13 @@ function funcs.doAdvancement()
 		char.cur_sppt = char.cur_sppt + 1
 		char.max_sppt = char.cur_sppt
 	end
-	funcs.advanceRandomStat(char)
+	self:advanceRandomStat(char)
 	party:display()
 	text:printContinue()
 	getkey()
 end
 
-function funcs.doClassChange()
+function review:doClassChange()
 	local char
 	local options = {}
 	local numAvailable = 0
@@ -116,12 +113,12 @@ function funcs.doClassChange()
 	if (not char) then
 		return
 	end
-	if (not char.getSpellLevel()) then
+	if (not char:getSpellLevel()) then
 		text:cdprint(true, true, "\n\nThou are not a spell caster!\n")
 		return
 	end
 
-	if (char.getSpellLevel() < 3) then
+	if (char:getSpellLevel() < 3) then
 		text:cdprint(false, true, "\nThou must know at least 3 spell levels in your present art first.")
 		return
 	end
@@ -185,7 +182,7 @@ function funcs.doClassChange()
 	until (inkey == "E")
 end
 
-funcs.spellLevelCost = {
+local spellLevelCost = {
 	[1] = 1000, 
 	[2] = 2000, 
 	[3] = 4000, 
@@ -194,7 +191,7 @@ funcs.spellLevelCost = {
 	[6] = 20000
 }
 
-function funcs.doSpellAcquire()
+function review:doSpellAcquire()
 	local char
 	local spellLevel
 	local cost
@@ -205,6 +202,7 @@ function funcs.doSpellAcquire()
 		return
 	end
 	spellLevel = char:getSpellLevel()
+	dprint(spellLevel)
 	text:clear()
 	if (not spellLevel) then
 		text:cdprint(false, true, "\n\nThou art not a spell caster!\n")
@@ -221,7 +219,7 @@ function funcs.doSpellAcquire()
 		return
 	end
 
-	cost = funcs.spellLevelCost[spellLevel]
+	cost = spellLevelCost[spellLevel]
 	text:print("%s %d will cost thee %d in gold. ", char.class, 
 			spellLevel + 1, cost)
 
@@ -250,11 +248,11 @@ function funcs.doSpellAcquire()
 
 end
 
-function funcs.selectOption()
+function review:selectOption()
 	local inkey
 	
 	repeat
-		if (funcs.nightCheck()) then
+		if (self:nightCheck()) then
 			return
 		end
 
@@ -269,22 +267,26 @@ function funcs.selectOption()
 			local c = party:readMember(inkey)
 			if (c) then
 				c:printCharacter()
-				funcs.setReviewBigpic()
+				self:resetBigpic()
 			end
 		elseif (inkey == "A") then
-			funcs.doAdvancement()
+			self:doAdvancement()
 		elseif (inkey == "C") then	
-			funcs.doClassChange()
+			self:doClassChange()
 		elseif (inkey == "S") then
-			funcs.doSpellAcquire()
+			self:doSpellAcquire()
 		end
 	until (inkey == "E")
 end
 
-function review.enter()
-	if (funcs.nightCheck()) then
+function review:enter()
+	if (self:nightCheck()) then
+		currentLevel:turnParty("back")
 		return
 	end
-	funcs.setReviewBigpic()
-	funcs.selectOption()
+	
+	self:resetBigpic()
+	self:selectOption()
+
+	currentLevel:turnParty("back")
 end

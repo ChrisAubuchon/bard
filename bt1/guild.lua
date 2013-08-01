@@ -200,8 +200,7 @@ local function enter()
 		elseif (inkey == "D") then
 			delete_member()
 		elseif (inkey == "E") then
-			--if (not party:getFirstCharacter()) then
-			if (false) then
+			if (not party:getFirstCharacter()) then
 				text:clear()
 				text:print("You must have a party to enter the city.")
 				text:printContinue()
@@ -212,6 +211,7 @@ local function enter()
 				globals.gameHour = 7
 
 				currentLevel = city:new("skara")
+				--currentLevel:enter(2, 3, "south")
 				currentLevel:enter(17, 16, "east")
 				--currentLevel:enter(25, 15, "east")
 				globals.gameState = globals.STATE_CITY
