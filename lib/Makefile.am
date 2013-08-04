@@ -1,1 +1,1 @@
-SUBDIRS = libbard libcnv libgnu jansson lua
+SUBDIRS = libgnu libbard libcnv jansson lua
