@@ -22,6 +22,7 @@ AC_CONFIG_FILES([
  Makefile
  bte/Makefile
  b1cnv/Makefile
+ btcscnv/Makefile
  lib/Makefile
  lib/lua/Makefile
  lib/libbard/Makefile
