@@ -116,7 +116,7 @@ btTable.setClassMetatable(madgod)
 function madgod:enter()
 	local inkey
 
-	city:enterDungeon("cellars", 1)
+	city:enterDungeon("catacombs", 3)
 	local xxx_uncomment_to_get_madgod_code = true
 if false then
 	self:resetBigpic()

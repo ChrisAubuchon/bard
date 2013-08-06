@@ -895,7 +895,24 @@ function party:disbelieve(inBattle)
 	end
 end
 
+----------------------------------------
+-- giveItem()
+--
+-- Try to give an item to a party
+-- member. Return the character that
+-- received the item.
+----------------------------------------
+function party:giveItem(inItem, inIsIdentified)
+	local c
 
+	for c in self:characterIterator() do
+		if (c:giveItem(inItem, inIsIdentified)) then
+			return c
+		end
+	end
+
+	return false
+end	
 
 
 

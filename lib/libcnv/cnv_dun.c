@@ -78,6 +78,8 @@ static void dunVertex_free(const void *vv)
 	bts_free(v->isTeleport);
 	bts_free(v->isStairs);
 	bts_free(v->isMessage);
+	bts_free(v->isForcedBattle);
+	bts_free(v->code);
 
 	free(v);
 }
@@ -262,6 +264,7 @@ static json_t *vertices_to_json(dunLevel_t *dl)
 		JSON_BTSTRING_IF(vertexNode,"isMessage",vertex->isMessage);
 		JSON_BTSTRING_IF(vertexNode,"isStairs",	vertex->isStairs);
 		JSON_BTSTRING_IF(vertexNode,"isTeleport", vertex->isTeleport);
+		JSON_BTSTRING_IF(vertexNode,"code", vertex->code);
 		json_object_set_new(vertices, vertex->label->buf, vertexNode);
 	}
 

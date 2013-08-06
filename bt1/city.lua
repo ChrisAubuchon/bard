@@ -324,10 +324,10 @@ function city:moveForward()
 		bigpic:setTitle("Skara Brae")
 	else
 		self:animateMove()
-		local saveSq = self.currentSquare
+		self.previousSquare = self.currentSquare
 		self.currentSquare = front_sq
 		if (self.currentSquare.onEnter()) then
-			self.currentSquare = saveSq
+			self.currentSquare = self.previousSquare
 		end
 		self:buildView()
 	end

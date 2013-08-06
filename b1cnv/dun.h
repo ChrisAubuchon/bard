@@ -11,5 +11,6 @@ extern b1levData_t	b1dungeons[];
 extern uint8_t		b1dun_randomMask[];
 extern uint8_t		b1dun_randomOffset[];
 extern uint8_t		b1dun_poisonDamage[];
+extern uint8_t		*b1dun_specialCode[];
 
 #endif

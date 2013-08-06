@@ -15,6 +15,8 @@ function cityIrongate:new(inDirection, inCastle)
 	end
 
 	if (inDirection ~= currentLevel.direction) then
+		dprint(inDirection)
+		dprint(currentLevel.direction)
 		return false
 	end
 

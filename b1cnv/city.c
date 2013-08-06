@@ -293,7 +293,7 @@ static btstring_t *onEnter(int32_t x, int32_t y, uint8_t sq)
 		case 12:
 			return doGuardian(x, y, hi);
 		case 13:
-			return doIrongate(x, y, hi);
+			return doIrongate(x, 29 - y, hi);
 		default:
 			rval = bts_strcpy(specEvent[hi]);
 			break;
@@ -374,8 +374,10 @@ static btstring_t *doGuardian(int32_t x, int32_t y, uint8_t hi)
 		}
 	}
 
-	if (!found) 
+	if (!found) {
+		debug("Not found: (%d,%d)\n", x, y);
 		index = 0;
+	}
 
 	return bts_sprintf("%s(\"%s\", \"%s\")",
 			specEvent[hi],
@@ -384,12 +386,12 @@ static btstring_t *doGuardian(int32_t x, int32_t y, uint8_t hi)
 			);
 }
 
-static uint8_t gate_x[] = { 25,  2, 27,  4 };
-static uint8_t gate_y[] = { 27,  4, 25,  2 };
+static uint8_t gate_x[] = { 25, 27,  2,  4 };
+static uint8_t gate_y[] = {  2,  4, 25, 27 };
 static uint8_t *gateDir[] = {
 	"east",
-	"south",
 	"north",
+	"south",
 	"west"
 };
 

@@ -398,6 +398,16 @@ static dunLevel_t *convertDunLevel(btstring_t *data, uint32_t dunIndex)
 					l->dun_teleonly[i].sqNorth,
 					isStuck);
 		}
+
+		if (l->dun_spSquare[i].sqNorth != 0xff) {
+			uint8_t index = l->dun_spSqOff[i].sqNumber - 10;
+
+			setSquareMember(dl, l->dun_spSquare[i].sqEast,
+					l->dun_spSquare[i].sqNorth,
+					code,
+					bts_strcpy(b1dun_specialCode[index])
+					);
+		}
 	}
 
 	addItems(dl);

@@ -58,6 +58,8 @@ typedef struct {
 	btstring_t	*isTeleport;
 	btstring_t 	*isStairs;
 	btstring_t 	*isMessage;
+	btstring_t	*isForcedBattle;
+	btstring_t	*code;
 } dunVertex_t;
 
 typedef struct {

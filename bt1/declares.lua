@@ -62,6 +62,7 @@ declare_global("false_table")
 
 -- dun.lua
 declare_global("dun")
+declare_global("dunSquares")
 
 -- durationSpell.lua
 declare_global("lightEffect")

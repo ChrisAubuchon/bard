@@ -350,6 +350,12 @@ end
 -- repeated actions
 ----------------------------------------
 
+function textBox:splash(format, ...)
+	self:print(format, ...)
+	self:printContinue()
+	getkey()
+end
+
 function textBox:splashMessage(format, ...)
 	self:clear()
 	self:print(format, ...)

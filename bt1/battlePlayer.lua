@@ -222,6 +222,8 @@ function battlePlayer:doDamage(inAction)
 
 			outData.specialAttack = "kill"
 
+			party:isLive()
+
 			return true
 		end
 	end

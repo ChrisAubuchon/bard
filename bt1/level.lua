@@ -4,6 +4,7 @@ level = {
 	name		= false,
 	title		= false,
 	currentSquare	= false,
+	previousSquare	= false,
 	direction	= false
 }
 

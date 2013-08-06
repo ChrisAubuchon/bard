@@ -171,6 +171,10 @@ dunSq.new = function(inLabel, inSquare)
 		return x,y
 	end
 
+	function self.clearCode()
+		self.code = false
+	end
+
 	__init()
 
 	return self
@@ -186,7 +190,7 @@ function dun:new(inName, inLevel, inX, inY, inDirection)
 		edges		= {}
 	}
 
-	btTable.addParent(self, dun, level)
+	btTable.addParent(self, dun, level, dunSquares)
 	btTable.setClassMetatable(self)
 
 	self.name		= inName
@@ -255,6 +259,9 @@ function dun:getSqXY(inX, inY)
 end
 
 function dun:getSq(label)
+	if (self == nil) or (self.squares == nil) then
+		error("bad getSq call", 2)
+	end
 	return self.squares[label]
 end
 
@@ -349,24 +356,31 @@ function dun:buildView()
 	end
 end
 
-function dun:turnParty(inRelDirection)
-	self.direction = directions[inRelDirection][self.direction]
-	self.isPhasedFlag = false
-	text:clear()
+function dun:doSpinnerCheck()
 	if (self.currentSquare.isSpinner) then
-		local r = rnd_xdy(1, 4)
+		text:cdprint(true, false, "isSpinner")
+		local r = rnd_xdy(1,4)
+
 		if (r == 1) then
 			self.direction = "north"
 		elseif (r == 2) then
 			self.direction = "south"
-		elseif (r == 3) then	
+		elseif (r == 3) then
 			self.direction = "east"
 		else
 			self.direction = "west"
 		end
+		self:buildView()
 	else
 		party.compass:update(self.direction)
 	end
+end
+
+function dun:turnParty(inRelDirection)
+	self.direction = directions[inRelDirection][self.direction]
+	self.isPhasedFlag = false
+	text:clear()
+	self:doSpinnerCheck()
 
 	if (self.currentSquare.isPhased) then
 		self.currentSquare.isPhased = nil
@@ -374,8 +388,9 @@ function dun:turnParty(inRelDirection)
 
 	if (self.currentSquare.isLifeDrain) then
 		self:doLifeDrain()
-		party:isLive()
-		return
+		if (globals.partyDied) then
+			return
+		end
 	end
 
 	self:buildView()
@@ -405,8 +420,10 @@ function dun:moveForward()
 
 	self.currentSquare.isPhased = nil
 
+	self.previousSquare = self.currentSquare
 	self.currentSquare = edge.path
 	self:runSquareCode()
+	self:doSpinnerCheck()
 end
 
 function dun:runSquareCode()
@@ -416,22 +433,33 @@ function dun:runSquareCode()
 
 	if (curSq.isRandomBattle) then
 		text:cdprint(true, false, "Random battle")
+		battle:random()
+		if (globals.partyDied) then
+			return
+		end
 		curSq.isRandomBattle = false
+		text:clear()
+		self:setTitle()
+		self:buildView()
+		
 	end
 	if (not (self.squareFlags["seenDarkness"]) and curSq.isDarkness) then
-		party.light.deactivate()
+		party.light:deactivate()
 		text:print("\n\nDarkness!")
 		self:buildView()
 		self.squareFlags["seenDarkness"] = true
 	end
-	if (curSq.onEnter) then
-		text:cdprint(true, false, "onEnter")
+	if (curSq.code) then
+		executeString(curSq.code)
+		text:clear()
+		self:setTitle()
+		self:buildView()
 	end
 	if (curSq.isAntiMagic) then
-		party.levitate.deactivate()
-		party.compass.deactivate()
-		party.detect.deactivate()
-		party.shield.deactivate()
+		party.levitate:deactivate()
+		party.compass:deactivate()
+		party.detect:deactivate()
+		party.shield:deactivate()
 	end
 	if (not (self.squareFlags["seenSmoke"]) and curSq.isSmoke) then
 		if (party.light.active) then
@@ -442,7 +470,7 @@ function dun:runSquareCode()
 		self.squareFlags["seenSmoke"] = true
 	end
 	if (curSq.isTeleport) then
-		self.currentSquare = self.getSq(curSq.isTeleport)
+		self.currentSquare = self:getSq(curSq.isTeleport)
 		text:clear()
 		bigpic:setTitle(self.title)
 		self:buildView()
@@ -451,6 +479,10 @@ function dun:runSquareCode()
 	end
 	if (curSq.isLifeDrain) then
 		text:cdprint(true, false, "isLifeDrain")
+		self:doLifeDrain()
+		if (globals.partyDied) then
+			return	
+		end
 	end
 	if (curSq.isMessage) then
 		if not (self.squareFlags["seenMessage"]) then
@@ -461,13 +493,20 @@ function dun:runSquareCode()
 	end
 	if (curSq.isForcedBattle) then
 		text:cdprint(true, false, "isForcedBattle")
+		text:clear()
+		self:setTitle()
+		self:buildView()
 	end
 	if (curSq.isTrap) then
 		text:cdprint(true, false, "isTrap")
+		text:clear()
+		self:setTitle()
+		self:buildView()
 	end
 	if (curSq.isStairs) then
 		if not (self.squareFlags["seenStairs"]) then
 			executeString(curSq.isStairs)
+			self.squareFlags.seenStairs = true
 		end
 	end
 end
@@ -506,6 +545,9 @@ function dun:doLifeDrain()
 		action = btAction.new()
 		action.outData.damage = self.level
 		c:doDamage(action)
+		if (globals.partyDied) then
+			return	
+		end
 	end
 
 	party:display()
