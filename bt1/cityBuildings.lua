@@ -116,9 +116,10 @@ btTable.setClassMetatable(madgod)
 function madgod:enter()
 	local inkey
 
-	city:enterDungeon("catacombs", 3)
 	local xxx_uncomment_to_get_madgod_code = true
+	city:enterDungeon("cellars", 1)
 if false then
+	city:enterDungeon("catacombs", 3)
 	self:resetBigpic()
 	repeat
 		text:cdprint(true, false, "\nThis is the temple of the Mad God. What is thy business, unbeliever?\n\nSpeak to priest")

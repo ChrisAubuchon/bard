@@ -402,11 +402,13 @@ static dunLevel_t *convertDunLevel(btstring_t *data, uint32_t dunIndex)
 		if (l->dun_spSquare[i].sqNorth != 0xff) {
 			uint8_t index = l->dun_spSqOff[i].sqNumber - 10;
 
-			setSquareMember(dl, l->dun_spSquare[i].sqEast,
+			if (b1dun_specialCode[index] != NULL) {
+				setSquareMember(dl, l->dun_spSquare[i].sqEast,
 					l->dun_spSquare[i].sqNorth,
 					code,
 					bts_strcpy(b1dun_specialCode[index])
 					);
+			}
 		}
 	}
 

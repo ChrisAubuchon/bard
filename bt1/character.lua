@@ -287,6 +287,24 @@ function character:isItemEquipped(inName)
 	return false
 end
 
+----------------------------------------
+-- hasItem()
+----------------------------------------
+function character:hasItem(inName)
+	local i
+
+	for i in self.inventory:iterator() do
+		if (i.name == inName) then
+			return i
+		end
+	end
+
+	return false
+end
+
+----------------------------------------
+-- getBattlePriority()
+----------------------------------------
 function character:getBattlePriority()
 	local priority
 	local levelBonus

@@ -82,11 +82,18 @@ function inventory:findItem(inItem)
 end
 
 function inventory:dropItem(inSlot)
-	assert(self[inSlot] ~= nil)
+	if (type(inSlot) == "string") then
+		local i
 
-	dprint("Dropping slot %d", inSlot)
-
-	self:__remove(inSlot)
+		for i = 1,self.size do
+			if (self[i].name == inSlot) then
+				self:__remove(i)
+				return
+			end
+		end
+	elseif (type(inSlot == "number")) then
+		self:__remove(inSlot)
+	end
 end
 
 function inventory:equipItem(inSlot)

@@ -132,6 +132,20 @@ end
 
 bigpic = __bigpic:new()
 
+----------------------------------------
+-- setBigpic()
+--
+-- Helper function to set the image and
+-- title in one shot
+----------------------------------------
+function bigpic:setBigpic(inName, inTitle)
+	self:drawImage(inName)
+	self:setTitle(inTitle)
+end
+
+----------------------------------------
+-- setTitle()
+----------------------------------------
 function bigpic:setTitle(format, ...)
 	local title
 	local fontP
@@ -160,6 +174,9 @@ function bigpic:setTitle(format, ...)
 	m_window:Update(self.titleRect)
 end
 
+----------------------------------------
+-- drawImage()
+----------------------------------------
 function bigpic:drawImage(inName, inIsTimeAware)
 	local isTimeAware = inIsTimeAware or false
 
@@ -181,6 +198,9 @@ function bigpic:drawImage(inName, inIsTimeAware)
 	end
 end
 
+----------------------------------------
+-- cityBackground()
+----------------------------------------
 function bigpic:cityBackground()
 	self.surface:Draw(nil, self.city.bg, nil)
 end

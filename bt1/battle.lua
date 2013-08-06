@@ -515,6 +515,8 @@ function battleData:getRunFightOption()
 		inkey = getkey()
 
 		if (inkey == "R") then
+			local xxx_remove_if_false_after_debug = true
+if false then
 			local saveAction = btAction:new()
 			saveAction.target = party:getFirstCharacter()
 			saveAction.source = self.monParty:getLeadGroup()
@@ -534,6 +536,8 @@ function battleData:getRunFightOption()
 			end
 
 			return false
+end
+			return true
 		elseif (inkey == "D") then
 			self:dumpBattleBonus()
 		elseif (inkey == "Q") then

@@ -212,8 +212,8 @@ local function enter()
 
 				currentLevel = city:new("skara")
 				--currentLevel:enter(2, 3, "south")
-				currentLevel:enter(6, 24, "west")
-				--currentLevel:enter(17, 16, "east")
+				--currentLevel:enter(6, 24, "west")
+				currentLevel:enter(17, 16, "east")
 				--currentLevel:enter(25, 15, "east")
 				globals.gameState = globals.STATE_CITY
 				local xxx_delete_after_debugging = true

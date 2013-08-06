@@ -10308,7 +10308,7 @@ fi
 
 ac_config_headers="$ac_config_headers config.h"
 
-ac_config_files="$ac_config_files Makefile bte/Makefile b1cnv/Makefile lib/Makefile lib/lua/Makefile lib/libbard/Makefile lib/libcnv/Makefile lib/libgnu/Makefile lib/jansson/Makefile"
+ac_config_files="$ac_config_files  Makefile bte/Makefile b1cnv/Makefile btcscnv/Makefile lib/Makefile lib/lua/Makefile lib/libbard/Makefile lib/libcnv/Makefile lib/libgnu/Makefile lib/jansson/Makefile"
 
 
 
@@ -11117,15 +11117,17 @@ do
   case $ac_config_target in
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
-    "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
-    "bte/Makefile") CONFIG_FILES="$CONFIG_FILES bte/Makefile" ;;
-    "b1cnv/Makefile") CONFIG_FILES="$CONFIG_FILES b1cnv/Makefile" ;;
-    "lib/Makefile") CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
-    "lib/lua/Makefile") CONFIG_FILES="$CONFIG_FILES lib/lua/Makefile" ;;
-    "lib/libbard/Makefile") CONFIG_FILES="$CONFIG_FILES lib/libbard/Makefile" ;;
-    "lib/libcnv/Makefile") CONFIG_FILES="$CONFIG_FILES lib/libcnv/Makefile" ;;
-    "lib/libgnu/Makefile") CONFIG_FILES="$CONFIG_FILES lib/libgnu/Makefile" ;;
-    "lib/jansson/Makefile") CONFIG_FILES="$CONFIG_FILES lib/jansson/Makefile" ;;
+    "") CONFIG_FILES="$CONFIG_FILES " ;;
+    "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+    "bte/Makefile") CONFIG_FILES="$CONFIG_FILES bte/Makefile" ;;
+    "b1cnv/Makefile") CONFIG_FILES="$CONFIG_FILES b1cnv/Makefile" ;;
+    "btcscnv/Makefile") CONFIG_FILES="$CONFIG_FILES btcscnv/Makefile" ;;
+    "lib/Makefile") CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
+    "lib/lua/Makefile") CONFIG_FILES="$CONFIG_FILES lib/lua/Makefile" ;;
+    "lib/libbard/Makefile") CONFIG_FILES="$CONFIG_FILES lib/libbard/Makefile" ;;
+    "lib/libcnv/Makefile") CONFIG_FILES="$CONFIG_FILES lib/libcnv/Makefile" ;;
+    "lib/libgnu/Makefile") CONFIG_FILES="$CONFIG_FILES lib/libgnu/Makefile" ;;
+    "lib/jansson/Makefile") CONFIG_FILES="$CONFIG_FILES lib/jansson/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5 ;;
   esac

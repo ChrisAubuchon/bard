@@ -543,6 +543,21 @@ function party:isItemEquipped(inName)
 end
 
 ----------------------------------------
+-- hasItem()
+----------------------------------------
+function party:hasItem(inName)
+	local c
+
+	for c in self:characterIterator() do
+		if (c:hasItem(inName)) then	
+			return c
+		end
+	end
+
+	return false
+end
+
+----------------------------------------
 -- randomMeleeCharacter()
 --
 -- Return a random melee character that
