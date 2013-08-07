@@ -560,8 +560,8 @@ function battleData:getPlayerOption(c)
 	action.inBattle = self
 
 	if ((c.isPossessed) or (c.isNuts)) then
-		local xxx_possessedAttack = true
-		return false
+		action.action = "possessedAttack"
+		return action
 	end
 
 	while true do

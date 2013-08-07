@@ -493,12 +493,16 @@ function dun:runSquareCode()
 		end
 	end
 	if (curSq.isForcedBattle) then
+		local xxx_do_forced_battle = true
+
 		text:cdprint(true, false, "isForcedBattle")
 		text:clear()
 		self:setTitle()
 		self:buildView()
 	end
 	if (curSq.isTrap) then
+		local xxx_do_trap_code = true
+
 		text:cdprint(true, false, "isTrap")
 		text:clear()
 		self:setTitle()

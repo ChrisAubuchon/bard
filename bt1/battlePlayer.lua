@@ -56,6 +56,34 @@ function battlePlayer:doAction(inAction)
 	elseif (inAction.action == "sing") then
 		dprint("Singing a bard song")
 		self:doBardSong(inAction)
+	elseif (inAction.action == "possessedAttack") then
+		local attackParty	= false
+		local inBattle		= inAction.inBattle
+
+		-- A nuts attack randomly attacks player or monster
+		if (self.isNuts) then
+			if (rnd_and_x(1) == 1) then	
+				attackParty = true
+			end
+		else
+			attackParty = self.possessed
+		end
+
+		if (attackParty) then
+			inAction.target = party:randomCharacter()
+		else
+			if (inBattle.monParty) then
+				inAction.target=inBattle.monParty:getLeadGroup()
+			else
+				-- This should probably attack a random
+				-- party member. In the DOS version it does
+				-- nothing.
+				--
+				return
+			end
+		end
+
+		self:doMeleeAttack(inAction)
 	end
 end
 
@@ -270,6 +298,10 @@ function battlePlayer:inflictStatus(inAction)
 		self.isOld = true
 	elseif (inData.specialAttack == "possess") then
 		self.cur_hp = 100
+
+		-- self.possessed indicates whether or not a monster
+		-- has possessed the player
+		--
 		if (inAction.source:isMonster()) then
 			self.possessed = true
 		end
