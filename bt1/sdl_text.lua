@@ -129,6 +129,7 @@ function textBox:readString(inMaxLen)
 		inMaxLen = 14
 	end
 
+	self.window:Print("\n")
 	x,y = self.window:GetCursor()
 	self.window:SetCursor(240, y)
 	self.window:Print("<")
@@ -140,6 +141,8 @@ function textBox:readString(inMaxLen)
 		inkey = getkey()
 
 		if (inkey == btkeys.BTKEY_RETURN) then
+			self.window:eraseChar(128, x)
+			self.window:putc(32)
 			break
 		elseif (inkey == btkeys.BTKEY_BACKSPACE) then
 			if (nchars ~= 0) then

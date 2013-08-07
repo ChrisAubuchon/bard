@@ -172,6 +172,7 @@ dunSq.new = function(inLabel, inSquare)
 	end
 
 	function self.clearCode()
+		self.isSpecial = false
 		self.code = false
 	end
 
@@ -513,6 +514,8 @@ end
 
 function dun:main()
 	local inkey
+
+	globals.swapWallsAndDoors = false
 
 	text:clear()
 	self:resetBigpic()
