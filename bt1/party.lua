@@ -162,10 +162,10 @@ local iteratorConditionals = {
 	skipDisabled	= function (c) return not c:isDisabled() end,
 	isLive		= function (c) 
 				return (not c:isDisabled() and 
-				        not c.isDoppelganger)
+				        not c.isDoppleganger)
 			  end,
 	isHostile	= function (c)
-				return (c.isPossessed or c.isDoppelganger)
+				return (c.isPossessed or c.isDoppleganger)
 			  end,
 	isAttackable	= function (c)
 				return (not c.isDead and not c.isStoned)
@@ -214,7 +214,7 @@ function party:getLastLiveCharacter()
 	local c
 
 	for c in self:reverseIterator() do
-		if ((not c:isDisabled()) and (not c.isDoppelganger)) then	
+		if ((not c:isDisabled()) and (not c.isDoppleganger)) then	
 			return c
 		end
 	end
@@ -886,7 +886,7 @@ end
 ----------------------------------------
 -- disbelieve()
 ----------------------------------------
-function party:disbelieve(inBattle)
+function party:doDisbelieve(inBattle)
 	local mgroup
 
 	if (not inBattle.monParty) then

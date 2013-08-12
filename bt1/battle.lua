@@ -348,7 +348,7 @@ function battleData:endRound()
 		end
 	end
 
-	party:disbelieve(self)
+	party:doDisbelieve(self)
 	if (globals.partyDied) then
 		return
 	end
@@ -395,22 +395,12 @@ function battleData:postRoundCleanup()
 	end
 
 	for c in party:iterator() do
-		if (c.isDoppelganger) then
+		if (c.isDoppleganger) then
 			if (c.isDead or c.isStoned or c.isParalyzed) then
 				party:removeCharacter(c)
 			end
 		end
 	end
-if false then
-	for i,c in party:ipairs() do
-		if (c.isDoppelganger) then
-			if (c.isDead or c.isStoned or c.isParalyzed) then
-				party:removeCharacter(i)
-			end
-		end
-	end
-
-end
 	if (not party:isLive()) then
 		return
 	end
@@ -453,9 +443,9 @@ end
 --
 ----------------------------------------
 function battleData:getPlayerOptions()
-	local i
 	local c
 	local done = false
+	local action
 
 	if (self:getRunFightOption()) then
 		return false
@@ -471,14 +461,12 @@ function battleData:getPlayerOptions()
 
 	repeat
 		for c in party:characterIterator("skipDisabled") do
-			self:addAction(c, self:getPlayerOption(c))
+			action = self:getPlayerOption(c)
+			if (c.isDoppleganger) then
+				action.action = "possessedAttack"
+			end
+			self:addAction(c, action)
 		end 
-
-if false then
-		for i,c in party:ipairs() do
-			self:addAction(c, self:getPlayerOption(i,c))
-		end
-end
 
 		text:cdprint(true, false, "Use these attack commands?")
 		if (not text:getYesNo()) then

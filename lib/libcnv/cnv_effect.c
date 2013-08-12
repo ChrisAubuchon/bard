@@ -370,7 +370,7 @@ static json_t *bteDisbelieve_toJson(const void *vbd)
 
 	JSON_TRUE_IF(inData, "disbelieve", bd->disbelieve);
 	JSON_TRUE_IF(inData, "allBattle", bd->allBattle);
-	JSON_TRUE_IF(inData, "revealDoppelganger", bd->revealDoppelganger);
+	JSON_TRUE_IF(inData, "revealDoppleganger", bd->revealDoppelganger);
 	JSON_TRUE_IF(inData, "noSummon", bd->noSummon);
 
 	json_object_set_new(node, "inData", inData);

@@ -283,11 +283,28 @@ end
 
 function battleMonster:doDoppleganger(inAction)
 	local randomCharacter
+	local doppleganger
+
 	if (not party:hasRoom()) then
 		return false
 	end
 
-	randomCharacter = false
+	randomCharacter = party:randomCharacter()
+	dprint("cloneCharacter = %s", randomCharacter.name)
+	doppleganger = randomCharacter:clone()
+	party:addCharacter(doppleganger)
+	if (rnd_and_x(1) == 1) then
+		dprint("randomCharacter is the doppleganger")
+		randomCharacter.isDoppleganger = true
+		randomCharacter.possessed = true
+	else
+		dprint("doppleganger is the doppleganger")
+		doppleganger.isDoppleganger = true
+		doppleganger.possessed = true
+	end
+
+	party:display()
+	text:cdprint(false, true, "A Doppleganger jumps into your party!\n\n")
 end
 
 

@@ -43,7 +43,7 @@ baseCharacter = {
 	isParalyzed	= false,
 	isPossessed	= false,
 	isNuts		= false,
-	isDoppelganger	= false,
+	isDoppleganger	= false,
 	songs		= 0,
 	battlesWon	= 0,
 	possessed	= false,
@@ -159,6 +159,35 @@ function character:new()
 
 	return self
 end
+
+----------------------------------------
+-- clone()
+--
+-- Create a clone of the current character
+----------------------------------------
+function character:clone()
+	local rval = character:new()
+	local k
+	local v
+
+	for k,v in pairs(baseCharacter) do
+		if (type(v) == "table") then
+			rawset(rval, k, table.copy(self.v))
+		else
+			rawset(rval, k, self[k])
+		end
+	end
+	for k,v in pairs(battleBonus) do
+		if (type(v) == "table") then
+			rawset(rval, k, table.copy(self.v))
+		else
+			rawset(rval, k, self[k])
+		end
+	end
+
+	return rval
+end
+
 
 ----------------------------------------
 -- giveItem()

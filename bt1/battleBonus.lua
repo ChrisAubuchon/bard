@@ -7,7 +7,8 @@ battleBonus = {
 	damageRandom	= 0,
 	damageBonus	= 0,
 	damagePenalty	= 0,
-	missTurn	= false
+	missTurn	= false,
+	disbelieve	= false
 }
 
 function battleBonus:resetBattleBonus()

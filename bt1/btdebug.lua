@@ -83,6 +83,7 @@ function btdebug.cityDebug()
 		text:print("3. Random battle\n")
 		text:print("4. Enter building\n")
 		text:print("5. Battle\n")
+		text:print("6. Add doppleganger\n")
 		text:printExit()
 		inkey = getkey()
 
@@ -104,6 +105,10 @@ function btdebug.cityDebug()
 			return
 		elseif (inkey == "5") then
 			btdebug.doBattle()
+		elseif (inkey == "6") then
+			text:clear()
+			battleMonster:doDoppleganger()
+			return
 		end
 
 	until (inkey == "E")

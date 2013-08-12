@@ -380,7 +380,6 @@ end
 
 
 function spells.attack(inAction)
-	local xxx_attack_spell = true
 	dprint("spells.attack()")
 	inAction.source:attackSpell(inAction)
 end
@@ -395,10 +394,22 @@ function spells.disbelieve(inAction)
 	-- disbelieve is kind of broken in the DOS version of BT1
 	--
 	if (inAction.source:isMonster()) then
-		text:printEllipsis()
-		local xxx_set_mon_disbelieve_flag = true
+		assert(inAction.inBattle.monParty.disbelieve)
+		inAction.inBattle.monParty.disbelieve = true
+	else
+		party.disbelieve = true
+		if (inAction.inData.revealDoppleganger) then
+			local c
+
+			for c in party:characterIterator() do
+				if (c.isDoppleganger) then
+					c.name = "DOPPLEGANGER   "
+				end
+			end
+			party:display()
+		end
 	end
-	local xxx_disbelieve = true
+	text:printEllipsis()
 end
 
 function spells.getSpellByAbbreviation(abbr)

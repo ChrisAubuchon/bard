@@ -1,7 +1,7 @@
 monsterParty = {}
 function monsterParty:new()
 	local self = {
-		size = 0
+		size		= 0
 	}
 
 	btTable.addParent(self, monsterParty, battleBonus, linkedList)
