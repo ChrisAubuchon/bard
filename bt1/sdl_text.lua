@@ -50,7 +50,7 @@ end
 -- print()
 ----------------------------------------
 function textBox:print(format, ...)
-	if (format == nil) then
+	if (type(format) ~= "string") then
 		error("nil format in textBox:print(). Probably a bad cdprint() call", 2)
 	end
 

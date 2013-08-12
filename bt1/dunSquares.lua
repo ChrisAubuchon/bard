@@ -122,7 +122,7 @@ function dunSquares:sphynx()
 	bigpic:setTitle("")
 	text:clear()
 	text:splashMessage("This is the High Priest's treasure chamber. his pet dragon, Sphynx, peers at you hungily. \"Sphynx eat now,\" it growls.")
-	self:battle("M_GREY_DRAGON")
+	self:battle("M_GREY_DRAGON", 1)
 end
 	
 ----------------------------------------
@@ -246,7 +246,7 @@ function dunSquares:vampireOldMan()
 	local function printIntro()
 		text:splashMessage("A wizened man appears before you, saying, \"Answer this riddle to pass:")
 		text:splashMessage("\"Once man alive\nNow living death\nIt drinketh blood\nN' stealeth breath.\"")
-		text:cdprint("Will you:\n\nAnswer riddle\nFight him")
+		text:cdprint(true,false,"Will you:\n\nAnswer riddle\nFight him")
 		text:printExit()
 	end
 
@@ -310,7 +310,7 @@ function dunSquares:shieldsMouth()
 	local answer
 
 	bigpic:drawImage("PIC_MAGICMOUTH")
-	bigpic.setTitle("Mouth...")
+	bigpic:setTitle("Mouth...")
 	text:splashMessage("A magic mouth on the wall speaks to you, saying this riddle:")
 	text:cdprint(true, false, "Past warscapes fought by men long dead, and treasures lost on bloodied fields, ")
 	text:print("the One god lifts his thorn-crowned head, and lays a strength on friendly..\n\n")
@@ -559,10 +559,10 @@ function dunSquares:onyxKey()
 		return
 	end
 
-	bigpic:setbigpic("PIC_KYLEARAN", "Kylearan")
+	bigpic:setBigpic("PIC_KYLEARAN", "Kylearan")
 	text:splash("Greetings! I am Kylearan, oh perseverent ones, the good wizard of Skara Brae. Put away your weapons, for I am your ally, not an enemy\n")
 	text:splashMessage("You have passed my tests, and can now continue on to your true quest, the source of evil in skara Brae -- Mangar the Dark, my nemesis\n")
-	text:splashMessage("Mangar's tower, at the opposite corner of Skara Brae, is a five level deathtrap, which can only be entered by use of an onxy key.\n")
+	text:splashMessage("Mangar's tower, at the opposite corner of Skara Brae, is a five level deathtrap, which can only be entered by use of an onyx key.\n")
 	text:cdprint(true, true, "Good luck, and remember, seeing is not always believing.\n\n")
 
 	c = party:giveItem("Onyx Key")
@@ -599,7 +599,7 @@ function dunSquares:silverCircle()
 		return	
 	end
 
-	bigpic:setImage("PIC_MAGICMOUTH", "Mouth...")
+	bigpic:setBigpic("PIC_MAGICMOUTH", "Mouth...")
 	text:cdprint(true, false, "A magic mouth on the wall speaks to you, saying this:\n\"")
 	text:print("Two shapes yours,\n one's around;\n Speak the shape\n and final found\"\n\n")
 
@@ -629,7 +629,7 @@ function dunSquares:masterKey()
 		return
 	end
 
-	bigpic:setImage("PIC_FRED", "Keymaster")
+	bigpic:setBigpic("PIC_FRED", "Keymaster")
 	text:splash("An old man is here, and says to you:\n\"I am the Keymaster. I have something to sell you for the low price of 50000 gold pieces.\"")
 	self.currentSquare.clearCode()
 
@@ -666,7 +666,7 @@ function dunSquares:masterKey()
 		if (inkey == "B") then
 			local c
 
-			text:cdprint(true, false, "Who wil pay?")
+			text:cdprint(true, false, "Who will pay?")
 			c = party:readSlot()
 			if (c) then
 				text:clear()
@@ -754,7 +754,7 @@ function dunSquares:sleepingDragons()
 		return
 	end
 
-	text:cdprint("Two sleeping dragons awaken at your passage. \"Hmm, humans for dinner again, ")
+	text:cdprint(true, false, "Two sleeping dragons awaken at your passage. \"Hmm, humans for dinner again, ")
 	text:splash("Gor,\" says the small one. \"Why don't we get any pork up here?\"")
 	self:battle("M_RED_DRAGON", 1, "M_RED_DRAGON", 1)
 end
@@ -833,7 +833,7 @@ function dunSquares:spectreSnare()
 		return
 	end
 
-	c = party:giveItem("Spectre Snare")
+	c = party:giveItem("Spectre Snare", true)
 	if (c) then
 		text:cdprint(true, true, "%s found something.", c.name)
 	end
@@ -881,7 +881,7 @@ end
 function dunSquares:mangarTreasure()
 	text:splashMessage("This is Mangar's treasure trove. Two dragons are here, and they're very hungry. I think you're in some real trouble.")
 
-	self:battle("M_BLACK_DRAGON", 1, "M_BLACK_DRAGON", 2)
+	self:battle("M_BLACK_DRAGON", 1, "M_BLACK_DRAGON", 1)
 end
 
 ----------------------------------------

@@ -315,7 +315,7 @@ function dun:changeLevel(inLevelDelta)
 	currentLevel = newDun
 end
 
-local function doDetect()
+function dun:doDetect()
 	local found = {}
 	local i
 	local sq
@@ -353,7 +353,7 @@ function dun:buildView()
 	bigpic:dunDisplay()
 
 	if (party.detect.active) then
-		doDetect()
+		self:doDetect()
 	end
 end
 

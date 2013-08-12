@@ -5,6 +5,325 @@ local __debugLog = "output.log"
 --local __debugFile = io.open(__debugLog, "w+")
 local __debugFile = io.stdout
 
+----------------------------------------
+-- specialSquare class
+----------------------------------------
+local specialSquare = {
+	squares = {}
+}
+
+function specialSquare:toArray()
+	return self.squares
+end
+
+function specialSquare:printName(inSquare)
+	text:print(inSquare.name)
+end
+
+specialSquare.squares = {
+	{
+		name		= "SpiderGod",
+		dungeon		= "cellars",
+		level		= 2,
+		y		= 10,
+		x		= 4,
+		direction	= "south"
+	},
+	{
+		name		= "LightBeam",
+		dungeon		= "cellars",
+		level		= 3,
+		y		= 5,
+		x		= 0,
+		direction	= "south"
+	},
+	{
+		name		= "TarjanMouth",
+		dungeon		= "cellars",
+		level		= 3,
+		y		= 3,
+		x		= 3,
+		direction	= "north"
+	},
+	{
+		name		= "LongStairs",
+		dungeon		= "cellars",
+		level		= 4,
+		y		= 16,
+		x		= 18,
+		direction	= "west"
+	},
+	{
+		name		= "Bashar",
+		dungeon		= "catacombs",
+		level		= 2,
+		y		= 11,
+		x		= 10,
+		direction	= "north"
+	},
+	{
+		name		= "Sphynx",
+		dungeon		= "catacombs",
+		level		= 2,
+		y		= 12,
+		x		= 6,
+		direction	= "north"
+	},
+	{
+		name		= "WitchKing",
+		dungeon		= "catacombs",
+		level		= 3,
+		y		= 18,
+		x		= 20,
+		direction	= "north"
+	},
+	{
+		name		= "CrystalSword",
+		dungeon		= "castle",
+		level		= 1,
+		y		= 0,
+		x		= 20,
+		direction	= "west"
+	},
+	{
+		name		= "RobedMen",
+		dungeon		= "castle",
+		level		= 1,
+		y		= 5,
+		x		= 16,
+		direction	= "north"
+	},
+	{
+		name		= "BaronThrone",
+		dungeon		= "castle",
+		level		= 1,
+		y		= 13,
+		x		= 9,
+		direction	= "north"
+	},
+	{
+		name		= "GuardCap",
+		dungeon		= "castle",
+		level		= 1,
+		y		= 17,
+		x		= 9,
+		direction	= "north"
+	},
+	{
+		name		= "SilverSq",
+		dungeon		= "castle",
+		level		= 2,
+		y		= 1,
+		x		= 0,
+		direction	= "south"
+	},
+	{
+		name		= "ShieldMouth",
+		dungeon		= "castle",
+		level		= 2,
+		y		= 0,
+		x		= 18,
+		direction	= "east"
+	},
+	{
+		name		= "OldMan",
+		dungeon		= "castle",
+		level		= 2,
+		y		= 9,
+		x		= 8,
+		direction	= "east"
+	},
+	{
+		name		= "Eye Statue",
+		dungeon		= "castle",
+		level		= 3,
+		y		= 0,
+		x		= 21,
+		direction	= "north"
+	},
+	{
+		name		= "Tavern Q",
+		dungeon		= "castle",
+		level		= 3,
+		y		= 5,
+		x		= 2,
+		direction	= "east"
+	},
+	{
+		name		= "Robe Check",
+		dungeon		= "castle",
+		level		= 3,
+		y		= 5,
+		x		= 11,
+		direction	= "east"
+	},
+	{
+		name		= "Crystal Stat",
+		dungeon		= "kylr",
+		level		= 1,
+		y		= 0,
+		x		= 4,
+		direction	= "north"
+	},
+	{
+		name		= "Sinister Q",
+		dungeon		= "kylr",
+		level		= 1,
+		y		= 2,
+		x		= 13,
+		direction	= "west"
+	},
+	{
+		name		= "Stone Golem",
+		dungeon		= "kylr",
+		level		= 1,
+		y		= 10,
+		x		= 14,
+		direction	= "west"
+	},
+	{
+		name		= "Onyx Key",
+		dungeon		= "kylr",
+		level		= 1,
+		y		= 12,
+		x		= 17,
+		direction	= "north"
+	},
+	{
+		name		= "Silver Tri",
+		dungeon		= "kylr",
+		level		= 1,
+		y		= 19,
+		x		= 2,
+		direction	= "north"
+	},
+	{
+		name		= "Mouth Four",
+		dungeon		= "mangar",
+		level		= 1,
+		y		= 13,
+		x		= 21,
+		direction	= "west"
+	},
+	{
+		name		= "Silver Circle",
+		dungeon		= "mangar",
+		level		= 2,
+		y		= 15,
+		x		= 3,
+		direction	= "east"
+	},
+	{
+		name		= "Seven Q",
+		dungeon		= "mangar",
+		level		= 3,
+		y		= 5,
+		x		= 10,
+		direction	= "south"
+	},
+	{
+		name		= "Master Key",
+		dungeon		= "mangar",
+		level		= 3,
+		y		= 12,
+		x		= 20,
+		direction	= "west"
+	},
+	{
+		name		= "Large Coffin",
+		dungeon		= "mangar",
+		level		= 4,
+		y		= 8,
+		x		= 11,
+		direction	= "east"
+	},
+	{
+		name		= "Sleeping Dragons",
+		dungeon		= "mangar",
+		level		= 4,
+		y		= 7,
+		x		= 21,
+		direction	= "north"
+	},
+	{
+		name		= "Thor Figurine",
+		dungeon		= "mangar",
+		level		= 4,
+		y		= 9,
+		x		= 21,
+		direction	= "west"
+	},
+	{
+		name		= "Swap Doors",
+		dungeon		= "mangar",
+		level		= 4,
+		y		= 20,
+		x		= 2,
+		direction	= "east"
+	},
+	{
+		name		= "BoilingLiq",
+		dungeon		= "mangar",
+		level		= 5,
+		y		= 10,
+		x		= 20,
+		direction	= "east"
+	},
+	{
+		name		= "MangarTreas",
+		dungeon		= "mangar",
+		level		= 5,
+		y		= 18,
+		x		= 0,
+		direction	= "south"
+	},
+	{
+		name		= "SilverDest",
+		dungeon		= "mangar",
+		level		= 5,
+		y		= 14,
+		x		= 10,
+		direction	= "north"
+	},
+	{
+		name		= "PossessChar",
+		dungeon		= "mangar",
+		level		= 5,
+		y		= 0,
+		x		= 20,
+		direction	= "north"
+	},
+	{
+		name		= "DeathMouth",
+		dungeon		= "mangar",
+		level		= 5,
+		y		= 0,
+		x		= 10,
+		direction	= "north"
+	},
+	{
+		name		= "SpectreSnare",
+		dungeon		= "mangar",
+		level		= 5,
+		y		= 21,
+		x		= 11,
+		direction	= "west"
+	},
+	{
+		name		= "Mangar",
+		dungeon		= "mangar",
+		level		= 5,
+		y		= 19,
+		x		= 10,
+		direction	= "north"
+	}
+}
+
+
+
+----------------------------------------
+-- dprint()
+----------------------------------------
 function dprint(format, ...)
 	if (__debug) then
 		local dstring
@@ -16,62 +335,27 @@ function dprint(format, ...)
 
 		if (select("#", ...) == 0) then
 			__debugFile:write(dstring .. tostring(format).."\n")
-			--print(dstring .. tostring(format))
 		else
 			__debugFile:write(dstring .. string.format(format,...).."\n")
-			--print(dstring .. string.format(format, ...))
 		end
 		__debugFile:flush()
 	end
 end
 
 function btdebug.enterDungeon()
-	local inkey
-	local level
+	local destination
 
-	repeat
-		text:cdprint(true, false, "1. Sewers\n")
-		text:print("2. Catacombs\n")
-		text:print("3. Castle\n")
-		text:print("4. Tower\n")
-		text:print("5. Mangar\n")
-		inkey = getkey()
+	destination = text:scrollingSelect(specialSquare, 
+						specialSquare.printName)
+	if (not destination) then
+		return false
+	end
 
-		if (inkey == "1") then
-			text:cdprint(true, false, "Enter level [1-4]:\n")
-			level = getkey()
-			if ((level > "0") and (level < "5")) then
-				city:enterDungeon("cellars", tonumber(level))
-				return true
-			end 
-		elseif (inkey == "2") then
-			text:cdprint(true, false, "Enter level [1-3]:\n")
-			level = getkey()
-			if ((level > "0") and (level < "4")) then
-				city:enterDungeon("catacombs", tonumber(level))
-				return true
-			end 
-		elseif (inkey == "3") then
-			text:cdprint(true, false, "Enter level [1-3]:\n")
-			level = getkey()
-			if ((level > "0") and (level < "4")) then
-				city:enterDungeon("castle", tonumber(level))
-				return true
-			end 
-		elseif (inkey == "4") then
-			city:enterDungeon("kylr", 1)
-			return true
-		elseif (inkey == "5") then
-			text:cdprint(true, false, "Enter level [1-5]:\n")
-			level = getkey()
-			if ((level > "0") and (level < "6")) then
-				city:enterDungeon("mangar", tonumber(level))
-				return true
-			end 
-		end
-	until (inkey == "E")
+	city:enterDungeon(destination.dungeon, destination.level)
+	currentLevel.direction = destination.direction
+	currentLevel.currentSquare = currentLevel:getSqXY(destination.x, destination.y)
 
-	return false
+	return true
 end
 
 function btdebug.cityDebug() 
@@ -182,6 +466,7 @@ function btdebug.dunDebug()
 		text:cdprint(true, false, "1. Square Flags\n")
 		text:print("2. Move to square\n")
 		text:print("3. Random Encounter\n")
+		text:print("4. Special Square\n")
 		text:printExit()
 		inkey = getkey()
 
@@ -192,6 +477,10 @@ function btdebug.dunDebug()
 			return
 		elseif (inkey == "3") then
 			battle:random()
+		elseif (inkey == "4") then
+			if (btdebug.enterDungeon()) then	
+				return	
+			end
 		end
 	until (inkey == "E")
 

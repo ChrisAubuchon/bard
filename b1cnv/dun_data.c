@@ -10,17 +10,17 @@ b1levData_t b1dungeons[] = {
 };
 
 uint8_t b1dun_randomMask[] = {
-	15, 15, 31, 31,
+	0, 15, 15, 31, 31,
 	31, 31, 31, 31
 };
 
 uint8_t b1dun_randomOffset[] = {
-	0, 8, 8, 16,
+	0, 0, 8, 8, 16,
 	32, 48, 64, 81
 };
 
 uint8_t b1dun_poisonDamage[] = {
-	1,2,4,6,
+	0, 1,2,4,6,
 	8,10,16,20
 };
 
@@ -35,7 +35,7 @@ uint8_t *b1dun_specialCode[] = {
 	"currentLevel:spiderGod()",
 	"currentLevel:lightBeam()",
 	"currentLevel:tarjanMouth()",
-	"currentLevel:bashasKavilor()",
+	"currentLevel:basharKavilor()",
 	"currentLevel:sphynx()",
 	"currentLevel:witchKing()",
 	"--doNothing",
@@ -56,7 +56,7 @@ uint8_t *b1dun_specialCode[] = {
 	"currentLevel:sinisterMouth()",
 	"currentLevel:silverTriangle()",
 	"currentLevel:crystalStatue()",
-	"currentLevel:onxyKey()",
+	"currentLevel:onyxKey()",
 	"--doNothing",
 	"currentLevel:mouthFour()",
 	"currentLevel:silverCircle()",

@@ -108,6 +108,7 @@ function getActionTarget(inTargetOptions, inTargets)
 		end
 	end
 
+	dprint("inTargets: " .. tostring(inTargets))
 	if ((inTargets) and 
             ((inTargetOptions.monster) or (inTargetOptions.melee))) then
 		local i

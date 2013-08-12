@@ -785,7 +785,12 @@ end
 -- Get an item to use from the character
 ----------------------------------------
 function character:getUseItem(inAction)
+	local target	= false
 	local item
+
+	if (inAction.inBattle) then
+		target = inAction.inBattle.monParty
+	end
 
 	if (self:isDisabled()) then
 		return false
@@ -815,7 +820,7 @@ function character:getUseItem(inAction)
 	if (item.targetted) then
 		text:cdprint(true, false, "Use on:")
 
-		inAction.target = getActionTarget(item.targetted, false)
+		inAction.target = getActionTarget(item.targetted, target)
 		if (not inAction.target) then
 			text:clear()
 			return false
@@ -931,7 +936,7 @@ function character:castSpell(inAction)
 
 	if (fizzle) then
 		party:display()
-		text:print(false, true, " but it fizzles!\n")
+		text:cdprint(false, true, " but it fizzles!\n")
 		return
 	end
 
