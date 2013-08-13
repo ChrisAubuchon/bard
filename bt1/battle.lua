@@ -18,10 +18,13 @@ function battle:random()
 	b.isPartyAttack = false
 	b.monParty = monsterParty.new()
 	mgroups = currentLevel:getBattleOpponents()
+	dprint(mgroups)
 	for _,mgroup in ipairs(mgroups) do
+		dprint(mgroup)
 		b.monParty:addMonsterGroup(monsterGroup:new(mgroup, false))
 	end
 
+	dprint(b.monParty.head)
 	return b:start()
 end
 

@@ -42,7 +42,10 @@ end
 ----------------------------------------
 function monsterParty:addMonsterGroup(inGroup)
 	self.size = self.size + 1
+	dprint(inGroup)
 	self:insertTail(inGroup)
+	dprint(self.head)
+	dprint(self.tail)
 end
 
 ----------------------------------------

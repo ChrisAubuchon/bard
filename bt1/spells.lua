@@ -253,7 +253,7 @@ function spells.summon(inAction)
 	local inData	= inAction.inData
 	local summon	= {}
 
-	summon.illusionFlag = inData.illusionFlag
+	summon.isIllusion = inData.isIllusion
 	summon.type = inData.summons[rnd_xdy(1,#inData.summons)]
 
 	if (inAction.source:isCharacter()) then

@@ -424,14 +424,17 @@ function btdebug.enterBuilding()
 end
 
 function btdebug.toggleSquareFlag(inSqFlag)
+	local frontSq
+
 	if (not currentLevel:isDungeon()) then
 		return
 	end
 
-	if (currentLevel.currentSquare[inSqFlag]) then
-		currentLevel.currentSquare[inSqFlag] = false
+	frontSq = currentLevel.currentSquare[currentLevel.direction].path
+	if (frontSq[inSqFlag]) then
+		frontSq[inSqFlag] = false
 	else
-		currentLevel.currentSquare[inSqFlag] = true
+		frontSq[inSqFlag] = true
 	end
 end
 

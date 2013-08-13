@@ -2,8 +2,10 @@
 #include <dehuf.h>
 #include <cnv_dun.h>
 #include <cnv_item.h>
+#include <cnv_trap.h>
 #include <dun_level.h>
 #include <dun.h>
+#include <trap.h>
 #include <item.h>
 
 
@@ -69,17 +71,20 @@ static uint8_t levelNumber[] = {
 /*					*/
 /****************************************/
 
-static int8_t wrapNumber(int8_t in);
-static btstring_t *getNodeLabel(uint16_t x, uint16_t y);
-static uint32_t getEdge(int32_t x, int32_t y, uint32_t dir);
-static uint32_t getVertex(int32_t x, int32_t y);
-static void setEdgeWall(dungeonLevel_t *l, dunEdge_t *edge, 
-			int32_t x, int32_t y, uint8_t square, uint8_t dir);
-static dunLevel_t *convertDunLevel(btstring_t *data, uint32_t index);
-static void convertStairs(dungeonLevel_t *l, uint32_t index, dunVertex_t *v,
-				uint32_t dunIndex);
-static void addItems(dunLevel_t *dl);
-static void addMonsters(dunLevel_t *dl);
+static int8_t		wrapNumber(int8_t in);
+static btstring_t	*getNodeLabel(uint16_t x, uint16_t y);
+static uint32_t		getEdge(int32_t x, int32_t y, uint32_t dir);
+static uint32_t		getVertex(int32_t x, int32_t y);
+static void 		setEdgeWall(dungeonLevel_t *l, dunEdge_t *edge, 
+				int32_t x, int32_t y, uint8_t square, 
+				uint8_t dir);
+static dunLevel_t	*convertDunLevel(btstring_t *data, uint32_t index);
+static void 		convertStairs(dungeonLevel_t *l, uint32_t index, 
+					dunVertex_t *v, uint32_t dunIndex);
+
+static void 		addItems(dunLevel_t *dl);
+static void 		addMonsters(dunLevel_t *dl);
+static void 		addTraps(dunLevel_t *dl);
 
 /****************************************/
 /*					*/
@@ -263,7 +268,7 @@ static void convertStairs(dungeonLevel_t *l, uint32_t index, dunVertex_t *v,
 	}
 
 	v->isStairs = bts_sprintf(stairCode[stairCodeIndex],
-		direction ? "Down" : "Up",
+		direction ? "down" : "up",
 		newLevel
 		);
 }
@@ -410,10 +415,27 @@ static dunLevel_t *convertDunLevel(btstring_t *data, uint32_t dunIndex)
 					);
 			}
 		}
+
+		if (l->dun_reqBattle[i].sqNorth != 0xff) {
+			btstring_t *enc;
+
+			enc = bts_sprintf("battle:new(\"%s\", %d)",
+					getMonMacro(l->dun_reqBatMon[i].monName-1),
+					l->dun_reqBatMon[i].monSize
+					);
+			setSquareMember(
+					dl, 
+					l->dun_reqBattle[i].sqEast,
+					l->dun_reqBattle[i].sqNorth,
+					isForcedBattle,
+					enc
+					);
+		}
 	}
 
 	addItems(dl);
 	addMonsters(dl);
+	addTraps(dl);
 
 	dl->path = mkJsonPath("");
 
@@ -432,11 +454,54 @@ static void addItems(dunLevel_t *dl)
 
 static void addMonsters(dunLevel_t *dl)
 {
-	uint32_t i;
+	uint32_t	i;
+	int32_t		offset;
 
 	for (i = 0; i <= b1dun_randomMask[dl->level]; i++) {
-		cnvList_add(dl->monsters,
-			getMonsterName(b1dun_randomOffset[dl->level] + i - 1));
+		offset = b1dun_randomOffset[dl->level] + i - 1;
+
+		if (offset < 0)
+			offset = 0;
+		cnvList_add(dl->monsters, getMonsterName(offset));
+	}
+}
+
+static void addTraps(dunLevel_t *dl)
+{
+	uint32_t	level = dl->level - 1;
+	trap_t		*t;
+	uint32_t	i;
+
+	/* Floor traps */
+	for (i = 0; i < 8; i++) {
+		t = trap_new();
+
+		t->name = bts_strcpy(dun_trap_macros[i]);
+		t->effectString = bts_strcpy(dun_trap_strings[i]);
+		t->partyFlag = dun_trap_partyFlag[i];
+		t->spAttack = dun_trap_spAttack[i];
+		t->ndice = dun_trap_dice[i] * dl->level;
+		t->dieval = 4;
+
+		getSavingThrow((level << 4) + 1, &t->sv_lo, &t->sv_hi);
+
+		cnvList_add(dl->floorTraps, t);
+	}
+
+	/* Chest traps */
+	for (i = 0; i < 7; i++) {
+		t = trap_new();
+
+		t->name = bts_strcpy(chest_trap_strings[i]);
+		t->effectString = NULL;
+		t->partyFlag = (i < 3) ? 1 : 0;
+		t->spAttack = chest_trap_spAttack[i];
+		t->ndice = chest_trap_dice[i] * dl->level;
+		t->dieval = 4;
+
+		getSavingThrow((level << 4) + 0x10, &t->sv_lo, &t->sv_hi);
+
+		cnvList_add(dl->chestTraps, t);
 	}
 }
 

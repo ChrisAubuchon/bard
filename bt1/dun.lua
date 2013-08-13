@@ -427,6 +427,70 @@ function dun:moveForward()
 	self:doSpinnerCheck()
 end
 
+local trapSave = {}
+function trapSave:calculateSavingThrow()
+	return rnd_between_xy_inc(self.saveLo, self.saveHi)
+end
+
+----------------------------------------
+-- doFloorTrap()
+----------------------------------------
+function dun:doFloorTrap()
+	local trap
+	local action
+
+	trap = self.floorTraps[rnd_xdy(1,#self.floorTraps)]
+	btTable.addParent(trap, trapSave)
+	btTable.setClassMetatable(trap)
+
+	text:cdprint(false, true, trap.effectString)
+
+	local function doTrapAttack(inTrap, inAction)
+		local save
+		local half
+
+		inAction.source = inTrap
+		inAction.outData.damage = rnd_xdy(inTrap.ndice, inTrap.dieval)
+		inAction.inData.specialAtatck = inTrap.specialAttack
+
+		save, half = inAction:savingThrow()
+		if (not save) then
+			if (half) then
+				inAction.outData.damage = bit32.rshift(inAction.outData.damage)
+			end
+			inAction.target:doDamage(inAction)
+		end
+	end
+
+
+	if (trap.isPartyAttack) then
+		local c
+
+		for c in party:iterator() do
+			action = btAction:new()
+			action.target = c
+			doTrapAttack(trap, action)
+			if (globals.partyDied) then	
+				return	
+			end
+		end
+	else
+		action = btAction:new()
+
+		action.target = party:randomMeleeCharacter()
+		doTrapAttack(trap, action)
+		if (globals.partyDied) then
+			return	
+		end
+	end
+
+	party:display()
+	text:clear()
+end
+
+----------------------------------------
+-- runSquareCode()
+----------------------------------------
 function dun:runSquareCode()
 	local curSq = self.currentSquare
 
@@ -452,6 +516,9 @@ function dun:runSquareCode()
 	end
 	if (curSq.code) then
 		executeString(curSq.code)
+		if (globals.partyDied) then
+			return
+		end
 		text:clear()
 		self:setTitle()
 		self:buildView()
@@ -493,20 +560,30 @@ function dun:runSquareCode()
 		end
 	end
 	if (curSq.isForcedBattle) then
-		local xxx_do_forced_battle = true
+		executeString(curSq.isForcedBattle)
+		if (globals.partyDied) then
+			return
+		end
 
-		text:cdprint(true, false, "isForcedBattle")
+		curSq.isForcedBattle = false
 		text:clear()
 		self:setTitle()
 		self:buildView()
 	end
 	if (curSq.isTrap) then
-		local xxx_do_trap_code = true
+		if (not (party.levitate.active and (rnd_and_x(3) ~= 0))) then
+			text:cdprint(true, false, "TRAP! You've hit a ")
+		
+			self:doFloorTrap()
+			if (globals.partyDied) then
+				return
+			end
 
-		text:cdprint(true, false, "isTrap")
-		text:clear()
-		self:setTitle()
-		self:buildView()
+			text:clear()
+			self:setTitle()
+			self:buildView()
+			curSq.isTrap = false
+		end
 	end
 	if (curSq.isStairs) then
 		if not (self.squareFlags["seenStairs"]) then

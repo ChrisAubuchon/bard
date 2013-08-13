@@ -2,6 +2,7 @@
 #include <cnv_dun.h>
 #include <cnv_int.h>
 #include <cnv_item.h>
+#include <cnv_trap.h>
 #include <gl_xlist.h>
 #include <gl_array_list.h>
 #include <gl_linkedhash_list.h>
@@ -127,10 +128,8 @@ static void dunLevel_free(const void *vdl)
 	}
 	cnvList_free(dl->items);
 	cnvList_free(dl->monsters);
-#if 0
-	cnvlist_free(dl->chestTraps);
+	cnvList_free(dl->chestTraps);
 	cnvList_free(dl->floorTraps);
-#endif
 	bts_free(dl->name);
 	bts_free(dl->title);
 	bts_free(dl->path);
@@ -158,6 +157,8 @@ static void dunLevel_toJson(const void *vdl)
 
 	json_object_set_new(root,"items", cnvList_toJsonArray(dl->items));
 	json_object_set_new(root,"monsters", cnvList_toJsonArray(dl->monsters));
+	json_object_set_new(root,"floorTraps",cnvList_toJsonArray(dl->floorTraps));
+	json_object_set_new(root,"chestTraps",cnvList_toJsonArray(dl->chestTraps));
 
 	fname = bts_sprintf("%s/%s.json", dl->path->buf, dl->name->buf);
 
@@ -264,6 +265,7 @@ static json_t *vertices_to_json(dunLevel_t *dl)
 		JSON_BTSTRING_IF(vertexNode,"isMessage",vertex->isMessage);
 		JSON_BTSTRING_IF(vertexNode,"isStairs",	vertex->isStairs);
 		JSON_BTSTRING_IF(vertexNode,"isTeleport", vertex->isTeleport);
+		JSON_BTSTRING_IF(vertexNode,"isForcedBattle", vertex->isForcedBattle);
 		JSON_BTSTRING_IF(vertexNode,"code", vertex->code);
 		json_object_set_new(vertices, vertex->label->buf, vertexNode);
 	}
@@ -398,12 +400,8 @@ dunLevel_t *dunLevel_new(void)
 
 	rval->items = cnvList_btstring();
 	rval->monsters = cnvList_btstring();
-#if 0
-	rlva->floorTraps = cnvList_new(levelTrap_free, levelTrap_toJson,
-					levelTrap_toName);
-	rval->chestTraps = cnvList_new(levelTrap_free, levelTrap_toJson,
-					levelTrap_toName);
-#endif
+	rval->floorTraps = trapList_new();
+	rval->chestTraps = trapList_new();
 
 	return rval;
 }

@@ -93,8 +93,11 @@ function battlePlayer:doMeleeAttack(inAction)
 	local outData	= inAction.outData
 
 	if (target:isSummon()) then
-		local xxx_isIllusion_check = true
-		party.summon.isHostile = true
+		dprint(party.summon.isHostile)
+		if (not target.isIllusion) then
+			party.summon.isHostile = true
+		end
+		dprint(party.summon.isHostile)
 	end
 
 	if (target:isCharacter() and target:isDisabled()) then

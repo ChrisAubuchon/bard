@@ -19,7 +19,7 @@ int main(int argc, char **argv)
   extern char *optarg;
   int c;
 
-  while ((c = getopt(argc,argv,"cdhgimst")) != EOF) {
+  while ((c = getopt(argc,argv,"cdhgims")) != EOF) {
     switch (c) {
 	case 'c':
 		convertClasses();
@@ -44,9 +44,6 @@ int main(int argc, char **argv)
       case 's':
 	convertSpells();
 	convertSongs();
-	break;
-      case 't':
-	convertTraps();
 	break;
     }
   }

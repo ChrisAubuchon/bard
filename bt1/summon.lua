@@ -7,6 +7,8 @@ summon = {}
 
 function summon:new(inName)
 	local self = {
+		isHostile	= false,
+		isIllusion	= false
 	}
 
 	btTable.addParent(self, summon, battleSummon, monster:new(inName), 

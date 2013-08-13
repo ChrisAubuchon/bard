@@ -34,6 +34,7 @@ libcnv_a_SOURCES = \
 	cnv_spell.h	\
 	cnv_spell.c	\
 	cnv_trap.h	\
+	cnv_trap.c	\
 	cnv_list.h	\
 	cnv_list.c	\
 	cnv_class.h	\
@@ -44,8 +45,7 @@ libcnv_a_SOURCES = \
 	bt_gfx.h	\
 	cnv_effect.h	\
 	cnv_effect.c	\
-	common.c	\
 	gfx_view.c	\
-	trap.c	
+	common.c
 	
 libcnv_a_CFLAGS = $(AM_CFLAGS)

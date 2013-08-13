@@ -96,6 +96,4 @@ typedef btstring_t *	(*btFunc_toName)(const void *data);
 		}							\
 	} while(0)
 
-#define Bitfield(x,n)	unsigned x:n
-
 #endif

@@ -69,11 +69,11 @@ am_libcnv_a_OBJECTS = libcnv_a-bigpic_gfx.$(OBJEXT) \
 	libcnv_a-cnv_dun.$(OBJEXT) libcnv_a-cnv_function.$(OBJEXT) \
 	libcnv_a-cnv_gfx.$(OBJEXT) libcnv_a-cnv_item.$(OBJEXT) \
 	libcnv_a-cnv_mon.$(OBJEXT) libcnv_a-cnv_song.$(OBJEXT) \
-	libcnv_a-cnv_spell.$(OBJEXT) libcnv_a-cnv_list.$(OBJEXT) \
-	libcnv_a-cnv_class.$(OBJEXT) libcnv_a-cnv_race.$(OBJEXT) \
-	libcnv_a-bt_gfx.$(OBJEXT) libcnv_a-cnv_effect.$(OBJEXT) \
-	libcnv_a-common.$(OBJEXT) libcnv_a-gfx_view.$(OBJEXT) \
-	libcnv_a-trap.$(OBJEXT)
+	libcnv_a-cnv_spell.$(OBJEXT) libcnv_a-cnv_trap.$(OBJEXT) \
+	libcnv_a-cnv_list.$(OBJEXT) libcnv_a-cnv_class.$(OBJEXT) \
+	libcnv_a-cnv_race.$(OBJEXT) libcnv_a-bt_gfx.$(OBJEXT) \
+	libcnv_a-cnv_effect.$(OBJEXT) libcnv_a-gfx_view.$(OBJEXT) \
+	libcnv_a-common.$(OBJEXT)
 libcnv_a_OBJECTS = $(am_libcnv_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -549,6 +549,7 @@ libcnv_a_SOURCES = \
 	cnv_spell.h	\
 	cnv_spell.c	\
 	cnv_trap.h	\
+	cnv_trap.c	\
 	cnv_list.h	\
 	cnv_list.c	\
 	cnv_class.h	\
@@ -559,9 +560,8 @@ libcnv_a_SOURCES = \
 	bt_gfx.h	\
 	cnv_effect.h	\
 	cnv_effect.c	\
-	common.c	\
 	gfx_view.c	\
-	trap.c	
+	common.c
 
 libcnv_a_CFLAGS = $(AM_CFLAGS)
 all: all-am
@@ -627,11 +627,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-cnv_race.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-cnv_song.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-cnv_spell.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-cnv_trap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-common.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-d3comp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-dehuf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-gfx_view.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-trap.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -815,6 +815,20 @@ libcnv_a-cnv_spell.obj: cnv_spell.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-cnv_spell.obj `if test -f 'cnv_spell.c'; then $(CYGPATH_W) 'cnv_spell.c'; else $(CYGPATH_W) '$(srcdir)/cnv_spell.c'; fi`
 
+libcnv_a-cnv_trap.o: cnv_trap.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-cnv_trap.o -MD -MP -MF $(DEPDIR)/libcnv_a-cnv_trap.Tpo -c -o libcnv_a-cnv_trap.o `test -f 'cnv_trap.c' || echo '$(srcdir)/'`cnv_trap.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libcnv_a-cnv_trap.Tpo $(DEPDIR)/libcnv_a-cnv_trap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cnv_trap.c' object='libcnv_a-cnv_trap.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-cnv_trap.o `test -f 'cnv_trap.c' || echo '$(srcdir)/'`cnv_trap.c
+
+libcnv_a-cnv_trap.obj: cnv_trap.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-cnv_trap.obj -MD -MP -MF $(DEPDIR)/libcnv_a-cnv_trap.Tpo -c -o libcnv_a-cnv_trap.obj `if test -f 'cnv_trap.c'; then $(CYGPATH_W) 'cnv_trap.c'; else $(CYGPATH_W) '$(srcdir)/cnv_trap.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libcnv_a-cnv_trap.Tpo $(DEPDIR)/libcnv_a-cnv_trap.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cnv_trap.c' object='libcnv_a-cnv_trap.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-cnv_trap.obj `if test -f 'cnv_trap.c'; then $(CYGPATH_W) 'cnv_trap.c'; else $(CYGPATH_W) '$(srcdir)/cnv_trap.c'; fi`
+
 libcnv_a-cnv_list.o: cnv_list.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-cnv_list.o -MD -MP -MF $(DEPDIR)/libcnv_a-cnv_list.Tpo -c -o libcnv_a-cnv_list.o `test -f 'cnv_list.c' || echo '$(srcdir)/'`cnv_list.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libcnv_a-cnv_list.Tpo $(DEPDIR)/libcnv_a-cnv_list.Po
@@ -885,20 +899,6 @@ libcnv_a-cnv_effect.obj: cnv_effect.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-cnv_effect.obj `if test -f 'cnv_effect.c'; then $(CYGPATH_W) 'cnv_effect.c'; else $(CYGPATH_W) '$(srcdir)/cnv_effect.c'; fi`
 
-libcnv_a-common.o: common.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-common.o -MD -MP -MF $(DEPDIR)/libcnv_a-common.Tpo -c -o libcnv_a-common.o `test -f 'common.c' || echo '$(srcdir)/'`common.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libcnv_a-common.Tpo $(DEPDIR)/libcnv_a-common.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='common.c' object='libcnv_a-common.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-common.o `test -f 'common.c' || echo '$(srcdir)/'`common.c
-
-libcnv_a-common.obj: common.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-common.obj -MD -MP -MF $(DEPDIR)/libcnv_a-common.Tpo -c -o libcnv_a-common.obj `if test -f 'common.c'; then $(CYGPATH_W) 'common.c'; else $(CYGPATH_W) '$(srcdir)/common.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libcnv_a-common.Tpo $(DEPDIR)/libcnv_a-common.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='common.c' object='libcnv_a-common.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-common.obj `if test -f 'common.c'; then $(CYGPATH_W) 'common.c'; else $(CYGPATH_W) '$(srcdir)/common.c'; fi`
-
 libcnv_a-gfx_view.o: gfx_view.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-gfx_view.o -MD -MP -MF $(DEPDIR)/libcnv_a-gfx_view.Tpo -c -o libcnv_a-gfx_view.o `test -f 'gfx_view.c' || echo '$(srcdir)/'`gfx_view.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libcnv_a-gfx_view.Tpo $(DEPDIR)/libcnv_a-gfx_view.Po
@@ -913,19 +913,19 @@ libcnv_a-gfx_view.obj: gfx_view.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-gfx_view.obj `if test -f 'gfx_view.c'; then $(CYGPATH_W) 'gfx_view.c'; else $(CYGPATH_W) '$(srcdir)/gfx_view.c'; fi`
 
-libcnv_a-trap.o: trap.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-trap.o -MD -MP -MF $(DEPDIR)/libcnv_a-trap.Tpo -c -o libcnv_a-trap.o `test -f 'trap.c' || echo '$(srcdir)/'`trap.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libcnv_a-trap.Tpo $(DEPDIR)/libcnv_a-trap.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='trap.c' object='libcnv_a-trap.o' libtool=no @AMDEPBACKSLASH@
+libcnv_a-common.o: common.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-common.o -MD -MP -MF $(DEPDIR)/libcnv_a-common.Tpo -c -o libcnv_a-common.o `test -f 'common.c' || echo '$(srcdir)/'`common.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libcnv_a-common.Tpo $(DEPDIR)/libcnv_a-common.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='common.c' object='libcnv_a-common.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-trap.o `test -f 'trap.c' || echo '$(srcdir)/'`trap.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-common.o `test -f 'common.c' || echo '$(srcdir)/'`common.c
 
-libcnv_a-trap.obj: trap.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-trap.obj -MD -MP -MF $(DEPDIR)/libcnv_a-trap.Tpo -c -o libcnv_a-trap.obj `if test -f 'trap.c'; then $(CYGPATH_W) 'trap.c'; else $(CYGPATH_W) '$(srcdir)/trap.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libcnv_a-trap.Tpo $(DEPDIR)/libcnv_a-trap.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='trap.c' object='libcnv_a-trap.obj' libtool=no @AMDEPBACKSLASH@
+libcnv_a-common.obj: common.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-common.obj -MD -MP -MF $(DEPDIR)/libcnv_a-common.Tpo -c -o libcnv_a-common.obj `if test -f 'common.c'; then $(CYGPATH_W) 'common.c'; else $(CYGPATH_W) '$(srcdir)/common.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libcnv_a-common.Tpo $(DEPDIR)/libcnv_a-common.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='common.c' object='libcnv_a-common.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-trap.obj `if test -f 'trap.c'; then $(CYGPATH_W) 'trap.c'; else $(CYGPATH_W) '$(srcdir)/trap.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-common.obj `if test -f 'common.c'; then $(CYGPATH_W) 'common.c'; else $(CYGPATH_W) '$(srcdir)/common.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

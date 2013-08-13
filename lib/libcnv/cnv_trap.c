@@ -8,6 +8,10 @@
 /*				*/
 /********************************/
 
+static void		trap_free(const void *vt);
+static json_t		*trap_toJson(const void *vt);
+static btstring_t	*trap_toName(const void *vt);
+
 /********************************/
 /*				*/
 /* Static Variables		*/
@@ -20,12 +24,73 @@
 /*				*/
 /********************************/
 
+static void trap_free(const void *vt)
+{
+	trap_t		*t = (trap_t *)vt;
+
+	if (t == NULL)
+		return;
+
+	bts_free(t->name);
+	bts_free(t->effectString);
+
+	free(t);
+}
+
+static json_t *trap_toJson(const void *vt)
+{
+	trap_t		*t = (trap_t *)vt;
+	json_t		*node;
+
+	node = json_object();
+
+	JSON_BTSTRING(node, "name", 		t->name);
+	JSON_BTSTRING_IF(node, "effectString",	t->effectString);
+	JSON_NUMBER(node,   "ndice",		t->ndice);
+	JSON_NUMBER(node,   "dieval",		t->dieval);
+	JSON_STRING_IF(node,"specialAttack",	getSpecialAttack(t->spAttack));
+	JSON_NUMBER(node, "saveLo",	t->sv_lo);
+	JSON_NUMBER(node, "saveHi",	t->sv_hi);
+	JSON_BOOL(node, "isPartyAttack",	t->partyFlag);
+	JSON_NUMBER_IF_NOT_ZERO(node, "saveChance",	t->sv_chance);
+	JSON_NUMBER_IF_NOT_ZERO(node, "saveHalf",	t->sv_half);
+
+	return node;
+}
+
+static btstring_t *trap_toName(const void *vt)
+{
+	trap_t		*t = (trap_t *)vt;
+
+	return t->name;
+}
+
 /********************************/
 /*				*/
-/* Constructor/Destructor	*/
+/* Public interface		*/
 /*				*/
 /********************************/
 
+trap_t *trap_new(void)
+{
+	trap_t		*rval;
+
+	rval = (trap_t *)xzalloc(sizeof(trap_t));
+
+	return rval;
+}
+
+cnvList_t *trapList_new(void)
+{
+	return cnvList_new(trap_free, trap_toJson, trap_toName);
+}
+
+json_t *trapList_toJson(cnvList_t *tl)
+{
+	return cnvList_toJsonArray(tl);
+}
+
+#if 0
 trapList_t *trapList_new(uint8_t ntraps)
 {
   trapList_t *rval;
@@ -98,3 +163,4 @@ void outputTrapListXML(uint8_t indent, trapList_t *tl)
   }
 }
 
+#endif

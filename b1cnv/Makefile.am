@@ -43,7 +43,6 @@ b1cnv_SOURCES = 	\
 	spell.h	\
 	spell_data.c	\
 	summon_data.c	\
-	trap.c	\
 	trap.h	\
 	trap_data.c
 

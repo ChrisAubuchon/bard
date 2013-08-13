@@ -328,34 +328,43 @@ static void addItems(btcity_t *city)
 {
 	uint32_t	i;
 
-	for (i = 0; i <= b1dun_randomMask[0]; i++) {
+	for (i = 0; i <= b1dun_randomMask[1]; i++) {
 		cnvList_add(city->day->items,
-			getItemName(b1dun_randomOffset[0] + i));
+			getItemName(b1dun_randomOffset[1] + i));
 	}
 
-	for (i = 0; i <= b1dun_randomMask[1]; i++) {
+	for (i = 0; i <= b1dun_randomMask[2]; i++) {
 		cnvList_add(city->night->items,
-				getItemName(b1dun_randomOffset[1] + i));
+				getItemName(b1dun_randomOffset[2] + i));
 	}
 }
 
 static void addMonsters(btcity_t *city)
 {
 	uint32_t	i;
+	int32_t		offset;
 
 	/*
 	 * The selection of the monster group uses an array
 	 * that starts at [1]. If the random result is 0, BTI
 	 * just increments.
 	 */
-	for (i = 1; i <= b1dun_randomMask[0]; i++) {
-		cnvList_add(city->day->monsters,
-			getMonsterName(b1dun_randomOffset[0] + i - 1));
+	for (i = 0; i <= b1dun_randomMask[1]; i++) {
+		offset = b1dun_randomOffset[1] + i - 1;
+
+		if (offset < 0)
+			offset = 0;
+
+		cnvList_add(city->day->monsters, getMonsterName(offset));
 	}
 
-	for (i = 0; i <= b1dun_randomMask[1]; i++) {
-		cnvList_add(city->night->monsters,
-			getMonsterName(b1dun_randomOffset[1] + i - 1));
+	for (i = 0; i <= b1dun_randomMask[2]; i++) {
+		offset = b1dun_randomOffset[2] + i - 1;
+
+		if (offset < 0)
+			offset = 0;
+
+		cnvList_add(city->night->monsters, getMonsterName(offset));
 	}
 }
 
