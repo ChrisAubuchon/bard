@@ -17,10 +17,6 @@ function battleMonster:doAction(inAction)
 		if (attack.type == "melee") then
 			if (self:inMeleeRange()) then
 				inAction.inData = attack.action.inData
-				if (inAction.target:isDisabled()) then
-					return
-				end
-				text:print("A ")
 				self:meleeAttack(inAction)
 				return
 			end
@@ -62,7 +58,11 @@ function battleMonster:meleeAttack(inAction)
 	local outData	= inAction.outData
 
 	dprint("battleMonster:meleeAttack() inData: " .. tostring(inData))
-	text:print("%s%s%s", 
+	if (not inAction:validateTarget()) then
+		return
+	end
+
+	text:print("A %s%s%s", 
 			self.singular,
 			inData.meleeString[rnd_xdy(1,2)],
 			inAction.target:getSingularName()

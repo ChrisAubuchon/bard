@@ -92,23 +92,9 @@ function battlePlayer:doMeleeAttack(inAction)
 	local inData	= inAction.inData
 	local outData	= inAction.outData
 
-	if (target:isSummon()) then
-		dprint(party.summon.isHostile)
-		if (not target.isIllusion) then
-			party.summon.isHostile = true
-		end
-		dprint(party.summon.isHostile)
-	end
-
-	if (target:isCharacter() and target:isDisabled()) then
-		return	
-	end
-
-	if (target.size == 0) then
-		dprint("Target group is gone")
+	if (not inAction:validateTarget()) then
 		return
 	end
-	dprint("target: " .. tostring(target))
 
 	text:print(self:getSingularName())
 	if (self:isTypeEquipped("Weapon")) then
@@ -152,6 +138,7 @@ function battlePlayer:checkMeleeHits(inAction)
 	local sourceAttack
 	local bonus
 
+	-- xxx - Look in to making this block a class method
 	targetAC = target.ac
 	if (not target:isCharacter()) then
 		targetAC = targetAC + target.acPenalty
@@ -159,6 +146,7 @@ function battlePlayer:checkMeleeHits(inAction)
 			targetAC = 10
 		end
 	end
+	--
 
 	sourceAttack = self.ac
 	sourceAttack = sourceAttack - classes.get(self.class, "meleeBonus")

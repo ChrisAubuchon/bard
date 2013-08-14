@@ -39,6 +39,30 @@ function btAction:dump()
 end
 
 ----------------------------------------
+-- validateTarget()
+----------------------------------------
+function btAction:validateTarget()
+	if (self.target:isSummon() and self.source:isCharacter()) then
+		if (not self.target.isIllusion) then
+			self.target.isHostile = true
+		end
+	end
+
+	if (self.target:isCharacter() and self.target:isDisabled()) then
+		dprint("Character target is disabled")
+		return false
+	end
+
+	if (self.target:isMonster() and self.target.size == 0) then
+		dprint("Monster group is gone")
+		return false
+	end
+
+	return true
+end
+
+
+----------------------------------------
 -- savingThrow
 --
 -- Calculate the saving throw value for
@@ -71,6 +95,9 @@ function btAction:savingThrow()
 	return true, false
 end
 
+----------------------------------------
+-- groupSavingThrow()
+----------------------------------------
 function btAction:groupSavingThrow()
 	if (self.source:isMonster()) then
 		self.target = party:getFirstCharacter()
@@ -79,6 +106,9 @@ function btAction:groupSavingThrow()
 	return self:savingThrow()
 end
 
+----------------------------------------
+-- printDamage()
+----------------------------------------
 function btAction:printDamage()
 	text:print("for %d point%s of damage",
 		self.outData.damage,
@@ -86,6 +116,9 @@ function btAction:printDamage()
 		)
 end
 
+----------------------------------------
+-- doDamage()
+----------------------------------------
 function btAction:doDamage()
 	if (self.target:doDamage(self)) then
 		if (not globals.partyDied) then
@@ -97,6 +130,9 @@ function btAction:doDamage()
 	end
 end
 
+----------------------------------------
+-- singleTargetSpell()
+----------------------------------------
 function btAction:singleTargetSpell()
 	local target		= self.target
 	local source		= self.source
@@ -169,6 +205,9 @@ function btAction:singleTargetSpell()
 	timer:delay(3)
 end
 
+----------------------------------------
+-- multiTargetSpell
+----------------------------------------
 function btAction:multiTargetSpell()
 	local source		= self.source
 	local target		= self.target
