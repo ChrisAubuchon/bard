@@ -817,8 +817,8 @@ function character:getUseItem(inAction)
 	local target	= false
 	local item
 
-	if (inAction.inBattle) then
-		target = inAction.inBattle.monParty
+	if (currentBattle) then
+		target = currentBattle.monParty
 	end
 
 	if (self:isDisabled()) then

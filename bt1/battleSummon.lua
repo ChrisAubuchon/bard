@@ -4,7 +4,6 @@ battleSummon	= {}
 -- doAction()
 ----------------------------------------
 function battleSummon:doAction(inAction)
-	local inBattle	= inAction.inBattle
 	local attack
 
 	dprint("battleSummon:doAction() called")
@@ -13,9 +12,9 @@ function battleSummon:doAction(inAction)
 		return
 	end
 
-	if (self.isIllusion and (not inBattle.isPartyAttack)) then
-		dprint(inBattle.monParty.disbelieve)
-		if (inBattle.monParty.disbelieve) then
+	if (self.isIllusion and (not currentBattle.isPartyAttack)) then
+		dprint(currentBattle.monParty.disbelieve)
+		if (currentBattle.monParty.disbelieve) then
 			dprint("Skipping summon turn: disbelieve")
 			return
 		end
@@ -58,8 +57,8 @@ end
 function battleSummon:getTarget(inAction)
 	if (self.isHostile) then
 		inAction.target = party:randomCharacter()
-	elseif (not inAction.inBattle.isPartyAttack) then
-		inAction.target = inAction.inBattle.monParty:getLeadGroup()
+	elseif (not currentBattle.isPartyAttack) then
+		inAction.target = currentBattle.monParty:getLeadGroup()
 	else
 		return false
 	end
@@ -111,7 +110,6 @@ end
 ----------------------------------------
 function battleSummon:checkMeleeHits(inAction)
 	local target		= inAction.target
-	local inBattle		= inAction.inBattle
 	local targetAC
 	local sourceAttack
 	local bonus
@@ -125,7 +123,7 @@ function battleSummon:checkMeleeHits(inAction)
 	end
 
 	sourceAttack = self.ac
-	sourceAttack = sourceAttack - inBattle.songToHitBonus
+	sourceAttack = sourceAttack - currentBattle.songToHitBonus
 	sourceAttack = sourceAttack + self.toHitPenalty
 
 	if (sourceAttack > 10) then sourceAttack = 10 end
@@ -204,7 +202,6 @@ function battleSummon:attackSpell(inAction)
 	local inData		= inAction.inData
 	local outData		= inAction.outData
 	local target		= inAction.target
-	local inBattle		= inAction.inBattle
 
 	if (inData.group or inData.allFoes) then
 		inAction:multiTargetSpell()

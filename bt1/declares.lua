@@ -81,6 +81,7 @@ declare_global("garths")
 declare_global("globals")
 declare_global("directions")
 declare_global("currentLevel")
+declare_global("currentBattle")
 declare_global("stringTables")
 declare_global("m_window")
 

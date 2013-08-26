@@ -168,6 +168,13 @@ local iteratorConditionals = {
 				return (c.isPossessed or c.isDoppleganger)
 			  end,
 	isAttackable	= function (c)
+				if (c:isSummon() and c.isIllusion) then
+					if (currentBattle and 
+					    currentBattle.disbelieve) then
+						return false
+					end
+				end
+		
 				return (not c.isDead and not c.isStoned 
 						     and not c.isHiding)
 			  end
@@ -891,19 +898,18 @@ end
 ----------------------------------------
 -- disbelieve()
 ----------------------------------------
-function party:doDisbelieve(inBattle)
+function party:doDisbelieve()
 	local mgroup
 
-	if (not inBattle.monParty) then
+	if (not currentBattle.monParty) then
 		return
 	end
 
-	for mgroup in inBattle.monParty:iterator() do
+	for mgroup in currentBattle.monParty:iterator() do
 		if (mgroup.isIllusion) then
 			local action = btAction:new()
 			action.source = self:getFirstCharacter()
 			action.target = mgroup
-			action.inBattle = inBattle
 
 			if (not action:savingThrow()) then
 				mgroup:truncate()

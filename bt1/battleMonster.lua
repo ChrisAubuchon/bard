@@ -99,7 +99,6 @@ end
 
 function battleMonster:checkMeleeHits(inAction)
 	local target	= inAction.target
-	local inBattle	= inAction.inBattle
 	local sourceAttack
 	local targetAC
 	local bonus
@@ -131,7 +130,6 @@ end
 function battleMonster:getMeleeDamage(inAction)
 	local inData	= inAction.inData
 	local outData	= inAction.outData
-	local inBattle	= inAction.inBattle
 
 	outData.damage = rnd_xdy(inData.ndice, inData.dieval)
 	outData.damage = outData.damage + self.parentGroup.damageBonus
@@ -142,7 +140,6 @@ end
 
 function battleMonster:doDamage(inAction)
 	local outData		= inAction.outData
-	local inBattle		= inAction.inBattle
 	local target		= false
 	local m
 
@@ -170,10 +167,10 @@ function battleMonster:doDamage(inAction)
 	end
 
 	self:removeMonster(target)
-	inBattle:removePriority(target)
-	inBattle.killCount[self.name] = inBattle.killCount[self.name] + 1
+	currentBattle:removePriority(target)
+	currentBattle.killCount[self.name] = currentBattle.killCount[self.name] + 1
 	if (self.size == 0) then
-		inBattle.monParty:removeMonsterGroup(self)
+		currentBattle.monParty:removeMonsterGroup(self)
 	end
 
 	return true
@@ -188,7 +185,6 @@ end
 ----------------------------------------
 function battleMonster:battleBonus(inAction)
 	local inData		= inAction.inData
-	local inBattle		= inAction.inBattle
 	local inSource		= inAction.source
 	local inTarget		= inAction.target
 	local updateParty	= false

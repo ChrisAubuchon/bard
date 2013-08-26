@@ -10,42 +10,56 @@ battleSummon	= {}
 -- Public battle interface
 --
 battle = {}
+
+----------------------------------------
+-- random()
+--
+-- Levelled random battle
+----------------------------------------
 function battle:random()
-	local b = battleData:new()
 	local mgroups
 	local mgroup
 
-	b.isPartyAttack = false
-	b.monParty = monsterParty.new()
+	currentBattle = battleData:new()
+
+	currentBattle.isPartyAttack = false
+	currentBattle.monParty = monsterParty.new()
 	mgroups = currentLevel:getBattleOpponents()
-	dprint(mgroups)
 	for _,mgroup in ipairs(mgroups) do
 		dprint(mgroup)
-		b.monParty:addMonsterGroup(monsterGroup:new(mgroup, false))
+		currentBattle.monParty:addMonsterGroup(monsterGroup:new(mgroup, false))
 	end
 
-	dprint(b.monParty.head)
-	return b:start()
+	return currentBattle:start()
 end
 
+----------------------------------------
+-- partyAttack()
+----------------------------------------
 function battle:partyAttack()
-	local b = battleData:new()
+	currentBattle = battleData:new()
 
-	b.isPartyAttack = true
-	b.battleGroup	= false
+	currentBattle.isPartyAttack = true
+	currentBattle.battleGroup	= false
 
-	return b:start()
+	return currentBattle:start()
 end
 
+----------------------------------------
+-- new()
+--
+-- Predefined battle
+-- Function arguments are
+-- Monster type, Group size pairs
+----------------------------------------
 function battle:new(...)
-	local b = battleData:new()
 	local name
 	local count
 	local i
 
-	b.isPartyAttack = false
-
-	b.monParty = monsterParty:new()
+	currentBattle = battleData:new()
+	currentBattle.isPartyAttack = false
+	currentBattle.monParty = monsterParty:new()
 
 	for i = 1,select('#', ...),2 do
 		name,count = select(i, ...)
@@ -59,10 +73,10 @@ function battle:new(...)
 		end
 
 		local g = monsterGroup:new(name, count)
-		b.monParty:addMonsterGroup(g)
+		currentBattle.monParty:addMonsterGroup(g)
 	end
 
-	return b:start()
+	return currentBattle:start()
 end
 
 
@@ -259,6 +273,8 @@ function battleData:start()
 
 	self:stop()
 
+	currentBattle = false
+
 	return not partyRan
 end
 
@@ -324,7 +340,6 @@ function battleData:doRound()
 	currentAction = self.actionHead
 	text:setCursor(0, 11)
 	while (currentAction) do
-		currentAction.inBattle = self
 		currentAction.source:doAction(currentAction)
 
 		if (globals.partyDied) then
@@ -549,7 +564,6 @@ function battleData:getPlayerOption(c)
 
 	action = btAction.new()
 	action.source = c
-	action.inBattle = self
 
 	if ((c.isPossessed) or (c.isNuts)) then
 		action.action = "possessedAttack"
@@ -765,7 +779,6 @@ function battleData:convertPreBattleSong()
 		    (singer.song.name == "Lucklaran")) then
 			dprint("Running combatFunction")
 			local action = btAction.new()
-			action.inBattle = self
 			action.inData = singer.song.combatData[currentLevel.level].inData
 			singer.song.combatFunction.func(action)
 		end

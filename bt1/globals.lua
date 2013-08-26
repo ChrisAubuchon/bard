@@ -40,6 +40,8 @@ text			= textBox:new(m_window)
 garths			= false
 
 currentLevel		= false
+currentBattle		= false
+
 directions = {
 	front = {
 		north	= "north",

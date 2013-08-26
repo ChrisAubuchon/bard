@@ -58,7 +58,6 @@ function battlePlayer:doAction(inAction)
 		self:doBardSong(inAction)
 	elseif (inAction.action == "possessedAttack") then
 		local attackParty	= false
-		local inBattle		= inAction.inBattle
 
 		-- A nuts attack randomly attacks player or monster
 		if (self.isNuts) then
@@ -72,8 +71,8 @@ function battlePlayer:doAction(inAction)
 		if (attackParty) then
 			inAction.target = party:randomCharacter()
 		else
-			if (inBattle.monParty) then
-				inAction.target=inBattle.monParty:getLeadGroup()
+			if (currentBattle.monParty) then
+				inAction.target=currentBattle.monParty:getLeadGroup()
 			else
 				-- This should probably attack a random
 				-- party member. In the DOS version it does
@@ -133,7 +132,6 @@ end
 
 function battlePlayer:checkMeleeHits(inAction)
 	local target	= inAction.target
-	local inBattle	= inAction.inBattle
 	local targetAC
 	local sourceAttack
 	local bonus
@@ -150,7 +148,7 @@ function battlePlayer:checkMeleeHits(inAction)
 
 	sourceAttack = self.ac
 	sourceAttack = sourceAttack - classes.get(self.class, "meleeBonus")
-	sourceAttack = sourceAttack - inBattle.songToHitBonus
+	sourceAttack = sourceAttack - currentBattle.songToHitBonus
 	sourceAttack = sourceAttack + self.toHitPenalty
 
 	if (sourceAttack >  10) then sourceAttack =  10 end
@@ -166,7 +164,6 @@ end
 function battlePlayer:getMeleeDamage(inAction)
 	local target		= inAction.target
 	local outData		= inAction.outData
-	local inBattle		= inAction.inBattle
 	local damageBonus	= 0
 	local weapon
 	local ndice
@@ -343,7 +340,7 @@ function battlePlayer:getCombatSpell(inAction)
 	if (s.targetted) then
 		text:cdprint(true, false, "Use on:")
 		inAction.target = getActionTarget(s.targetted, 
-					inAction.inBattle.monParty)
+					currentBattle.monParty)
 		if (not inAction.target) then
 			return false
 		end
@@ -423,7 +420,6 @@ end
 ----------------------------------------
 function battlePlayer:battleBonus(inAction)
 	local inData		= inAction.inData
-	local inBattle		= inAction.inBattle
 	local inSource		= inAction.source
 	local inTarget		= inAction.target
 	local updateParty	= false
@@ -546,14 +542,13 @@ function battlePlayer:attackSpell(inAction)
 	local outData		= inAction.outData
 	local source		= inAction.source
 	local target		= inAction.target
-	local inBattle		= inAction.inBattle
 
 	dprint("battlePlayer:attackSpell()")
 	-- printEllipsis if a group or allFoes spell was cast
 	-- and all of the monster groups are dead.
 	--
 	if ((inData.group and target.size == 0) or
-	    (inData.allFoes and not inBattle.monParty:isAlive())) then
+	    (inData.allFoes and not currentBattle.monParty:isAlive())) then
 		text:printEllipsis()
 		return
 	end
@@ -576,7 +571,7 @@ function battlePlayer:attackSpell(inAction)
 	if (inData.allFoes) then
 		local mgroup
 
-		for mgroup in inBattle.monParty:iterator() do
+		for mgroup in currentBattle.monParty:iterator() do
 			inAction.target = mgroup
 			inAction:multiTargetSpell()
 			if (not mgroup:isLast()) then

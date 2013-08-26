@@ -8,7 +8,6 @@ function btAction:new()
 		source		= false,
 		target		= false,
 		func		= false,
-		inBattle	= false,
 		inData		= {},
 		outData		= {}
 	}

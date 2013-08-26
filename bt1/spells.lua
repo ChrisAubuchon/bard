@@ -263,7 +263,7 @@ function spells.summon(inAction)
 		text:printEllipsis()
 		return
 	else
-		inAction.inBattle.monParty:doSummon(summon)
+		currentBattle.monParty:doSummon(summon)
 	end
 end
 
@@ -306,8 +306,8 @@ local function __doHeal(inAction, inTarget)
 		inTarget.cur_hp = 1
 		inTarget.possessed = false
 
-		if (inAction.inBattle) then
-			inAction.inBattle:removeAction(inTarget)
+		if (currentBattle) then
+			currentBattle:removeAction(inTarget)
 		end
 	end
 
@@ -341,7 +341,6 @@ end
 ----------------------------------------
 function spells.spellBind(inAction)
 	local target		= inAction.target
-	local inBattle		= inAction.inBattle
 	local last
 
 	if (inAction:savingThrow() 
@@ -359,9 +358,9 @@ function spells.spellBind(inAction)
 	--
 	last = target:getLast()
 	target:removeMonster(last)
-	inBattle:removePriority(last)
+	currentBattle:removePriority(last)
 	if (target.size == 0) then
-		inAction.inBattle.monParty:removeMonsterGroup(target)
+		currentBattle.monParty:removeMonsterGroup(target)
 	end
 	text:printEllipsis()
 end
@@ -394,8 +393,8 @@ function spells.disbelieve(inAction)
 	-- disbelieve is kind of broken in the DOS version of BT1
 	--
 	if (inAction.source:isMonster()) then
-		assert(inAction.inBattle.monParty.disbelieve)
-		inAction.inBattle.monParty.disbelieve = true
+		assert(currentBattle.monParty.disbelieve)
+		currentBattle.monParty.disbelieve = true
 	else
 		party.disbelieve = true
 		if (inAction.inData.revealDoppleganger) then
