@@ -103,7 +103,7 @@ function battlePlayer:doMeleeAttack(inAction)
 		text:print(" chops at ")
 	end
 
-	text:print(target:getSingularName())
+	text:print(target:getTargetString())
 
 	if (not self:checkMeleeHits(inAction)) then
 		text:print(", but misses!\n\n")
@@ -264,6 +264,9 @@ function battlePlayer:inflictStatus(inAction)
 	if (inData.specialAttack == "poison") then
 		self.isPoisoned = true
 	elseif (inData.specialAttack == "drain") then
+		if (self:isSummon()) then
+			return
+		end
 		if (self.cur_level ~= 1) then
 			self.cur_level = self.cur_level - 1
 			self.xp = classes.getXpForLevel(self.class, 
@@ -576,13 +579,11 @@ function battlePlayer:attackSpell(inAction)
 		for mgroup in inBattle.monParty:iterator() do
 			inAction.target = mgroup
 			inAction:multiTargetSpell()
-			--self:multipleTargetSpell(inAction)
 			if (not mgroup:isLast()) then
 				text:print("and")
 			end
 		end
 	elseif (inData.group) then
-		--self:multipleTargetSpell(inAction)
 		inAction:multiTargetSpell()
 	else
 		-- Single target spell
@@ -605,47 +606,6 @@ function battlePlayer:attackSpell(inAction)
 	end
 end
 
-function battlePlayer:multipleTargetSpell(inAction)
-	local inData		= inAction.inData
-	local outData		= inAction.outData
-	local target		= inAction.target
-	local lastDamage	= 0
-	local m
-
-	text:print(" at %s %s...\n\n",
-		pluralize(target.size, "a", "some"),
-		pluralize(target.size, target.singular, 
-					target.plural)
-		)
-
-	for m in target:iterator() do
-		local save
-		local half
-
-		-- Prevent consecutive targets from receiving
-		-- the same damage.
-		--
-		repeat
-			outData.damage = rnd_xdy(inData.ndice, inData.dieval)
-		until (outData.damage ~= lastDamage)
-		lastDamage = outData.damage
-
-		text:print("One")
-		save, half = inAction:savingThrow()
-		if (save and not half) then
-			text:print(" repelled the spell!\n\n")
-		else
-			if (half) then 
-				bit32.rshift(outData.damage, 1)
-			end
-			text:print(" is %s ", 
-				stringTables.isEffects[inData.atype])
-			inAction:printDamage()
-			inAction:doDamage()
-		end
-		timer:delay(3)
-	end
-end
 
 
 

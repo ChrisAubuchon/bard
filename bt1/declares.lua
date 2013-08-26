@@ -166,10 +166,6 @@ declare_global("tavern")
 -- temple.lua
 declare_global("temple")
 
--- text.lua
-declare_global("text_delay")
-declare_global("printStatusLine")
-
 -- timer.lua
 declare_global("timer")
 

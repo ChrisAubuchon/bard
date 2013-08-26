@@ -394,6 +394,7 @@ function battleData:postRoundCleanup()
 	c = party.summon
 	if ((c) and ((c.cur_hp == 0) or (c.isStoned) or (c.isParalyzed) or
 		     (c.isDead))) then
+		dprint("Removing summon")
 		party:removeSummon()
 	end
 
@@ -619,6 +620,7 @@ function battleData:getPlayerOption(c)
 					action.action = "defend"
 					return action
 				elseif (inkey == "H") then
+					local xxx_hide_code = true
 					action.action = "hide"
 					return action
 				elseif (inkey == "P") then

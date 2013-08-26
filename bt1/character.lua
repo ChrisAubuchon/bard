@@ -57,6 +57,62 @@ baseCharacter = {
 	inventory	= false
 }
 
+----------------------------------------
+-- Character class
+----------------------------------------
+function character:new()
+	local self = {
+		isHiding	= false
+	}
+
+	btTable.addParent(self, baseCharacter, character, entity, 
+			objectHash:new(self), battlePlayer, battleBonus,
+			linkedListNode
+			)
+	btTable.setClassMetatable(self)
+
+	self.__index = self
+
+	return self
+end
+
+----------------------------------------
+-- getHpString()
+----------------------------------------
+function character:getHpString()
+	if (self.isDead) then
+		return "DEAD"
+	elseif (self.isStoned) then
+		return "STON"
+	elseif (self.isPoisoned) then
+		return "POIS"
+	elseif (self.isOld) then
+		return "OLD"
+	elseif (self.isParalyzed) then
+		return "PARA"
+	elseif (self.isPossessed) then
+		return "POSS"
+	else
+		return string.format("%4d", self.max_hp)
+	end
+end
+
+----------------------------------------
+-- getAcString()
+----------------------------------------
+function character:getAcString()
+	self:calcAC()
+	if (self.ac <= -10) then
+		return "L0"
+	else
+		return string.format("%2d", self.ac)
+	end
+end
+
+
+----------------------------------------
+-- getStatusLine()
+----------------------------------------
 function character:getStatusLine()
 	local ac
 	local fnt
@@ -64,42 +120,29 @@ function character:getStatusLine()
 	local outString
 	local outHpString
 
-	self:calcAC()
-	if (self.ac == -10) then
-		ac = "L0"
-	else
-		ac = string.format("%2d", self.ac)
-	end
-		
-	if (self.isDead) then
-		hpstring = "DEAD"
-	elseif (self.isStoned) then
-		hpstring = "STON"
-	elseif (self.isPoisoned) then
-		hpstring = "POIS"
-	elseif (self.isOld) then
-		hpstring = "OLD"
-	elseif (self.isParalyzed) then
-		hpstring = "PARA"
-	elseif (self.isPossessed) then
-		hpstring = "POSS"
-	else
-		hpstring = string.format("%4d", self.max_hp)
-	end
-
 	outString = string.format("%-15s %2s %4s     %4d %2s",
-		self.name, ac, hpstring, self.cur_sppt,
-		string.sub(self.class,1,2))
+		self.name, 
+		self:getAcString(),
+		self:getHpString(),
+		self.cur_sppt,
+		string.sub(self.class,1,2)
+		)
 
 	outHpString = string.format("%4d", self.cur_hp)
 
 	return outString,outHpString
 end
 
+----------------------------------------
+-- isDisabled()
+----------------------------------------
 function character:isDisabled()
 	return (self.isDead or self.isStoned or self.isParalyzed)
 end
 
+----------------------------------------
+-- fromTable()
+----------------------------------------
 function character:fromTable(t)
 	local k
 	local v
@@ -123,6 +166,9 @@ function character:fromTable(t)
 	end
 end
 			
+----------------------------------------
+-- toTable()
+----------------------------------------
 function character:toTable()
 	local t = {}
 	local k
@@ -142,23 +188,6 @@ function character:toTable()
 	return t
 end
 
-----------------------------------------
--- Character class
-----------------------------------------
-function character:new()
-	local self = {
-	}
-
-	btTable.addParent(self, baseCharacter, character, entity, 
-			objectHash:new(self), battlePlayer, battleBonus,
-			linkedListNode
-			)
-	btTable.setClassMetatable(self)
-
-	self.__index = self
-
-	return self
-end
 
 ----------------------------------------
 -- clone()
@@ -1010,6 +1039,10 @@ function character:songTimeout()
 end
 
 function character:getMultiString()
+	return self.name
+end
+
+function character:getTargetString()
 	return self.name
 end
 

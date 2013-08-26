@@ -168,7 +168,8 @@ local iteratorConditionals = {
 				return (c.isPossessed or c.isDoppleganger)
 			  end,
 	isAttackable	= function (c)
-				return (not c.isDead and not c.isStoned)
+				return (not c.isDead and not c.isStoned 
+						     and not c.isHiding)
 			  end
 }
 	
@@ -278,6 +279,8 @@ function party:display()
 		charString, hpString = member:getStatusLine()
 		self:printStatusLine(charString, hpString, 0)
 		member = member.next
+	else
+		self:printStatusLine(false, false, 0)
 	end
 
 	for i = 1,6 do
@@ -647,10 +650,12 @@ end
 -- Remove the summoned monster
 ----------------------------------------
 function party:removeSummon()
+	dprint(self.summon)
 	if (not self.summon) then return end
 
 	self:remove(self.summon)
 	self.summon	= false
+	party:display()
 end
 
 ----------------------------------------
@@ -822,12 +827,12 @@ function party:singSong()
 	end
 
 	if ((char.class ~= "Bard") or (char:isDisabled())) then
-		text_cdcprint(true, true, true, "\n\nHe can't sing")
+		text:cdcprint(true, true, true, "\n\nHe can't sing")
 		return
 	end
 
 	if (not char:isTypeEquipped("Instrument")) then
-		text_cdcprint(true, true, true, 
+		text:cdcprint(true, true, true, 
 			"\n\nHe has no instrument to play.")
 		return
 	end

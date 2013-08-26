@@ -183,6 +183,9 @@ function battleMonster:calculateSavingThrow()
 	return rnd_between_xy_inc(self.spellSaveLo, self.spellSaveHi)
 end
 
+----------------------------------------
+-- battleBonus()
+----------------------------------------
 function battleMonster:battleBonus(inAction)
 	local inData		= inAction.inData
 	local inBattle		= inAction.inBattle

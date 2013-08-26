@@ -99,6 +99,10 @@ function monster:attackIterator()
 	return f, nil, nil
 end
 
+function monster:getTargetString()
+	return string.format("a %s", self.singular)
+end
+
 function monster.getXPReward(inType)
 	assert(_monsters[inType])
 

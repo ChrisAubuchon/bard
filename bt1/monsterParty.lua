@@ -83,7 +83,7 @@ end
 ----------------------------------------
 -- disbelieve()
 ----------------------------------------
-function monsterParty:disbelieve(inBattle)
+function monsterParty:doDisbelieve(inBattle)
 	if (party.summon and party.summon.isIllusion and self.doDisbelieve) then
 		local action = btAction:new()
 		action.source = party:getFirstCharacter()
