@@ -804,7 +804,7 @@ function party:castSpell()
 	if (s.targetted) then
 		text:cdprint(true, false, "Use on:")
 
-		action.target = getActionTarget(s.targetted, false)
+		action.target = char:getActionTarget(s.targetted)
 		if (not action.target) then
 			text:clear()
 			return

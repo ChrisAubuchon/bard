@@ -659,8 +659,9 @@ function battleData:meleeTarget(inAction)
 	if (self.isPartyAttack or inAction.action == "partyAttack") then
 		inAction.action = "melee"
 		text:cdprint(true, false, "Attack:")
-		inAction.target = getActionTarget({party = true, summon = true},
-						self.monParty)
+		inAction.target = inAction.source:getActionTarget(
+					{party = true, summon = true}
+					)
 		if (not inAction.target) then
 			return false
 		end
@@ -669,8 +670,7 @@ function battleData:meleeTarget(inAction)
 			text:cdprint(true, false, "Attack:")
 		end
 
-		inAction.target = getActionTarget({melee = true}, 
-							self.monParty)
+		inAction.target=inAction.source:getActionTarget({melee = true})
 		if (not inAction.target) then
 			return false
 		end

@@ -74,6 +74,7 @@ function monster:getPronoun()
 end
 
 function monster:inMeleeRange()
+	dprint(self.parentGroup.inMeleeRange)
 	return self.parentGroup.inMeleeRange
 end
 
@@ -108,15 +109,6 @@ function monster.getXPReward(inType)
 
 	return _monsters[inType].reward
 end
-
-function monster.pluralizeName(inType, numMonsters)
-	if (numMonsters == 1) then
-		return _monsters[inType].singular
-	else
-		return _monsters[inType].plural
-	end
-end
-
 
 function monster.typeTable()
 	local t = {}

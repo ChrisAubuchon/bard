@@ -86,66 +86,15 @@ function keyboardCommand(inkey)
 	return true
 end
 
-function getActionTarget(inTargetOptions, inTargets)
-	local inkey
-	local i
-	local optionKeys = btTable.new()
-	dprint("getActionTarget() called")
-
-	if (inTargetOptions.party) then
-		local count = 1
-		for i in party:characterIterator() do
-			optionKeys[tostring(count)] = i
-			count = count + 1
-		end
-
-		text:print("\nMember #[1-%d", party.size)
-		if ((inTargetOptions.summon) and party.summon) then
-			optionKeys["S"] = party.summon
-			text:print("S]")
-		else
-			text:print("]")
-		end
-	end
-
-	dprint("inTargets: " .. tostring(inTargets))
-	if ((inTargets) and 
-            ((inTargetOptions.monster) or (inTargetOptions.melee))) then
-		local i
-		local monGroup
-
-		if ((not inTargetOptions.party) and (inTargets.size == 1)) then
-			dprint("returning lead group")
-			return inTargets:getLeadGroup()
-		end
-		
-		text:print("\n")
-		for i,mgroup in inTargets:ipairs() do
-			if ((i > 2) and (inTargetOptions.melee)) then
-				break
-			end
-
-			optionKeys[string.char((i-1) + string.byte("A"))] = mgroup
-			text:print("[%s] %d %s\n", 
-				string.char((i - 1) + string.byte("a")), 
-				mgroup.size,
-				monster.pluralizeName(mgroup.name)
-				)
-		end
-	end
-
-	inkey = getkey()
-	if (not optionKeys[inkey]) then
-		return false
-	end
-
-	return optionKeys[inkey]
+function string.toLetterOption(inValue, inBase)
+	return string.char(inValue + string.byte(inBase))
 end
 
-function pluralize(count, singular, plural)
-	if (count == 1) then
-		return singular
+function string.pluralize(inCount, inSingular, inPlural)
+	if (inCount == 1) then
+		return inSingular
 	else
-		return plural
+		return inPlural
 	end
 end
+

@@ -339,8 +339,7 @@ function battlePlayer:getCombatSpell(inAction)
 
 	if (s.targetted) then
 		text:cdprint(true, false, "Use on:")
-		inAction.target = getActionTarget(s.targetted, 
-					currentBattle.monParty)
+		inAction.target = self:getActionTarget(s.targetted) 
 		if (not inAction.target) then
 			return false
 		end

@@ -31,7 +31,7 @@ function monsterParty:printGroups()
 		end
 
 		text:print("%d %s", node.size,
-			pluralize(node.size, node.singular, node.plural)
+			string.pluralize(node.size, node.singular, node.plural)
 			)
 	end
 	text:print(".\n\n")
@@ -70,6 +70,7 @@ function monsterParty:adjustMeleeGroups()
 		else
 			mgroup.inMeleeRange = false
 		end
+		i = i + 1
 	end
 end
 
@@ -108,9 +109,9 @@ function monsterParty:advance()
 			self:insertBefore(mgroup, mgroup.prev)
 
 			text:print("The %s advance%s!\n\n",
-				pluralize(mgroup.size, mgroup.singular, 
+				string.pluralize(mgroup.size, mgroup.singular, 
 						       mgroup.plural),
-				pluralize(mgroup.size, "", "s")
+				string.pluralize(mgroup.size, "", "s")
 				)
 		end
 	end

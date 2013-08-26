@@ -849,7 +849,7 @@ function character:getUseItem(inAction)
 	if (item.targetted) then
 		text:cdprint(true, false, "Use on:")
 
-		inAction.target = getActionTarget(item.targetted, target)
+		inAction.target = self:getActionTarget(item.targetted)
 		if (not inAction.target) then
 			text:clear()
 			return false
@@ -1038,15 +1038,81 @@ function character:songTimeout()
 	self.song = false
 end
 
+----------------------------------------
+-- getMultiString()
+----------------------------------------
 function character:getMultiString()
 	return self.name
 end
 
+----------------------------------------
+-- getTargetString()
+----------------------------------------
 function character:getTargetString()
 	return self.name
 end
 
+----------------------------------------
+-- getActionTarget()
+----------------------------------------
+function character:getActionTarget(inTargetOptions)
+	local optionKeys	= btTable:new()
+	local inkey
+	local i
 
+	if (inTargetOptions.party) then
+		local count = 1
+
+		for i in party:characterIterator() do
+			optionKeys[tostring(count)] = i
+			count = count + 1
+		end
+
+		text:print("\nMember #[1-%d", party.size)
+		if (inTargetOptions.summon and party.summon) then
+			optionKeys["S"] = party.summon
+			text:print("S]")
+		else
+			text:print("]")
+		end
+	end
+
+	if (currentBattle and (not currentBattle.isPartyAttack)) then
+		if (inTargetOptions.melee or inTargetOptions.monster) then
+			local i
+			local monGroup
+
+			if ((not inTargetOptions.party) and 
+			    (currentBattle.monParty.size == 1)) then
+				return currentBattle.monParty:getLeadGroup()
+			end
+
+			text:print("\n")
+			for i,monGroup in currentBattle.monParty:ipairs() do
+				if ((i > 2) and (inTargetOptions.melee)) then
+					break
+				end
+
+				local key = string.toLetterOption(i - 1, "A")
+				optionKeys[key]=monGroup
+				text:print("[%s] %d %s\n",
+					string.toLetterOption(i - 1, "a"),
+					monGroup.size,
+					string.pluralize(monGroup.size,
+						monGroup.singular,
+						monGroup.plural)
+					)
+			end
+		end
+	end
+
+	inkey = getkey()
+	if (not optionKeys[inkey]) then
+		return false
+	end
+
+	return optionKeys[inkey]
+end
 
 
 

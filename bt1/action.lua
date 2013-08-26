@@ -111,7 +111,7 @@ end
 function btAction:printDamage()
 	text:print("for %d point%s of damage",
 		self.outData.damage,
-		pluralize(self.outData.damage, "", "s")
+		string.pluralize(self.outData.damage, "", "s")
 		)
 end
 
@@ -221,8 +221,9 @@ function btAction:multiTargetSpell()
 		target = party
 	else
 		text:print(" at %s %s...\n\n",
-			pluralize(target.size, "a", "some"),
-			pluralize(target.size, target.singular, target.plural)
+			string.pluralize(target.size, "a", "some"),
+			string.pluralize(target.size, target.singular, 
+						      target.plural)
 			)
 		iter = target
 	end
