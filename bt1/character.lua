@@ -68,6 +68,7 @@ function character:new()
 
 	btTable.addParent(self, baseCharacter, 
 			character, 
+			classes,
 			entity, 
 			objectHash:new(self), 
 			battleParty,
@@ -170,6 +171,8 @@ function character:fromTable(t)
 		dprint("Creating empty inventory")
 		self.inventory = inventory:new()
 	end
+
+	self:setClass(self.class)
 end
 			
 ----------------------------------------
@@ -219,6 +222,8 @@ function character:clone()
 			rawset(rval, k, self[k])
 		end
 	end
+
+	rval:setClass(rval.class)
 
 	return rval
 end
@@ -444,12 +449,11 @@ function character.createCharacter()
 	text:clear()
 	character.printAttributes(newchar)
 
-	newchar.class = classes.selectClass(newchar.race)
-	if (not newchar.class) then
+	if (not newchar:selectClass(newchar.race)) then
 		goto restart
 	end
 
-	bigpic:drawImage(classes.get(newchar.class, "pic"))
+	bigpic:drawImage(newchar.pic)
 	bigpic:setTitle(newchar.class)
 
 	newchar.name = character.getCharacterName()
@@ -535,7 +539,7 @@ function character:printCharacter()
 	local inkey
 	local inv
 
-	bigpic:drawImage(classes.get(self.class, "pic"))
+	bigpic:drawImage(self.pic)
 	bigpic:setTitle(self.class)
 
 	repeat

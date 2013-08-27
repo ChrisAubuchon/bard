@@ -40,7 +40,7 @@ static json_t *btClass_toJson(const void *vbc)
 
 	root = json_object();
 
-	JSON_BTSTRING(root, "name", bc->name);
+	JSON_BTSTRING(root, "className", bc->name);
 	JSON_BTSTRING(root, "pic", bc->pic);
 	JSON_NUMBER(root, "hpDice", bc->hpDice + 1);
 	JSON_NUMBER(root, "meleeBonus", bc->meleeBonus);

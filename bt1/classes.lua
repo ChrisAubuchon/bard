@@ -1,63 +1,78 @@
-local _class = {}
+local __classes = read_table("classes")
 
-_class.init = function ()
-	local self = {}
-	local classes = nil
 
-	classes = read_table("classes")
+classes = {}
+function classes:setClass(inClass)
+	local k
+	local v
 
-	----------------------------------------
-	-- selectClass()
-	--
-	-- Have the player select a class
-	----------------------------------------
-	function self.selectClass(r)
-		local i
-		local inkey
-		local clist
-
-		clist = race.startingClasses(r)
-
-		for i = 1, #clist do
-			text:print("\n%d) %s", i, clist[i])
-		end
-
-		text:setCursor(0, 10)
-		text:print("\n   (REROLL)")
-
-		repeat
-			inkey = getkey()
-			if (key_in_num_range(inkey, 1, #clist)) then
-				inkey = tonumber(inkey)
-				return clist[inkey]
-			end
-		until (inkey == "R")
-
-		return false
-
-	end
-
-	----------------------------------------
-	-- get()
-	--
-	-- Get a member of a class
-	----------------------------------------
-	function self.get(c, attr)
-		assert(classes[c] ~= nil, "Invalid class " .. tostring(c))
-		assert(classes[c][attr] ~= nil)
-
-		return classes[c][attr]
-	end
-
-	function self.getXpForLevel(c, level)
-		if (level < 13) then
-			return classes[c].xpreq[level]
-		else
-			return classes[c].xpreq[12] * (level - 11)
-		end
-	end
-
-	return self
+	self.class	= inClass
+	table.copy(__classes[self.class], self)
 end
 
-classes = _class.init()
+----------------------------------------
+-- selectClass()
+----------------------------------------
+function classes:selectClass(inRace)
+	local i
+	local inkey
+	local classList
+
+	classList = race.startingClasses(inRace)
+
+	for i = 1,#classList do
+		text:print("\n%d) %s", i, classList[i])
+	end
+
+	text:setCursor(0, 10)
+	text:print("\n   (REROLL)")
+	repeat
+		inkey = getkey()
+		if (key_in_num_range(inkey, 1, #classList)) then
+			inkey = tonumber(inkey)
+			return classList[inkey]
+		end
+	until (inkey == "R")
+
+	return false
+end
+
+----------------------------------------
+-- getXpForLevel()
+----------------------------------------
+function classes:getXpForLevel(inLevel)
+	if (inLevel < 13) then
+		return self.xpreq[inLevel]
+	else
+		return self.xpreq[12] * (inLevel - 11)
+	end
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

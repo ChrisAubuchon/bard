@@ -271,7 +271,7 @@ function battlePlayer:calculateSavingThrow()
 		end
 		value = value + paladinSavingBonus[plevel]
 	else
-		value = value + classes.get(self.class, "saveBonus")
+		value = value + self.saveBonus
 	end
 
 	if (self.lk > 15) then

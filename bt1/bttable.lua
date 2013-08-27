@@ -16,16 +16,16 @@ local function classSearch(inKey, inClassList)
 	return nil
 end
 
-function table.copy(inTable)
-	local t = {}
+function table.copy(inSource, inDestination)
+	local t = inDestination or {}
 	local k
 	local v
 
-	if (inTable == nil) then
+	if (inSource == nil) then
 		return nil
 	end
 
-	for k,v in pairs(inTable) do
+	for k,v in pairs(inSource) do
 		if (type(v) == "table") then
 			rawset(t, k, table.copy(v))
 		else

@@ -66,7 +66,7 @@ function battleParty:checkMeleeHits(inAction)
 
 	sourceAttack = self.ac
 	if (not self:isSummon()) then
-		sourceAttack = sourceAttack - classes.get(self.class, "meleeBonus")
+		sourceAttack = sourceAttack - self.meleeBonus
 	end
 	sourceAttack = sourceAttack - currentBattle.songToHitBonus
 	sourceAttack = sourceAttack + self.toHitPenalty
@@ -141,8 +141,7 @@ function battleParty:inflictStatus(inAction)
 		end
 		if (self.cur_level ~= 1) then
 			self.cur_level = self.cur_level - 1
-			self.xp = classes.getXpForLevel(self.class, 
-							self.cur_level)
+			self.xp = self:getXpForLevel(self.cur_level)
 		end
 		return true
 	elseif (inData.specialAttack == "nuts") then

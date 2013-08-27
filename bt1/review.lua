@@ -47,7 +47,7 @@ function review:doAdvancement()
 		return
 	end
 	text:cdprint(true, false, "The guild leaders deem that " .. char.name)
-	xpRequired = classes.getXpForLevel(char.class, char.cur_level + 1)
+	xpRequired = char:getXpForLevel(char.cur_level + 1)
 	if (char.xp < xpRequired) then
 		text:cdprint(false, true, " still needeth %d experience points prior to advancement...\n", xpRequired - char.xp)
 		return
@@ -57,7 +57,7 @@ function review:doAdvancement()
 	char.cur_level = char.cur_level + 1
 	char.max_level = char.cur_level
 
-	char.cur_hp = char.cur_hp + (rnd() % classes.get(char.class, "hpDice"))
+	char.cur_hp = char.cur_hp + (rnd() % char.hpDice)
 	if (char.cn > 14) then
 		char.cur_hp = char.cur_hp + (char.cn - 14)
 	end

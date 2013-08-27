@@ -178,7 +178,7 @@ function temple:restoreLife(inChar)
 	end
 
 	inChar.cur_level = inChar.max_level
-	inChar.xp = classes.getXpForLevel(inChar.class, inChar.cur_level)
+	inChar.xp = inChar:getXpForLevel(inChar.cur_level)
 
 	return true
 end
