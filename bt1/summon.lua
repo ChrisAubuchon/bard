@@ -12,8 +12,13 @@ function summon:new(inName)
 		isIllusion	= false
 	}
 
-	btTable.addParent(self, summon, battleSummon, monster:new(inName), 
-				character, baseCharacter, battleBonus,
+	btTable.addParent(self, summon, 
+				battleParty,
+				battleSummon, 
+				monster:new(inName), 
+				character, 
+				baseCharacter, 
+				battleBonus,
 				linkedListNode
 			)
 	btTable.setClassMetatable(self)

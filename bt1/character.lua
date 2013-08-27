@@ -2,6 +2,7 @@ require "btTable"
 require "inventory"
 require "entity"
 require "dataio"
+require "battleParty"
 require "battlePlayer"
 require "race"
 require "objectHash"
@@ -65,8 +66,13 @@ function character:new()
 		isHiding	= false
 	}
 
-	btTable.addParent(self, baseCharacter, character, entity, 
-			objectHash:new(self), battlePlayer, battleBonus,
+	btTable.addParent(self, baseCharacter, 
+			character, 
+			entity, 
+			objectHash:new(self), 
+			battleParty,
+			battlePlayer, 
+			battleBonus,
 			linkedListNode
 			)
 	btTable.setClassMetatable(self)

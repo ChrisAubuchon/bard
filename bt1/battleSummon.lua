@@ -1,3 +1,9 @@
+----------------------------------------
+-- battleSummon class
+--
+-- Class methods specific to summoned
+-- monsters
+----------------------------------------
 battleSummon	= {}
 
 ----------------------------------------
@@ -36,7 +42,7 @@ function battleSummon:doAction(inAction)
 	if (attack.type == "melee" or attack.type == "dopple") then
 		inAction.inData = attack.action.inData
 
-		self:meleeAttack(inAction)
+		self:doMeleeAttack(inAction)
 	elseif (attack.type == "spell") then
 		inAction.inData = attack.action.inData
 		inAction.func = attack.action.func
@@ -67,73 +73,14 @@ function battleSummon:getTarget(inAction)
 end
 
 ----------------------------------------
--- meleeAttack()
+-- getMeleeAttackString
 ----------------------------------------
-function battleSummon:meleeAttack(inAction)
-	local inData		= inAction.inData
-	local target		= inAction.target
-
-	if (not inAction:validateTarget()) then
-		return
-	end
-
-	text:print("%s%s%s", 
-		self.singular,
-		inData.meleeString[rnd_xdy(1,2)],
-		inAction.target:getTargetString()
-		)
-
-	if (not self:checkMeleeHits(inAction)) then
-		text:print(", but misses!\n")
-		timer:delay(3)
-		return
-	else
-		text:print(", and hits ")
-		self:getMeleeDamage(inAction)
-		inAction:printDamage()
-		inAction:doDamage()
-
-		if (target:isCharacter()) then
-			party:display()
-		end
-
-		if (globals.partyDied) then
-			return
-		end
-	end
-
-	timer:delay(3)
-end
-
-----------------------------------------
--- checkMeleeHits()
-----------------------------------------
-function battleSummon:checkMeleeHits(inAction)
-	local target		= inAction.target
-	local targetAC
-	local sourceAttack
-	local bonus
-
-	targetAC = target.ac
-	if (not target:isCharacter()) then
-		targetAC = targetAC + target.acPenalty
-		if (targetAC > 10) then
-			targetAC = 10
-		end
-	end
-
-	sourceAttack = self.ac
-	sourceAttack = sourceAttack - currentBattle.songToHitBonus
-	sourceAttack = sourceAttack + self.toHitPenalty
-
-	if (sourceAttack > 10) then sourceAttack = 10 end
-	if (sourceAttack < -10) then sourceAttack = -10 end
-
-	if (sourceAttack > targetAC) then
-		return false
-	end
-
-	return true
+function battleSummon:getMeleeAttackString(inAction)
+	return string.format("%s%s%s",
+			self.singular,
+			inAction.inData.meleeString[rnd_xdy(1,2)],
+			inAction.target:getTargetString()
+			)
 end
 
 ----------------------------------------
@@ -154,33 +101,12 @@ function battleSummon:getMeleeDamage(inAction)
 	outData.specialAttack = inData.specialAttack
 end
 
-----------------------------------------
--- Exactly the same as
--- battlePlayer:doDamage()
-----------------------------------------
-function battleSummon:doDamage(inAction)
-	return battlePlayer.doDamage(self, inAction)
-end
-
-
-----------------------------------------
--- Same as battlePlayer:inflictStatus()
--- except that level drain and old 
--- attacks do nothing.
---
--- Would be easy to add:
--- if self:isSummon() then return end
--- to unify the functions
-----------------------------------------
-function battleSummon:inflictStatus(inAction)
-	return battlePlayer.inflictStatus(self, inAction)
-end
 
 ----------------------------------------
 -- calculateSavingThrow()
 ----------------------------------------
 function battleSummon:calculateSavingThrow()
-	return battleMonster.calculateSavingThrow(self)
+	return rnd_between_xy_inc(self.spellSaveLo, self.spellSaveHi)
 end
 
 ----------------------------------------
@@ -214,20 +140,6 @@ function battleSummon:attackSpell(inAction)
 		end
 		inAction:singleTargetSpell()
 	end
-end
-
-----------------------------------------
--- battleBonus()
-----------------------------------------
-function battleSummon:battleBonus(inAction)
-	return battlePlayer.battleBonus(self, inAction)
-end
-
-----------------------------------------
--- mageStar()
-----------------------------------------
-function battleSummon:mageStar(inAction)
-	return battlePlayer.mageStar(self, inAction)
 end
 
 

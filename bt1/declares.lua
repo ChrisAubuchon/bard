@@ -9,6 +9,7 @@ declare_global("btDefaultTable")
 -- battle.lua
 declare_global("battle")
 declare_global("doDamage")
+declare_global("battleParty")
 declare_global("battlePlayer")
 declare_global("battleSummon")
 declare_global("battleMonster")

@@ -1,3 +1,8 @@
+----------------------------------------
+-- battleMonster class
+--
+-- Battle functions for monsters
+----------------------------------------
 battleMonster	= {}
 
 function battleMonster:doAction(inAction)
