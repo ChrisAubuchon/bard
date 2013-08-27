@@ -83,18 +83,3 @@ function summon:getStatusLine()
 
 	return outString,outHpString
 end
-
-----------------------------------------
--- canBeAttacked()
-----------------------------------------
-function summon:canBeAttacked()
-	if ((self.isHostile) or (self.isDead) or (self.isStoned)) then
-		return false
-	end
-
-	if (self.isIllusion) then
-		local xxx_illusion_disbelieve_check
-	end
-
-	return true
-end

@@ -470,6 +470,7 @@ function btdebug.dunDebug()
 		text:print("2. Move to square\n")
 		text:print("3. Random Encounter\n")
 		text:print("4. Special Square\n")
+		text:print("5. Do chest\n")
 		text:printExit()
 		inkey = getkey()
 
@@ -484,6 +485,8 @@ function btdebug.dunDebug()
 			if (btdebug.enterDungeon()) then	
 				return	
 			end
+		elseif (inkey == "5") then
+			currentLevel:doTreasureChest()
 		end
 	until (inkey == "E")
 

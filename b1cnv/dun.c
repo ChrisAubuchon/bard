@@ -469,8 +469,9 @@ static void addMonsters(dunLevel_t *dl)
 static void addTraps(dunLevel_t *dl)
 {
 	uint32_t	level = dl->level - 1;
-	trap_t		*t;
 	uint32_t	i;
+	uint8_t		trapIndex;
+	trap_t		*t;
 
 	/* Floor traps */
 	for (i = 0; i < 8; i++) {
@@ -489,17 +490,24 @@ static void addTraps(dunLevel_t *dl)
 	}
 
 	/* Chest traps */
-	for (i = 0; i < 7; i++) {
+	for (i = 0; i < 4; i++) {
 		t = trap_new();
 
-		t->name = bts_strcpy(chest_trap_strings[i]);
-		t->effectString = NULL;
-		t->partyFlag = (i < 3) ? 1 : 0;
-		t->spAttack = chest_trap_spAttack[i];
-		t->ndice = chest_trap_dice[i] * dl->level;
-		t->dieval = 4;
+		trapIndex = chest_trap_by_level[level][i];
 
-		getSavingThrow((level << 4) + 0x10, &t->sv_lo, &t->sv_hi);
+		if (trapIndex) {
+			t->name = bts_strcpy(chest_trap_strings[trapIndex]);
+			t->effectString = NULL;
+			t->partyFlag = (trapIndex < 3) ? 1 : 0;
+			t->spAttack = chest_trap_spAttack[trapIndex];
+			t->ndice = chest_trap_dice[trapIndex] * dl->level;
+			t->dieval = 4;
+
+			getSavingThrow((level << 4) + 0x10, 
+					&t->sv_lo, &t->sv_hi);
+		} else {
+			t->name = NULL;
+		}
 
 		cnvList_add(dl->chestTraps, t);
 	}

@@ -42,6 +42,9 @@ declare_global("keyboardCommand")
 declare_global("baseCharacter")
 declare_global("character")
 
+-- chest.lua
+declare_global("chest")
+
 -- city.lua
 declare_global("city")
 declare_global("cityBuildings")

@@ -658,6 +658,13 @@ function dun:getBattleReward()
 	return self.items[rnd_xdy(1,#self.items)]
 end
 
+----------------------------------------
+-- doTreasureChest()
+----------------------------------------
+function dun:doTreasureChest()
+	return chest:new(self.chestTraps[rnd_xdy(1,4)])
+end
+
 local function __init()
 	dunData = read_table("dungeons", false)
 end

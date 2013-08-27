@@ -14,5 +14,6 @@ extern uint8_t *chest_trap_strings[];
 extern uint8_t *chest_trap_macros[];
 extern uint8_t chest_trap_dice[];
 extern uint8_t chest_trap_spAttack[];
+extern uint8_t chest_trap_by_level[][4];
 
 #endif

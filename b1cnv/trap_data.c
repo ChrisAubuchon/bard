@@ -35,6 +35,7 @@ uint8_t dun_trap_dice[] = {
 };
 
 uint8_t *chest_trap_strings[] = {
+  "NONE",
   "POISON NEEDLE",
   "BLADES",
   "DARTS",
@@ -63,3 +64,13 @@ uint8_t chest_trap_spAttack[] = {
 };
 
 
+uint8_t chest_trap_by_level[8][4] = {
+	{ 0, 0, 1, 1 },
+	{ 1, 1, 2, 3 },
+	{ 3, 4, 4, 5 },
+	{ 3, 4, 5, 5 },
+	{ 5, 6, 6, 7 },
+	{ 5, 6, 7, 7 },
+	{ 6, 5, 7, 7 },
+	{ 5, 6, 7, 7 }
+};

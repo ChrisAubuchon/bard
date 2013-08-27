@@ -44,6 +44,11 @@ static json_t *trap_toJson(const void *vt)
 
 	node = json_object();
 
+	if (t->name == NULL) {
+		JSON_FALSE(node, "name");
+		return node;
+	}
+
 	JSON_BTSTRING(node, "name", 		t->name);
 	JSON_BTSTRING_IF(node, "effectString",	t->effectString);
 	JSON_NUMBER(node,   "ndice",		t->ndice);

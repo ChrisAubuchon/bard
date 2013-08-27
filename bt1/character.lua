@@ -1124,11 +1124,22 @@ function character:getActionTarget(inTargetOptions)
 	return optionKeys[inkey]
 end
 
+----------------------------------------
+-- hideInShadows()
+----------------------------------------
+function character:hideInShadows()
+	if (self:isEffectEquipped("hasAlwaysHide")) then
+		self.isHiding = true
+		return
+	end
 
-
-
-
-
+	-- The DOS version has a bug where the check for a successful
+	-- hide uses the wrong field of the character structure for
+	-- comparison. It uses the word at offset 0x48 while the Review
+	-- Board uses offset 0x44 for the Rogue ability.
+	--
+	self.isHiding = true
+end
 
 
 
