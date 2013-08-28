@@ -709,11 +709,10 @@ function battleData:doReward()
 	local partySize		= 0
 
 	if (globals.gameState == globals.STATE_DUNGEON) then
-		local xxx_do_treasure_chest = true
+		giveGold = currentLevel:doTreasureChest()
 	end
 
-	bigpic:drawImage("PIC_TREASURE")
-	bigpic:setTitle("Treasure!")
+	bigpic:setBigpic("PIC_TREASURE", "Treasure!")
 
 	for mgroup,nmonsters in pairs(self.killCount) do
 		for i = 1,nmonsters do
@@ -745,6 +744,28 @@ function battleData:doReward()
 		i.battlesWon = i.battlesWon + 1
 	end
 
+	local function giveItem(inTarget, inItem)
+		local isIdentified = (rnd_and_x(7) ~= 7)
+		local item = items:new(inItem)
+
+		if (not inTarget:isSummon()) then
+			if (inTarget:giveItem(inItem, isIdentified)) then
+				text:print("%s found a ", inTarget.name)
+				if (isIdentified) then
+					text:print(item.name)
+				else
+					text:print(item.type)
+				end
+
+				return true
+			end
+		end
+
+		return false
+	end
+
+	itemsToGive = 1
+
 	if (giveGold) then
 		if ((itemsToGive == 0) and (currentLevel.level > 4)) then
 			itemsToGive = 1
@@ -760,10 +781,18 @@ function battleData:doReward()
 			end
 		end
 
-		if (itemsToGive == 0) then
-			timer:delay(8)
-			return
+		for i = 1,itemsToGive do
+			local item	= currentLevel:getBattleReward()
+			local c
+
+			for c in party:iterateFrom(party:randomCharacter()) do
+				if (giveItem(c, item)) then
+					break
+				end
+			end
 		end
+
+		timer:delay(8)
 	else
 		timer:delay(10)
 	end

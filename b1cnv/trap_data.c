@@ -46,6 +46,7 @@ uint8_t *chest_trap_strings[] = {
 };
 
 uint8_t *chest_trap_macros[] = {
+  "NONE",
   "CT_POISON_NEEDLE",
   "CT_BLADES",
   "CT_DARTS",
@@ -56,11 +57,11 @@ uint8_t *chest_trap_macros[] = {
 };
 
 uint8_t chest_trap_dice[] = {
-  1,2,4,3,7,1,1            
+  1,1,2,4,3,7,1,1            
 };
 
 uint8_t chest_trap_spAttack[] = {
-  1,0,0,1,0,3,5
+  0,1,0,0,1,0,3,5
 };
 
 

@@ -23,6 +23,10 @@ end
 
 ----------------------------------------
 -- enter()
+--
+-- Return values:
+--   true	- Party gets reward
+--   false	- Party left chest
 ----------------------------------------
 function chest:enter()
 	local inkey
@@ -43,6 +47,14 @@ function chest:enter()
 			end
 		elseif (inkey == "E") then
 			self:examine()
+		elseif (inkey == "O") then
+			if (self:open()) then
+				return true
+			end
+		elseif (inkey == "T") then
+			if (self:trapZap()) then
+				return true
+			end
 		end
 	until (inkey == "L")
 
@@ -88,17 +100,16 @@ function chest:disarm()
 	text:print("\n\n")
 
 	local function doDisarm()
-		dprint(self.isTrapped)
 		if (not self.isTrapped) then
 			return true
 		end
 
-		dprint(answer)
 		if (answer == self.name) then
 			return true
 		end
 
 		if (char.lk >= rnd_xdy(1,256)) then
+			dprint("Lucky trap disarm")
 			return true
 		end
 
@@ -115,7 +126,7 @@ function chest:disarm()
 		return false
 	end
 
-	self:setOffTrap()
+	self:setOffTrap(char)
 
 	return true
 end
@@ -162,16 +173,100 @@ end
 ----------------------------------------
 -- setOffTrap()
 ----------------------------------------
-function chest:setOffTrap()
+function chest:setOffTrap(inTarget)
+	local save
+	local half
+	local action
+	local damage
+
+	local function doTrap(inTarget)
+		action.target = inTarget
+		save, half = action:savingThrow()
+		if (not save) then
+			if (half) then
+				action.outData.damage = bit32.rshift(damage,1)
+			else
+				action.outData.damage = damage
+			end
+			action:doDamage()
+		end
+	end
+
 	text:cdprint(true, true, "You set off a %s", self.name)
+
+	damage = rnd_xdy(self.ndice, self.dieval)
+
+	action = btAction:new()
+	action.source = self
+
+	dprint(self.specialAttack)
+	action.inData.specialAttack = self.specialAttack
+
+	if (self.isPartyAttack) then
+		local c
+
+		for c in party:iterator() do
+			doTrap(c)
+		end
+	else
+		doTrap(inTarget)
+	end
+
+	party:display()
+end
+
+----------------------------------------
+-- calculateSavingThrow()
+----------------------------------------
+function chest:calculateSavingThrow()
+	return rnd_between_xy_inc(self.saveLo, self.saveHi)
+end
+
+----------------------------------------
+-- open()
+----------------------------------------
+function chest:open()
+	local char
+
+	char = self:getSource("\n\nWho will open it?")
+	if (not char) then
+		return false
+	end
+
+	if (self.isTrapped) then
+		self:setOffTrap(char)
+	end
+
+	return true
 end
 
 
+----------------------------------------
+-- trapZap()
+----------------------------------------
+function chest:trapZap()
+	local char
+	local action
 
+	char = self:getSource("\n\nWho will cast it?")
+	if (not char) then
+		return false
+	end
 
+	if (char.spellLevel.Conjurer < 1) then
+		return false
+	end
 
-
-
+	action = btAction:new()
+	action.inData.sppt = spells["TRZP"].sppt
+	if (char:consumeSpellPoints(action)) then
+		text:cdprint(true, true, "\nNot enough spell points.")
+		return false
+	else
+		text:cdprint(true, true, "\n\nYou disarmed it!")
+		return true
+	end
+end
 
 
 

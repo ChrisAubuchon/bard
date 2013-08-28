@@ -481,6 +481,7 @@ function btdebug.dunDebug()
 			return
 		elseif (inkey == "3") then
 			battle:random()
+			return
 		elseif (inkey == "4") then
 			if (btdebug.enterDungeon()) then	
 				return	

@@ -190,16 +190,24 @@ end
 ----------------------------------------
 -- iterateFrom()
 ----------------------------------------
-function linkedList:iterateFrom(inHead)
+function linkedList:iterateFrom(inHead, isCircular)
 	local function f(_, head)
 		if (not self.head) then return end
 
 		if (head == nil) then
 			return inHead
 		end
+		if (isCircular and (head.next == inHead)) then
+			return
+		end
 		if (head.next) then
 			return head.next
 		end
+		if (isCircular and (head ~= self.head)) then
+			
+			return self.head
+		end
+			
 		return
 	end
 

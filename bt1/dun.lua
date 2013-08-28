@@ -451,7 +451,7 @@ function dun:doFloorTrap()
 
 		inAction.source = inTrap
 		inAction.outData.damage = rnd_xdy(inTrap.ndice, inTrap.dieval)
-		inAction.inData.specialAtatck = inTrap.specialAttack
+		inAction.inData.specialAttack = inTrap.specialAttack
 
 		save, half = inAction:savingThrow()
 		if (not save) then

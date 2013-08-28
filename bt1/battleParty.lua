@@ -98,6 +98,10 @@ function battleParty:doDamage(inAction)
 		return false
 	end
 
+	if (inData.specialAttack) then
+		outData.specialAttack = inData.specialAttack
+	end
+
 	if (outData.damage > 0) then
 		if (self.cur_hp > outData.damage) then
 			self.cur_hp = self.cur_hp - outData.damage
