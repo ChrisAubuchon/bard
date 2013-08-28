@@ -21,11 +21,12 @@ end
 
 local function __addPortal(sq, quad, tileSet)
 	if (sq.hasCeilPortal) then
-		bigpic:dunAdd(quad, tileSet, "portal", sq"ceil")
+		bigpic:dunAdd(quad, tileSet, "portal", sq, "ceil")
 	end
 
 	if (sq.hasFloorPortal) then
-		bigpic:dunAdd(quad, tileset, "portal", sq"floor")
+		dprint(quad)
+		bigpic:dunAdd(quad, tileSet, "portal", sq, "floor")
 	end
 end
 
@@ -64,7 +65,7 @@ local function __buildSide(sq, tileSet, pathDir, wallDir, depth,
 				sideDepth, face)
 	local quad = tostring(depth) .. "-" .. sideNames[face][sideDepth]
 
-	if ((depth > 2) and (sideDepth < 3)) then
+	if ((depth >= 2) and (sideDepth < 3)) then
 		__addPortal(sq, quad, tileSet)
 	end
 	
@@ -593,6 +594,9 @@ function dun:runSquareCode()
 	end
 end
 
+----------------------------------------
+-- main()
+----------------------------------------
 function dun:main()
 	local inkey
 
@@ -608,17 +612,31 @@ function dun:main()
 
 		if (keyboardCommand(inkey)) then
 			self:resetBigpic()
+		elseif (inkey == "A") then
+			if (self.currentSquare.hasCeilPortal) then
+				if (party.levitate.active) then
+					self:doPortal(-1, 1)
+				end
+			end
 		elseif (inkey == "D") then
-			if (globals.debug) then	
-				btdebug.dunDebug()
-				self:resetBigpic()
+			if (self.currentSquare.hasFloorPortal) then
+				if (not party.levitate.active) then
+					self:doLifeDrain()
+					if (globals.partyDied) then
+						break
+					end
+				end
+				self:doPortal(1, -1)
 			end
 		elseif (inkey == btkeys.BTKEY_WANDERING) then
 			self:wanderingMonster()
 			self:resetBigpic()
+		elseif (inkey == "Z") then
+			if (globals.debug) then	
+				btdebug.dunDebug()
+				self:resetBigpic()
+			end
 		end
-
-		--self:resetBigpic()
 
 		if (globals.partyDied) then
 			globals.gameState = globals.STATE_PARTYDIED
@@ -627,6 +645,20 @@ function dun:main()
 	until (self.exit)
 end
 
+----------------------------------------
+-- doPortal()
+----------------------------------------
+function dun:doPortal(inDeltaUp, inDeltaDown)
+	if (self.dungeonDirection == "below") then
+		self:changeLevel(inDeltaUp)
+	else
+		self:changeLevel(inDeltaDown)
+	end
+end
+
+----------------------------------------
+-- doLifeDrain()
+----------------------------------------
 function dun:doLifeDrain()
 	local c
 	local action

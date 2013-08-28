@@ -22,6 +22,22 @@ end
 
 specialSquare.squares = {
 	{
+		name		= "Floor Portal",
+		dungeon		= "cellars",
+		level		= 3,
+		y		= 11,
+		x		= 21,
+		direction	= "north"
+	},
+	{
+		name		= "Ceiling Portal",
+		dungeon		= "cellars",
+		level		= 4,
+		y		= 11,
+		x		= 21,
+		direction	= "north"
+	},
+	{
 		name		= "SpiderGod",
 		dungeon		= "cellars",
 		level		= 2,

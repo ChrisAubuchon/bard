@@ -3,7 +3,7 @@
 #include <cnv_gfx.h>
 #include <dehuf.h>
 
-/*#define DEBUG*/
+#define DEBUG
 #include <debug.h>
 
 #define DUN_FRONT	0x01
@@ -30,16 +30,16 @@ static void getDunFacet(bt_view_t *oview, uint8_t tilset, dunfacet_t *fxxx, uint
 /****************************************/
 
 static dunfacet_t dunSide[] = {
-	{ "FL", "left", 5, 0, 9 },
-	{ "L" , "left", 5, 0, 6 },
-	{ "M" , "left", 5, 0, 4 },
-	{ "FL", "left", 4, 0, 8 },
-	{ "L" , "left", 4, 0, 5 },
-	{ "M" , "left", 4, 0, 3 },
-	{ "L" , "left", 3, 0, 7 },
-	{ "M" , "left", 3, 0, 2 },
-	{ "M" , "left", 2, 0, 1 },
-	{ "M" , "left", 1, 0, 0 },
+	{ "FL", "left",  5, 0, 9 },
+	{ "L" , "left",  5, 0, 6 },
+	{ "M" , "left",  5, 0, 4 },
+	{ "FL", "left",  4, 0, 8 },
+	{ "L" , "left",  4, 0, 5 },
+	{ "M" , "left",  4, 0, 3 },
+	{ "L" , "left",  3, 0, 7 },
+	{ "M" , "left",  3, 0, 2 },
+	{ "M" , "left",  2, 0, 1 },
+	{ "M" , "left",  1, 0, 0 },
 	{ "FR", "right", 5, 1, 9 },
 	{ "R" , "right", 5, 1, 6 },
 	{ "M" , "right", 5, 1, 4 },
@@ -95,15 +95,31 @@ static btwoGfx_t dun_sideGfx[10];
 static btstring_t *dundata;
 
 static oldGfxXY_t dunFrontXY[] = {
-	{9, 0, 103, 85}, {29, 13, 83, 66}, {40, 24, 72, 56}, {48, 33, 64, 49},
-	{0, 0, 8, 85}, {0, 13, 28, 66}, {7, 24, 39, 56}, {31, 33, 47, 49},
-	{0, 24, 6, 56}, {14, 33, 30, 49}, {0, 33, 13, 49}
+	{  9,  0, 103, 85 },
+	{ 29, 13,  83, 66 },
+	{ 40, 24,  72, 56 },
+	{ 48, 33,  64, 49 },
+	{  0,  0,   8, 85 },
+	{  0, 13,  28, 66 },
+	{  7, 24,  39, 56 },
+	{ 31, 33,  47, 49 },
+	{  0, 24,   6, 56 },
+	{ 14, 33,  30, 49 },
+	{  0, 33,  13, 49 }
 };
 
 static oldGfxSZ_t dunFrontSZ[] = {
-	{1, 0, 95, 85}, {5, 0, 59, 53}, {0, 0, 32, 32}, {0, 0, 16, 16},
-	{87, 0, 95, 85}, {31, 0, 59, 53}, {0, 0, 32, 32}, {0, 0, 16, 16},
-	{26, 0, 32, 32}, {0, 0, 16, 16}, {3, 0, 16, 16}
+	{  1, 0, 95, 85 },
+	{  5, 0, 59, 53 },
+	{  0, 0, 32, 32 },
+	{  0, 0, 16, 16 },
+	{ 87, 0, 95, 85 },
+	{ 31, 0, 59, 53 },
+	{  0, 0, 32, 32 },
+	{  0, 0, 16, 16 },
+	{ 26, 0, 32, 32 },
+	{  0, 0, 16, 16 },
+	{  3, 0, 16, 16 }
 };
 
 static uint16_t dunFrontDoorOffset[] = {
@@ -111,12 +127,21 @@ static uint16_t dunFrontDoorOffset[] = {
 };
 
 static oldGfxXY_t dunPortXY[] = {
-	{48, 72, 63, 78}, {48, 61, 63, 63}, {48, 52, 63, 53}, {0, 72, 7, 77}, {8, 60, 23, 62},
-	{24, 52, 39, 53}
+	{ 48, 72, 63, 78 },
+	{ 48, 61, 63, 63 },
+	{ 48, 52, 63, 53 },
+	{  0, 72,  7, 77 },
+	{  8, 60, 23, 62 },
+	{ 24, 52, 39, 53 }
 };
 
 static oldGfxSZ_t dunPortSZ[] = {
-	{0, 0, 15, 6}, {0, 0, 15, 2}, {0, 0, 15, 1}, {0, 0, 7, 5}, {0, 0, 15, 2}, {0, 0, 15, 1}
+	{ 0, 0, 15, 6 }, 
+	{ 0, 0, 15, 2 },
+	{ 0, 0, 15, 1 },
+	{ 0, 0,  7, 5 },
+	{ 0, 0, 15, 2 },
+	{ 0, 0, 15, 1 }
 };
 
 static uint16_t dunPortFloorOffset[] = {
@@ -124,13 +149,29 @@ static uint16_t dunPortFloorOffset[] = {
 };
 
 static oldGfxXY_t dunSideXY[] = {
-	{0, 0, 8, 87}, {9, 0, 28, 84}, {29, 14, 39, 65}, {40, 25, 47, 55}, {48, 34, 51, 48},
-	{8, 24, 29, 55}, {30, 32, 42, 49}, {0, 21, 7, 60}, {0, 24, 13, 55}, {14, 32, 26, 49}
+	{  0,  0,  8, 87 },
+	{  9,  0, 28, 84 },
+	{ 29, 14, 39, 65 },
+	{ 40, 25, 47, 55 },
+	{ 48, 34, 51, 48 },
+	{  8, 24, 29, 55 },
+	{ 30, 32, 42, 49 },
+	{  0, 21,  7, 60 },
+	{  0, 24, 13, 55 },
+	{ 14, 32, 26, 49 }
 };
 
 static oldGfxSZ_t dunSideSZ[] = {
-	{0, 0, 8, 87}, {1, 0, 20, 84}, {5, 0, 15, 51}, {0, 0, 7, 30}, {0, 0, 3, 14},
-	{0, 0, 21, 31}, {6, 0, 18, 17}, {0, 0, 7, 39}, {8, 0, 21, 31}, {6, 0, 18, 17}
+	{ 0, 0,  8, 87 },
+	{ 1, 0, 20, 84 },
+	{ 5, 0, 15, 51 },
+	{ 0, 0,  7, 30 },
+	{ 0, 0,  3, 14 },
+	{ 0, 0, 21, 31 },
+	{ 6, 0, 18, 17 },
+	{ 0, 0,  7, 39 },
+	{ 8, 0, 21, 31 },
+	{ 6, 0, 18, 17 }
 };
 
 static uint16_t dunSideDoorOffset[] = {
@@ -305,6 +346,7 @@ static void dun_gfxInit(void)
 		dun_portalGfx[counter].width = (dunPortSZ[counter].right + dunPortFloorOffset[counter] + 8) >> 3;
 		dun_portalGfx[counter].height = dunPortSZ[counter].top + 1;
 		dun_portalGfx[counter].offset = offset;
+		debug("dun_portalGfx[%d].offset = %x\n", counter, offset);
 		offset += (dun_portalGfx[counter].width * dun_portalGfx[counter].height) << 2;
 		counter++;
 	} while (counter < 6);
