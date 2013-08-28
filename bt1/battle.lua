@@ -522,8 +522,6 @@ function battleData:getRunFightOption()
 		inkey = getkey()
 
 		if (inkey == "R") then
-			local xxx_remove_if_false_after_debug = true
-if false then
 			local saveAction = btAction:new()
 			saveAction.target = party:getFirstCharacter()
 			saveAction.source = self.monParty:getLeadGroup()
@@ -532,19 +530,15 @@ if false then
 			end
 
 			if (rnd_and_x(7) == 0) then
-				dprint("rnd_and_x(7) == true")
 				return true
 			end
 			if (currentLevel:isCity() and not globals.isNight) then
 				if (rnd_and_x(3) == 0) then
-					dprint("rnd_and_x(3) == true")
 					return true
 				end
 			end
 
 			return false
-end
-			return true
 		elseif (inkey == "D") then
 			self:dumpBattleBonus()
 		elseif (inkey == "Q") then
@@ -736,7 +730,10 @@ function battleData:doReward()
 	xp = xp / partySize
 	au = au / partySize
 
-	text:cdprint(true, false, "Each character receives %d experience points for valor and battle knowledge, and %d pieces of gold.\n\n", xp, au)
+	text:cdprint(true, false, 
+		"Each character receives %d experience points for " ..
+		"valor and battle knowledge, and %d pieces of gold.\n\n", 
+		xp, au)
 
 	for i in party:characterIterator("isLive") do
 		i.xp = i.xp + xp

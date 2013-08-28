@@ -333,9 +333,6 @@ function city:moveForward()
 	end
 
 	text:clear()
-
-	local xxx_debug_print_label = true
-	text:print(self.currentSquare.label)
 end
 
 ----------------------------------------

@@ -1,14 +1,11 @@
 ----------------------------------------
 -- City gates
 ----------------------------------------
-local cityGates = {}
-
-btTable.addParent(cityGates, building:new("City Gate", "PIC_CITYGATE"))
-btTable.setClassMetatable(cityGates)
-
+local cityGates = building:new("City Gate", "PIC_CITYGATE")
 function cityGates:enter()
 	self:resetBigpic(true)
-	text:cdprint(true, false, "You stand before the city gates, which are blocked by a gigantic snow drift.")
+	text:cdprint(true, false, "You stand before the city gates, " ..
+				  "which are blocked by a gigantic snow drift.")
 	text:printContinue()
 	getkey()
 
@@ -28,11 +25,7 @@ end
 ----------------------------------------
 -- Empty building
 ----------------------------------------
-local empty = {}
-
-btTable.addParent(empty, building:new("Empty Building", "PIC_EMPTYBLDG"))
-btTable.setClassMetatable(empty)
-
+local empty = building:new("Empty Building", "PIC_EMPTYBLDG")
 function empty:enter()
 	if (rnd_xdy(1,4) == 1) then
 		battle:random()
@@ -51,18 +44,16 @@ end
 ----------------------------------------
 -- Harkyn entry square
 ----------------------------------------
-local harkyn = {}
-
-btTable.addParent(harkyn, building:new("Castle", "PIC_HARKYNCASTLE"))
-btTable.setClassMetatable(harkyn)
+local harkyn = building:new("Castle", "PIC_HARKYNCASTLE")
 
 function harkyn:enter()
 	local inkey
 
 	self:resetBigpic(true)
-	text:cdprint(true, false, "This is the entry chamber to Harkyn's ")
-	text:print("Castle. It is not guarded, but a sign threatens ")
-	text:print("trespassers with death. You can:\n\nTake stairs up")
+	text:cdprint(true, false, 
+			"This is the entry chamber to Harkyn's " ..
+			"Castle. It is not guarded, but a sign threatens " ..
+			"trespassers with death. You can:\n\nTake stairs up")
 	text:printExit()
 
 	repeat
@@ -80,18 +71,15 @@ end
 ----------------------------------------
 -- Kylearan entry square
 ----------------------------------------
-local kylearan = {}
-
-btTable.addParent(kylearan, building:new("Amber Tower", "PIC_TOWERINT"))
-btTable.setClassMetatable(kylearan)
-
+local kylearan = building:new("Amber Tower", "PIC_TOWERINT")
 function kylearan:enter()
 	local inkey
 
 	self:resetBigpic()
-	text:cdprint(true, false, "This is the entry chamber to Kylearan's ")
-	text:print("Amber Tower. A stairwell leads up to a lofty level of ")
-	text:print("chambers. You can:\n\nTake stairs")
+	text:cdprint(true, false, 
+			"This is the entry chamber to Kylearan's " ..
+			"Amber Tower. A stairwell leads up to a lofty level " ..
+			"of chambers. You can:\n\nTake stairs")
 	text:printExit()
 
 	repeat
@@ -108,21 +96,17 @@ end
 ----------------------------------------
 -- madgod temple code
 ----------------------------------------
-local madgod = {}
-
-btTable.addParent(madgod, building:new("Mad God", "PIC_TEMPLEINT"))
-btTable.setClassMetatable(madgod)
-
+local madgod = building:new("Mad God", "PIC_TEMPLEINT")
 function madgod:enter()
 	local inkey
 
-	local xxx_uncomment_to_get_madgod_code = true
-	city:enterDungeon("cellars", 1)
-if false then
 	city:enterDungeon("catacombs", 3)
 	self:resetBigpic()
 	repeat
-		text:cdprint(true, false, "\nThis is the temple of the Mad God. What is thy business, unbeliever?\n\nSpeak to priest")
+		text:cdprint(true, false, 
+			"\nThis is the temple of the Mad God. What is " ..
+			"thy business, unbeliever?\n\nSpeak to priest"
+			)
 		text:printExit()
 
 		inkey = getkey()
@@ -133,12 +117,24 @@ if false then
 				self:resetBigpic()
 			end
 		elseif (inkey == "S") then
-			text:cdprint(true, false, "\nOnly those who know the name of the Mad One are welcome.\nWhat wilt thou say?\n\n")
+			text:cdprint(true, false, 
+				"\nOnly those who know the name of the " ..
+				"Mad One are welcome.\nWhat wilt thou " ..
+				"say?\n\n"
+				)
 			local inString = text:readString()
 			if (inString ~= "TARJAN") then
-				text:cdprint(false, true, "\n\n\"Quit thy babbling,\" the priest says.")
+				text:cdprint(false, true, 
+					"\n\n\"Quit thy babbling,\" the " ..
+					"priest says."
+					)
 			else
-				text:cdprint(false, true, "\n\"Speak not the name of the High One so loudly, lest he awaken,\" the priest says. \"Enter the catacombs, believer.\"")
+				text:cdprint(false, true, 
+					"\n\"Speak not the name of the " ..
+					"High One so loudly, lest he " ..
+					"awaken,\" the priest says. " ..
+					"\"Enter the catacombs, believer.\""
+				)
 				city:enterDungeon("catacombs", 1)
 				return
 			end
@@ -148,16 +144,11 @@ if false then
 
 	currentLevel:turnParty("back")
 end
-end
 
 ----------------------------------------
 -- mangar entry square
 ----------------------------------------
-local mangar = {}
-
-btTable.addParent(mangar, building:new("The Tower", "PIC_TOWERINT"))
-btTable.setClassMetatable(mangar)
-
+local mangar = building:new("The Tower", "PIC_TOWERINT")
 function mangar:enter()
 	local inkey
 
@@ -168,15 +159,21 @@ function mangar:enter()
 	if (not party:isItemEquipped("Onyx Key")) then
 		bigpic:drawImage("PIC_MAGICMOUTH")
 		bigpic:setTitle("Magic Mouth")
-		text:splashMessage("A magic mouth on the wall speaks to you: \"Despised ones, none save Mangar may enter his demesne.")
+		text:splashMessage(
+			"A magic mouth on the wall speaks " ..
+			"to you: \"Despised ones, none save Mangar may " ..
+			"enter his demesne."
+			)
 		currentLevel:turnParty("back")
 		return
 	end
 
 	self:resetBigpic()
-	text:print("This is the entry chamber to Mangar's Tower. A stairwell ")
-	text:print("up to the first level of traps and terrors. You can:\n\n")
-	text:print("Take stairs")
+	text:print(
+		"This is the entry chamber to Mangar's Tower. A stairwell " ..
+		"up to the first level of traps and terrors. You can:\n\n" ..
+		"Take stairs"
+		)
 	text:printExit()
 
 	repeat
@@ -212,13 +209,13 @@ end
 ----------------------------------------
 -- stables
 ----------------------------------------
-local stables = {}
-btTable.addParent(stables, building:new("Empty Building", "PIC_EMPTYBLDG"))
-btTable.setClassMetatable(stables)
-
+local stables = building:new("Empty Building", "PIC_EMPTYBLDG")
 function stables:enter()
 	self:resetBigpic()
-	text:cdprint(true, false, "\nSorry, friends, all the horses have been eaten by creatures!")
+	text:cdprint(true, false, 
+		"\nSorry, friends, all the horses " ..
+		"have been eaten by creatures!"
+		)
 	text:printExit()
 	getkey()
 	currentLevel:turnParty("back")

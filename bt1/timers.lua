@@ -1,3 +1,17 @@
+----------------------------------------
+-- timers.lua
+--
+-- Real time timers for Bard's Tale 1
+--
+-- Based on the DOS version where one
+-- clock tick is ~55ms.
+----------------------------------------
+
+----------------------------------------
+-- bt1_16()
+--
+-- Interval: ~1s
+----------------------------------------
 local function bt1_16()
 	if (globals.doTimeEvents) then
 		if (globals.isNight) then
@@ -6,20 +20,22 @@ local function bt1_16()
 			end
 		else
 			if (rnd_and_x(0x7f) == 2) then
-				text:print("random encounter")
 				return btkeys.BTKEY_RANDOMBATTLE
 			end
 		end
 
 		if (rnd_and_x(0xff) == 2) then
-			text:print("Wandering monster")
 			return btkeys.BTKEY_WANDERING
 		end
 	end
 end
 
+----------------------------------------
+-- bt1_256()
+--
+-- Interval: ~15s
+----------------------------------------
 local function bt1_256()
-	dprint("bt1_256()")
 	if ((not globals.isPaused) and (globals.doTimeEvents)) then
 		party:doPoison()
 
@@ -30,8 +46,12 @@ local function bt1_256()
 	end
 end
 
+----------------------------------------
+-- bt1_512()
+--
+-- Interval: ~30s
+----------------------------------------
 local function bt1_512()
-	dprint("bt1_512()")
 	if (not globals.isPaused) then
 		if ((party.song.active) and (party.song.timer > 0)) then
 			party.song.timer = party.song.timer - 1
@@ -92,7 +112,13 @@ local function bt1_512()
 	end
 end
 
+----------------------------------------
+-- bt1_2048()
+--
+-- Interval: ~2m
+----------------------------------------
 local function bt1_2048()
+	dprint("bt1_2048()")
 	if (not globals.isPaused) then
 		if (globals.gameHour == 23) then
 			globals.gameHour = 0

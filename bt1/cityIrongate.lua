@@ -27,7 +27,11 @@ function cityIrongate:enter()
 
 	self:resetBigpic(true)
 	text:clear()
-	text:splashMessage("\nYou stand before an iron gate, beyond which stands %s tower.", self.castle)
+	text:splashMessage(
+		"\nYou stand before an iron gate, beyond which " ..
+		"stands %s tower.", 
+		self.castle
+		)
 
 	return true
 end

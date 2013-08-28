@@ -107,7 +107,6 @@ stringTables.isEffects = {
 	choke	= "choked",
 	steam	= "steamed"
 }
-	
 
 btkeys = {
 	BTKEY_RETURN = ":A:",

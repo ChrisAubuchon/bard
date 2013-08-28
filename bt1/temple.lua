@@ -29,7 +29,10 @@ function temple:enter()
 	self:setBigpic()
 
 	repeat
-		text:cdprint(true, false, "Welcome, oh weary ones, to our humble temple. Who needeth healing?")
+		text:cdprint(true, false, 
+			"Welcome, oh weary ones, to our humble temple. " ..
+			"Who needeth healing?"
+			)
 		text:printExit()
 		inkey = getkey()
 		if ((inkey > "0") and (inkey < "7")) then

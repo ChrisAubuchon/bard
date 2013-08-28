@@ -83,12 +83,15 @@ function shoppe:selectOption(inChar)
 		text:clear()
 		text:print("Greetings, %s. Would you like to:", inChar.name)
 		text:setCursor(0, 3)
-		text:print("\nBuy an item.")
-		text:print("\nSell an item.")
-		text:print("\nIdentify an item.")
-		text:print("\nPool gold.")
-		text:print("\nDone.")
-		text:print("\n\nYou have %d gold.", inChar.gold)
+		text:print(
+			"\nBuy an item." ..
+			"\nSell an item." ..
+			"\nIdentify an item." ..
+			"\nPool gold." ..
+			"\nDone." ..
+			"\n\nYou have %d gold.",
+			inChar.gold 
+			)
 
 		inkey = getkey()
 		if (inkey == "B") then

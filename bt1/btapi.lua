@@ -4,39 +4,6 @@
 -- Function to run API code in a 
 -- sandbox
 ----------------------------------------
-if false then
-function executeString(inString)
-	local rval
-	local mesg
-	local chunk
-
-	-- Load the chunk using the API as the global environment
-	chunk, mesg = load(inString, "=(load)", "bt", btapi)
-	if (chunk == nil) then
-		error("Compilation error: \n" .. inString.."\n", 2)
-	end
-
-	rval, mesg = pcall(chunk)
-	if (not rval) then
-		error("Code execution error: \n" .. inString .."\n"..mesg, 2)
-	end
-
-	return mesg
-end
-
-function executeFunction(inFunction)
-	local rval
-	local mesg
-
-	rval, mesg = pcall(inFunction)
-	if (mesg ~= nil) then
-		error("Code execution error: \n"..mesg, 2)
-	end
-
-	return rval
-end
-end
-
 function executeString(inString)
 	local chunk
 	local rval, mesg
@@ -54,6 +21,9 @@ function executeString(inString)
 	return mesg
 end
 
+----------------------------------------
+-- compileString()
+----------------------------------------
 function compileString(inString)
 	local rval, mesg
 
@@ -69,6 +39,9 @@ function compileString(inString)
 	return nil
 end
 
+----------------------------------------
+-- compileAction()
+----------------------------------------
 function compileAction(inAction)
 	local mesg
 
@@ -89,21 +62,3 @@ function compileAction(inAction)
 	end
 end
 
-----------------------------------------
--- API functions
-----------------------------------------
-
-if false then
-function btapi.doStairs(direction)
-	text:print("\nThere are stairs here, going " .. direction ..". Do you wish to take them?")
-	if (text:getYesNo()) then
-		return true
-	else
-		text:clear()
-	end
-end
-
-function btapi.inDungeon()
-	return (globals.gameState == globals.STATE_DUNGEON)
-end
-end

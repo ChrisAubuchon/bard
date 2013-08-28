@@ -4,7 +4,10 @@ function tavern:selectOption()
 	local inkey
 
 	repeat 
-		text:cdprint(true, false, "Hail, travelers! Step to the bar and I'll draw you a tankard.")
+		text:cdprint(true, false, 
+			"Hail, travelers! Step to the bar and I'll draw " ..
+			"you a tankard."
+			)
 		text:print("\n\nYou can:\nOrder a drink\nTalk to barkeep")
 		text:printExit()
 
@@ -30,12 +33,17 @@ function tavern:selectOption()
 end
 
 local talk = {
-	[1] = "\"The guardians can be deadly,\" the barkeep smirks.",
-	[2] = "\"A taste of wine might turn to ready adventure,\" the barkeep chuckles",
-	[3] = "\"Look for the Review Board on Trumpet Street,\" the barkeep whispers.",
-	[4] = "\"The gates cannot be scaled, but an entrance always exists,\" the barkeep stutters.",
-	[5] = "\"The Stone Golem has been spoken of twofold,\" the barkeep smiles.",
-	[6] = "\"The Spectre Snare can draw in even the mightiest,\" the barkeep grumbles.",
+	[1] =	"\"The guardians can be deadly,\" the barkeep smirks.",
+	[2] = 	"\"A taste of wine might turn to ready adventure,\" the " ..
+			"barkeep chuckles",
+	[3] =	"\"Look for the Review Board on Trumpet Street,\" the " ..
+			"barkeep whispers.",
+	[4] =	"\"The gates cannot be scaled, but an entrance always " ..
+			"exists,\" the barkeep stutters.",
+	[5] =	"\"The Stone Golem has been spoken of twofold,\" the " ..
+			"barkeep smiles.",
+	[6] =	"\"The Spectre Snare can draw in even the mightiest,\" " ..
+			"the barkeep grumbles.",
 }
 
 function tavern:talkToBarkeep()
@@ -133,10 +141,15 @@ function tavern:orderDrink()
 	if (inkey == "F") then
 		text:print("You don't feel too well.")
 	elseif (inkey == "G") then
-		text:cdprint(false, true, "The girls in the tavern are not impressed.")
+		text:cdprint(false, true, 
+			"The girls in the tavern are not impressed."
+			)
 		return true
 	elseif (inkey == "W") then
-		text:splashMessage("The barkeep says, \"Go down to the cellar and pick out a bottle.\"")
+		text:splashMessage(
+			"The barkeep says, \"Go down to the cellar and " ..
+			"pick out a bottle.\""
+			)
 		city:enterDungeon("cellars", 1)
 		return false
 	else

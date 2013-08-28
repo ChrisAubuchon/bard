@@ -32,12 +32,15 @@ function chest:enter()
 	local inkey
 
 	repeat
-		text:cdprint(true,false, "There is a chest here. Will you:\n\n")
-		text:print("Examine it\n")
-		text:print("Open chest\n")
-		text:print("Disarm it\n")
-		text:print("Trap Zap\n")
-		text:print("Leave chest\n")
+		text:cdprint(true,false, 
+			"There is a chest here. " ..
+			"Will you:\n\n" ..
+			"Examine it\n" ..
+			"Open chest\n" ..
+			"Disarm it\n" ..
+			"Trap Zap\n" ..
+			"Leave chest\n" 
+		)
 
 		inkey = getkey()
 

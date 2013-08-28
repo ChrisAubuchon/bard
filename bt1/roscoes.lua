@@ -20,8 +20,11 @@ function roscoes:doReenergize(inChar)
 	end
 
 	rechargeCost = (inChar.max_sppt - inChar.cur_sppt) * 15
-	text:print(" has some definite spell point problems. It will cost ")
-	text:print("%d in gold. Who will pay?", rechargeCost)
+	text:print(
+		" has some definite spell point problems. It will cost " ..
+		"%d in gold. Who will pay?", 
+		rechargeCost
+		)
 
 	payer = party:readSlot()
 	if (not payer) then
@@ -44,7 +47,10 @@ function roscoes:selectCharacter()
 	local inkey
 
 	repeat
-		text:cdprint(true, false, "Welcome, my friends, to Roscoe's Energy Emporium. Who needeth spell points restored?")
+		text:cdprint(true, false, 
+			"Welcome, my friends, to Roscoe's Energy Emporium. " ..
+			"Who needeth spell points restored?"
+			)
 		text:printExit()
 
 		inkey = getkey()

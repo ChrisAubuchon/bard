@@ -29,7 +29,9 @@ local function add_member()
 		party:addParty(roster:readParty(member))
 	else
 		if (party:findByName(member)) then
-			text:splashMessage("\n\nThat member is already in the party.")
+			text:splashMessage(
+				"\n\nThat member is already in the party."
+			)
 			return
 		end
 
@@ -72,12 +74,16 @@ local function delete_member()
 	end
 
 	if (party:findByName(member)) then
-		text:splashMessage("You can't delete a member in your party from the disk.")
+		text:splashMessage(
+			"You can't delete a member in your party from the disk."			)
 		return
 	end
 
-	text:clear()
-	text:print("This will permanently remove " .. member .. " from the disk! Do you wish to do this?")
+	text:cdprint(true, false,
+		"This will permanently remove %s from the disk! Do you " ..
+		"wish to do this?",
+		member
+		)
 
 	if (not text:getYesNo()) then
 		return
@@ -115,8 +121,10 @@ local function remove_member()
 		return
 	end
 
-	text:clear()
-	text:print("\nPick the party member to save to disk and remove from the party.")
+	text:cdprint(true, false, 
+		"\nPick the party member to save to disk and remove " ..
+		"from the party."
+		)
 	text:printCancel()
 
 	inkey = getkey()
@@ -179,15 +187,16 @@ local function enter()
 	bigpic:setTitle("The Guild")
 
 	while 1 do
-		text:clear()
-		text:print("Thou art in the Guild of Adventurers.\n");
-		text:print("\nAdd member");
-		text:print("\nRemove member");
-		text:print("\nCreate a member");
-		text:print("\nDelete a member");
-		text:print("\nSave party");
-		text:print("\nLeave game");
-		text:print("\nEnter the city");
+		text:cdprint(true, false,
+			"Thou art in the Guild of Adventurers.\n"
+			"\nAdd member"		..
+			"\nRemove member"	..
+			"\nCreate a member"	..
+			"\nDelete a member"	..
+			"\nSave party"		..
+			"\nLeave game"		..
+			"\nEnter the city"
+			)
 
 		inkey = getkey();
 
@@ -202,7 +211,10 @@ local function enter()
 		elseif (inkey == "E") then
 			if (not party:getFirstCharacter()) then
 				text:clear()
-				text:print("You must have a party to enter the city.")
+				text:print(
+					"You must have a party to enter " ..
+					"the city."
+					)
 				text:printContinue()
 				getkey()
 			else
@@ -211,12 +223,8 @@ local function enter()
 				globals.gameHour = 7
 
 				currentLevel = city:new("skara")
-				--currentLevel:enter(2, 3, "south")
-				--currentLevel:enter(6, 24, "west")
-				currentLevel:enter(17, 16, "east")
-				--currentLevel:enter(25, 15, "east")
+				currentLevel:enter(25, 15, "east")
 				globals.gameState = globals.STATE_CITY
-				local xxx_delete_after_debugging = true
 				party.light.active = true
 				party.light.distance = 5
 				party.light.seeSecret = true

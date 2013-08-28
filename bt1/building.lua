@@ -1,3 +1,9 @@
+----------------------------------------
+-- building class
+--
+-- Base class for a building in the
+-- city
+----------------------------------------
 building = {}
 function building:new(inTitle, inBigpic)
 	local self = {

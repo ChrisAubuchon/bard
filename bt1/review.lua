@@ -5,8 +5,11 @@ btTable.setClassMetatable(review)
 
 function review:nightCheck()
 	if (globals.isNight) then
-		text:cdprint(true, false, "The review Board is closed for the evening.")
-		text:cdprint(false, true, " The guild leaders will meet with you in the morning.\n\n")
+		text:cdprint(true, true, 
+			"The review Board is closed for the evening. " ..
+			"The guild leaders will meet with you in the " ..
+			"morning.\n\n"
+			)
 		return true
 	end
 
@@ -49,7 +52,11 @@ function review:doAdvancement()
 	text:cdprint(true, false, "The guild leaders deem that " .. char.name)
 	xpRequired = char:getXpForLevel(char.cur_level + 1)
 	if (char.xp < xpRequired) then
-		text:cdprint(false, true, " still needeth %d experience points prior to advancement...\n", xpRequired - char.xp)
+		text:cdprint(false, true, 
+			" still needeth %d experience points prior to " ..
+			"advancement...\n", 
+			xpRequired - char.xp
+			)
 		return
 	end
 
@@ -119,7 +126,10 @@ function review:doClassChange()
 	end
 
 	if (char:getSpellLevel() < 3) then
-		text:cdprint(false, true, "\nThou must know at least 3 spell levels in your present art first.")
+		text:cdprint(false, true, 
+			"\nThou must know at least 3 spell levels in your " ..
+			"present art first."
+			)
 		return
 	end
 
@@ -149,7 +159,9 @@ function review:doClassChange()
 	end
 
 	if (numAvailable == 0) then
-		text:cdprint(false, true, "\n\nThou cannot change to an old class!\n")
+		text:cdprint(false, true, 
+			"\n\nThou cannot change to an old class!\n"
+			)
 		return
 	end
 
@@ -210,12 +222,16 @@ function review:doSpellAcquire()
 	end
 
 	if (spellLevel == 7) then
-		text:cdprint(false, true, "\n\nThou art at the highest level of spell ability!")
+		text:cdprint(false, true, 
+			"\n\nThou art at the highest level of spell ability!"
+			)
 		return
 	end
 
 	if (math.floor((char.cur_level + 1) / 2) <= spellLevel) then
-		text:cdprint(false, true, "\n\nThou cannot acquire new spells yet.")
+		text:cdprint(false, true, 
+			"\n\nThou cannot acquire new spells yet."
+			)
 		return
 	end
 
@@ -224,7 +240,10 @@ function review:doSpellAcquire()
 			spellLevel + 1, cost)
 
 	if (char.gold < cost) then
-		text:cdprint(false, true, "\n\nThe spell Sages refure to teach you until you can pay!")
+		text:cdprint(false, true, 
+			"\n\nThe spell Sages refure to teach you until " ..
+			"you can pay!"
+			)
 		return
 	end
 
@@ -243,7 +262,9 @@ function review:doSpellAcquire()
 		if (char.class == "Wizard") then
 			char.wiza_level = char.wiza_level + 1
 		end
-		text:cdprint(true, true, "\n\nThe Spell Sages have taught you the lore.\n")
+		text:cdprint(true, true, 
+			"\n\nThe Spell Sages have taught you the lore.\n"
+			)
 	end
 
 end
@@ -256,7 +277,9 @@ function review:selectOption()
 			return
 		end
 
-		text:cdprint(true, false, "Wouldst thou like to be reviewed for:\n\n")
+		text:cdprint(true, false, 
+			"Wouldst thou like to be reviewed for:\n\n"
+			)
 		text:print("Advancement\n")
 		text:print("Spell Acquiring\n")
 		text:print("Class Change\n")

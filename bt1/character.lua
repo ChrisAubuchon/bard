@@ -281,6 +281,12 @@ function character:getSingularName()
 		return self.name
 end
 
+----------------------------------------
+-- isAfllicted()
+--
+-- Returns true if the character has
+-- a special status
+----------------------------------------
 function character:isAfflicted()
 	dprint("isAfflicted() called")
 	return (self.isDead or self.isOld or self.isPoisoned 
@@ -288,6 +294,12 @@ function character:isAfflicted()
 		or self.isPossessed or self.isNuts)
 end
 
+----------------------------------------
+-- getSpellLevel()
+--
+-- Returns the spell level of the
+-- current class
+----------------------------------------
 function character:getSpellLevel()
 	dprint(self.class)
 	if (self.class == "Magician") then return self.spellLevel.Magician end
@@ -295,10 +307,12 @@ function character:getSpellLevel()
 	if (self.class == "Sorcerer") then return self.spellLevel.Sorcerer end
 	if (self.class == "Wizard") then return self.spellLevel.Wizard end
 
-	dprint("getting here")
 	return false
 end
 
+----------------------------------------
+-- isSpellCaster()
+----------------------------------------
 function character:isSpellCaster()
 	if ((self.class == "Magician") or (self.class == "Conjurer") or
 	    (self.class == "Sorcerer") or (self.class == "Wizard")) then
@@ -308,6 +322,9 @@ function character:isSpellCaster()
 	return false
 end
 
+----------------------------------------
+-- isEffectEquipped()
+----------------------------------------
 function character:isEffectEquipped(effect)
 	local i
 
@@ -325,6 +342,8 @@ function character:isEffectEquipped(effect)
 end
 
 ----------------------------------------
+-- isTypeEquipped()
+--
 -- Return false if the item type is not
 -- equipped and the inventory slot if
 -- the type is equipped
@@ -406,10 +425,6 @@ function character:getBattlePriority()
 		return priority
 	end
 end
-
-function character:doEquippedEffect()
-end
-
 
 ----------------------------------------
 -- createCharacter()

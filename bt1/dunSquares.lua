@@ -1,5 +1,10 @@
 dunSquares = {}
 
+----------------------------------------
+-- battle()
+--
+-- Helper for dungeon square battles
+----------------------------------------
 function dunSquares:battle(...)
 	if (not battle:new(...)) then
 		if (globals.partyDied) then
@@ -14,11 +19,16 @@ function dunSquares:battle(...)
 	end
 end
 
+----------------------------------------
+-- longStairs()
+----------------------------------------
 function dunSquares:longStairs()
 	local rval
 
-	text:cdprint(true, false, "There are stairs here, which seem to go ")
-	text:print("a long way up. Do you wish to take them?")
+	text:cdprint(true, false, 
+		"There are stairs here, which seem to go a long way up. " ..
+		"Do you wish to take them?"
+		)
 	
 	if (text:getYesNo()) then
 		text:clear()
@@ -29,6 +39,9 @@ function dunSquares:longStairs()
 	end
 end
 
+----------------------------------------
+-- spiderGod()
+----------------------------------------
 function dunSquares:spiderGod()
 	local inkey
 
@@ -50,6 +63,9 @@ function dunSquares:spiderGod()
 	self.currentSquare = self.previousSquare
 end
 
+----------------------------------------
+-- lightBeam()
+----------------------------------------
 function dunSquares:lightBeam()
 	local inkey
 
@@ -57,9 +73,11 @@ function dunSquares:lightBeam()
 		return
 	end
 
-	text:cdprint(true, false, "A light beam from the surface is mirrored ")
-	text:print("down here and focused to a burning ray, blocking the ")
-	text:print("corridor. Do you wish to:\n\nTry crossing")
+	text:cdprint(true, false, 
+		"A light beam from the surface is mirrored down here " ..
+		"and focused to a burning ray, blocking the corridor. " ..
+		"Do you wish to:\n\nTry crossing"
+		)
 	text:printExit()
 
 	repeat
@@ -77,7 +95,10 @@ function dunSquares:lightBeam()
 				end
 			end
 			party:display()
-			text:cdprint(true, true,"\nYou try but are unable to pass through the burning ray of light!")
+			text:cdprint(true, true,
+				"\nYou try but are unable to pass through " ..
+				"the burning ray of light!"
+				)
 			self.currentSquare = self.previousSquare
 			return
 		end
@@ -92,9 +113,17 @@ function dunSquares:tarjanMouth()
 	bigpic:drawImage("PIC_MAGICMOUTH")
 	bigpic:setTitle("Mouth...")
 	text:clear()
-	text:splashMessage("A magic mouth on the wall speaks: Know this, that a man called Tarjan, thought to many to be insane, had through wizardly powers")
+	text:splashMessage(
+		"A magic mouth on the wall speaks: Know this, that a man " ..
+		"called Tarjan, thought to many to be insane, had through " ..
+		"wizardly powers"
+		)
 	text:clear()
-	text:splashMessage("...proclaimed himself a god in Skara Brae a hundred years ago. His image is locked in stone until made whole again...")
+	text:splashMessage(
+		"...proclaimed himself a god in Skara Brae a hundred " ..
+		"years ago. His image is locked in stone until made " ..
+		"whole again..."
+		)
 	text:clear()
 	self.currentSquare.clearCode()
 end
@@ -106,9 +135,11 @@ function dunSquares:basharKavilor()
 	text:clear()
 	bigpic:drawImage("PIC_SMAGE")
 	bigpic:setTitle("Bashar Kavilor")
-	text:print("You have entered the living chambers of Bashar Kavilor, ")
-	text:print("the High Priest. ")
-	text:splashMessage("He screams, \"Infidel! Face now the wrath of a servant of the Mad One!\"\n\n")
+	text:splashMessage(
+		"You have entered the living chambers of Bashar Kavilor, " ..
+		"the High Priest. He screams, \"Infidel! Face now the " ..
+		"wrath of a servant of the Mad One!\"\n\n"
+		)
 	text:cdprint(true, true, "\n\nI think you're in trouble.")
 	self:battle("M_MASTER_SORCERER", 1)
 	return
@@ -121,7 +152,10 @@ function dunSquares:sphynx()
 	bigpic:drawImage("PIC_TREASURE")
 	bigpic:setTitle("")
 	text:clear()
-	text:splashMessage("This is the High Priest's treasure chamber. his pet dragon, Sphynx, peers at you hungily. \"Sphynx eat now,\" it growls.")
+	text:splashMessage("This is the High Priest's treasure chamber. " ..
+		"His pet dragon, Sphynx, peers at you hungily. \"Sphynx " ..
+		"eat now,\" it growls."
+		)
 	self:battle("M_GREY_DRAGON", 1)
 end
 	
@@ -132,7 +166,10 @@ function dunSquares:witchKing()
 	text:clear()
 	bigpic:drawImage("PIC_SPECTRE")
 	bigpic:setTitle("Witch King")
-	text:splashMessage("Before you lies the ancient burial chamber of King Aildrek, now a creature of darkness. \"Now, mortal man, I will drink of your souls,\" he hisses.")
+	text:splashMessage("Before you lies the ancient burial chamber " ..
+		"of King Aildrek, now a creature of darkness. \"Now, " ..
+		"mortal man, I will drink of your souls,\" he hisses."
+		)
 	if (self:battle("M_SPECTRE", 1)) then
 		local c
 		c = party:giveItem("Eye", true)
@@ -156,7 +193,9 @@ function dunSquares:baronsThrone()
 	end
 
 	bigpic:setTitle("Throne")
-	text:cdprint(true, false, "You are at the Baron's throne. Who wishes to sit on it?")
+	text:cdprint(true, false, 
+		"You are at the Baron's throne. Who wishes to sit on it?"
+		)
 
 	inkey = getkey()
 	c = party:readMember(inkey)
@@ -177,7 +216,9 @@ function dunSquares:baronsThrone()
 		party:display()
 		goto restart
 	else
-		text:cdprint(true, true, "\n\nThe sound of grating stone is heard.")
+		text:cdprint(true, true, 
+			"\n\nThe sound of grating stone is heard."
+			)
 		self.currentSquare.north.gfx = false
 		self.currentSquare.north.isWall = false
 		self.currentSquare.clearCode()
@@ -191,10 +232,16 @@ function dunSquares:guardCaptain()
 	text:clear()
 	bigpic:drawImage("PIC_THIEF")
 	bigpic:setTitle("Guard Captain")
-	text:splashMessage("You see the Captain of the Guard standing before you.\n\"Die, scum!\" he screams as he runs insanely toward you.")
+	text:splashMessage(
+		"You see the Captain of the Guard standing before you.\n" ..
+		"\"Die, scum!\" he screams as he runs insanely toward you."
+		)
 	self:battle("M_MASTER_NINJA", 1)
 end
 
+----------------------------------------
+-- robedMen()
+----------------------------------------
 function dunSquares:robedMen()
 	local foundRobes = false
 	local c
@@ -202,9 +249,11 @@ function dunSquares:robedMen()
 	text:clear()
 	bigpic:drawImage("PIC_NOMAD")
 	bigpic:setTitle("Robed Men")
-	text:print("Before you stand six warriors, dressed in bright green ")
-	text:print("robes. \"Intruders!\" ")
-	text:splash("They scream battle cries as they run toward you with drawn swords.")
+	text:splashMessage(
+		"Before you stand six warriors, dressed in bright green " ..
+		"robes. \"Intruders!\" They scream battle cries as they " ..
+		"run toward you with drawn swords."
+		)
 	if (self:battle("M_BERSERKER", 6)) then
 		for c in party:characterIterator() do
 			if (c:giveItem("Robes")) then	
@@ -220,6 +269,9 @@ function dunSquares:robedMen()
 	end
 end
 
+----------------------------------------
+-- crystalSword()
+----------------------------------------
 function dunSquares:crystalSword()
 	text:clear()
 	if (not party:hasItem("Crystal Sword")) then
@@ -227,7 +279,9 @@ function dunSquares:crystalSword()
 
 		c = party:giveItem("Crystal Sword")
 		if (c) then
-			text:cdprint(true,true, "%s has found a Crystal sword.", c.name)
+			text:cdprint(true,true, 
+				"%s has found a Crystal sword.", c.name
+				)
 			text:clear()
 		end
 	end
@@ -244,8 +298,14 @@ function dunSquares:vampireOldMan()
 	bigpic:setTitle("Old Man")
 
 	local function printIntro()
-		text:splashMessage("A wizened man appears before you, saying, \"Answer this riddle to pass:")
-		text:splashMessage("\"Once man alive\nNow living death\nIt drinketh blood\nN' stealeth breath.\"")
+		text:splashMessage(
+			"A wizened man appears before you, saying, "..
+			"\"Answer this riddle to pass:"
+			)
+		text:splashMessage(
+			"\"Once man alive\nNow living death\nIt drinketh " ..
+			"blood\nN' stealeth breath.\""
+			)
 		text:cdprint(true,false,"Will you:\n\nAnswer riddle\nFight him")
 		text:printExit()
 	end
@@ -261,7 +321,9 @@ function dunSquares:vampireOldMan()
 			return false
 		end
 
-		text:cdprint(true, true, "\"Pass at your leisure,\" the Master Sorcerer says.")
+		text:cdprint(true, true, 
+			"\"Pass at your leisure,\" the Master Sorcerer says."
+			)
 		text:clear()
 		return true
 	end
@@ -296,7 +358,9 @@ function dunSquares:silverSquare()
 
 		c = party:giveItem("Silvr Square")
 		if (c) then
-			text:cdprint(true, true, "%s has found a silver square.", c.name)
+			text:cdprint(true, true, 
+				"%s has found a silver square.", c.name
+				)
 			text:clear()
 		end
 		self.currentSquare.clearCode()
@@ -311,9 +375,14 @@ function dunSquares:shieldsMouth()
 
 	bigpic:drawImage("PIC_MAGICMOUTH")
 	bigpic:setTitle("Mouth...")
-	text:splashMessage("A magic mouth on the wall speaks to you, saying this riddle:")
-	text:cdprint(true, false, "Past warscapes fought by men long dead, and treasures lost on bloodied fields, ")
-	text:print("the One god lifts his thorn-crowned head, and lays a strength on friendly..\n\n")
+	text:splashMessage(
+		"A magic mouth on the wall speaks to you, saying this riddle:"
+		)
+	text:cdprint(true, false, 
+		"Past warscapes fought by men long dead, and treasures " ..
+		"lost on bloodied fields, the One god lifts his " ..
+		"thorn-crowned head, and lays a strength on friendly..\n\n"
+		)
 
 	answer = text:readString()
 	if (answer ~= "SHIELDS") then
@@ -342,7 +411,11 @@ function dunSquares:partyHasRobes()
 		if (not c:hasItem("Robes")) then
 			bigpic:drawImage("PIC_NOMAD")
 			bigpic:setTitle("Robed Men")
-			text:splashMessage("The legions of Baron Harkyn stand before you, recognizing you as intruders, \"Death to them!\" they scream.")
+			text:splashMessage(
+				"The legions of Baron Harkyn stand before " ..
+				"you, recognizing you as intruders, " ..
+				"\"Death to them!\" they scream."
+				)
 			self:battle("M_BERSERKER", 99,
 				    "M_BERSERKER", 99,
 				    "M_BERSERKER", 99,
@@ -362,7 +435,10 @@ function dunSquares:eyeStatue()
 	bigpic:setBigpic("PIC_MADGOD", "Old statue")
 
 	local function printIntro()
-		text:cdprint(true, false, "An old statue of a fifteen foot tall warrior stands before you. Will you:\n\nApproach it")
+		text:cdprint(true, false, 
+			"An old statue of a fifteen foot tall warrior " ..
+			"stands before you. Will you:\n\nApproach it"
+			)
 		text:printExit()
 	end
 
@@ -375,10 +451,16 @@ function dunSquares:eyeStatue()
 			c = party:hasItem("Eye")
 			dprint(c)
 			if (c) then
-				text:cdprint(true, true, "An Eye levitates from %s and goes into the statue's empty socket.", c.name)
+				text:cdprint(true, true, 
+					"An Eye levitates from %s and goes " ..
+					"into the statue's empty socket.", 
+					c.name
+					)
 				c.inventory:dropItem("Eye")
 				if (self:battle("M_MAD_GOD", 1)) then
-					text:cdprint(true, true, "You are being teleported!")
+					text:cdprint(true, true, 
+						"You are being teleported!"
+						)
 					self:exitToCity()
 					currentLevel.currentSquare = currentLevel:getSq("28-2")
 					return
@@ -405,7 +487,11 @@ function dunSquares:skullTavernQuestion()
 	bigpic:setBigpic("PIC_FRED", "An old man")
 
 	local function printIntro()
-		text:splashMessage("An old man stands before you saying, \"Answer this question to pass:\n\nWhat tavern lies off Night Archer street?\"")
+		text:splashMessage(
+			"An old man stands before you saying, \"Answer " ..
+			"this question to pass:\n\nWhat tavern lies off " ..
+			"Night Archer street?\""
+			)
 	end
 
 	local function checkAnswer()
@@ -423,7 +509,9 @@ function dunSquares:skullTavernQuestion()
 	printIntro()
 
 	repeat
-		text:cdprint(true, false, "Will you:\n\nAnswer question\nFight him")
+		text:cdprint(true, false, 
+			"Will you:\n\nAnswer question\nFight him"
+			)
 		text:printExit()
 
 		inkey = getkey()
@@ -431,17 +519,21 @@ function dunSquares:skullTavernQuestion()
 		if (inkey == "A") then
 			if (checkAnswer()) then
 				self.currentSquare.clearCode()
-				text:cdprint(true, true, "\"Pass, oh learned ones,\" he says.")
+				text:cdprint(true, true, 
+					"\"Pass, oh learned ones,\" he says."
+					)
 				text:clear()
 				return
 			else
-				text:cdprint(true, true, "\"Wrong,\" the old man says.")
+				text:cdprint(true, true, 
+					"\"Wrong,\" the old man says."
+					)
 				printIntro()
 			end
 		elseif (inkey == "F") then
 			self:battle("M_OLD_MAN", 1, 
-				"M_LESSER_DEMON", 2,
-				"M_LESSER_DEMON", 2
+					"M_LESSER_DEMON", 2,
+					"M_LESSER_DEMON", 2
 				)
 			return
 		end
@@ -457,8 +549,10 @@ function dunSquares:stoneGolemMouth()
 	local answer
 
 	bigpic:setBigpic("PIC_MAGICMOUTH", "Mouth...")
-	text:cdprint(true, false, "A magic mouth on the wall speaks to you, saying this:\n\"")
-	text:print("Name the one of cold, foretold twofold:\"\n\n")
+	text:cdprint(true, false, 
+		"A magic mouth on the wall speaks to you, saying this:\n\"" ..
+		"Name the one of cold, foretold twofold:\"\n\n"
+		)
 
 	answer = text:readString()
 	if (answer == "STONE GOLEM") then
@@ -477,8 +571,10 @@ function dunSquares:sinisterMouth()
 	local answer
 
 	bigpic:setBigpic("PIC_MAGICMOUTH", "Mouth...")
-	text:cdprint(true, false, "A magic mouth on the wall speaks to you, saying \"")
-	text:print("Name the endless byway and your path shall be guaranteed:\"\n")
+	text:cdprint(true, false, 
+		"A magic mouth on the wall speaks to you, saying \"" ..
+		"Name the endless byway and your path shall be guaranteed:\"\n"
+		)
 
 	answer = text:readString()
 	if (answer == "SINISTER") then
@@ -507,7 +603,9 @@ function dunSquares:silverTriangle()
 
 		c = party:giveItem("Silvr Triang")
 		if (c) then
-			text:cdprint(true, true, "%s has found a silver triangle.", c.name)
+			text:cdprint(true, true, 
+				"%s has found a silver triangle.", c.name
+				)
 			text:clear()
 		end
 		self.currentSquare.clearCode()
@@ -522,7 +620,10 @@ function dunSquares:crystalStatue()
 
 	local function printIntro()
 		bigpic:setBigpic("PIC_STATUE", "Golem!")
-		text:cdprint(true, false, "A crystal statue comes to life before you, ready to attack! Will you:\n\nFight it")
+		text:cdprint(true, false, 
+			"A crystal statue comes to life before you, ready " ..
+			"to attack! Will you:\n\nFight it"
+			)
 		text:printExit()
 	end
 
@@ -537,7 +638,10 @@ function dunSquares:crystalStatue()
 					self.currentSquare.clearCode()
 					return
 				end
-				text:cdprint(false, true, "Something is happening to the golem's shattered body...")
+				text:cdprint(false, true, 
+					"Something is happening to the " ..
+					"golem's shattered body..."
+					)
 				printIntro()
 			else
 				if (not globals.partyDied) then
@@ -551,6 +655,9 @@ function dunSquares:crystalStatue()
 	self.currentSquare = self.previousSquare
 end
 
+----------------------------------------
+-- onyxKey()
+----------------------------------------
 function dunSquares:onyxKey()
 	local c
 
@@ -560,10 +667,24 @@ function dunSquares:onyxKey()
 	end
 
 	bigpic:setBigpic("PIC_KYLEARAN", "Kylearan")
-	text:splash("Greetings! I am Kylearan, oh perseverent ones, the good wizard of Skara Brae. Put away your weapons, for I am your ally, not an enemy\n")
-	text:splashMessage("You have passed my tests, and can now continue on to your true quest, the source of evil in skara Brae -- Mangar the Dark, my nemesis\n")
-	text:splashMessage("Mangar's tower, at the opposite corner of Skara Brae, is a five level deathtrap, which can only be entered by use of an onyx key.\n")
-	text:cdprint(true, true, "Good luck, and remember, seeing is not always believing.\n\n")
+	text:splash(
+		"Greetings! I am Kylearan, oh perseverent ones, the " ..
+		"good wizard of Skara Brae. Put away your weapons, for I " ..
+		"am your ally, not an enemy\n"
+		)
+	text:splashMessage(
+		"You have passed my tests, and can now continue on to " ..
+		"your true quest, the source of evil in skara Brae -- " ..
+		"Mangar the Dark, my nemesis\n"
+		)
+	text:splashMessage(
+		"Mangar's tower, at the opposite corner of Skara Brae, " ..
+		"is a five level deathtrap, which can only be entered " ..
+		"by use of an onyx key.\n"
+		)
+	text:cdprint(true, true, 
+		"Good luck, and remember, seeing is not always believing.\n\n"
+		)
 
 	c = party:giveItem("Onyx Key")
 	if (c) then
@@ -582,8 +703,10 @@ end
 function dunSquares:mouthFour()
 	bigpic:setBigpic("PIC_MAGICMOUTH", "Mouth...")
 
-	text:cdprint(true, false, "A magic mouth on the wall speaks to you, saying this:\n\"")
-	text:splash("Perseverence in all things.\"")
+	text:splashMessage(
+		"A magic mouth on the wall speaks to you, saying this:\n\"" ..
+		"Perseverence in all things.\""
+		)
 	text:clear()
 	self:changeLevel(1)
 end
@@ -600,8 +723,11 @@ function dunSquares:silverCircle()
 	end
 
 	bigpic:setBigpic("PIC_MAGICMOUTH", "Mouth...")
-	text:cdprint(true, false, "A magic mouth on the wall speaks to you, saying this:\n\"")
-	text:print("Two shapes yours,\n one's around;\n Speak the shape\n and final found\"\n\n")
+	text:cdprint(true, false, 
+		"A magic mouth on the wall speaks to you, saying this:\n\"" ..
+		"Two shapes yours,\n one's around;\n Speak the shape\n and " ..
+		"final found\"\n\n"
+		)
 
 	answer = text:readString()
 	if (answer ~= "CIRCLE") then
@@ -624,13 +750,16 @@ end
 function dunSquares:masterKey()
 	local inkey
 
-	text:clear()
 	if (party:hasItem("Master Key")) then
 		return
 	end
 
 	bigpic:setBigpic("PIC_FRED", "Keymaster")
-	text:splash("An old man is here, and says to you:\n\"I am the Keymaster. I have something to sell you for the low price of 50000 gold pieces.\"")
+	text:splashMessage(
+		"An old man is here, and says to you:\n\"I am the " ..
+		"Keymaster. I have something to sell you for the low " ..
+		"price of 50000 gold pieces.\""
+		)
 	self.currentSquare.clearCode()
 
 	----------------------------------------
@@ -680,7 +809,11 @@ function dunSquares:masterKey()
 			end
 			printIntro()
 		elseif (inkey == "F") then
-			text:splashMessage("The man speaks briefly and 6 friends appear. \"Most unfriendly,\" he says. His friends look very angry.")
+			text:splashMessage(
+				"The man speaks briefly and 6 friends " ..
+				"appear. \"Most unfriendly,\" he says. " ..
+				"His friends look very angry."
+				)
 			self:battle("M_WRAITH", 3, 
 				    "M_WRAITH", 3, 
 				    "M_OLD_MAN", 1)
@@ -701,8 +834,11 @@ function dunSquares:sevenAnswers()
 	}
 
 	bigpic:setBigpic("PIC_MAGICMOUTH", "Mouth...")
-	text:cdprint(true, false, "A magic mouth on the wall speaks to you, saying this:\n\"")
-	text:print("Speak the seven of the One God, in Sequence, and seek the lost stairs:\"")
+	text:cdprint(true, false, 
+		"A magic mouth on the wall speaks to you, saying this:\n\"" ..
+		"Speak the seven of the One God, in Sequence, and seek " ..
+		"the lost stairs:\""
+		)
 	self.currentSquare.clearCode()
 
 	for i = 1,7 do
@@ -728,14 +864,20 @@ end
 function dunSquares:largeCoffin()
 	local inkey
 
-	text:cdprint(true, false, "There is a large black coffin in this tomb. Do you wish to:\n\nOpen it")
+	text:cdprint(true, false, 
+		"There is a large black coffin in this tomb. " ..
+		"Do you wish to:\n\nOpen it"
+		)
 	text:printExit()
 
 	repeat
 		inkey = getkey()
 
 		if (inkey == "O") then
-			text:splashMessage("A Vampire Lord rises from the coffin. He seems rather disturbed.")
+			text:splashMessage(
+				"A Vampire Lord rises from the coffin. " ..
+				"He seems rather disturbed."
+				)
 			self:battle("M_VAMPIRE_LORD", 1)
 			return
 		end
@@ -749,13 +891,19 @@ end
 ----------------------------------------
 function dunSquares:sleepingDragons()
 	if (party.song.active) then
-		text:splashMessage("Your music caused two sleeping dragons to continue slumbering.")
+		text:splashMessage(
+			"Your music caused two sleeping dragons to " ..
+			"continue slumbering."
+			)
 		self.currentSquare.clearCode()
 		return
 	end
 
-	text:cdprint(true, false, "Two sleeping dragons awaken at your passage. \"Hmm, humans for dinner again, ")
-	text:splash("Gor,\" says the small one. \"Why don't we get any pork up here?\"")
+	text:splashMessage(
+		"Two sleeping dragons awaken at your passage. \"Hmm, " ..
+		"humans for dinner again, Gor,\" says the small one. " ..
+		"\"Why don't we get any pork up here?\""
+		)
 	self:battle("M_RED_DRAGON", 1, "M_RED_DRAGON", 1)
 end
 
@@ -767,8 +915,10 @@ function dunSquares:thorFigurine()
 	local c
 
 	bigpic:setBigpic("PIC_MAGICMOUTH", "Mouth...")
-	text:cdprint(true, false, "A magic mouth on the wall speaks to you, saying this:\n\"")
-	text:print("Name the greatest son of Odin and win his aid.\"")
+	text:cdprint(true, false, 
+		"A magic mouth on the wall speaks to you, saying this:\n\"" ..
+		"Name the greatest son of Odin and win his aid.\""
+		)
 
 	answer = text:readString()
 	if (answer ~= "THOR") then
@@ -796,7 +946,10 @@ end
 -- silverDest
 ----------------------------------------
 function dunSquares:silverDest()
-	text:cdprint(true, true, "On the wall to the north are etched 3 geometric shapes: a square, a circle, and a triangle.")
+	text:cdprint(true, true, 
+		"On the wall to the north are etched 3 geometric shapes: " ..
+		"a square, a circle, and a triangle."
+		)
 	self.currentSquare.clearCode()
 
 	if (party:hasItem("Silvr Square") and party:hasItem("Silvr Circle") and
@@ -824,8 +977,10 @@ function dunSquares:spectreSnare()
 
 	bigpic:setBigpic("PIC_MAGICMOUTH", "Mouth...")
 
-	text:cdprint(true, false, "A magic mouth on the wall speaks to you, saying this:\n\"")
-	text:print("What can bind the mightiest foes?\"\n\n")
+	text:cdprint(true, false, 
+		"A magic mouth on the wall speaks to you, saying this:\n\"" ..
+		"What can bind the mightiest foes?\"\n\n"
+		)
 
 	answer = text:readString()
 	if (answer ~= "SPECTRE SNARE") then
@@ -850,7 +1005,9 @@ function dunSquares:boilingLiquid()
 	local inkey
 	local c
 
-	text:cdprint(true, false, "There is a pool of boiling liquid here. Will you:\n\nDive in")
+	text:cdprint(true, false, 
+		"There is a pool of boiling liquid here. Will you:\n\nDive in"
+		)
 	text:printExit()
 
 	repeat
@@ -879,7 +1036,10 @@ end
 -- mangarTreasure()
 ----------------------------------------
 function dunSquares:mangarTreasure()
-	text:splashMessage("This is Mangar's treasure trove. Two dragons are here, and they're very hungry. I think you're in some real trouble.")
+	text:splashMessage(
+		"This is Mangar's treasure trove. Two dragons are here, " ..
+		"and they're very hungry. I think you're in some real trouble."
+		)
 
 	self:battle("M_BLACK_DRAGON", 1, "M_BLACK_DRAGON", 1)
 end
@@ -891,8 +1051,10 @@ function dunSquares:mouthOne()
 	local c
 
 	bigpic:setBigpic("PIC_MAGICMOUTH", "Mouth...")
-	text:cdprint(true, false, "A magic mouth on the wall speaks to you, saying this:\n\"")
-	text:cdprint(false, true, "Death to those who would attack the mighty one!\"")
+	text:cdprint(true, true, 
+		"A magic mouth on the wall speaks to you, saying this:\n\"" ..
+		"Death to those who would attack the mighty one!\""
+		)
 
 	for c in party:iterator() do
 		local action = btAction:new()
@@ -941,9 +1103,15 @@ function dunSquares:mangar()
 	text:clear()
 	bigpic:setBigpic("PIC_MANGAR", "Mangar!")
 
-	text:print("You stand in the antechamber of Mangar the Dark, evil Archmage of Skara ")
-	text:splash("Brae. Mangar glares at you with deep hatred. \"Die, mortals!\" he screams.")
-	text:splashMessage("With a wave of his hand a few of his close friends drop by. They don't look like a fun group.")
+	text:splashMessage(
+		"You stand in the antechamber of Mangar the Dark, evil " ..
+		"Archmage of Skara Brae. Mangar glares at you with deep " ..
+		"hatred. \"Die, mortals!\" he screams."
+		)
+	text:splashMessage(
+		"With a wave of his hand a few of his close friends drop " ..
+		"by. They don't look like a fun group."
+		)
 	text:clear()
 	if (not battle:new("M_DEMON_LORD", 2, "M_VAMPIRE_LORD", 3, 
 			   "M_MANGAR", 1)) then
@@ -959,10 +1127,20 @@ function dunSquares:mangar()
 
 	-- There seems to be a loop waiting for a key here. Not sure why.
 
-	text:print("Kylearan, the good Archmage, appears before you in a flash of light. \"Well")
-	text:splash(" done!\" he cries, beaming. \"Your quest in Skara Brae is now finished!\"")
-	text:splashMessage("\"The evil one is now defeated, and his spell of winter will soon end.\"")
-	text:splashMessage("\"You will all, as a symbol of my gratitude, receive a gold and experience bonus of 300,000 units. Fare well and live long!\"")
+	text:splashMessage(
+		"Kylearan, the good Archmage, appears before you in a " ..
+		"flash of light. \"Well done!\" he cries, beaming. 
+		"\"Your quest in Skara Brae is now finished!\""
+		)
+	text:splashMessage(
+		"\"The evil one is now defeated, and his spell of winter " ..
+		"will soon end.\""
+		)
+	text:splashMessage(
+		"\"You will all, as a symbol of my gratitude, receive " ..
+		"a gold and experience bonus of 300,000 units. Fare well " ..
+		"and live long!\""
+		)
 	text:cdprint(true, true, "Kylearan vanishes.")
 
 	for c in party:characterIterator() do

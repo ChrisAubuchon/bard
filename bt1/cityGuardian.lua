@@ -23,12 +23,7 @@ function cityGuardian:new(inDirection, inMonster)
 		return
 	end
 
-	local xxx_remove_if_false_debug = true
-if false then
 	return self:enter()
-else
-	return false
-end
 end
 
 function cityGuardian:enter()
@@ -37,9 +32,13 @@ function cityGuardian:enter()
 	repeat
 		self:resetBigpic(true)
 		text:clear()
-		text:print("\nYou stand before a gate, which is guarded by %s",
-				statueDescription[self.monster])
-		text:print(". You can:\n\nAttack it.\nLeave it.")
+		text:print(
+			"\nYou stand before a gate, which is guarded by %s" ..
+			". You can:\n\n" ..
+			"Attack it.\n"	..
+			"Leave it.",
+			statueDescription[self.monster]
+			)
 
 		inkey = getkey()
 		if (inkey == "A") then
