@@ -19,6 +19,7 @@ local function bt1_16()
 end
 
 local function bt1_256()
+	dprint("bt1_256()")
 	if ((not globals.isPaused) and (globals.doTimeEvents)) then
 		party:doPoison()
 

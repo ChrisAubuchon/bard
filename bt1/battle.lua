@@ -764,8 +764,6 @@ function battleData:doReward()
 		return false
 	end
 
-	itemsToGive = 1
-
 	if (giveGold) then
 		if ((itemsToGive == 0) and (currentLevel.level > 4)) then
 			itemsToGive = 1

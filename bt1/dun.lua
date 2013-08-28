@@ -606,13 +606,19 @@ function dun:main()
 		inkey = getkey()
 		globals.doTimeEvents = false
 
-		if (not keyboardCommand(inkey)) then
-			if (inkey == "D") then
-				if (globals.debug) then	
-					btdebug.dunDebug()
-				end
+		if (keyboardCommand(inkey)) then
+			self:resetBigpic()
+		elseif (inkey == "D") then
+			if (globals.debug) then	
+				btdebug.dunDebug()
+				self:resetBigpic()
 			end
+		elseif (inkey == btkeys.BTKEY_WANDERING) then
+			self:wanderingMonster()
+			self:resetBigpic()
 		end
+
+		--self:resetBigpic()
 
 		if (globals.partyDied) then
 			globals.gameState = globals.STATE_PARTYDIED
@@ -637,6 +643,9 @@ function dun:doLifeDrain()
 	party:display()
 end
 
+----------------------------------------
+-- getBattleOpponents()
+----------------------------------------
 function dun:getBattleOpponents()
 	local numGroups
 	local monGroups = {}
@@ -650,10 +659,49 @@ function dun:getBattleOpponents()
 	return monGroups
 end
 
+----------------------------------------
+-- wanderingMonster()
+----------------------------------------
+function dun:wanderingMonster()
+	local m
+	local mtype
+	local inkey
+
+	mtype = self.monsters[rnd_xdy(1,#self.monsters)]
+	m = monster:new(mtype)
+
+	bigpic:setBigpic(m.picture, m.singular)
+	text:cdprint(true, false, "A wandering creature offers to join your party. You can:\n\nAllow it to join\nFight it")
+	text:printExit()
+
+	repeat
+		inkey = getkey()
+		if (inkey == "A") then
+			local s = {}
+			s.type = mtype
+			s.isIllusion = false
+			party:doSummon(s)
+			text:clear()
+			return
+		elseif (inkey == "F") then
+			battle:new(mtype, 1)
+			return
+		end
+	until (inkey == "E")
+
+	text:clear()
+end
+
+----------------------------------------
+-- getPoisonDamage()
+----------------------------------------
 function dun:getPoisonDamage()
 	return self.poisonDamage
 end
 
+----------------------------------------
+-- getBattleReward()
+----------------------------------------
 function dun:getBattleReward()
 	return self.items[rnd_xdy(1,#self.items)]
 end

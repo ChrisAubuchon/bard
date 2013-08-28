@@ -468,9 +468,10 @@ function btdebug.dunDebug()
 	repeat
 		text:cdprint(true, false, "1. Square Flags\n")
 		text:print("2. Move to square\n")
-		text:print("3. Random Encounter\n")
+		text:print("3. Random Enc\n")
 		text:print("4. Special Square\n")
 		text:print("5. Do chest\n")
+		text:print("6. Wandering Mon\n")
 		text:printExit()
 		inkey = getkey()
 
@@ -488,6 +489,9 @@ function btdebug.dunDebug()
 			end
 		elseif (inkey == "5") then
 			currentLevel:doTreasureChest()
+		elseif (inkey == "6") then
+			currentLevel:wanderingMonster()
+			return
 		end
 	until (inkey == "E")
 

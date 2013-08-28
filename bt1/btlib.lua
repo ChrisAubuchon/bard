@@ -77,6 +77,9 @@ function keyboardCommand(inkey)
 		currentLevel:turnParty("back")
 	elseif (inkey == btkeys.BTKEY_UP) then
 		currentLevel:moveForward()
+	elseif (inkey == btkeys.BTKEY_RANDOMBATTLE) then
+		battle:random()
+		return true
 	elseif (inkey == "Q") then
 		os.exit()
 	else
