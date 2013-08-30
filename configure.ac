@@ -22,6 +22,7 @@ AC_CONFIG_FILES([
  Makefile
  bte/Makefile
  b1cnv/Makefile
+ b2cnv/Makefile
  btcscnv/Makefile
  lib/Makefile
  lib/lua/Makefile
@@ -47,4 +48,20 @@ AC_ARG_WITH(dos-bard1,
 	]
 )
 AC_SUBST(BARDONEDIR)
+AC_ARG_WITH(dos-bard2,
+	[  --with-dos-bard2=PATH   Specify path to DOS Bard2 installation ],
+	[
+		if test "x$withval" != "xno" ; then
+			case "$withval" in
+				./*|../*)	withval="`pwd`/$withval"
+			esac
+			if test -f "$withval/DK.EXE" ; then
+				BARDTWODIR=$withval
+			else
+				BARDTWODIR=
+			fi
+		fi
+	]
+)
+AC_SUBST(BARDTWODIR)
 AC_OUTPUT

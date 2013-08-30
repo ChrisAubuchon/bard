@@ -425,7 +425,6 @@ static void getCityGfx(bt_view_t *view, uint8_t quad)
 static void outputBldgFronts(bt_view_t *view)
 {
 	bta_cell_t *b;
-/*	uint8_t fbuf[512];*/
 	uint8_t i;
 
 	xmkdir(mkImagePath("citypics/base-1"));
@@ -527,7 +526,6 @@ static void outputBackground(void)
 void outputCitypics(uint8_t indent)
 {
 	FILE *fp;
-	int fd;
 	huffile_t *huf;
 	int i;
 	bt_view_t *view;

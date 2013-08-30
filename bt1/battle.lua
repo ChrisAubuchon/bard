@@ -702,6 +702,8 @@ function battleData:doReward()
 	local giveGold		= true
 	local partySize		= 0
 
+	timer:delay()
+
 	if (globals.gameState == globals.STATE_DUNGEON) then
 		giveGold = currentLevel:doTreasureChest()
 	end

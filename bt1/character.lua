@@ -990,7 +990,7 @@ function character:castSpell(inAction)
 
 	if (fizzle) then
 		party:display()
-		text:cdprint(false, true, " but it fizzles!\n")
+		text:ctdprint(false, true, " but it fizzles!\n")
 		return
 	end
 

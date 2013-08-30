@@ -24,9 +24,6 @@
 #define mkJsonPathRel(format, ...)	\
 	bts_sprintf("json/"format, ## __VA_ARGS__)
 
-#define mkLuaPath(format, ...)		\
-	bts_sprintf("%s/bt1/lua/"format, DATADIR, ## __VA_ARGS__)
-
 #define mkBardOnePath(format, ...)		\
 	bts_sprintf("%s/"format, BASEDIR, ## __VA_ARGS__)
 

@@ -98,7 +98,7 @@ function battleMonster:meleeAttack(inAction)
 		text:print(", but misses!\n\n")
 	end
 
-	timer:delay(3)
+	timer:delay()
 	return
 end
 
@@ -308,7 +308,7 @@ function battleMonster:doDoppleganger(inAction)
 	end
 
 	party:display()
-	text:cdprint(false, true, "A Doppleganger jumps into your party!\n\n")
+	text:ctdprint(false, true, "A Doppleganger jumps into your party!\n\n")
 end
 
 

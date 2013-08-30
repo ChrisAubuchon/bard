@@ -1,0 +1,33 @@
+bin_PROGRAMS = b2cnv
+
+AM_CFLAGS = @CFLAGS@	\
+	-I$(top_srcdir)/lib/libbard \
+	-I$(top_srcdir)/lib/libgnu \
+	-I$(top_srcdir)/lib/jansson \
+	-I$(top_srcdir)/lib/libcnv
+
+AM_CPPFLAGS = -DHAVE_CONFIG_H -DDATADIR=\"$(datadir)\" \
+	-DBASEDIR=\"$(BARDTWODIR)\"
+
+b2cnv_SOURCES = 	\
+	b2cnv.c		\
+	b2lib.h		\
+	bitmap.c	\
+	gfx.c		\
+	gfx.h		\
+	gfx_bigpic.c	\
+	gfx_bigpic.h	\
+	gfx_city.c	\
+	gfx_wild.c	\
+	picIndex.c	
+#	gfx_dun.c	\
+#
+
+b2cnv_LDADD = \
+	$(top_builddir)/lib/libcnv/libcnv.a	\
+	$(top_builddir)/lib/libbard/libbard.a	\
+	$(top_builddir)/lib/libgnu/libgnu.a	\
+	$(top_builddir)/lib/jansson/libjansson.a	\
+	-lpng					\
+	-lz					
+

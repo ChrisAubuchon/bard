@@ -36,7 +36,7 @@ host_triplet = @host@
 subdir = .
 DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/configure compile config.guess config.sub \
+	$(top_srcdir)/configure TODO compile config.guess config.sub \
 	depcomp install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/00gnulib.m4 \
@@ -127,6 +127,7 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 BARDONEDIR = @BARDONEDIR@
+BARDTWODIR = @BARDTWODIR@
 BITSIZEOF_PTRDIFF_T = @BITSIZEOF_PTRDIFF_T@
 BITSIZEOF_SIG_ATOMIC_T = @BITSIZEOF_SIG_ATOMIC_T@
 BITSIZEOF_SIZE_T = @BITSIZEOF_SIZE_T@
@@ -544,7 +545,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = lib bte b1cnv btcscnv
+SUBDIRS = lib bte b1cnv b2cnv btcscnv
 EXTRA_DIST = m4/gnulib-cache.m4
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive

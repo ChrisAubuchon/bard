@@ -137,9 +137,8 @@ function monsterParty:doSummon(inSummon)
 	mgroup = monsterGroup:new(inSummon.type, 1)
 	mgroup.isIllusion = inSummon.isIllusion or false
 	self:addMonsterGroup(mgroup)
-	text:print(" and a %s appears!\n\n", mgroup.singular)
 	party:display()
-	timer:delay(3)
+	text:ctdprint(false, true, " and a %s appears!\n\n", mgroup.singular)
 end
 
 

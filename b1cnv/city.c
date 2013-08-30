@@ -535,7 +535,6 @@ void convertLevels(void)
 	addItems(skara);
 	addMonsters(skara);
 
-/*	btcity_to_lua(mkLuaPath("skara.lua"), skara);*/
 	btcity_to_json(mkJsonPath("skara.json"), skara);
 
 	gl_list_free(blhash);

@@ -181,8 +181,8 @@ function btAction:singleTargetSpell()
 		if (half) then
 			bit32.rshift(outData.damage, 1)
 		else
-			text:print(" but it had no effect!\n\n")
-			timer:delay(3)
+			text:ctdprint(false, true, " but it had no effect!\n\n")
+			party:display()
 			return
 		end
 	end
@@ -201,7 +201,7 @@ function btAction:singleTargetSpell()
 	end
 
 	party:display()
-	timer:delay(3)
+	timer:delay()
 end
 
 ----------------------------------------
@@ -258,7 +258,8 @@ function btAction:multiTargetSpell()
 			self:printDamage()
 			self:doDamage()
 		end
-		timer:delay(3)
+		party:display()
+		timer:delay()
 	end
 end
 

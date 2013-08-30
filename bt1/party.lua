@@ -855,7 +855,6 @@ function party:singSong()
 
 	text:cdprint(true, false, char.name)
 	if (not char:doVoiceCheck()) then
-		timer:delay(3)
 		return
 	end
 
@@ -915,7 +914,9 @@ function party:doDisbelieve()
 				mgroup:truncate()
 				action.outData.specialAttack = "stone"
 				mgroup:doDamage(action)
-				text:cdprint(false, true, "\nThe party disbelieves!")
+				text:ctdprint(false, true, 
+					"\nThe party disbelieves!"
+					)
 			end
 		end
 	end

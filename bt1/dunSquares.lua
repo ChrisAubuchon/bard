@@ -1129,7 +1129,7 @@ function dunSquares:mangar()
 
 	text:splashMessage(
 		"Kylearan, the good Archmage, appears before you in a " ..
-		"flash of light. \"Well done!\" he cries, beaming. 
+		"flash of light. \"Well done!\" he cries, beaming. " ..
 		"\"Your quest in Skara Brae is now finished!\""
 		)
 	text:splashMessage(

@@ -188,7 +188,7 @@ local function enter()
 
 	while 1 do
 		text:cdprint(true, false,
-			"Thou art in the Guild of Adventurers.\n"
+			"Thou art in the Guild of Adventurers.\n" ..
 			"\nAdd member"		..
 			"\nRemove member"	..
 			"\nCreate a member"	..

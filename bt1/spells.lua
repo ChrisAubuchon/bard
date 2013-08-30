@@ -348,7 +348,7 @@ function spells.spellBind(inAction)
 			or target.isIllusion
 		) then
 
-		text:cdprint(false, true, " but it had no effect!\n\n")
+		text:ctdprint(false, true, " but it had no effect!\n\n")
 		return
 	end
 
@@ -369,7 +369,7 @@ function spells.mageStar(inAction)
 	dprint("spells.mageStar")
 
 	if (inAction:groupSavingThrow()) then
-		text:cdprint(false, true, " but it had no effect!\n\n")
+		text:ctdprint(false, true, " but it had no effect!\n\n")
 		party:display()
 		return
 	end

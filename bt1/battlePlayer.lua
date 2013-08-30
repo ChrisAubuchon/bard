@@ -308,9 +308,8 @@ function battlePlayer:attackSpell(inAction)
 
 		repelType = next(inData.repel)
 		if (target:isCharacter() or not target.repel[repelType]) then
-			text:print(" but it fizzles!\n\n")
+			text:ctdprint(false, true, " but it fizzles!\n\n")
 			party:display()
-			timer:delay(3)
 			return
 		end
 	end

@@ -21,8 +21,7 @@ function battleParty:doMeleeAttack(inAction)
 	text:print(self:getMeleeAttackString(inAction))
 
 	if (not self:checkMeleeHits(inAction)) then
-		text:print(", but misses!\n\n")
-		timer:delay(3)
+		text:ctdprint(false, true, ", but misses!\n\n")
 		return
 	else
 		text:print(", and hits ")
@@ -43,7 +42,7 @@ function battleParty:doMeleeAttack(inAction)
 		end
 	end
 
-	timer:delay(3)
+	timer:delay()
 end
 
 ----------------------------------------
@@ -232,7 +231,9 @@ function battleParty:battleBonus(inAction)
 	if (inData.acPenalty) then
 		if (inData.group) then
 			if (inAction:savingThrow()) then
-				text:cdprint(false, true, " but it had no effect!\n\n")
+				text:ctdprint(false, true, 
+					" but it had no effect!\n\n"
+					)
 				party:display()
 				return false
 			end
