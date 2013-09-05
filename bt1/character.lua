@@ -962,7 +962,7 @@ function character:getSpell(mouseFlag)
 	end
 
 	if (s.level > self.spellLevel[s.class]) then
-		text:cdprint(false, true, "\nYou don't knw this spell")
+		text:cdprint(false, true, "\nYou don't know this spell")
 		return false
 	end
 

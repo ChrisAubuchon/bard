@@ -13,6 +13,16 @@
 #define ACT_TARJAN      7
 #define ACT_USE         8
 
+#define FIRE_NONE	0
+#define FIRE_ARROW	1
+#define FIRE_SPEAR	2
+#define FIRE_AXE	3
+#define FIRE_SHURIKEN	4
+#define FIRE_BOOMERANG	5
+#define FIRE_HAMMER	6
+#define FIRE_BLADE	7
+#define FIRE_LIGHT	8
+
 
 uint8_t *getSpecialAttack(uint8_t sp);
 uint8_t *getAttypeString(uint8_t at);

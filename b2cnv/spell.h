@@ -3,33 +3,33 @@
 
 #include <cnv_spell.h>
 
-typedef spellEffect_t* (spfunc_t)(uint32_t index);
+extern uint8_t spptReq[];
+extern uint8_t spellAttr[];
+extern uint8_t spellType[];
+extern uint8_t spellDuration[];
+extern uint8_t spellRange[];
+extern uint8_t summonIndex[];
+extern uint8_t spellLevel[];
 
-uint8_t spptReq[];
-uint8_t spellAttr[];
-uint8_t spellType[];
-uint8_t spellDuration[];
-uint8_t spellRange[];
-uint8_t summonIndex[];
-
-uint8_t *spellAbbr[];
-uint8_t *spellFull[];
+extern uint8_t *spellAbbr[];
+extern uint8_t *spellFull[];
+extern uint8_t *spellClass[];
 
 /* Light spell specific arrays */
-uint8_t lightDist[];
-uint8_t lightDur[];
-uint8_t lightSDFlag[];
+extern uint8_t lightDist[];
+extern uint8_t lightDur[];
+extern uint8_t lightSDFlag[];
 
 /* Levitation spell array */
-uint8_t levitDur[];
+extern uint8_t levitDur[];
 
 /* Phase blur bonus list */
-uint8_t phaseBlur[];
-uint8_t shieldSelf[];
+extern uint8_t phaseBlur[];
+extern uint8_t shieldSelf[];
 
 /* Word of fear penalty list */
-uint8_t wordoffear[];
-uint8_t battleskill[];
+extern uint8_t wordoffear[];
+extern uint8_t battleskill[];
 
 #define sp_Lightspell	0
 #define sp_ArcFire	1

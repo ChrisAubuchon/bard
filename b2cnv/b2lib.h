@@ -11,6 +11,8 @@
 /*				*/
 /********************************/
 
+#define IFBIT(x,y,true,false)	((x) & (y)) ? (true) : (false)
+
 #define DIEVAL(x)       4 << ((x) >> 5)
 #define NDICE(x)        (((x) & 0x1f) + 1)
 
@@ -43,6 +45,10 @@ void cnv_printSpellFooter(void);
 void cnv_printMonHeader(void);
 void cnv_printMonFooter(void);
 
+/* dun.c */
+uint32_t	getMaxLevels(void);
+btstring_t	*getMonsters(uint32_t level);
+
 /* items.c */
 void convertItems(void);
 
@@ -53,13 +59,10 @@ void mon2summon(uint32_t index);
 btstring_t *getSummonMacro(uint32_t index);
 
 /* spell.c */
-void spellHeader(void);
-void convertSpells(void);
-#if 0
-spellEffect_t *getSummonEffect(uint32_t spell);
-spellEffect_t *getSpellEffect(uint32_t spell);
-spellEffect_t *noSpellEffect(void);
-#endif
+void		convertSpells(void);
+btAction_t	*getSpellAction(uint32_t spell);
+void		getTargetting(uint32_t index, btTargetting_t *bt);
+btstring_t	*getSummonMacro(uint32_t index);
 
 void convertItems(void);
 

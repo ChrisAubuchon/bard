@@ -3,7 +3,7 @@
 #include <cnv_gfx.h>
 #include <dehuf.h>
 
-#define DEBUG
+/*#define DEBUG*/
 #include <debug.h>
 
 /****************************************/

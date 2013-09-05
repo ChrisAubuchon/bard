@@ -175,11 +175,9 @@ void convertMonsters(void)
 {
 	int i;
 	int j;
-	uint8_t str[16];
 	cnvList_t *mlist;
 	monster_t *m;
 
-/*	cnv_printMonHeader();*/
 
 	mlist = monList_new();
 

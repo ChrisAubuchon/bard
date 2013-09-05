@@ -21,15 +21,7 @@ b2mon_t sumMons[] = {
   { "Molten Man",	 127,128, 0, 1,14, 2,{  0,  0, 83, 83},96,16,54,17 },
   { "Bulldozer",	 255, 48, 0, 1,17, 4,{  0,  0,  0,107},80,16,38,16 },
   { "Vanquisher",	 511, 64, 0, 1,21, 7,{  0,  0,  0, 87}, 6,15,52,17 },
-  { "Blast Dragon",	1023, 32, 0, 1,24, 3,{  0,  0, 92, 92},39,18,32,17 }
-};
-
-uint8_t *sumMacro[] = {
-/*   */ "M_SUM_WOLF","M_SUM_OGRE","M_SUM_NINJA","M_SUM_RED_DRAGON",
-/*   */ "M_SUM_STORM_GIANT","M_SUM_MASTER_MAGE","M_SUM_SAMSON","M_SUM_FIRE_ELEMNTAL",
-/*   */ "M_SUM_WRAITH","M_SUM_SPECTRE","M_SUM_SALAMANDER","M_SUM_HERB",
-/*   */ "M_SUM_KRINGLE_BRO","M_SUM_SLAYER","M_SUM_WALL","M_SUM_STORM_GIANT",
-/*   */ "M_SUM_MOLTEN_MAN","M_SUM_BULLDOZER","M_SUM_SLAYER","M_SUM_VANQUISHER",
-/*   */ "M_SUM_BLAST_DRAGON","M_SUM_MASTER_MAGE","M_SUM_HERB","M_SUM_KRINGLE_BRO"
+  { "Blast Dragon",	1023, 32, 0, 1,24, 3,{  0,  0, 92, 92},39,18,32,17 },
+  { "",			   0,  0, 0, 0, 0, 0,{255,255,255,255}, 0, 0, 0, 0 }
 };
 

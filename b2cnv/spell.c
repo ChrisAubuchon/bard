@@ -1,7 +1,10 @@
 #include <b2lib.h>
 #include <spell.h>
-#include <bt.h>
 #include <cnv_spell.h>
+#include <cnv_song.h>
+
+#define DEBUG
+#include <debug.h>
 
 /********************************/
 /*				*/
@@ -9,15 +12,15 @@
 /*				*/
 /********************************/
 
-static spellEffect_t *spf_batbonus(uint32_t index);
-static spellEffect_t *spf_damagespell(uint32_t index);
-static spellEffect_t *spf_disbelieve(uint32_t index);
-static spellEffect_t *spf_generic(uint32_t index);
-static spellEffect_t *spf_passiveeffect(uint32_t index);
-static spellEffect_t *spf_rangespell(uint32_t index);
-static spellEffect_t *spf_wordofhealing(uint32_t index);
-static spellEffect_t *spf_summon(uint32_t index);
-static spellEffect_t *spf_quickfix(uint32_t index);
+static btAction_t	*spf_batbonus(uint32_t index);
+static btAction_t	*spf_damagespell(uint32_t index);
+static btAction_t	*spf_disbelieve(uint32_t index);
+static btAction_t	*spf_generic(uint32_t index);
+static btAction_t	*spf_passiveeffect(uint32_t index);
+static btAction_t	*spf_rangespell(uint32_t index);
+static btAction_t	*spf_wordofhealing(uint32_t index);
+static btAction_t	*spf_summon(uint32_t index);
+static btAction_t	*spf_quickfix(uint32_t index);
 
 /********************************/
 /*				*/
@@ -25,46 +28,30 @@ static spellEffect_t *spf_quickfix(uint32_t index);
 /*				*/
 /********************************/
 
-static spfunc_t *spFuncs[] = {
-  spf_passiveeffect, spf_damagespell, spf_batbonus, spf_generic,
-  spf_batbonus, spf_passiveeffect, spf_batbonus, spf_wordofhealing,
-  NULL, spf_passiveeffect, spf_damagespell, spf_summon,
-  spf_damagespell, spf_generic, spf_batbonus, spf_disbelieve,
-  spf_batbonus, spf_passiveeffect, spf_damagespell, spf_batbonus,
-  spf_generic, spf_damagespell, spf_passiveeffect, spf_damagespell,
-  spf_batbonus, spf_generic, spf_generic, spf_rangespell,
-  spf_quickfix, spf_generic, spf_generic, spf_generic, 
-  spf_rangespell, spf_generic, spf_generic
+typedef btAction_t *(spellFunction_t) (uint32_t index);
+
+static spellFunction_t *spellFunctions[] = {
+	spf_passiveeffect, spf_damagespell, spf_batbonus, spf_generic,
+	spf_batbonus, spf_passiveeffect, spf_batbonus, spf_wordofhealing,
+	NULL, spf_passiveeffect, spf_damagespell, spf_summon,
+	spf_damagespell, spf_generic, spf_batbonus, spf_disbelieve,
+	spf_batbonus, spf_passiveeffect, spf_damagespell, spf_batbonus,
+	spf_generic, spf_damagespell, spf_passiveeffect, spf_damagespell,
+	spf_batbonus, spf_generic, spf_generic, spf_rangespell,
+	spf_quickfix, spf_generic, spf_generic, spf_generic,
+	spf_rangespell, spf_generic, spf_generic
 };
 
 static uint8_t genSpell[] = {
-  GENS_NONE, GENS_NONE, GENS_NONE, GENS_TRAPZAP,
-  GENS_NONE, GENS_NONE, GENS_NONE, GENS_NONE,
-  GENS_MAGESTAR, GENS_NONE, GENS_NONE, GENS_NONE,
-  GENS_NONE, GENS_TELEPORT, GENS_NONE, GENS_NONE,
-  GENS_NONE, GENS_NONE, GENS_NONE, GENS_NONE,
-  GENS_SCRYSITE, GENS_NONE, GENS_NONE, GENS_NONE,
-  GENS_NONE, GENS_PHASEDOOR, GENS_SPELLBIND, GENS_NONE,
-  GENS_NONE, GENS_SAFETYSPELL, GENS_DREAMSPELL, GENS_MAGESTAR,
-  GENS_NONE, GENS_BATCHSPELL, GENS_CAMARADERIE
-};
-
-static uint8_t spTypeStr[] = {
-  S_PASSIVEEFFECT, S_DMGSPELL, S_BATBONUS, S_GENERIC,
-  S_BATBONUS, S_PASSIVEEFFECT, S_BATBONUS, S_HEALSPELL,
-  S_GENERIC, S_PASSIVEEFFECT, S_DMGSPELL, S_SUMMONSPELL,
-  S_DMGSPELL, S_GENERIC, S_BATBONUS, S_DISBELIEVE,
-  S_BATBONUS, S_PASSIVEEFFECT, S_DMGSPELL, S_BATBONUS,
-  S_GENERIC, S_DMGSPELL, S_PASSIVEEFFECT, S_DMGSPELL,
-  S_BATBONUS, S_GENERIC, S_GENERIC, S_DMGSPELL,
-  S_HEALSPELL, S_GENERIC, S_GENERIC, S_GENERIC,
-  S_DMGSPELL, S_GENERIC, S_GENERIC
-};
-
-static uint8_t *attEffList[] = {
-  "ATTEFF_FRIES", "ATTEFF_FROZE", "ATTEFF_SHOCK", "ATTEFF_DRAIN",
-  "ATTEFF_BURN", "ATTEFF_CHOKE", "ATTEFF_STEAM", "ATTEFF_BLAST",
-  "ATTEFF_HIT"
+	FUNC_NONE, FUNC_NONE, FUNC_NONE, FUNC_TRAPZAP,
+	FUNC_NONE, FUNC_NONE, FUNC_NONE, FUNC_NONE,
+	FUNC_MAGESTAR, FUNC_NONE, FUNC_NONE, FUNC_NONE,
+	FUNC_NONE, FUNC_TELEPORT, FUNC_NONE, FUNC_NONE,
+	FUNC_NONE, FUNC_NONE, FUNC_NONE, FUNC_NONE,
+	FUNC_SCRYSITE, FUNC_NONE, FUNC_NONE, FUNC_NONE,
+	FUNC_NONE, FUNC_PHASEDOOR, FUNC_SPELLBIND, FUNC_NONE,
+	FUNC_NONE, FUNC_SAFETYSPELL, FUNC_DREAMSPELL, FUNC_MAGESTAR,
+	FUNC_NONE, FUNC_BATCHSPELL, FUNC_CAMARADERIE
 };
 
 /********************************/
@@ -76,283 +63,294 @@ static uint8_t *attEffList[] = {
 /*
  * spf_batbonus()
  */
-static spellEffect_t *spf_batbonus(uint32_t index)
+static btAction_t *spf_batbonus(uint32_t index)
 {
-  spellEffect_t *rsp;
+	btAction_t	*rval;
+	bteBonus_t	*bb;
 
-  rsp = spellEffect_new(S_BATBONUS);
+	rval = btAction_new(FUNC_BONUS, EFFECT_BONUS);
+	bb = btEffect_bonus(rval->effect);
 
-  switch (spellType[index]) {
-    case sp_AntiMagic:
-	BBOPTR(rsp, group) = 1;
-	BBOPTR(rsp, antimagic) = 2;
-	break;
-    case sp_BattleSkill:
-	BBOPTR(rsp, dmgBon) = 1;
-	BBOPTR(rsp, dmgStk) = 1;
-	BBOPTR(rsp, dmgAmt) = battleskill[spellDuration[index]];
-        break;
-    case sp_FreezeFoes:
-	BBOPTR(rsp, group) = 1;
+	switch (spellType[index]) {
+	case sp_AntiMagic:
+		bb->group	= 1;
+		bb->antiMagic	= 2;
+		break;
+	case sp_BattleSkill:
+		bb->damageBonus	= 1;
+		bb->damageStack	= 1;
+		bb->damageAmount= battleskill[spellDuration[index]];
+		break;
+	case sp_FreezeFoes:
+		bb->group	= 1;
+		bb->acPenalty	= 1;
+		bb->acStack	= 1;
+		bb->acAmount	= 1;
+		break;
+	case sp_PhaseBlur:
+		bb->group	= 1;
+		bb->acBonus	= 1;
+		bb->acStack	= 1;
+		bb->acAmount	= phaseBlur[spellDuration[index]];
+		break;
+	case sp_VorpalPlating:
+		bb->damageBonus	= 1;
+		bb->damageStack	= 1;
+		bb->damageRandom= 1;
+		bb->damageAmount= spellDuration[index];
+		bb->damageDice	= 8;
+		break;
+	case sp_WordOfFear:
+		bb->group	= 1;
 
-	BBOPTR(rsp, acPen) = 1;
-	BBOPTR(rsp, acStk) = 1;
-	BBOPTR(rsp, acAmt) = 1;
-	break;
-    case sp_PhaseBlur:
-	BBOPTR(rsp, group) = 1;
+		bb->toHitPenalty= 1;
+		bb->toHitStack	= 1;
+		bb->toHitAmount	= wordoffear[spellDuration[index]];
 
-	BBOPTR(rsp, acBon) = 1;
-	BBOPTR(rsp, acStk) = 1;
-	BBOPTR(rsp, acAmt) = phaseBlur[spellDuration[index]];
-	break;
-    case sp_VorpalPlating:
-	BBOPTR(rsp, dmgBon) = 1;
-	BBOPTR(rsp, dmgStk) = 1;
-	BBOPTR(rsp, dmgRnd) = 1;
-	BBOPTR(rsp, dmgAmt) = spellDuration[index];
-	BBOPTR(rsp, dmgDice) = 8;
-        break;
-    case sp_WordOfFear:
-	BBOPTR(rsp, group) = 1;
+		bb->damagePenalty= 1;
+		bb->damageStack	= 1;
+		bb->damageAmount= wordoffear[spellDuration[index]];
 
-	BBOPTR(rsp, tohitPen) = 1;
-	BBOPTR(rsp, tohitStk) = 1;
-	BBOPTR(rsp, tohitAmt) = wordoffear[spellDuration[index]];
+		break;
+	}
 
-	BBOPTR(rsp, dmgPen) = 1;
-	BBOPTR(rsp, dmgStk) = 1;
-	BBOPTR(rsp, dmgAmt) = wordoffear[spellDuration[index]];
-
-        break;
-  }
-
-  return rsp;
+	return rval;
 }
 
 /*
  * spf_disbelieve(index)
  */
-static spellEffect_t *spf_disbelieve(uint32_t index)
+static btAction_t *spf_disbelieve(uint32_t index)
 {
-  spellEffect_t *rsp;
+	btAction_t	*rval;
+	bteDisbelieve_t	*bd;
 
-  rsp = spellEffect_new(S_DISBELIEVE);
+	rval = btAction_new(FUNC_DISBELIEVE, EFFECT_DISBELIEVE);
+	bd = btEffect_disbelieve(rval->effect);
 
-  if (spellDuration[index] == 0xff) {
-    DISPTR(rsp, disbelieve) = 1;
-    DISPTR(rsp, allBattle) = 1;
-    DISPTR(rsp, revealDoppl) = 1;
-  } else {
-    DISPTR(rsp, disbelieve) = 1;
-  }
+	bd->disbelieve = 1;
 
-  return rsp;
+	if (spellDuration[index] == 0xff) {
+		bd->allBattle = 1;
+		bd->revealDoppelganger = 1;
+	}
+
+	return rval;
 }
 
 /*
  * spf_damagespell()
  */
-static spellEffect_t *spf_damagespell(uint32_t index)
+static btAction_t *spf_damagespell(uint32_t index)
 {
-  spellEffect_t *rsp;
+	btAction_t	*rval;
+	bteAttack_t	*ba;
 
-  rsp = spellEffect_new(S_DMGSPELL);
+	rval = btAction_new(FUNC_ATTACK, EFFECT_ATTACK);
+	ba = btEffect_attack(rval->effect);
 
-  DMGPTR(rsp, dieval) = 4;
-  DMGPTR(rsp, attype) = 10;	/* ATTEFF_NONE */
+	ba->dieval = 4;
+	ba->attype = 10;
 
-  switch (spellType[index]) {
-    case sp_ArcFire:
-      DMGPTR(rsp, levelMult) = 1;
-      DMGPTR(rsp, ndice) = spellDuration[index];
-      break;
-    case sp_WarStrike:
-      DMGPTR(rsp, group) = 1;
-      DMGPTR(rsp, ndice) = spellDuration[index];
-      break;
-    case sp_SpectreTouch:
-      DMGPTR(rsp, ndice) = spellDuration[index];
-      break;
-    case sp_MindBlade:
-      DMGPTR(rsp, allFoes) = 1;
-      DMGPTR(rsp, ndice) = spellDuration[index];
-      break;
-    case sp_StoneTouch:
-      DMGPTR(rsp, spAttack) = spellDuration[index];
-      DMGPTR(rsp, attype) = 0xff;
-      break;
-    case sp_HolyWater:
-      if (index == 55) {
-	DMGPTR(rsp, group) = 1;
-	DMGPTR(rsp, rflags.spellcaster) = 1;
-      } else {
-	DMGPTR(rsp, rflags.evil) = 1;
-      }
-      DMGPTR(rsp, ndice) = spellDuration[index];
-      break;
-  }
+	if (spellType[index] == sp_StoneTouch) {
+		ba->spAttack = spellDuration[index];
+	} else {
+		ba->ndice = spellDuration[index];
+		if (index >= 96) {
+			ba->attype = 8;
+		} else {
+			ba->attype = spellAttr[index] >> 5;
+		}
 
-  DMGPTR(rsp, outOfRange) = IFBIT(spellRange[index], 0x80, 1, 0);
-  DMGPTR(rsp, range) = spellRange[index] & 0x7f;
+		switch (spellType[index]) {
+		case sp_ArcFire:
+			ba->levelMult = 1;
+			break;
+		case sp_WarStrike:
+			ba->group = 1;
+			break;
+		case sp_SpectreTouch:
+			ba->ndice++;
+			break;
+		case sp_MindBlade:
+			ba->allFoes = 1;
+			break;
+		case sp_HolyWater:
+			if (index == 55) {
+				ba->group = 1;
+				ba->rflags.spellcaster = 1;
+			} else {
+				ba->rflags.evil = 1;
+			}
+			break;
+		}
+	}
 
-  if (DMGPTR(rsp, attype) == 0xff) {
-    DMGPTR(rsp, attype) = 10;
-  } else {
-    if (index >= 96)
-      DMGPTR(rsp, attype) = 8;
-    else 
-      DMGPTR(rsp, attype) = spellAttr[index] >> 5;
-  }
+	ba->outOfRange = IFBIT(spellRange[index], 0x80, 1, 0);
+	ba->range = spellRange[index] & 0x7f;
 
-  return rsp;
+	return rval;
 }
 
 /*
  * spf_generic()
  *
  */
-static spellEffect_t *spf_generic(uint32_t index)
+static btAction_t *spf_generic(uint32_t index)
 {
-  spellEffect_t *rsp;
+	btAction_t	*rval;
+	bteGeneric_t	*bg;
 
-  rsp = spellEffect_new(S_GENERIC);
+	rval = btAction_new(genSpell[spellType[index]], EFFECT_GENERIC);
+	bg = btEffect_generic(rval->effect);
 
-  GENPTR(rsp, type) = genSpell[spellType[index]];
+	bg->type = genSpell[spellType[index]];
 
-  return rsp;
+	return rval;
 }
 
 /*
  * spf_passiveeffect()
  */
-static spellEffect_t *spf_passiveeffect(uint32_t index)
+static btAction_t *spf_passiveeffect(uint32_t index)
 {
-  spellEffect_t *rsp;
+	btAction_t	*rval;
+	btePassive_t	*bp;
 
-  rsp = spellEffect_new(S_PASSIVEEFFECT);
+	rval = btAction_new(FUNC_NONE, EFFECT_PASSIVE);
+	bp = btEffect_passive(rval->effect);
 
-  switch (spellType[index]) {
-    case sp_Lightspell:
-	PASPTR(rsp, type) = PASS_LIGHT;
-	PASPTR(rsp, duration) = lightDur[spellDuration[index]];
-	PASPTR(rsp, lightDist) = lightDist[spellDuration[index]];
-	PASPTR(rsp, secretDoor) = (lightSDFlag[spellDuration[index]] != 0);
-	break;
-    case sp_MagicCompass:
-	PASPTR(rsp, type) = PASS_COMPASS;
-	PASPTR(rsp, duration) = spellDuration[index];
-	break;
-    case sp_Levitation:
-	PASPTR(rsp, type) = PASS_LEVITATE;
-	PASPTR(rsp, duration) = levitDur[spellDuration[index]];
-	break;
-    case sp_GroupShield:
-	PASPTR(rsp, type) = PASS_SHIELD;
-	PASPTR(rsp, duration) = spellDuration[index];
-	PASPTR(rsp, detectFlag) = 2;
-	break;
-    case sp_AreaEnchant:
-	PASPTR(rsp, type) = PASS_DETECT;
-	PASPTR(rsp, duration) = spellDuration[index];
-	PASPTR(rsp, detectFlag) = spellAttr[index] >> 6;
-	break;
-  }
+	bp->duration = spellDuration[index];
 
-  return rsp;
+	switch (spellType[index]) {
+	case sp_Lightspell:
+		rval->function->type = FUNC_LIGHT;
+		bp->type = PASS_LIGHT;
+		bp->duration = lightDur[spellDuration[index]];
+		bp->lightDistance = lightDist[spellDuration[index]];
+		bp->detectSecret = (lightSDFlag[spellDuration[index]] != 0);
+		break;
+	case sp_MagicCompass:
+		rval->function->type = FUNC_COMPASS;
+		bp->type = PASS_COMPASS;
+		break;
+	case sp_Levitation:
+		rval->function->type = FUNC_LEVITATE;
+		bp->duration = levitDur[spellDuration[index]];
+		bp->type = PASS_LEVITATE;
+		break;
+	case sp_GroupShield:
+		rval->function->type = FUNC_SHIELD;
+		bp->type = PASS_SHIELD;
+		bp->acBonus = 2;
+		break;
+	case sp_AreaEnchant:
+	{
+		uint8_t	effect = spellAttr[index] >> 6;
+
+		rval->function->type = FUNC_DETECT;
+		bp->type = PASS_DETECT;
+		if (effect == 0) {
+			bp->detectTraps = 1;
+		} else if (effect == 1) {
+			bp->detectStairs = 1;
+		} else {
+			bp->detectTraps = 1;
+			bp->detectStairs = 1;
+			bp->detectSpecial = 1;
+		}
+		break;
+	}
+	}
+
+	return rval;
 }
 
 /*
  * spf_quickfix()
  */
-static spellEffect_t *spf_quickfix(uint32_t index)
+static btAction_t *spf_quickfix(uint32_t index)
 {
-  spellEffect_t *rsp;
+	btAction_t	*rval;
+	bteHeal_t	*bh;
 
-  rsp = spellEffect_new(S_HEALSPELL);
+	rval	= btAction_new(FUNC_HEAL, EFFECT_HEAL);
+	bh	= btEffect_heal(rval->effect);
 
-  HEAPTR(rsp, dice) = 8;
+	bh->ndice = 8;
 
-  return rsp;
+	return rval;
 }
 
 /*
  * spf_rangespell()
  */
-static spellEffect_t *spf_rangespell(uint32_t index)
+static btAction_t *spf_rangespell(uint32_t index)
 {
-  spellEffect_t *rsp;
+	btAction_t	*rval;
+	bteAttack_t	*ba;
 
-  rsp = spellEffect_new(S_DMGSPELL);
+	rval	= btAction_new(FUNC_ATTACK, EFFECT_ATTACK);
+	ba	= btEffect_attack(rval->effect);
 
-  switch (spellType[index]) {
-    case sp_FarFoe:
-	DMGPTR(rsp, addFlag) = 1;
-	DMGPTR(rsp, distance) = 4;
-	break;
-    case sp_MeleeMen:
-	DMGPTR(rsp, distance) = 1;
-	break;
-  }
+	switch (spellType[index]) {
+	case sp_FarFoe:
+		ba->addDistance = 1;
+		ba->distance	= 4;
+		break;
+	case sp_MeleeMen:
+		ba->distance	= 1;
+		break;
+	}
 
-  return rsp;
+	return rval;
 }
 
 /* 
  * spf_wordofhealing(index)
- * Parameters
- * groupHealFlag - If 1 heal the entire group
- * xd4 - The X in Xd4
- * fullHeal - Fully heal HP
- * dispossess - Flag to cure possession
- * resurrect - Flag to bring back to life
- * poison - Cure poision
- * paralysis - Cure paralysis
- * insanity - Cure insanity
- * old - Cure old status
  */
-static spellEffect_t *spf_wordofhealing(uint32_t index)
+static btAction_t *spf_wordofhealing(uint32_t index)
 {
-  uint8_t mask;
-  spellEffect_t *rsp;
+	uint8_t		mask;
+	btAction_t	*rval;
+	bteHeal_t	*bh;
 
-  rsp = spellEffect_new(S_HEALSPELL);
+	rval	= btAction_new(FUNC_HEAL, EFFECT_HEAL);
+	bh	= btEffect_heal(rval->effect);
 
-  HEAPTR(rsp, rndHeal) = 1;
-  if (spellDuration[index] & 0x80)
-    HEAPTR(rsp, groupHeal) = 1;
+	bh->randomHeal	= 1;
+	bh->groupHeal	= IFBIT(spellDuration[index], 0x80, 1, 0);
+	bh->ndice	= spellDuration[index] & 0x0f;
+	if (bh->ndice == 0x0f) {
+		bh->ndice	= 0;
+		bh->fullHeal	= 1;
+	}
+	if (bh->ndice == 0) {
+		bh->randomHeal == 0;
+	}
 
-  HEAPTR(rsp, dice) = spellDuration[index] & 0x0f;
-  if (HEAPTR(rsp, dice) == 0x0f) {
-    HEAPTR(rsp, dice) = 0;
-    HEAPTR(rsp, fullHeal) = 1;
-  }
+	mask = spellAttr[index] & 0xe0;
 
-  if (HEAPTR(rsp, dice) == 0)
-    HEAPTR(rsp, rndHeal) = 0;
+	if (mask == 0xc0)
+		bh->dispossess	= 1;
+	if (mask == 0xe0)
+		bh->resurrect	= 1;
+	if (mask == 0xa0) {
+		bh->resurrect	= 1;
+		bh->old		= 1;
+		bh->poison	= 1;
+		bh->paralysis	= 1;
+		bh->insanity	= 1;
+		bh->dispossess	= 1;
+		bh->stoned	= 1;
+	}
+	if (mask == 0x80) {
+		bh->poison	= 1;
+		bh->paralysis	= 1;
+		bh->insanity	= 1;
+	}
 
-  mask = spellAttr[index] & 0xe0;
-
-  if (mask == 0xc0)
-    HEAPTR(rsp, dispossess) = 1;
-  if (mask == 0xe0)
-    HEAPTR(rsp, resurrect) = 1;
-  if (mask == 0xa0) {
-    HEAPTR(rsp, resurrect) = 1;
-    HEAPTR(rsp, old) = 1;
-    HEAPTR(rsp, poison) = 1;
-    HEAPTR(rsp, paralysis) = 1;
-    HEAPTR(rsp, insanity) = 1;
-    HEAPTR(rsp, dispossess) = 1;
-    HEAPTR(rsp, stoned) = 1;
-  }
-  if (mask == 0x80) {
-    HEAPTR(rsp, poison) = 1;
-    HEAPTR(rsp, paralysis) = 1;
-    HEAPTR(rsp, insanity) = 1;
-  }
-
-  return rsp;
+	return rval;
 }
 
 /*
@@ -362,19 +360,21 @@ static spellEffect_t *spf_wordofhealing(uint32_t index)
  *   monIndex2
  *   illusionFlag
  */
-static spellEffect_t *spf_summon(uint32_t index)
+static btAction_t *spf_summon(uint32_t index)
 {
-  uint8_t *mon;
-  spellEffect_t *rsp;
+	uint8_t		sum;
+	btAction_t	*rval;
+	bteSummon_t	*bs;
 
-  rsp = spellEffect_new(S_SUMMONSPELL);
+	rval	= btAction_new(FUNC_SUMMON, EFFECT_SUMMON);
+	bs	= btEffect_summon(rval->effect);
 
-  if (spellDuration[index] & 0x80) 
-    SUMPTR(rsp, illflag) = 1;
+	bs->isIllusion = IFBIT(spellDuration[index], 0x80, 1, 0);
 
-  SUMPTR(rsp, sum_zero) = getSummonMacro(spellDuration[index] & 0x7f);
+	sum = spellDuration[index] & 0x7f;
+	cnvList_add(bs->monsters, getSummonMacro(sum));
 
-  return rsp;
+	return rval;
 }
 
 /********************************/
@@ -383,63 +383,103 @@ static spellEffect_t *spf_summon(uint32_t index)
 /*				*/
 /********************************/
 
-spellEffect_t *getSummonEffect(uint32_t spell)
+btAction_t *getSpellAction(uint32_t spell)
 {
-  return spf_summon(spell);
+	uint8_t		type;
+
+	type = spellType[spell];
+
+	if (type == sp_None)
+		return NULL;
+
+	if (spellFunctions[type] != NULL)
+		return spellFunctions[type](spell);
+
+	return NULL;
 }
 
-spellEffect_t *getSpellEffect(uint32_t spell)
+#if 0
+btAction_t *getSummonEffect(uint32_t spell)
 {
-  uint8_t sptype;
+	return spf_summon(spell);
+}
 
-  sptype = spellType[spell];
+btAction_t *getSpellEffect(uint32_t spell)
+{
+	uint8_t sptype;
 
-  if (sptype == sp_None)
-    return 0;
+	sptype = spellType[spell];
 
-  return spFuncs[sptype](spell);
+	if (sptype == sp_None)
+		return 0;
+
+	return spFuncs[sptype] (spell);
 }
 
 uint8_t *getSpellName(uint8_t spno)
 {
-  return spellFull[spno];
+	return spellFull[spno];
 }
 
-spellEffect_t *noSpellEffect(void)
+btAction_t *noSpellEffect(void)
 {
-  spellEffect_t *rsp;
+	btAction_t *rsp;
 
-  rsp = (spellEffect_t *)xmalloc(sizeof(spellEffect_t));
-  rsp->type = S_NONE;
-  rsp->effect = NULL;
+	rsp = (btAction_t *) xmalloc(sizeof(btAction_t));
+	rsp->type = S_NONE;
+	rsp->effect = NULL;
 
-  return rsp;
+	return rsp;
+}
+#endif
+
+void getTargetting(uint32_t index, btTargetting_t *bt)
+{
+	if ((spellAttr[index] & 7) >= 4) {
+		bt->targetted = 0;
+	} else {
+		bt->targetted = 1;
+		switch (spellAttr[index] & 7) {
+		case 3:
+			bt->targetMonster = 1;
+		case 1:
+		case 0:
+			bt->targetParty = 1;
+			break;
+		case 4:
+		case 2:
+			bt->targetMonster = 1;
+			break;
+		}
+	}
 }
 
 void convertSpells(void)
 {
-  int i;
-  mageSpell_t *m;
+	int		i;
+	mageSpell_t	*m;
+	cnvList_t	*spells;
 
-  cnv_printSpellHeader();
+	spells = spellList_new();
 
-  for (i = 0; i < 79; i++) {
-    m = mageSpell_new(0);
+	for (i = 0; i < 79; i++) {
+		m = mageSpell_new(0);
 
-    m->abbr = bts_strcpy(spellAbbr[i]);
-    m->full = bts_strcpy(spellFull[i]);
-    m->sppt = spptReq[i];
+		m->class= bts_strcpy(spellClass[i]);
+		m->level= spellLevel[i];
+		m->abbr	= bts_strcpy(spellAbbr[i]);
+		m->full = bts_strcpy(spellFull[i]);
+		m->sppt = spptReq[i];
 
-    m->combat = IFBIT(spellAttr[i], 8, 1, 0);
-    m->noncombat = IFBIT(spellAttr[i], 0x10, 1, 0);
-    m->targetted = ((spellAttr[i] & 7) < 4) ? 1 : 0;
+		m->combat = IFBIT(spellAttr[i], 8, 1, 0);
+		m->noncombat = IFBIT(spellAttr[i], 0x10, 1, 0);
+		getTargetting(i, &m->targetting);
 
-    
-    m->sp = getSpellEffect(i);
+		m->action = getSpellAction(i);
 
-    printSpellXML(2, m);
+		cnvList_add(spells, m);
+	}
 
-  }
-
-  cnv_printSpellFooter();
+	spellList_to_json(spells, mkJsonPath("spells.json"));
+	cnvList_free(spells);
 }

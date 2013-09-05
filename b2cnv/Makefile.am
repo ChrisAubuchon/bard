@@ -13,15 +13,22 @@ b2cnv_SOURCES = 	\
 	b2cnv.c		\
 	b2lib.h		\
 	bitmap.c	\
+	dun.c		\
 	gfx.c		\
 	gfx.h		\
 	gfx_bigpic.c	\
 	gfx_bigpic.h	\
 	gfx_city.c	\
+	gfx_dun.c	\
 	gfx_wild.c	\
-	picIndex.c	
-#	gfx_dun.c	\
-#
+	mon.c		\
+	mon.h		\
+	mon_data.c	\
+	picIndex.c	\
+	spell.c		\
+	spell.h		\
+	spell_data.c	\
+	summon_data.c	
 
 b2cnv_LDADD = \
 	$(top_builddir)/lib/libcnv/libcnv.a	\

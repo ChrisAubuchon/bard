@@ -27,15 +27,15 @@ int main(int argc, char *argv[])
       case 'h':
 	usage();
 	break;
-#if 0
-      case 'i':
-	convertItems();
-	break;
       case 'm':
 	convertMonsters();
 	break;
       case 's':
 	convertSpells();
+	break;
+#if 0
+      case 'i':
+	convertItems();
 	break;
       case 't':
 	convertTraps();

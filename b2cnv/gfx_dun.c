@@ -1,6 +1,7 @@
 #include <b2lib.h>
 #include <gfx.h>
 #include <cnv_gfx.h>
+#include <dehuf.h>
 
 /*#define DEBUG*/
 #include <debug.h>
@@ -9,7 +10,6 @@
 #define DUN_SIDE	0x02
 #define DUN_PORTAL	0x04
 
-
 /****************************************/
 /*					*/
 /* Local function prototypes		*/
@@ -17,13 +17,11 @@
 /****************************************/
 
 static void dun_gfxInit();
-static void dun_outputGfx(uint8_t indent, uint8_t dpic, uint8_t quad, uint8_t face);
-static void output_gfxXML(uint8_t indent, uint8_t * tag, btstring_t * gfx);
 
-static void outputBackground(uint8_t tileno);
-static void getDunGfx(uint8_t dunno, uint8_t quad);
-static void outputDunFacet(uint8_t dunno, uint8_t facet, uint8_t quad);
-static btstring_t *_getDunGfx(uint16_t offset, int16_t _src_skip, int16_t width, int16_t height);
+static btstring_t *getBackground(void);
+static void outputBackground(uint8_t tileset);
+static void getDunGfx(bt_view_t *view, uint8_t tileset);
+static void getDunFacet(bt_view_t *oview, uint8_t tilset, dunfacet_t *fxxx, uint8_t facet);
 
 /****************************************/
 /*					*/
@@ -31,86 +29,63 @@ static btstring_t *_getDunGfx(uint16_t offset, int16_t _src_skip, int16_t width,
 /*					*/
 /****************************************/
 
-static uint8_t quadmap[] = {
-	QUAD_5WL, QUAD_5FL, QUAD_5L,
-	QUAD_4WL, QUAD_4FL, QUAD_4L,
-	QUAD_3FL, QUAD_3L,
-	QUAD_2L,
-	QUAD_1L,
-	QUAD_5WR, QUAD_5FR, QUAD_5R,
-	QUAD_4WR, QUAD_4FR, QUAD_4R,
-	QUAD_3FR, QUAD_3R,
-	QUAD_2R,
-	QUAD_1R,
-	QUAD_4M, QUAD_3M, QUAD_2M,
-	QUAD_1M
+static dunfacet_t dunSide[] = {
+	{ "FL", "left",  5, 0, 9 },
+	{ "L" , "left",  5, 0, 6 },
+	{ "M" , "left",  5, 0, 4 },
+	{ "FL", "left",  4, 0, 8 },
+	{ "L" , "left",  4, 0, 5 },
+	{ "M" , "left",  4, 0, 3 },
+	{ "L" , "left",  3, 0, 7 },
+	{ "M" , "left",  3, 0, 2 },
+	{ "M" , "left",  2, 0, 1 },
+	{ "M" , "left",  1, 0, 0 },
+	{ "FR", "right", 5, 1, 9 },
+	{ "R" , "right", 5, 1, 6 },
+	{ "M" , "right", 5, 1, 4 },
+	{ "FR", "right", 4, 1, 8 },
+	{ "R" , "right", 4, 1, 5 },
+	{ "M" , "right", 4, 1, 3 },
+	{ "R" , "right", 3, 1, 7 },
+	{ "M" , "right", 3, 1, 2 },
+	{ "M" , "right", 2, 1, 1 },
+	{ "M" , "right", 1, 1, 0 },
+	{ ""  , "",      0, 0, 0 }
 };
 
-static uint8_t qfacets[] = {
-/*5WL*/ DUN_SIDE,
-/*5FL*/ DUN_SIDE,
-/*5L */ DUN_SIDE,
-/*4WL*/ DUN_SIDE | DUN_FRONT,
-/*4FL*/ DUN_SIDE | DUN_FRONT,
-/*4L */ DUN_SIDE | DUN_FRONT | DUN_PORTAL,
-/*3FL*/ DUN_SIDE | DUN_FRONT,
-/*3L */ DUN_SIDE | DUN_FRONT | DUN_PORTAL,
-/*2L */ DUN_SIDE | DUN_FRONT | DUN_PORTAL,
-/*1L */ DUN_SIDE | DUN_FRONT,
-/*5WR*/ DUN_SIDE,
-/*5FR*/ DUN_SIDE,
-/*5R */ DUN_SIDE,
-/*4WR*/ DUN_SIDE | DUN_FRONT,
-/*4FR*/ DUN_SIDE | DUN_FRONT,
-/*4R */ DUN_SIDE | DUN_FRONT | DUN_PORTAL,
-/*3FR*/ DUN_SIDE | DUN_FRONT,
-/*3R */ DUN_SIDE | DUN_FRONT | DUN_PORTAL,
-/*2R */ DUN_SIDE | DUN_FRONT | DUN_PORTAL,
-/*1R */ DUN_SIDE | DUN_FRONT,
-/*4M */ DUN_FRONT | DUN_PORTAL,
-/*3M */ DUN_FRONT | DUN_PORTAL,
-/*2M */ DUN_FRONT | DUN_PORTAL,
-/*1M */ DUN_FRONT
+static dunfacet_t dunFront[] = { 
+	{ "WL", "", 4, 0, 10},
+	{ "FL", "", 4, 0, 9 },
+	{ "L" , "", 4, 0, 7 },
+	{ "FL", "", 3, 0, 8 },
+	{ "L" , "", 3, 0, 6 },
+	{ "L" , "", 2, 0, 5 },
+	{ "L" , "", 1, 0, 4 },
+	{ "WR", "", 4, 1, 10},
+	{ "FR", "", 4, 1, 9 },
+	{ "R" , "", 4, 1, 7 },
+	{ "FR", "", 3, 1, 8 },
+	{ "R" , "", 3, 1, 6 },
+	{ "R" , "", 2, 1, 5 },
+	{ "R" , "", 1, 1, 4 },
+	{ "M" , "", 4, 0, 3 },
+	{ "M" , "", 3, 0, 2 },
+	{ "M" , "", 2, 0, 1 },
+	{ "M" , "", 1, 0, 0 },
+	{ ""  , "", 0, 0, 0 }
 };
 
-static uint8_t nfacets[] = {
-/*5WL*/ 1,
-/*5FL*/ 1,
-/*5L */ 1,
-/*4WL*/ 2,
-/*4FL*/ 2,
-/*4L */ 3,
-/*3FL*/ 2,
-/*3L */ 3,
-/*2L */ 3,
-/*1L */ 2,
-/*5WR*/ 1,
-/*5FR*/ 1,
-/*5R */ 1,
-/*4WR*/ 2,
-/*4FR*/ 2,
-/*4R */ 3,
-/*3FR*/ 2,
-/*3R */ 3,
-/*2R */ 3,
-/*1R */ 2,
-/*4M */ 2,
-/*3M */ 2,
-/*2M */ 2,
-/*1M */ 1
-};
-
-static uint8_t quadrightflag[] = { 0, 0, 0,
-	0, 0, 0,
-	0, 0,
-	0,
-	0,
-	1, 1, 1,
-	1, 1, 1,
-	1, 1,
-	1,
-	1,
-	0, 0, 0, 0
+static dunfacet_t dunPortal[] = {
+	{ "L" , "", 4, 0, 5 },
+	{ "L" , "", 3, 0, 4 },
+	{ "L" , "", 2, 0, 3 },
+	{ "R" , "", 4, 1, 5 },
+	{ "R" , "", 3, 1, 4 },
+	{ "R" , "", 2, 1, 3 },
+	{ "M" , "", 4, 0, 2 },
+	{ "M" , "", 3, 0, 1 },
+	{ "M" , "", 2, 0, 0 },
+	{ ""  , "", 0, 0, 0 }
 };
 
 static btwoGfx_t dun_frontGfx[11];
@@ -119,56 +94,32 @@ static btwoGfx_t dun_sideGfx[10];
 
 static btstring_t *dundata;
 
-static int8_t dunFrontQuadMap[] = { -1, -1, -1,
-	10, 9, 7,
-	8, 6,
-	5,
-	4,
-	-1, -1, -1,
-	10, 9, 7,
-	8, 6,
-	5,
-	4,
-	3, 2, 1, 0
-};
-
-static int8_t dunSideQuadMap[] = { 9, 6, 4,
-	8, 5, 3,
-	7, 2,
-	1,
-	0,
-	9, 6, 4,
-	8, 5, 3,
-	7, 2,
-	1,
-	0,
-	-1, -1, -1, -1
-};
-
-static int8_t dunPortQuadMap[] = {
-	-1, -1, -1,
-	-1, -1, 5,
-	-1, 4,
-	3,
-	-1,
-	-1, -1, -1,
-	-1, -1, 5,
-	-1, 4,
-	3,
-	-1,
-	2, 1, 0, -1
-};
-
 static oldGfxXY_t dunFrontXY[] = {
-	{9, 0, 103, 85}, {29, 13, 83, 66}, {40, 24, 72, 56}, {48, 33, 64, 49},
-	{0, 0, 8, 85}, {0, 13, 28, 66}, {7, 24, 39, 56}, {31, 33, 47, 49},
-	{0, 24, 6, 56}, {14, 33, 30, 49}, {0, 33, 13, 49}
+	{  9,  0, 103, 85 },
+	{ 29, 13,  83, 66 },
+	{ 40, 24,  72, 56 },
+	{ 48, 33,  64, 49 },
+	{  0,  0,   8, 85 },
+	{  0, 13,  28, 66 },
+	{  7, 24,  39, 56 },
+	{ 31, 33,  47, 49 },
+	{  0, 24,   6, 56 },
+	{ 14, 33,  30, 49 },
+	{  0, 33,  13, 49 }
 };
 
 static oldGfxSZ_t dunFrontSZ[] = {
-	{1, 0, 95, 85}, {5, 0, 59, 53}, {0, 0, 32, 32}, {0, 0, 16, 16},
-	{87, 0, 95, 85}, {31, 0, 59, 53}, {0, 0, 32, 32}, {0, 0, 16, 16},
-	{26, 0, 32, 32}, {0, 0, 16, 16}, {3, 0, 16, 16}
+	{  1, 0, 95, 85 },
+	{  5, 0, 59, 53 },
+	{  0, 0, 32, 32 },
+	{  0, 0, 16, 16 },
+	{ 87, 0, 95, 85 },
+	{ 31, 0, 59, 53 },
+	{  0, 0, 32, 32 },
+	{  0, 0, 16, 16 },
+	{ 26, 0, 32, 32 },
+	{  0, 0, 16, 16 },
+	{  3, 0, 16, 16 }
 };
 
 static uint16_t dunFrontDoorOffset[] = {
@@ -176,12 +127,21 @@ static uint16_t dunFrontDoorOffset[] = {
 };
 
 static oldGfxXY_t dunPortXY[] = {
-	{48, 72, 63, 78}, {48, 61, 63, 63}, {48, 52, 63, 53}, {0, 72, 7, 77}, {8, 60, 23, 62},
-	{24, 52, 39, 53}
+	{ 48, 72, 63, 78 },
+	{ 48, 61, 63, 63 },
+	{ 48, 52, 63, 53 },
+	{  0, 72,  7, 77 },
+	{  8, 60, 23, 62 },
+	{ 24, 52, 39, 53 }
 };
 
 static oldGfxSZ_t dunPortSZ[] = {
-	{0, 0, 15, 6}, {0, 0, 15, 2}, {0, 0, 15, 1}, {0, 0, 7, 5}, {0, 0, 15, 2}, {0, 0, 15, 1}
+	{ 0, 0, 15, 6 }, 
+	{ 0, 0, 15, 2 },
+	{ 0, 0, 15, 1 },
+	{ 0, 0,  7, 5 },
+	{ 0, 0, 15, 2 },
+	{ 0, 0, 15, 1 }
 };
 
 static uint16_t dunPortFloorOffset[] = {
@@ -189,13 +149,29 @@ static uint16_t dunPortFloorOffset[] = {
 };
 
 static oldGfxXY_t dunSideXY[] = {
-	{0, 0, 8, 87}, {9, 0, 28, 84}, {29, 14, 39, 65}, {40, 25, 47, 55}, {48, 34, 51, 48},
-	{8, 24, 29, 55}, {30, 32, 42, 49}, {0, 21, 7, 60}, {0, 24, 13, 55}, {14, 32, 26, 49}
+	{  0,  0,  8, 87 },
+	{  9,  0, 28, 84 },
+	{ 29, 14, 39, 65 },
+	{ 40, 25, 47, 55 },
+	{ 48, 34, 51, 48 },
+	{  8, 24, 29, 55 },
+	{ 30, 32, 42, 49 },
+	{  0, 21,  7, 60 },
+	{  0, 24, 13, 55 },
+	{ 14, 32, 26, 49 }
 };
 
 static oldGfxSZ_t dunSideSZ[] = {
-	{0, 0, 8, 87}, {1, 0, 20, 84}, {5, 0, 15, 51}, {0, 0, 7, 30}, {0, 0, 3, 14},
-	{0, 0, 21, 31}, {6, 0, 18, 17}, {0, 0, 7, 39}, {8, 0, 21, 31}, {6, 0, 18, 17}
+	{ 0, 0,  8, 87 },
+	{ 1, 0, 20, 84 },
+	{ 5, 0, 15, 51 },
+	{ 0, 0,  7, 30 },
+	{ 0, 0,  3, 14 },
+	{ 0, 0, 21, 31 },
+	{ 6, 0, 18, 17 },
+	{ 0, 0,  7, 39 },
+	{ 8, 0, 21, 31 },
+	{ 6, 0, 18, 17 }
 };
 
 static uint16_t dunSideDoorOffset[] = {
@@ -208,100 +184,138 @@ static uint16_t dunSideDoorOffset[] = {
 /*					*/
 /****************************************/
 
-static void outputDunFacet(uint8_t dunno, uint8_t facet, uint8_t quad)
+static void getDunFacet(bt_view_t *outView, uint8_t tileset, dunfacet_t *fxxx, uint8_t facet)
 {
-	bta_cell_t *img;
-
 	uint16_t doorOffset = 0;
-	uint16_t offset;
 	uint16_t x, y;
-	uint16_t width, height;
-	int16_t _src_skip;
+	uint16_t offset;
 	uint8_t i;
 
 	btwoGfx_t *dun;
 	oldGfxSZ_t *sz;
 	oldGfxXY_t *xy;
 	btstring_t *data;
+	view_t view;
+
+	bta_cell_t *img;
 
 	switch (facet) {
 	case DUN_FRONT:
-		dun = &dun_frontGfx[dunFrontQuadMap[quad]];
-		sz = &dunFrontSZ[dunFrontQuadMap[quad]];
-		xy = &dunFrontXY[dunFrontQuadMap[quad]];
-		doorOffset = dunFrontDoorOffset[dunFrontQuadMap[quad]];
+		dun = &dun_frontGfx[fxxx->faceMap];
+		sz = &dunFrontSZ[fxxx->faceMap];
+		xy = &dunFrontXY[fxxx->faceMap];
+		doorOffset = dunFrontDoorOffset[fxxx->faceMap];
 		break;
 	case DUN_SIDE:
-		dun = &dun_sideGfx[dunSideQuadMap[quad]];
-		sz = &dunSideSZ[dunSideQuadMap[quad]];
-		xy = &dunSideXY[dunSideQuadMap[quad]];
-		doorOffset = dunSideDoorOffset[dunSideQuadMap[quad]];
+		dun = &dun_sideGfx[fxxx->faceMap];
+		sz = &dunSideSZ[fxxx->faceMap];
+		xy = &dunSideXY[fxxx->faceMap];
+		doorOffset = dunSideDoorOffset[fxxx->faceMap];
 		break;
 	case DUN_PORTAL:
-		dun = &dun_portalGfx[dunPortQuadMap[quad]];
-		sz = &dunPortSZ[dunPortQuadMap[quad]];
-		xy = &dunPortXY[dunPortQuadMap[quad]];
-		doorOffset = dunPortFloorOffset[dunPortQuadMap[quad]];
+		dun = &dun_portalGfx[fxxx->faceMap];
+		sz = &dunPortSZ[fxxx->faceMap];
+		xy = &dunPortXY[fxxx->faceMap];
+		doorOffset = dunPortFloorOffset[fxxx->faceMap];
 		break;
 	}
 
-	height = (sz->top - sz->bottom) + 1;
-	width = ((sz->right - sz->left) >> 1) + 1;
-	_src_skip = (dun->width << 2) - width;
-
-	if (quadrightflag[quad])
-		x = 112 - (width << 1) - xy->x_lo;
-	else
-		x = xy->x_lo;
-	y = xy->y_lo;
+	view.x = xy->x_lo;
+	view.y = xy->y_lo;
+	view.rflag = fxxx->rightFlag;
+	view.left = sz->left;
+	view.right = sz->right;
+	view.top = sz->top;
+	view.bottom = sz->bottom;
+	view.width = dun->width;
 
 	for (i = 0; i < 2; i++) {
-		img = bta_cell_new(x, y, width, height, 0, NULL);
+		btstring_t *label;
+		btstring_t *l;
 
-		offset = (dun->offset + ((sz->left + ((i) ? doorOffset : 0)) >> 1));
+		view.right = sz->right + ((i) ? doorOffset : 0);
+		view.left = sz->left + ((i) ? doorOffset : 0);
+		view.offset = dun->offset;
 
-		img->gfx = _getDunGfx(offset, _src_skip, img->width, img->height);
-		if (quadrightflag[quad])
-			flipRight(img->gfx, img->height, img->width);
+		img = getImage(&view, dundata);
 
-		img = bta_cell_convert(img);
-		bta_toPNG(img, bts_sprintf("tile_dun_%d_%d_%d.png", dunno, quad, i));
+		switch (facet) {
+		case DUN_FRONT:
+			label = bts_strcpy("front");
+			break;
+		case DUN_SIDE:
+			label = bts_sprintf("%sside", fxxx->extra);
+			break;
+		case DUN_PORTAL:
+			label = bts_strcpy("portal");
+			break;
+		}
 
+		if (i == 0) {
+			btstring_t *q;
+			uint16_t imgx;
+
+			debug("label->buf = %s\n", label->buf);
+			xmkdir(mkImagePath("dpics/%d-%s", fxxx->depth,
+							fxxx->name));
+			xmkdir(mkImagePath("dpics/%d-%s/%s",
+						fxxx->depth,
+						fxxx->name,
+						label->buf));
+			q = bts_sprintf("%d-%s", fxxx->depth, 
+						fxxx->name
+					);
+
+			if (fxxx->rightFlag == 1)
+				imgx = 224 - (img->width) - (xy->x_lo << 1);
+			else
+				imgx = xy->x_lo << 1;
+
+			bt_view_new_facet(outView, q, label, imgx,
+						xy->y_lo << 1,
+						img->width, img->height);
+		}
+
+		if (i) {
+			if (facet == DUN_PORTAL) 
+				l = bts_strcpy("ceiling");
+			else
+				l = bts_strcpy("wall");
+		} else {
+			if (facet == DUN_PORTAL)
+				l = bts_strcpy("floor");
+			else
+				l = bts_strcpy("door");
+		}
+		bta_toPNG(img,
+			mkImagePath("dpics/%d-%s/%s/%d-%s.png",
+				fxxx->depth, fxxx->name,
+				label->buf, tileset, l->buf));
+		bts_free(l);
 		bta_cell_free(img);
 	}
 }
 
-static uint8_t *facetString[] = { "", "front", "side", "", "portal" };
-static void getDunGfx(uint8_t dunno, uint8_t quad)
+static void getDunGfx(bt_view_t *view, uint8_t tileset)
 {
 	uint8_t i;
 	uint8_t mask = 1;
 
-	for (i = 0; i < nfacets[quad]; i++) {
-		while (!(qfacets[quad] & mask))
-			mask <<= 1;
-
-		outputDunFacet(dunno, mask, quad);
-
-		mask <<= 1;
+	i = 0;
+	while (dunSide[i].depth) {
+		getDunFacet(view, tileset, &dunSide[i], DUN_SIDE);
+		i++;
 	}
-}
-
-static btstring_t *_getDunGfx(uint16_t offset, int16_t _src_skip, int16_t width, int16_t height)
-{
-	btstring_t *rval;
-	uint32_t i, j;
-
-	rval = bts_new(height * width);
-
-	for (i = 0; i < height; i++) {
-		for (j = 0; j < width; j++) {
-			rval->buf[(i * width) + j] = dundata->buf[offset++];
-		}
-		offset += _src_skip;
+	i = 0;
+	while (dunFront[i].depth) {
+		getDunFacet(view, tileset, &dunFront[i], DUN_FRONT);
+		i++;
 	}
-
-	return rval;
+	i = 0;
+	while (dunPortal[i].depth) {
+		getDunFacet(view, tileset, &dunPortal[i], DUN_PORTAL);
+		i++;
+	}
 }
 
 static void dun_gfxInit(void)
@@ -332,6 +346,7 @@ static void dun_gfxInit(void)
 		dun_portalGfx[counter].width = (dunPortSZ[counter].right + dunPortFloorOffset[counter] + 8) >> 3;
 		dun_portalGfx[counter].height = dunPortSZ[counter].top + 1;
 		dun_portalGfx[counter].offset = offset;
+		debug("dun_portalGfx[%d].offset = %x\n", counter, offset);
 		offset += (dun_portalGfx[counter].width * dun_portalGfx[counter].height) << 2;
 		counter++;
 	} while (counter < 6);
@@ -350,20 +365,19 @@ static void dun_gfxInit(void)
 	dun_sideGfx[9].offset = dun_sideGfx[6].offset;
 }
 
-static void outputBackground(uint8_t tileno)
+static void outputBackground(uint8_t tileset)
 {
-	bta_cell_t *img;
+	bta_cell_t *bg;
+	btstring_t *rval;
 	uint8_t *gfxp;
 	uint8_t *left, *right;
 	uint32_t i, j;
 
-	img = bta_cell_new(0, 0, 56, 88, 0, NULL);
-	img->gfx = bts_new(0x1340);
-
 	gfxp = dundata->buf;
+	rval = bts_new(0x1340);
 
-	left = img->gfx->buf;
-	right = img->gfx->buf + 55;
+	left = rval->buf;
+	right = rval->buf + 55;
 
 	for (i = 0; i < 88; i++) {
 		for (j = 0; j < 28; j++) {
@@ -375,9 +389,11 @@ static void outputBackground(uint8_t tileno)
 		right = left + 55;
 	}
 
-	img = bta_cell_convert(img);
-	bta_toPNG(img, bts_sprintf("tile_dun_%d_bg.png", tileno));
-	bta_cell_free(img);
+	bg = bta_cell_new(0,0,56,88,0, rval);
+	bg = bta_cell_convert(bg);
+	bta_toPNG(bg, mkImagePath("dpics/%d-bg.png", tileset));
+	bta_cell_free(bg);
+
 }
 
 /****************************************/
@@ -386,29 +402,29 @@ static void outputBackground(uint8_t tileno)
 /*					*/
 /****************************************/
 
-void outputDunpics(uint8_t indent)
+void outputDunpics(void)
 {
-	int fd;
 	huffile_t *huf;
+	FILE *fp;
 	int i, j;
+	bt_view_t *view;
+	
+	xmkdir(mkImagePath("dpics"));
 
-	for (j = 0; j < 3; j++) {
-		uint8_t fbuf[512];
-
-		sprintf(fbuf, "dpics%d", j);
-		fd = xopen(fbuf, O_RDONLY);
-		huf = dehuf_init(fd);
+	for (i = 0; i < 3; i++) {
+		fp = xfopen(mkBardTwoPath("DPICS%d", i), "rb");
+		huf = dehuf_init(fp);
 		dundata = dehuf(huf, 0x7fff);
 		dehuf_free(huf);
-		close(fd);
 
+		outputBackground(i);
 		dun_gfxInit();
 
-		outputBackground(j);
+		view = bt_view_new();
+		getDunGfx(view, i);
 
-		for (i = 0; i < 24; i++) 
-			getDunGfx(j, i);
-
+		bt_view_to_json(view, mkJsonPath("dunview.json"));
+		bt_view_free(view);
 		bts_free(dundata);
 	}
 }

@@ -261,6 +261,9 @@ static json_t *bteAttack_toJson(const void *vba)
 	JSON_NUMBER_IF_NOT_ZERO(inData, "distance", ba->addDistance);
 	JSON_STRING_IF(inData, "specialAttack", getSpecialAttack(ba->spAttack));
 	JSON_STRING(inData, "atype", getAttypeString(ba->attype));
+	if (ba->fireString) {
+		JSON_STRING(inData, "fireString", getFireString(ba->fireString));
+	}
 	if (ba->meleeString) {
 		json_object_set_new(inData, "meleeString",
 				meleeString_toJson(ba->meleeString));

@@ -137,6 +137,7 @@ typedef struct {
 	uint8_t		spAttack;
 	uint8_t		attype;
 	uint8_t		meleeString;
+	uint8_t		fireString;
 
 	repel_t		rflags;
 	elements_t	elem;
@@ -208,7 +209,7 @@ typedef struct {
 	uint8_t		fullHeal;
 	uint8_t		levelMultiply;
 
-	uint8_t		ndice;
+	uint32_t	ndice;
 	uint32_t	dieval;
 
 	uint8_t		dispossess;

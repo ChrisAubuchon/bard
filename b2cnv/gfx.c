@@ -292,10 +292,10 @@ void convertGFX(void)
 	outputBigpic();
 	outputBitmapFont();
 	outputCitypics();
-#endif
 	outputWildpics();
-#if 0
+#endif
 	outputDunpics();
+#if 0
 	outputMousePointers();
 #endif
 }
