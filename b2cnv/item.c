@@ -2,6 +2,8 @@
 #include <item.h>
 #include <cnv_item.h>
 
+/*#define DEBUG*/
+#include <debug.h>
 
 /********************************/
 /*				*/
@@ -20,24 +22,25 @@ static uint32_t getValue(uint8_t v);
 
 static uint8_t getEffect(uint32_t i)
 {
-  uint8_t rval = 0;
+	uint8_t rval = 0;
 
-  rval = itemEffect[i] & 0x7f;
-  if (rval >= 0x0d)
-    rval = 0;
+	rval = itemEffect[i] & 0x7f;
+	if (rval >= 0x0d)
+		rval = 0;
 
-  return rval;
+	return rval;
 }
 
 static uint32_t getValue(uint8_t v)
 {
-  uint8_t i;
-  uint32_t rval = 1;
+	uint8_t i;
+	uint32_t rval = 1;
 
-  i = v & 7;
-  while (i--) rval *= 10;
+	i = v & 7;
+	while (i--)
+		rval *= 10;
 
-  return (rval * (v >> 3));
+	return (rval * (v >> 3));
 }
 
 /********************************/
@@ -46,91 +49,124 @@ static uint32_t getValue(uint8_t v)
 /*				*/
 /********************************/
 
+btstring_t *getItemName(uint32_t index)
+{
+	return bts_strcpy(itemName[index]);
+}
+
 void convertItems(void)
 {
-  uint32_t i;
+	cnvList_t	*il;
+	btitem_t	*b;
+	uint32_t	i;
 
-  cnv_printItemHeader();
+	il = itemList_new();
+	for (i = 0; i < 127; i++) {
+		b = btitem_new();
 
-  for (i = 0; i < 127; i++) {
-    btitem_t *b;
+		b->name = bts_strcpy(itemName[i]);
+		debug("Item: %s\n", b->name->buf);
+		b->macro = bts_strcpy(itemName[i]);
+		str2macro(b->macro->buf);
 
-    b = btitem_new();
+		b->type = itemType[i] & 0x0f;
+		b->eclass = itemEClass[i] & 0x0f;
+		b->spAttack = itemType[i] >> 4;
+		b->canUse = (itemSpell[i] != 0);
 
-    b->name = bts_strcpy(itemName[i]);
-    b->macro = bts_strcpy(itemName[i]);
-    str2macro(b->macro->buf);
+		b->ieffect = getEffect(i);
 
-    b->type = itemType[i] & 0x0f;
-    b->eclass = itemEClass[i] & 0x0f;
-    b->spAttack = itemType[i] >> 4;
-    b->canUse = (itemSpell[i] != 0);
+		b->hasCharges = (itemCount[i] != 0xff);
+		b->maxCount = (itemCount[i] == 0xff) ? 0 : itemCount[i];
 
-    b->effect = getEffect(i);
+		b->combat = IFBIT(itemEffect[i], 0x80, 1, 0);
 
-    b->hasCharges = (itemCount[i] != 0xff);
-    b->maxCount = (itemCount[i] == 0xff) ? 0 : itemCount[i];
+		b->dmgBonus = itemDmgAc[i] >> 4;
+		b->acBonus = itemDmgAc[i] & 0x0f;
 
-    b->combat = IFBIT(itemEffect[i], 0x80, 1, 0);
+		if (b->type == 1) {
+			b->ndice = NDICE(itemDmgDice[i]);
+			b->die = DIEVAL(itemDmgDice[i]);
+		}
 
-    b->dmgBonus = itemDmgAc[i] >> 4;
-    b->acBonus = itemDmgAc[i] & 0x0f;
+		b->canEquip.warrior = IFBIT(itemEquipMask[i], 0x80, 1, 0);
+		b->canEquip.paladin = IFBIT(itemEquipMask[i], 0x04, 1, 0);
+		b->canEquip.rogue = IFBIT(itemEquipMask[i], 0x10, 1, 0);
+		b->canEquip.bard = IFBIT(itemEquipMask[i], 0x08, 1, 0);
+		b->canEquip.hunter = IFBIT(itemEquipMask[i], 0x02, 1, 0);
+		b->canEquip.monk = IFBIT(itemEquipMask[i], 0x01, 1, 0);
+		b->canEquip.conjurer = IFBIT(itemEquipMask[i], 0x40, 1, 0);
+		b->canEquip.magician = IFBIT(itemEquipMask[i], 0x40, 1, 0);
+		b->canEquip.sorcerer = IFBIT(itemEquipMask[i], 0x40, 1, 0);
+		b->canEquip.wizard = IFBIT(itemEquipMask[i], 0x20, 1, 0);
+		b->canEquip.archmage = IFBIT(itemEquipMask[i], 0x20, 1, 0);
 
-    if (b->type == 1) {
-      b->ndice = NDICE(itemDmgDice[i]);
-      b->die = DIEVAL(itemDmgDice[i]);
-    }
+#if 0
+		if (itemSpell[i] == 0) {
+			b->targetted = 0;
+		} else {
+			b->targetted = ((spellAttr[itemSpell[i]] & 7) < 4);
+		}
+#endif
 
-    b->canEquip.warrior  = IFBIT(itemEquipMask[i], 0x80, 1, 0);
-    b->canEquip.paladin  = IFBIT(itemEquipMask[i], 0x04, 1, 0);
-    b->canEquip.rogue    = IFBIT(itemEquipMask[i], 0x10, 1, 0);
-    b->canEquip.bard     = IFBIT(itemEquipMask[i], 0x08, 1, 0);
-    b->canEquip.hunter   = IFBIT(itemEquipMask[i], 0x02, 1, 0);
-    b->canEquip.monk     = IFBIT(itemEquipMask[i], 0x01, 1, 0);
-    b->canEquip.conjurer = IFBIT(itemEquipMask[i], 0x40, 1, 0);
-    b->canEquip.magician = IFBIT(itemEquipMask[i], 0x40, 1, 0);
-    b->canEquip.sorcerer = IFBIT(itemEquipMask[i], 0x40, 1, 0);
-    b->canEquip.wizard   = IFBIT(itemEquipMask[i], 0x20, 1, 0);
-    b->canEquip.archmage = IFBIT(itemEquipMask[i], 0x20, 1, 0);
+		b->value = getValue(itemValue[i]);
 
-    if (itemSpell[i] == 0) {
-      b->targetted = 0;
-    } else {
-      b->targetted = ((spellAttr[itemSpell[i]] & 7) < 4);
-    }
+		uint8_t spell = itemSpell[i];
+		if (spell) {
+			getTargetting(itemSpell[i], &b->targetting);
+			if (spell > 111) {
+				debug("spell = %d\n", spell);
+				b->action = getSummonEffect(spell);
+			} else {
+				b->action = getSpellAction(spell);
+			}
 
-    b->value = getValue(itemValue[i]);
+			if (spell < 79) {
+				b->use = USE_CASTSPELL;
+			} else if (spell < 96) {
+				b->use = USE_BREATH;
+			} else if ((spell == 96) || (spell == 97)) {
+				b->use = USE_MAKELIGHT;
+			} else if (spell < 112) {
+				bteAttack_t	*ba;
 
-    uint8_t spell = itemSpell[i];
-    if (spell == 0) {
-      b->spell = noSpellEffect();
-    } else if (spell < 79) {
-      b->spell = getSpellEffect(spell);
-      b->spell->subtype = USE_CASTSPELL;
-      b->spell->type = ACT_USE;
-    } else if (spell < 96) {
-      b->spell = getSpellEffect(spell);
-      b->spell->subtype = USE_BREATH;
-      b->spell->type = ACT_USE;
-    } else if ((spell == 96) || (spell == 97)) {
-      b->spell = getSpellEffect(spell);
-      b->spell->subtype = useWeap[spell - 96];
-      b->spell->type = ACT_USE;
-    } else if (spell < 112) {
-      b->spell = getSpellEffect(spell);
-      b->spell->subtype = useWeap[spell - 96];
-      b->spell->type = ACT_USE;
-    } else if (spell > 111) {
-      b->spell = getSummonEffect(spell);
-      b->spell->subtype = USE_FIGURINE;
-      b->spell->type = ACT_USE;
-    }
+				ba = btEffect_attack(b->action->effect);
+				ba->fireString = useWeap[spell - 98];
+			} else {
+				b->use = USE_FIGURINE;
+			}
+		}
+#if 0
+		if (spell == 0) {
+			b->spell = noSpellEffect();
+		} else if (spell < 79) {
+			b->spell = getSpellEffect(spell);
+			b->spell->subtype = USE_CASTSPELL;
+			b->spell->type = ACT_USE;
+		} else if (spell < 96) {
+			b->spell = getSpellEffect(spell);
+			b->spell->subtype = USE_BREATH;
+			b->spell->type = ACT_USE;
+		} else if ((spell == 96) || (spell == 97)) {
+			b->spell = getSpellEffect(spell);
+			b->spell->subtype = useWeap[spell - 96];
+			b->spell->type = ACT_USE;
+		} else if (spell < 112) {
+			b->spell = getSpellEffect(spell);
+			b->spell->subtype = useWeap[spell - 96];
+			b->spell->type = ACT_USE;
+		} else if (spell > 111) {
+			b->spell = getSummonEffect(spell);
+			b->spell->subtype = USE_FIGURINE;
+			b->spell->type = ACT_USE;
+		}
+#endif
 
+		cnvList_add(il, b);
 
-    printItemXML(2, b);
+	}
 
-    btitem_free(b);
-  }
-
-  cnv_printItemFooter();
+	itemList_to_json(il, mkJsonPath("items.json"));
+	shopList_to_json(il, mkJsonPath("garthinv.json"));
+	cnvList_free(il);
 }

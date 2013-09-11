@@ -198,7 +198,7 @@ function city:new(inName)
 	self.day	= cities[inName].day
 	self.night	= cities[inName].night
 	if (globals.isNight) then
-		self.level = 2
+		self.level	= 2
 	else
 		self.level	= 1
 	end

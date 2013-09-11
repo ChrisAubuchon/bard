@@ -50,6 +50,9 @@ static json_t *citybldg_toJson(const void *vcb);
 static btstring_t *citypath_toName(const void *vcp);
 static btstring_t *citybldg_toname(const void *vcb);
 
+static json_t		*btcity_toJson(const void *vc);
+static btstring_t	*btcity_toName(const void *vc);
+
 /********************************/
 /*				*/
 /* Internal functions		*/
@@ -111,11 +114,11 @@ static json_t *citypath_toJson(const void *vcp)
 	json_t		*node;
 
 	node = json_object();
-	JSON_STRING(node,	"north",	cp->north->buf);
-	JSON_STRING(node,	"south",	cp->south->buf);
-	JSON_STRING(node,	"west",		cp->west->buf);
-	JSON_STRING(node,	"east",		cp->east->buf);
-	JSON_STRING(node,	"location",	cp->location->buf);
+	JSON_BTSTRING(node,	"north",	cp->north);
+	JSON_BTSTRING(node,	"south",	cp->south);
+	JSON_BTSTRING(node,	"west",		cp->west);
+	JSON_BTSTRING(node,	"east",		cp->east);
+	JSON_BTSTRING(node,	"location",	cp->location);
 	if (cp->onEnter == NULL) {
 		JSON_NULL(node, "enterFunction");
 	} else {
@@ -131,9 +134,9 @@ static json_t *citybldg_toJson(const void *vcb)
 	json_t		*node;
 
 	node = json_object();
-	JSON_STRING(node,	"distFace",	cb->dist_face->buf);
-	JSON_STRING(node,	"nearFace",	cb->near_face->buf);
-	JSON_STRING(node,	"enterFunction",cb->onEnter->buf);
+	JSON_BTSTRING(node,	"distFace",	cb->dist_face);
+	JSON_BTSTRING(node,	"nearFace",	cb->near_face);
+	JSON_BTSTRING(node,	"enterFunction",cb->onEnter);
 
 	return node;
 }
@@ -152,6 +155,47 @@ static btstring_t *citybldg_toName(const void *vcb)
 	return cb->label;
 }
 
+static json_t *btcity_toJson(const void *vc)
+{
+	btcity_t	*btc = (btcity_t *)vc;
+	json_t		*root;
+	json_t		*node;
+
+	root = json_object();
+
+	JSON_BTSTRING(root, "title", btc->title);
+	json_object_set_new(root, "squares", cnvList_toJsonObject(btc->sqs));
+	json_object_set_new(root, "buildings", cnvList_toJsonObject(btc->bls));
+
+	node = json_object();
+	json_object_set_new(node, "items",
+				cnvList_toJsonArray(btc->day->items));
+	json_object_set_new(node, "monsters",
+				cnvList_toJsonArray(btc->day->monsters));
+	JSON_NUMBER(node, "poisonDamage", btc->day->poisonDmg);
+	JSON_NUMBER(node, "level", btc->day->level);
+	json_object_set_new(root, "day", node);
+
+	if (btc->night->level) {
+		node = json_object();
+		json_object_set_new(node, "items",
+				cnvList_toJsonArray(btc->night->items));
+		json_object_set_new(node, "monsters",
+				cnvList_toJsonArray(btc->night->monsters));
+		JSON_NUMBER(node, "poisonDamage", btc->night->poisonDmg);
+		JSON_NUMBER(node, "level", btc->night->level);
+		json_object_set_new(root, "night", node);
+	}
+
+	return root;
+}
+
+static btstring_t *btcity_toName(const void *vc)
+{
+	btcity_t	*btc = (btcity_t *)vc;
+
+	return btc->name;
+}
 
 /********************************/
 /*				*/
@@ -176,8 +220,10 @@ btcity_t *btcity_new(btstring_t *name)
 	return rval;
 }
 
-void btcity_free(btcity_t *btc)
+void btcity_free(const void *vc)
 {
+	btcity_t	*btc = (btcity_t *)vc;
+
 	if (btc == NULL) {
 		return;
 	}
@@ -232,29 +278,21 @@ void citybldg_new(btcity_t *btc, btstring_t *l, btstring_t *d, btstring_t *n, bt
 void btcity_to_json(btstring_t *fname, btcity_t *btc)
 {
 	json_t		*root;
-	json_t		*node;
 
-	root = json_object();
+	root = btcity_toJson(btc);
 
-	JSON_BTSTRING(root, "title", btc->title);
-	json_object_set_new(root, "squares", cnvList_toJsonObject(btc->sqs));
-	json_object_set_new(root, "buildings", cnvList_toJsonObject(btc->bls));
+	JSON_DUMP(root, fname);
+}
 
-	node = json_object();
-	json_object_set_new(node, "items",
-				cnvList_toJsonArray(btc->day->items));
-	json_object_set_new(node, "monsters",
-				cnvList_toJsonArray(btc->day->monsters));
-	JSON_NUMBER(node, "poisonDamage", btc->day->poisonDmg);
-	json_object_set_new(root, "day", node);
+cnvList_t *cityList_new(void)
+{
+	return cnvList_new(btcity_free, btcity_toJson, btcity_toName);
+}
 
-	node = json_object();
-	json_object_set_new(node, "items",
-				cnvList_toJsonArray(btc->night->items));
-	json_object_set_new(node, "monsters",
-				cnvList_toJsonArray(btc->night->monsters));
-	JSON_NUMBER(node, "poisonDamage", btc->night->poisonDmg);
-	json_object_set_new(root, "night", node);
+void cityList_to_json(cnvList_t *cl, btstring_t *fname)
+{
+	json_t		*root;
 
+	root = cnvList_toJsonObject(cl);
 	JSON_DUMP(root, fname);
 }

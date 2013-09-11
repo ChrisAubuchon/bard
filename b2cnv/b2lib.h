@@ -50,7 +50,8 @@ uint32_t	getMaxLevels(void);
 btstring_t	*getMonsters(uint32_t level);
 
 /* items.c */
-void convertItems(void);
+btstring_t	*getItemName(uint32_t index);
+void		convertItems(void);
 
 /* monster.c */
 void convertMonsters(void);
@@ -60,6 +61,7 @@ btstring_t *getSummonMacro(uint32_t index);
 
 /* spell.c */
 void		convertSpells(void);
+btAction_t	*getSummonEffect(uint32_t spell);
 btAction_t	*getSpellAction(uint32_t spell);
 void		getTargetting(uint32_t index, btTargetting_t *bt);
 btstring_t	*getSummonMacro(uint32_t index);
@@ -84,6 +86,10 @@ void outputDunpics(void);
 void convertTraps(void);
 btstring_t *getDunTrap(uint8_t level, uint8_t index);
 btstring_t *getChestTrap(uint8_t level, uint8_t index);
+
+/* wild.c */
+btstring_t	*getWildMonsters(void);
+void		convertWild(void);
 
 #endif
 

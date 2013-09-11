@@ -49,9 +49,13 @@ typedef btstring_t *	(*btFunc_toName)(const void *data);
 #define JSON_FALSE(obj, name) json_object_set_new(obj, name, json_false())
 #define JSON_TRUE(obj, name) json_object_set_new(obj, name, json_true())
 #define JSON_BTSTRING(obj, name, _str) \
-	json_object_set_new(obj, name, json_string(_str->buf))
+	do {								\
+		if (_str != NULL) {					\
+			JSON_STRING(obj, name, _str->buf);		\
+		}							\
+	} while(0)
 #define JSON_STRING(obj, name, _str) \
-	json_object_set_new(obj, name, json_string(_str))
+	json_object_set_new(obj, name, json_string(_str));
 #define JSON_NUMBER(obj, name, _num) \
 	json_object_set_new(obj, name, json_integer(_num))
 #define JSON_NUMBER_IF_NOT_ZERO(obj, name, _num) \

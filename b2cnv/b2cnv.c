@@ -19,13 +19,20 @@ int main(int argc, char *argv[])
   extern char *optarg;
   int c;
 
-  while ((c = getopt(argc,argv,"ghimst")) != EOF) {
+  while ((c = getopt(argc,argv,"dghimst")) != EOF) {
     switch (c) {
+	case 'd':
+		convertCities();
+		convertWild();
+		break;
       case 'g':
 	convertGFX();
 	break;
       case 'h':
 	usage();
+	break;
+      case 'i':
+	convertItems();
 	break;
       case 'm':
 	convertMonsters();
@@ -34,9 +41,6 @@ int main(int argc, char *argv[])
 	convertSpells();
 	break;
 #if 0
-      case 'i':
-	convertItems();
-	break;
       case 't':
 	convertTraps();
 	break;

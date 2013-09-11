@@ -73,6 +73,7 @@ static monster_t *convertMonster(b2mon_t *inMonster)
 	m->spellSaveHi	= m->breathSaveHi;
 	m->toHitLo	= inMonster->baseac2hit;
 	m->toHitHi	= inMonster->baseac2hit + 3;
+	m->pronoun	= (inMonster->flags & 1) ? 0 : 1;
 
 #define CAP(x,y)  ((x) > (y)) ? (y) : (x)
 	m->priorityLo	= CAP(((inMonster->basemelee << 2) | 1), 0xff);
@@ -161,6 +162,8 @@ static monster_t *convertMonster(b2mon_t *inMonster)
 			ba->meleeString	= ((inMonster->meleeatttype & 0xf0) >> 4) + 1;
 		} else if (att == 0xff) {
 			debug("No attack\n");
+		} else {
+			debug("Attack not covered: 0x%02x\n", att);
 		}
 
 		if (ma != NULL)
@@ -384,6 +387,32 @@ static void printMonster(b2mon_t * mon, uint32_t fmon, int index)
 
 #endif
 
+void getMonsterNameList(cnvList_t *list, btstring_t *monList, uint8_t level)
+{
+	uint32_t	numMonsters;
+	uint32_t	i, j;
+	b2mon_t		*bm;
+	btstring_t	*singular;
+
+	numMonsters = monList->size / sizeof(b2mon_t);
+	for (i = 0; i < numMonsters; i++) {
+		bm = (b2mon_t *)(&(monList->buf[i * sizeof(b2mon_t)]));
+		if (bm->name[0] == '\0')
+			break;
+		for (j = 0; j < 16; j++) {
+			if (bm->name[j] & 0x80)
+				bm->name[j] ^= 0x80;
+			if ((bm->name[j] == '/') || (bm->name[j] == '\\'))
+				bm->name[j] = '^';
+			if (bm->name[j] == 0x7f)
+				bm->name[j] = '\0';
+		}
+		singular = prepName(bm->name, 0);
+		cnvList_add(list, bts_sprintf("%s_%d", singular->buf, level));
+		bts_free(singular);
+	}
+}
+
 
 void convertMonsters(void)
 {
@@ -421,59 +450,33 @@ void convertMonsters(void)
 		bts_free(monData);
 	}
 
+	monData = getWildMonsters();
+	numMonsters = monData->size / sizeof(b2mon_t);
+	for (j = 0; j < numMonsters; j++) {
+		bm = (b2mon_t *)(&(monData->buf[j * sizeof(b2mon_t)]));
+
+		m = convertMonster(bm);
+		if (m == NULL)
+			break;
+
+		m->macro = bts_sprintf("%s_%d", m->singular->buf, M_WILD);
+		m->rndGroupSize = (j < 16) ? 1 : 0;
+		m->noRandom	= (j < 16) ? 0 : 1;
+		cnvList_add(monsters, m);
+	}
+	bts_free(monData);
+
 	i = 0;
 	while (sumMons[i].hpRnd) {
 		m = convertMonster(&sumMons[i]);
 		if (m == NULL)
 			break;
 
-		m->macro = bts_sprintf("SUM_%s", m->singular->buf);
+		m->macro = bts_sprintf("%s_%d", m->singular->buf, M_SUMMON);
 		cnvList_add(monsters, m);
 		i++;
 	}
 
 	monList_to_json(monsters, mkJsonPath("monsters.json"));
 	cnvList_free(monsters);
-#if 0
-	int	i, j;
-	int fd;
-	uint8_t buf[512];
-	b2mon_t m;
-	int index = -1;
-	uint32_t fmon;
-
-	cnv_printMonHeader();
-
-	for (i = 0; i < 25; i++) {
-		sprintf(buf, "lev%d-1.decomp", i);
-		fd = xopen(buf, O_RDONLY);
-
-		xread(fd, &m, sizeof(b2mon_t));
-		fmon = 0;
-		do {
-			index++;
-			for (j = 0; j < 16; j++) {
-				if (m.name[j] & 0x80)
-					m.name[j] ^= 0x80;
-				if ((m.name[j] == '/') || (m.name[j] == '\\'))
-					m.name[j] = '^';
-				if (m.name[j] == 0x7f)
-					m.name[j] = '\0';
-			}
-
-			printMonster(&m, fmon, index);
-
-			xread(fd, &m, sizeof(b2mon_t));
-			fmon++;
-		} while (m.name[0] != '\0');
-
-		close(fd);
-	}
-
-	for (i = 0; i < 19; i++) {
-		printMonster(&sumMons[i], i + 447, i + 447);
-	}
-
-	cnv_printMonFooter();
-#endif
 }

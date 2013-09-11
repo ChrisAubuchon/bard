@@ -531,7 +531,9 @@ void convertLevels(void)
 	}
 
 	skara->day->poisonDmg = b1dun_poisonDamage[0];
+	skara->day->level	= 1;
 	skara->night->poisonDmg = b1dun_poisonDamage[1];
+	skara->night->level	= 2;
 	addItems(skara);
 	addMonsters(skara);
 

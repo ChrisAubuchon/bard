@@ -3,7 +3,7 @@
 #include <cnv_spell.h>
 #include <cnv_song.h>
 
-#define DEBUG
+/*#define DEBUG*/
 #include <debug.h>
 
 /********************************/
@@ -371,7 +371,9 @@ static btAction_t *spf_summon(uint32_t index)
 
 	bs->isIllusion = IFBIT(spellDuration[index], 0x80, 1, 0);
 
-	sum = spellDuration[index] & 0x7f;
+	debug("spellDuration[%d] = %2d\n", index, spellDuration[index]);
+	sum = spellSummonMap[spellDuration[index] & 0x7f];
+	debug("sum = %d\n", sum);
 	cnvList_add(bs->monsters, getSummonMacro(sum));
 
 	return rval;
@@ -398,12 +400,12 @@ btAction_t *getSpellAction(uint32_t spell)
 	return NULL;
 }
 
-#if 0
 btAction_t *getSummonEffect(uint32_t spell)
 {
 	return spf_summon(spell);
 }
 
+#if 0
 btAction_t *getSpellEffect(uint32_t spell)
 {
 	uint8_t sptype;

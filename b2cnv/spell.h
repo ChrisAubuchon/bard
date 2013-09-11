@@ -8,12 +8,12 @@ extern uint8_t spellAttr[];
 extern uint8_t spellType[];
 extern uint8_t spellDuration[];
 extern uint8_t spellRange[];
-extern uint8_t summonIndex[];
 extern uint8_t spellLevel[];
 
 extern uint8_t *spellAbbr[];
 extern uint8_t *spellFull[];
 extern uint8_t *spellClass[];
+extern uint8_t spellSummonMap[];
 
 /* Light spell specific arrays */
 extern uint8_t lightDist[];
