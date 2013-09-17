@@ -192,12 +192,20 @@ static wildGfxOff_t wild_wallLtCrnrGfxOff[] = {
 
 /* graphics for a city wall at the edge */
 static wildObjGfx_t wild_cityWallCrGfxOff[] = {
-	{{{13, 0, 35, 25, 0, 28}, {0, 0, 0, 0, 0, 0}, {13, 0, 35, 25, 89, 28}}}
+	{{
+		{13, 0, 35, 25, 0, 28}, 
+		{0, 0, 0, 0, 0, 0}, 
+		{13, 0, 35, 25, 89, 28}
+	}}
 };
 
 /* graphics for a city entrance at the edge */
 static wildObjGfx_t wild_cityEntrCrGfxOff[] = {
-	{{{13, 0, 35, 26, 0, 28}, {0, 0, 0, 0, 0, 0}, {13, 0, 35, 26, 89, 28}}}
+	{{
+		{13, 0, 35, 26, 0, 28}, 
+		{0, 0, 0, 0, 0, 0}, 
+		{13, 0, 35, 26, 89, 28}
+	}}
 };
 
 /****************************************/
@@ -388,8 +396,10 @@ static void getWildData(dunfacet_t *df, uint8_t facet,
 			*sz	= &wild_cityWallGfxOff[df->faceMap].objs[df->rightFlag];
 			break;
 		case WILD_EDGE:
+			debug("df->faceMap: %d, df->rightFlag: %d\n", df->faceMap, df->rightFlag);
 			*wild	= &wild_cityWallGfx[df->faceMap];
-			*sz	= &wild_cityWallCrGfxOff[df->faceMap].objs[df->rightFlag];
+/*			*sz	= &wild_cityWallCrGfxOff[df->faceMap].objs[df->rightFlag];*/
+			*sz	= &wild_cityWallCrGfxOff[0].objs[df->rightFlag];
 			break;
 		case WILD_SIDE:
 			if (!df->rightFlag) {
@@ -479,11 +489,13 @@ static void outputWildFacet(bt_view_t *oview, dunfacet_t *df, uint8_t facet)
 	view.rflag = 0;
 	view.left = sz->left;
 	view.right = sz->right;
+	debug("sz->right = %d\n", sz->right);
 	view.top = sz->top;
 	view.bottom = sz->bottom;
 	view.width = wild->width;
 	view.offset = wild->offset;
 
+	debug("wpics/%d-%s/%s%s.png\n", df->depth, df->name, facetString[facet], df->extra);
 	img = getImage(&view, wpic);
 
 	xmkdir(mkImagePath("wpics/%d-%s", df->depth, df->name));	

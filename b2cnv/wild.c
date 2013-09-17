@@ -229,6 +229,7 @@ static void addMonsters(cnvList_t *cl)
 
 	data = getWildMonsters();
 	getMonsterNameList(cl, data, M_WILD);
+	bts_free(data);
 }
 
 static void addItems(cnvList_t *cl)
@@ -236,7 +237,7 @@ static void addItems(cnvList_t *cl)
 	uint32_t	i;
 
 	for (i = 0; i < rewardItemRange[WILD_LEVELINDEX]; i++) {
-		cnvList_add(cl, getItemName(rewardItemBase[WILD_LEVELINDEX] + i));
+		cnvList_add(cl, getItemName(rewardItemBase[WILD_LEVELINDEX]+i));
 	}
 }
 

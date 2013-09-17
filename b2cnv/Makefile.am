@@ -16,6 +16,7 @@ b2cnv_SOURCES = 	\
 	city.c		\
 	dun.c		\
 	dun.h		\
+	dun_data.c	\
 	gfx.c		\
 	gfx.h		\
 	gfx_bigpic.c	\

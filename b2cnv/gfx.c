@@ -286,15 +286,13 @@ static void outputMousePointers(void)
 
 void convertGFX(void)
 {
-#if 0
 	outputScreens();
 	outputIcons();
 	outputBigpic();
 	outputBitmapFont();
 	outputCitypics();
-	outputWildpics();
-#endif
 	outputDunpics();
+	outputWildpics();
 #if 0
 	outputMousePointers();
 #endif

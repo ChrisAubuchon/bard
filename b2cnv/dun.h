@@ -1,8 +1,13 @@
-#ifndef __B2CNV_DUN_H
-#define __B2CNV_DUN_H
+#ifndef _B1CNV_DUN_H
+#define _B1CNV_DUN_H
 
-extern uint8_t	poisonDamageList[];
-extern uint8_t	rewardItemBase[];
-extern uint8_t	rewardItemRange[];
+typedef struct {
+	uint8_t		*name;
+	uint8_t		numLevels;
+	uint8_t		levels[5];
+} b2levData_t;
+
+extern b2levData_t	b2dungeons[];
+extern uint8_t		*b2dun_specialCode[];
 
 #endif

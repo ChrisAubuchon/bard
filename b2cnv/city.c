@@ -4,6 +4,7 @@
 #include <level.h>
 #include <gl_list.h>
 #include <gl_linkedhash_list.h>
+#include <mon.h>
 
 #define DEBUG
 #include <debug.h>
@@ -14,6 +15,7 @@
 /*				*/
 /********************************/
 
+#define CITY_LEVELINDEX	0
 #define LOC_OFFSET	256
 
 /********************************/
@@ -23,7 +25,27 @@
 /********************************/
 
 static btcity_t		*convertCity(btstring_t *data, uint32_t index);
-static uint32_t		inCity(uint32_t index, int32_t x, int32_t y);
+
+static void		convertPath(btstring_t *data, int32_t x, int32_t y);
+static void		move(btstring_t *data, int32_t *x, int32_t *y);
+static uint16_t 	xy2index(int32_t x, int32_t y);
+static uint8_t		isPath(uint8_t sq);
+
+static uint32_t		getBuildingLabel(int32_t x, int32_t y,  uint8_t sq);
+static btstring_t	*toLabel(int32_t x, int32_t y, btstring_t *data,
+				btstring_t *path);
+static btstring_t	*getFace(uint8_t hi, uint8_t lo);
+static btstring_t	*getStreet(btstring_t *data, uint32_t index);
+static btstring_t	*getEvent(int32_t x, int32_t y, uint8_t sq);
+static btstring_t	*getTavernName(int32_t x, int32_t y);
+static btstring_t	*getTempleName(int32_t x, int32_t y);
+
+static uint32_t		building_getHash(const void *data);
+static bool		building_compare(const void *data, const void *cmp);
+static void		building_free(const void *data);
+
+static void		addMonsters(cnvList_t *cl);
+static void		addItems(cnvList_t *cl);
 
 /********************************/
 /*				*/
@@ -31,78 +53,354 @@ static uint32_t		inCity(uint32_t index, int32_t x, int32_t y);
 /*				*/
 /********************************/
 
-static uint32_t inCity(uint32_t index, int32_t x, int32_t y)
+
+/********************************/
+/*				*/
+/* Building list functions	*/
+/*				*/
+/********************************/
+
+static uint32_t building_getHash(const void *data)
 {
-	if ((x < 0) || (y < 0) || (x > 15) || (y > 15))
-		return 0;
+	return (uint32_t)data % 255;
+}
 
-	switch (index) {
-	case 1:
-		/* Left corners */
-		if ((x == 0) && ((y == 15) || (y == 0))) {
-			return 0;
+static bool building_compare(const void *data, const void *cmp)
+{
+	return ((uint32_t)data == (uint32_t)cmp);
+}
+
+static void building_free(const void *data)
+{
+}
+
+
+/********************************/
+/*				*/
+/* Path functions		*/
+/*				*/
+/********************************/
+
+static uint16_t xy2index(int32_t x, int32_t y)
+{
+	return (y * 16) + x;
+}
+
+static uint8_t isPath(uint8_t sq)
+{
+	return (!(sq & 0x0f));
+}
+
+static uint32_t countPaths(btstring_t *data, int32_t x, int32_t y)
+{
+	uint32_t	rval = 0;
+
+	if (x > 0) {
+		if (isPath(data->buf[xy2index(x - 1, y)])) {
+			rval++;
 		}
-
-		/* Right side */
-		if ((x == 15) && ((y == 15) || (y == 0))) {
-			return 0;
-		}
-		break;
-	case 2:
-		/* Left side */
-		if ((x == 0) && ((y == 15) || (y == 1))) 
-			return 0;
-
-		/* Bottom */
-		if (y == 0) {
-			switch (x) {
-				case 0: case 1: case 2:
-				case 4: case 6: case 7:
-				case 8: case 12: case 15:
-					return 0;
-			}
-		}
-
-		/* Right */
-		if (x == 15) {
-			switch (y) {
-				case 2: case 5: case 7:
-				case 11:
-					return 0;
-			}
-		}
-
-		break;
 	}
 
-	return 1;
+	if (y > 0) {
+		if (isPath(data->buf[xy2index(x, y - 1)])) {
+			rval++;
+		}
+	}
+
+	if (y < 15) {
+		if (isPath(data->buf[xy2index(x, y + 1)])) {
+			rval++;
+		}
+	}
+
+	if (x < 15) {
+		if (isPath(data->buf[xy2index(x + 1, y)])) {
+			rval++;
+		}
+	}
+
+	return rval;
 }
+
+static void move(btstring_t *data, int32_t *x, int32_t *y)
+{
+	if (*x > 0) {
+		if (isPath(data->buf[xy2index(*x - 1, *y)])) {
+			*x = *x - 1;
+			return;
+		}
+	}
+
+	if (*y > 0) {
+		if (isPath(data->buf[xy2index(*x, *y - 1)])) {
+			*y = *y - 1;
+			return;
+		}
+	}
+
+	if (*x < 15) {
+		if (isPath(data->buf[xy2index(*x + 1, *y)])) {
+			*x = *x + 1;
+			return;
+		}
+	}
+
+	if (*y < 15) {
+		if (isPath(data->buf[xy2index(*x, *y + 1)])) {
+			*y = *y + 1;
+			return;
+		}
+	}
+}
+
+static void convertPath(btstring_t *data, int32_t x, int32_t y)
+{
+	uint32_t		index;
+	uint32_t		i;
+	int32_t			saveX, saveY;
+	uint32_t		numPaths;
+
+	index	= xy2index(x, y);
+	data->buf[index] = 0xff;
+
+	while (countPaths(data, x, y) == 1) {
+		move(data, &x, &y);
+		data->buf[xy2index(x, y)] = 0xff;
+	}
+
+	if (!countPaths(data, x, y)) {
+		return;
+	}
+
+	saveX	= x;
+	saveY	= y;
+	numPaths = countPaths(data, x, y);
+	for (i = 0; i < numPaths; i++) {
+		move(data, &x, &y);
+		convertPath(data, x, y);
+		x = saveX;
+		y = saveY;
+	}
+}
+
+
+/********************************/
+/*				*/
+/* Label functions		*/
+/*				*/
+/********************************/
+
+
+static uint32_t getBuildingLabel(int32_t x, int32_t y, uint8_t sq)
+{
+	uint8_t		event;
+	uint32_t	coords = 0;
+
+	coords = (x << 8) | y;
+
+	if (sq & 0xf0) {
+		event = sq >> 4;
+		switch (event) {
+		case 1:		/* Tavern */
+		case 2:		/* Temple */
+		case 6:
+			return coords | (sq << 16);
+		default:
+			return sq;
+		}
+	} else {
+		return sq;
+	}
+}
+
+static btstring_t *toLabel(int32_t x, int32_t y, btstring_t *data, btstring_t *path)
+{
+	uint32_t		index;
+
+	index = ((15 - y) * 16) + x;
+	if ((x < 0) || (y < 0) || (x > 15) || (y > 15)) {
+		return bts_strcpy("nil");
+	} else if (path->buf[index] == 0xff) {
+		return bts_sprintf("%02d-%02d", x, y);
+	} else {
+		return bts_sprintf("b%08x", 
+			getBuildingLabel(x, y, data->buf[index]));
+	}
+}
+
+static btstring_t *getFace(uint8_t hi, uint8_t lo)
+{
+	if (citySpecialFace[hi] == NULL)
+		return bts_strcpy(bldgFace[(lo & 3) + 1]);
+	else
+		return bts_strcpy(citySpecialFace[hi]);
+}
+
+static btstring_t *getStreet(btstring_t *data, uint32_t index)
+{
+	uint8_t		sq;
+
+	sq = data->buf[index + LOC_OFFSET];
+
+	if (sq > 0x2b) {
+		return bts_strcpy("plaza");
+	} else {
+		return bts_strcpy(cityStreetName[sq]);
+	}
+
+	return NULL;
+}
+
+static btstring_t *getTavernName(int32_t x, int32_t y)
+{
+	uint32_t	i = 0;
+
+	while (cityTavernY[i] >= 0) {
+		if ((cityTavernY[i] == (15-y)) && (cityTavernX[i] == x)) {
+			return bts_sprintf("%s(\"%s\")",
+				cityEvent[1],
+				cityTavernName[i]
+				);
+		}
+		i++;
+	}
+
+	return bts_sprintf("xxx-tavern: x: %d, y: %d", x, 15-y);
+}
+
+static btstring_t *getTempleName(int32_t x, int32_t y)
+{
+	uint32_t	i = 0;
+
+	while (cityTempleY[i] >= 0) {
+		if ((cityTempleY[i] == (15-y)) && (cityTempleX[i] == x)) {
+			return bts_sprintf("%s(\"%s\")",
+				cityEvent[2],
+				cityTempleName[i]
+				);
+		}
+		i++;
+	}
+
+	return bts_sprintf("xxx->temple: x: %2d, y: %2d", x, 15-y);
+}
+
+static btstring_t *getEvent(int32_t x, int32_t y, uint8_t sq)
+{
+	uint8_t		event;
+
+	if (sq == 0) {
+		return NULL;
+	}
+
+	event = sq >> 4;
+
+	switch (event) {
+	case 1:
+		return getTavernName(x, y);
+	case 2:
+		return getTempleName(x, y);
+	default:
+		return bts_strcpy(cityEvent[event]);
+	}
+	return NULL;
+}
+
+/********************************/
+/*				*/
+/* convertCity function		*/
+/*				*/
+/********************************/
 
 static btcity_t *convertCity(btstring_t *data, uint32_t cityIndex)
 {
-	uint32_t		index;
-	int32_t			x, y;
 	gl_list_t		blhash;
+	uint32_t		index;
+	uint32_t		i;
+	uint32_t		tag;
+	uint8_t			lo, hi;
+	int32_t			x, y;
 	btcity_t		*c;
+	btstring_t		*pathData;
+	btstring_t		*event;
 
-	index		= 0;
 	c		= btcity_new(bts_strcpy(locationTitleList[cityIndex]));
-	debug("cityIndex: %d\n", cityIndex);
+	blhash		= gl_list_nx_create_empty(GL_LINKEDHASH_LIST,
+				building_compare,
+				building_getHash,
+				building_free,
+				0);
 
+	pathData = bts_ncopy(data, 0x100, 0);
+	x = cityStartX[cityIndex];
+	y = cityStartY[cityIndex];
+	convertPath(pathData, x, y);
+
+	index = 0;
 	for (y = 15; y >= 0; y--) {
 		for (x = 0; x < 16; x++) {
-			if (!data->buf[index]) {
-				if (!inCity(cityIndex, x, y)) {
-					debug("x: %d, y: %d not inCity\n", x, y);
+			if (pathData->buf[index] == 0xff) {
+				/* Path */
+				citypath_new(c,
+					toLabel(x, y, data, pathData),
+					toLabel(x, y + 1,data, pathData),
+					toLabel(x, y - 1,data, pathData),
+					toLabel(x + 1, y,data, pathData),
+					toLabel(x - 1, y,data, pathData),
+					getEvent(x, y, data->buf[index]),
+					getStreet(data, index)
+					);
+			} else if (pathData->buf[index]) {
+				/* Building */
+				tag = getBuildingLabel(x, y, data->buf[index]);
+				if (gl_list_search(blhash, (void *)tag) != NULL) {
 					index++;
 					continue;
 				}
+
+				if (gl_list_nx_add_last(blhash, (void *)tag) == NULL) {
+					bt_error("Out of memory: %d", gl_list_size(blhash));
+				}
+
+				lo = data->buf[index] & 0x0f;
+				hi = data->buf[index] >> 4;
+
+				event = getEvent(x, y, data->buf[index]);
+
+				citybldg_new(c,
+					toLabel(x, y, data, pathData),
+					getFace(0, lo),
+					getFace(hi, lo),
+					event
+					);
+					
 			}
 			index++;
 		}
 	}
 
+	addMonsters(c->day->monsters);
+	addItems(c->day->items);
+
 	return c;
+}
+
+static void addMonsters(cnvList_t *cl)
+{
+	btstring_t	*data;
+
+	data = getWildMonsters();
+	getMonsterNameList(cl, data, M_WILD);
+	bts_free(data);
+}
+
+static void addItems(cnvList_t *cl)
+{
+	uint32_t	i;
+
+	for (i = 0; i < rewardItemRange[CITY_LEVELINDEX]; i++) {
+		cnvList_add(cl, getItemName(rewardItemBase[CITY_LEVELINDEX]+1));
+	}
 }
 
 /********************************/
@@ -139,5 +437,6 @@ void convertCities(void)
 
 	cityList_to_json(cities, mkJsonPath("cities.json"));
 
+	cnvList_free(cities);
 	fclose(fp);
 }

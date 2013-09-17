@@ -206,12 +206,16 @@ static json_t *edges_to_json(dunLevel_t *dl)
 		} else {
 			JSON_STRING(sqNode, "gfx", edge->gfx1->buf);
 		}
-		JSON_STRING(sqNode,	"path",		edge->sq2->buf);
+		JSON_BTSTRING(sqNode,	"path",		edge->sq2);
 		JSON_TRUE_IF(sqNode,	"secret",	edge->secret1);
 		JSON_TRUE_IF(sqNode,	"isWall",	edge->isWall1);
 		JSON_TRUE_IF(sqNode,	"isDoor",	edge->isDoor1);
 		JSON_TRUE_IF(sqNode,	"canPhase",	edge->canPhase1);
-		json_object_set_new(edgeNode,	edge->sq1->buf, sqNode);
+		if (edge->sq1) {
+			json_object_set_new(edgeNode,	edge->sq1->buf, sqNode);
+		} else {
+			fprintf(stderr, "Edge: %s has no sq1\n", edge->label->buf);
+		}
 
 		sqNode = json_object();
 		if (edge->gfx2 == NULL) {
@@ -219,12 +223,16 @@ static json_t *edges_to_json(dunLevel_t *dl)
 		} else {
 			JSON_STRING(sqNode, "gfx", edge->gfx2->buf);
 		}
-		JSON_STRING(sqNode,	"path",		edge->sq1->buf);
+		JSON_BTSTRING(sqNode,	"path",		edge->sq1);
 		JSON_TRUE_IF(sqNode,	"secret",	edge->secret2);
 		JSON_TRUE_IF(sqNode,	"isWall",	edge->isWall2);
 		JSON_TRUE_IF(sqNode,	"isDoor",	edge->isDoor2);
 		JSON_TRUE_IF(sqNode,	"canPhase",	edge->canPhase2);
-		json_object_set_new(edgeNode,	edge->sq2->buf, sqNode);
+		if (edge->sq2) {
+			json_object_set_new(edgeNode,	edge->sq2->buf, sqNode);
+		} else {
+			fprintf(stderr, "Edge: %s has no sq2\n", edge->label->buf);
+		}
 
 		json_object_set_new(edges, edge->label->buf, edgeNode);
 	}
@@ -258,10 +266,14 @@ static json_t *vertices_to_json(dunLevel_t *dl)
 		JSON_TRUE_IF(vertexNode,"isTrap",	vertex->isTrap);
 		JSON_TRUE_IF(vertexNode,"isStairs",	vertex->isStairs);
 		JSON_TRUE_IF(vertexNode,"isRandomBattle",vertex->isRandomBattle);
+		JSON_TRUE_IF(vertexNode,"isOdd",	vertex->isOdd);
+		JSON_TRUE_IF(vertexNode,"isMakeHostile",vertex->isMakeHostile);
+		JSON_TRUE_IF(vertexNode,"isSilent",	vertex->isSilent);
 		JSON_TRUE_IF(vertexNode,"isStuck",	vertex->isStuck);
 		JSON_TRUE_IF(vertexNode,"isSpecial",	vertex->isSpecial);
 		JSON_TRUE_IF(vertexNode,"hasCeilPortal",vertex->hasCeilPortal);
 		JSON_TRUE_IF(vertexNode,"hasFloorPortal",vertex->hasFloorPortal);
+		JSON_NUMBER_IF_NOT_ZERO(vertexNode,"isSpptDrain", vertex->isSpptDrain);
 		JSON_BTSTRING_IF(vertexNode,"isMessage",vertex->isMessage);
 		JSON_BTSTRING_IF(vertexNode,"isStairs",	vertex->isStairs);
 		JSON_BTSTRING_IF(vertexNode,"isTeleport", vertex->isTeleport);

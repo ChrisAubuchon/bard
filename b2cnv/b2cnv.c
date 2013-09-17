@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
 	case 'd':
 		convertCities();
 		convertWild();
+		convertDungeons();
 		break;
       case 'g':
 	convertGFX();

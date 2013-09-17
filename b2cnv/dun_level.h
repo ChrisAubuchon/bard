@@ -98,12 +98,17 @@ typedef struct {
 } _magicMouth_t;
 
 typedef struct {
+	uint8_t		monName;
+	uint8_t		monSize;
+} _batGroup_t;
+
+typedef struct {
   uint8_t wallData[0x200];
   uint8_t loFlags[0x200];
   uint8_t hiFlags[0x200];
-  uint8_t name[14];
+  uint8_t title[14];
   uint8_t songLevel;
-  uint8_t unknown1;
+  uint8_t phaseFlag;
   uint8_t direction;
   uint8_t unknown5[2];
   uint8_t exitSQN;
@@ -114,8 +119,8 @@ typedef struct {
   _magicMouth_t mouthNum[8];
   _dunCoord_t teleporter[8];
   _dunCoord_t teleDest[8];
-  _dunCoord_t unknown3[8];
-  _dunCoord_t unknown4[8];
+  _dunCoord_t reqBattle[8];
+  _batGroup_t reqBatMon[8];
   _dunCoord_t infoMess[8];
   uint16_t infoOffset[8];
   uint8_t text[0x260];
@@ -150,6 +155,15 @@ typedef struct {
 typedef struct {
   _dungeonMonst_t monster[24];
 } dungeonLevelMonst_t;
+
+#define setSquareMember(inDl, inX, inY, flag, value)		\
+	do {							\
+		dunVertex_t *v;					\
+		v = dunVertex_get(inDl, getVertex(inX, inY));	\
+		v->flag = value;				\
+	} while(0)
+#define setSquareFlag(inDl, inX, inY, flag)			\
+	setSquareMember(inDl, inX, inY, flag, 1)
 
 #endif
 

@@ -557,4 +557,6 @@ void convertDungeons(void)
 
 	dunList_to_json(dungeons, mkJsonPath("dungeons.json"));
 	cnvList_free(dungeons);
+
+	fclose(fp);
 }

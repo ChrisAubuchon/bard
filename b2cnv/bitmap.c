@@ -141,13 +141,6 @@ void outputBitmapFont(void)
 		img->gfx = cell;
 		img = bta_cell_scale(img);
 
-#if DEBUG
-		btstring_t *fname;
-		fname = bts_sprintf("char_%d.gfx", i + ' ');
-		dump_btstring(fname, img->gfx, 0);
-		bts_free(fname);
-#endif
-
 		c = i + ' ';
 		if (c == 'i') {
 			varWidth = 6;

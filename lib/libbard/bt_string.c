@@ -124,6 +124,8 @@ btstring_t *bts_resize(btstring_t *in, uint32_t size)
 	uint32_t i;
 
 	rval = bts_new(size);
+	if (size > in->size)
+		size = in->size;
 	for (i = 0; i < size; i++)
 		rval->buf[i] = in->buf[i];
 
