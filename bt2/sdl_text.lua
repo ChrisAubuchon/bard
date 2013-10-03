@@ -7,7 +7,7 @@ function textBox:new(inParent)
 		window	= false
 	}
 
-	self.window = sdl.NewTextbox(inParent.surface, 352, 34, 262, 192)
+	self.window = sdl.NewTextbox(inParent.surface, 23, 340, 12, 276, 192)
 	self.window.bg_color = sdl.NewColor(255, 255, 255)
 	self.window.fg_color = sdl.NewColor(0, 0, 0)
 	self.window.hg_color = sdl.NewColor(255, 255, 0)
@@ -23,7 +23,8 @@ end
 -- clear()
 ----------------------------------------
 function textBox:clear()
-	local r = gfxRectangle:new(348,30,266,200)
+	--local r = gfxRectangle:new(348,30,266,200)
+	local r = gfxRectangle:new(340,12,276,192)
 	self.parent:Fill(r, globals.colors[16])
 	self.parent:Update(r)
 	self.window:Clear()
@@ -54,7 +55,7 @@ function textBox:print(format, ...)
 		error("nil format in textBox:print(). Probably a bad cdprint() call", 2)
 	end
 
-	self.window:Print(string.format(format, ...))
+	self.window:Print(sprintf(format, ...))
 end
 
 ----------------------------------------
@@ -206,11 +207,11 @@ end
 ----------------------------------------
 -- readNumber()
 ----------------------------------------
-function textBox:readNumber()
+function textBox:readNumber(inMaxLen)
 	local t
 
 	self:print("\n")
-	t = self:readString()
+	t = self:readString(inMaxLen)
 	t = string.match(t, "^%d+$")
 	if (t ~= nil) then
 		return tonumber(t)
@@ -370,6 +371,15 @@ end
 -- repeated actions
 ----------------------------------------
 
+function textBox:csplash(inClear, inPrintContinue, format, ...)
+	self:cdprint(inClear, false, format, ...)
+	if (inPrintContinue) then
+		self:printContinue()
+	end
+	getkey()
+end
+
+if false then
 function textBox:splash(format, ...)
 	self:print(format, ...)
 	self:printContinue()
@@ -381,6 +391,7 @@ function textBox:splashMessage(format, ...)
 	self:print(format, ...)
 	self:printContinue()
 	getkey()
+end
 end
 
 function textBox:printContinue()

@@ -169,4 +169,12 @@ void convertItems(void)
 	itemList_to_json(il, mkJsonPath("items.json"));
 	shopList_to_json(il, mkJsonPath("garthinv.json"));
 	cnvList_free(il);
+
+#if 0
+	for (i = 1; i < 128; i++) {
+		if (itemB1map[i]) {
+			printf("%s:%s\n", itemB1name[i], itemName[itemB1map[i] - 1]);
+		}
+	}
+#endif
 }

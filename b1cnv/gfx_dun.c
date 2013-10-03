@@ -255,7 +255,6 @@ static void getDunFacet(bt_view_t *outView, uint8_t tileset, dunfacet_t *fxxx, u
 			btstring_t *q;
 			uint16_t imgx;
 
-			debug("label->buf = %s\n", label->buf);
 			xmkdir(mkImagePath("dpics/%d-%s", fxxx->depth,
 							fxxx->name));
 			xmkdir(mkImagePath("dpics/%d-%s/%s",
@@ -287,6 +286,7 @@ static void getDunFacet(bt_view_t *outView, uint8_t tileset, dunfacet_t *fxxx, u
 			else
 				l = bts_strcpy("door");
 		}
+		debug("dpics/%d-%s/%s/%d-%s\n", fxxx->depth, fxxx->name, label->buf, tileset, l->buf);
 		bta_toPNG(img,
 			mkImagePath("dpics/%d-%s/%s/%d-%s.png",
 				fxxx->depth, fxxx->name,
@@ -303,16 +303,19 @@ static void getDunGfx(bt_view_t *view, uint8_t tileset)
 
 	i = 0;
 	while (dunSide[i].depth) {
+		debug("DUN_SIDE: %2d\n", i);
 		getDunFacet(view, tileset, &dunSide[i], DUN_SIDE);
 		i++;
 	}
 	i = 0;
 	while (dunFront[i].depth) {
+		debug("DUN_FRONT: %2d\n", i);
 		getDunFacet(view, tileset, &dunFront[i], DUN_FRONT);
 		i++;
 	}
 	i = 0;
 	while (dunPortal[i].depth) {
+		debug("DUN_PORTAL: %2d\n", i);
 		getDunFacet(view, tileset, &dunPortal[i], DUN_PORTAL);
 		i++;
 	}

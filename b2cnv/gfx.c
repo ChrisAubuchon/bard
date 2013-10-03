@@ -290,8 +290,8 @@ void convertGFX(void)
 	outputIcons();
 	outputBigpic();
 	outputBitmapFont();
-	outputCitypics();
 	outputDunpics();
+	outputCitypics();
 	outputWildpics();
 #if 0
 	outputMousePointers();

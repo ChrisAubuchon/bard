@@ -54,10 +54,12 @@ btstring_t	*getItemName(uint32_t index);
 void		convertItems(void);
 
 /* monster.c */
-void convertMonsters(void);
-void monsterHeader(void);
-void mon2summon(uint32_t index);
-btstring_t *getSummonMacro(uint32_t index);
+void		convertMonsters(void);
+btstring_t	*getSummonMacro(uint32_t index);
+void		getMonsterNameList(cnvList_t *list, btstring_t *monList,
+					uint8_t level);
+btstring_t	*getMonsterByIndex(btstring_t *monList, uint32_t index,
+					uint8_t level);
 
 /* spell.c */
 void		convertSpells(void);

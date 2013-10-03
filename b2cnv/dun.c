@@ -3,10 +3,27 @@
 #include <dehuf.h>
 #include <dun.h>
 #include <level.h>
+#include <trap.h>
+#include <cnv_trap.h>
 #include <cnv_dun.h>
 
 #define DEBUG
 #include <debug.h>
+
+/********************************/
+/*				*/
+/* Internal structures		*/
+/*				*/
+/********************************/
+
+typedef struct {
+	dunLevel_t	*dst;
+	dungeonLevel_t	*src;
+	btstring_t	*data;
+	btstring_t	*monsters;
+	uint32_t	levno;
+	uint32_t	dunno;
+} b2level_t;
 
 /********************************/
 /*				*/
@@ -28,30 +45,27 @@
 static btstring_t	*unmaskString(uint8_t *inString, uint8_t inSize);
 static btstring_t	*getNodeLabel(uint32_t x, uint32_t y);
 static FILE		*openLevelFile(void);
-static dunLevel_t	*convertDunLevel(btstring_t *data, btstring_t *monsters,
-				uint32_t dunno, uint32_t levno);
+static void		convertDunLevel(b2level_t *level);
 static uint32_t		getEdge(int32_t x, int32_t y, uint32_t dir);
 static uint32_t		getVertex(int32_t x, int32_t y);
 
-static void		setEdges(dunLevel_t *dl, dungeonLevel_t *l, int32_t x, 
-				int32_t y, uint8_t walls);
-static void		setVertex(dunLevel_t *dl, dungeonLevel_t *l,
-				int32_t x, int32_t y, uint32_t index,
-				uint32_t levno);
-static void		setEdgeWall(dungeonLevel_t *l, dunEdge_t *edge,
+static void		setEdges(b2level_t *level, int32_t x, int32_t y, 
+				uint8_t walls);
+static void		setVertex(b2level_t *level, int32_t x, int32_t y, 
+				uint32_t index);
+static void		setEdgeWall(b2level_t *level, dunEdge_t *edge,
 				int32_t x, int32_t y, uint8_t square,
 				uint8_t dir);
 static uint8_t		wrapNumber(int8_t inN);
-static void		convertStairs(dungeonLevel_t *l, uint32_t index,
-				dunVertex_t *v, uint32_t levno);
-static void		addSpecialSquares(dunLevel_t *dl, dungeonLevel_t *l);
-
-static void 		getTeleport(dunLevel_t *dl, dungeonLevel_t *l, 
-				uint32_t index);
-static void 		getInfoMessage(dunLevel_t *dl, dungeonLevel_t *l, 
-				uint32_t index);
-static void 		getRequiredBattle(dunLevel_t *dl, dungeonLevel_t *l, 
-				uint32_t index);
+static void		convertStairs(b2level_t *level, uint32_t index,
+				dunVertex_t *v);
+static void		addSpecialSquares(b2level_t *level);
+static void 		getTeleport(b2level_t *level, uint32_t index);
+static void 		getInfoMessage(b2level_t *level, uint32_t index);
+static void 		getRequiredBattle(b2level_t *level, uint32_t index);
+static void		addMonsters(b2level_t *level);
+static void		addItems(b2level_t *level);
+static void		addTraps(b2level_t *level);
 
 /********************************/
 /*				*/
@@ -129,14 +143,14 @@ static uint32_t getEdge(int32_t x, int32_t y, uint32_t dir)
 }
 #undef doLabel
 
-static void setEdgeWall(dungeonLevel_t *l, dunEdge_t *edge, int32_t x, 
+static void setEdgeWall(b2level_t *level, dunEdge_t *edge, int32_t x, 
 				int32_t y, uint8_t square, uint8_t dir)
 {
 	switch (dir) {
 	case DIR_NORTH:
 		edge->sq1 = getNodeLabel(x, y);
 		if (square & NORTH_MASK) {
-			edge->canPhase1 = l->phaseFlag;
+			edge->canPhase1 = level->src->phaseFlag;
 			if (square & WALL_NORTH) {
 				edge->gfx1 = bts_strcpy("wall");
 				if (square & DOOR_NORTH) {
@@ -154,7 +168,7 @@ static void setEdgeWall(dungeonLevel_t *l, dunEdge_t *edge, int32_t x,
 	case DIR_SOUTH:
 		edge->sq2 = getNodeLabel(x, y);
 		if (square & SOUTH_MASK) {
-			edge->canPhase2 = l->phaseFlag;
+			edge->canPhase2 = level->src->phaseFlag;
 			if (square & WALL_SOUTH) {
 				edge->gfx2 = bts_strcpy("wall");
 				if (square & DOOR_SOUTH) {
@@ -172,7 +186,7 @@ static void setEdgeWall(dungeonLevel_t *l, dunEdge_t *edge, int32_t x,
 	case DIR_WEST:
 		edge->sq1 = getNodeLabel(x, y);
 		if (square & WEST_MASK) {
-			edge->canPhase1 = l->phaseFlag;
+			edge->canPhase1 = level->src->phaseFlag;
 			if (square & WALL_WEST) {
 				edge->gfx1 = bts_strcpy("wall");
 				if (square & DOOR_WEST) {
@@ -190,7 +204,7 @@ static void setEdgeWall(dungeonLevel_t *l, dunEdge_t *edge, int32_t x,
 	case DIR_EAST:
 		edge->sq2 = getNodeLabel(x, y);
 		if (square & EAST_MASK) {
-			edge->canPhase2 = l->phaseFlag;
+			edge->canPhase2 = level->src->phaseFlag;
 			if (square & WALL_EAST) {
 				edge->gfx2 = bts_strcpy("wall");
 				if (square & DOOR_EAST) {
@@ -208,19 +222,18 @@ static void setEdgeWall(dungeonLevel_t *l, dunEdge_t *edge, int32_t x,
 	}
 }
 
-static void setEdges(dunLevel_t *dl, dungeonLevel_t *l, int32_t x, int32_t y, 
-			uint8_t walls)
+static void setEdges(b2level_t *level, int32_t x, int32_t y, uint8_t walls)
 {
 	dunEdge_t	*edge;
 
-	edge	= dunEdge_new(dl, getEdge(x, y, DIR_NORTH));
-	setEdgeWall(l, edge, x, y, walls, DIR_NORTH);
-	edge	= dunEdge_new(dl, getEdge(x, y, DIR_SOUTH));
-	setEdgeWall(l, edge, x, y, walls, DIR_SOUTH);
-	edge	= dunEdge_new(dl, getEdge(x, y, DIR_EAST));
-	setEdgeWall(l, edge, x, y, walls, DIR_EAST);
-	edge	= dunEdge_new(dl, getEdge(x, y, DIR_WEST));
-	setEdgeWall(l, edge, x, y, walls, DIR_WEST);
+	edge	= dunEdge_new(level->dst, getEdge(x, y, DIR_NORTH));
+	setEdgeWall(level, edge, x, y, walls, DIR_NORTH);
+	edge	= dunEdge_new(level->dst, getEdge(x, y, DIR_SOUTH));
+	setEdgeWall(level, edge, x, y, walls, DIR_SOUTH);
+	edge	= dunEdge_new(level->dst, getEdge(x, y, DIR_EAST));
+	setEdgeWall(level, edge, x, y, walls, DIR_EAST);
+	edge	= dunEdge_new(level->dst, getEdge(x, y, DIR_WEST));
+	setEdgeWall(level, edge, x, y, walls, DIR_WEST);
 }
 
 /********************************/
@@ -239,22 +252,21 @@ static uint8_t *stairCode[] = {
 		currentLevel:changeLevel(%d)\
 	end",
 	"if (currentLevel:doStairs(\"%s\")) then \
-		currentLevel:exitToCity() \
+		currentLevel:exit() \
 	end"
 };
 
-static void convertStairs(dungeonLevel_t *l, uint32_t index, dunVertex_t *v, 
-				uint32_t levno)
+static void convertStairs(b2level_t *level, uint32_t index, dunVertex_t *v)
 {
 	uint8_t		direction;
 	uint8_t		stairCodeIndex = 0;
 	int8_t		newLevel = 0;
 
-	direction = (l->direction & 1) ^ ((l->loFlags[index] >> 1) & 1);
-	if (l->loFlags[index] & DUN_DOWNSTAIR) {
+	direction = (level->src->direction & 1) ^ ((level->src->loFlags[index] >> 1) & 1);
+	if (level->src->loFlags[index] & DUN_DOWNSTAIR) {
 		newLevel = 1;
 	} else {
-		if (!levno)
+		if (!level->levno)
 			stairCodeIndex = 1;
 		newLevel = -1;
 	}
@@ -264,74 +276,73 @@ static void convertStairs(dungeonLevel_t *l, uint32_t index, dunVertex_t *v,
 				newLevel);
 }
 
-static void setVertex(dunLevel_t *dl, dungeonLevel_t *l, int32_t x, 
-			int32_t y, uint32_t index, uint32_t levno)
+static void setVertex(b2level_t *level, int32_t x, int32_t y, uint32_t index) 
 {
 	dunVertex_t	*vertex;
 
-	vertex = dunVertex_new(dl, getVertex(x, y));
+	vertex = dunVertex_new(level->dst, getVertex(x, y));
 	vertex->northEdge = bts_sprintf("x%08x", getEdge(x,y,DIR_NORTH));
 	vertex->southEdge = bts_sprintf("x%08x", getEdge(x,y,DIR_SOUTH));
 	vertex->eastEdge = bts_sprintf("x%08x", getEdge(x,y,DIR_EAST));
 	vertex->westEdge = bts_sprintf("x%08x", getEdge(x,y,DIR_WEST));
 
-	if (l->loFlags[index] & DUN_SPECIAL) {
+	if (level->src->loFlags[index] & DUN_SPECIAL) {
 		vertex->isSpecial = 1;
 	}
 
-	if (l->loFlags[index] & DUN_DARKNESS) {
+	if (level->src->loFlags[index] & DUN_DARKNESS) {
 		vertex->isDarkness = 1;
 	}
 
-	if (l->loFlags[index] & DUN_TRAP) {
+	if (level->src->loFlags[index] & DUN_TRAP) {
 		vertex->isTrap = 1;
 	}
 
-	if (l->loFlags[index] & DUN_CEILPORT) {
+	if (level->src->loFlags[index] & DUN_CEILPORT) {
 		vertex->hasCeilPortal = 1;
 	}
 
-	if (l->loFlags[index] & DUN_FLOORPORT) {
+	if (level->src->loFlags[index] & DUN_FLOORPORT) {
 		vertex->hasFloorPortal = 1;
 	}
 
-	if (l->loFlags[index] & DUN_BATTLE) {
+	if (level->src->loFlags[index] & DUN_BATTLE) {
 		vertex->isRandomBattle = 1;
 	}
 
-	if (l->loFlags[index] & STAIR_MASK) {
-		convertStairs(l, index, vertex, levno);
+	if (level->src->loFlags[index] & STAIR_MASK) {
+		convertStairs(level, index, vertex);
 	}
 
-	if (l->hiFlags[index] & HI_SPINNER) {
+	if (level->src->hiFlags[index] & HI_SPINNER) {
 		vertex->isSpinner = 1;
 	}
 
-	if (l->hiFlags[index] & HI_ANTIMAGIC) {
+	if (level->src->hiFlags[index] & HI_ANTIMAGIC) {
 		vertex->isAntiMagic = 1;
 	}
 
-	if (l->hiFlags[index] & HI_DAMAGE) {
+	if (level->src->hiFlags[index] & HI_DAMAGE) {
 		vertex->isLifeDrain = 1;
 	}
 
-	if (l->hiFlags[index] & HI_SOMETHINGODD) {
+	if (level->src->hiFlags[index] & HI_SOMETHINGODD) {
 		vertex->isOdd = 1;
 	}
 
-	if (l->hiFlags[index] & HI_ENDTUNE) {
+	if (level->src->hiFlags[index] & HI_ENDTUNE) {
 		vertex->isSilent = 1;
 	}
 
-	if (l->hiFlags[index] & HI_SPREGEN) {
+	if (level->src->hiFlags[index] & HI_SPREGEN) {
 		vertex->isSpptRegen = 1;
 	}
 
-	if (l->hiFlags[index] & HI_DRAINSPPT) {
-		vertex->isSpptRegen = l->songLevel;
+	if (level->src->hiFlags[index] & HI_DRAINSPPT) {
+		vertex->isSpptRegen = level->src->songLevel;
 	}
 
-	if (l->hiFlags[index] & HI_HOSTILEMON) {
+	if (level->src->hiFlags[index] & HI_HOSTILEMON) {
 		vertex->isMakeHostile = 1;
 	}
 }
@@ -342,8 +353,10 @@ static void setVertex(dunLevel_t *dl, dungeonLevel_t *l, int32_t x,
 /*				*/
 /********************************/
 
-static void getInfoMessage(dunLevel_t *dl, dungeonLevel_t *l, uint32_t index)
+static void getInfoMessage(b2level_t *level, uint32_t index)
 {
+	dunLevel_t	*dl = level->dst;
+	dungeonLevel_t	*l = level->src;
 	uint16_t	start;
 	uint16_t	offset;
 
@@ -368,8 +381,11 @@ static void getInfoMessage(dunLevel_t *dl, dungeonLevel_t *l, uint32_t index)
 		);
 }
 
-static void getTeleport(dunLevel_t *dl, dungeonLevel_t *l, uint32_t index)
+static void getTeleport(b2level_t *level, uint32_t index)
 {
+	dunLevel_t	*dl = level->dst;
+	dungeonLevel_t	*l = level->src;
+	
 	if ((l->teleporter[index].sqNorth == l->teleDest[index].sqNorth) &&
 	    (l->teleporter[index].sqEast == l->teleDest[index].sqEast))
 		return;
@@ -383,26 +399,64 @@ static void getTeleport(dunLevel_t *dl, dungeonLevel_t *l, uint32_t index)
 		);
 }
 
-static void getRequiredBattle(dunLevel_t *dl, dungeonLevel_t *l, uint32_t index)
+static void getRequiredBattle(b2level_t *level, uint32_t index)
 {
+	btstring_t	*code;
+	btstring_t	*mString;
+	dungeonLevel_t	*l = level->src;
+
 	if ((!l->reqBattle[index].sqNorth) && (!l->reqBattle[index].sqEast) &&
 	    (!l->reqBatMon[index].monName) && (!l->reqBatMon[index].monSize))
 		return;
-	debug("reqBattle: (%2d,%2d) - (%2d,%2d)\n",
-		l->reqBattle[index].sqNorth,
+
+	mString = getMonsterByIndex(level->monsters, 
+				l->reqBatMon[index].monName,
+				b2dungeons[level->dunno].levels[level->levno]
+				);
+
+	code = bts_sprintf("battle:new(\"%.*s\", %d)",
+		mString->size,
+		mString->buf,
+		l->reqBatMon[index].monSize
+		);
+	bts_free(mString);
+
+	setSquareMember(level->dst,
 		l->reqBattle[index].sqEast,
-		l->reqBatMon[index].monName,
-		l->reqBatMon[index].monSize);
+		l->reqBattle[index].sqNorth,
+		isForcedBattle,
+		code
+		);
 }
 
-static void addSpecialSquares(dunLevel_t *dl, dungeonLevel_t *l)
+static void getSpecialSquare(b2level_t *level, uint32_t index)
+{
+	dungeonLevel_t	*l = level->src;
+	dunLevel_t	*dl = level->dst;
+	uint8_t		square;
+
+	if ((!l->magicMouth[index].sqNorth) && (!l->magicMouth[index].sqEast) &&
+	    (!l->mouthNum[index].sqNumber))
+		return;
+
+	square = l->mouthNum[index].sqNumber - 32;
+	setSquareMember(dl,
+		l->magicMouth[index].sqNorth,
+		l->magicMouth[index].sqEast,
+		code,
+		bts_strcpy(b2dun_specialCode[square])
+		);
+}
+
+static void addSpecialSquares(b2level_t *level)
 {
 	uint32_t	i;
 
 	for (i = 0; i < 8; i++) {
-		getInfoMessage(dl, l, i);
-		getTeleport(dl, l, i);
-		getRequiredBattle(dl, l, i);
+		getInfoMessage(level, i);
+		getTeleport(level, i);
+		getRequiredBattle(level, i);
+		getSpecialSquare(level, i);
 	}
 }
 
@@ -412,44 +466,114 @@ static void addSpecialSquares(dunLevel_t *dl, dungeonLevel_t *l)
 /*				*/
 /********************************/
 
-static dunLevel_t *convertDunLevel(
-	btstring_t	*data, 
-	btstring_t	*monsters,
-	uint32_t	dunno,
-	uint32_t	levno
-	)
+static void addMonsters(b2level_t *level)
 {
-	dunLevel_t	*dl;
+	getMonsterNameList(level->dst->monsters, level->monsters, level->levno);
+}
+
+static void addItems(b2level_t *level)
+{
+	uint32_t 	i;
+	uint32_t	ilevel = level->src->songLevel;
+
+	for (i = 0; i < rewardItemRange[ilevel]; i++) {
+		cnvList_add(level->dst->items,
+			getItemName(rewardItemBase[ilevel]+i));
+	}
+}
+
+static void addTraps(b2level_t *level)
+{
 	dungeonLevel_t	*l;
+	dunLevel_t	*dl;
+	uint32_t	dlevel;
+	uint32_t	i;
+	uint32_t	trapIndex;
+	trap_t		*t;
+
+	l	= level->src;
+	dl	= level->dst;
+	dlevel	= l->songLevel;
+
+	for (i = 0; i < 8; i++) {
+		t = trap_new();
+
+		t->name		= bts_strcpy(dun_trap_macros[i]);
+		t->effectString	= bts_strcpy(dun_trap_strings[i]);
+		t->partyFlag	= dun_trap_partyFlag[i];
+		t->spAttack	= dun_trap_spAttack[i];
+		t->ndice	= dun_trap_dice[i] * dlevel;
+		t->dieval	= 4;
+
+		/* 
+		 * BT2 doesn't do saving throw for floor traps. It's
+		 * a straight 50% chance.
+		 */
+		t->sv_lo	= 0;
+		t->sv_hi	= 0;
+
+		cnvList_add(dl->floorTraps, t);
+	}
+
+	for (i = 0; i < 4; i++) {
+		t = trap_new();
+
+		trapIndex = chest_trap_by_level[dlevel][i];
+		if (trapIndex) {
+			t->name	= bts_strcpy(chest_trap_strings[trapIndex]);
+			t->effectString = NULL;
+			t->partyFlag	= (trapIndex < 3) ? 1 : 0;
+			t->spAttack	= chest_trap_spAttack[trapIndex];
+			t->ndice	= chest_trap_dice[trapIndex] * dlevel;
+			t->dieval	= 4;
+
+			t->sv_lo	= 0;
+			t->sv_hi	= 0;
+		} else {
+			t->name = NULL;
+		}
+
+		cnvList_add(dl->chestTraps, t);
+	}
+}
+
+static void convertDunLevel(b2level_t *level)
+{
 	uint32_t	i, index;
 	int32_t		x, y;
+	dunLevel_t	*dl;
+	dungeonLevel_t	*l;
 
-	dl	= dunLevel_new();
-	l	= (dungeonLevel_t *)data->buf;
+	level->dst	= dunLevel_new();
+	dl = level->dst;
+	level->src	= (dungeonLevel_t *)level->data->buf;
+	l = level->src;
 
 	dl->title	= unmaskString(l->title, 14);
-	dl->name	= bts_sprintf("%s-%d", b2dungeons[dunno].name, levno);
+	dl->name	= bts_sprintf("%s-%d", 
+				b2dungeons[level->dunno].name, level->levno);
 	dl->path	= mkJsonPath("");
 
 	/* XXX - Might have to be songLevel + 1; */
-	dl->level	= l->songLevel + 1;
-	dl->poisonDmg	= poisonDamageList[dl->level];
+	dl->level	= l->songLevel;
+	dl->poisonDmg	= poisonDamageList[l->songLevel];
 
-	dl->dungeonLevel	= levno;
+	dl->dungeonLevel	= level->levno;
 	dl->dungeonDirection	= l->direction ? DIR_UPWARD : DIR_DOWNWARD;
 
 	index = 0;
 	for (y = 0; y < 22; y++) {
 		for (x = 0; x < 22; x++) {
-			setEdges(dl, l, x, y, l->wallData[index]);
-			setVertex(dl, l, x, y, index, levno);
+			setEdges(level, x, y, l->wallData[index]);
+			setVertex(level, x, y, index);
 			index++;
 		}
 	}
 
-	addSpecialSquares(dl, l);
-
-	return dl;
+	addSpecialSquares(level);
+	addMonsters(level);
+	addItems(level);
+	addTraps(level);
 }
 
 /********************************/
@@ -500,9 +624,7 @@ void convertDungeons(void)
 	uint32_t	nlevs, dunno, levno;
 	cnvList_t	*dungeons;
 	huffile_t	*huf;
-	btstring_t	*data;
-	btstring_t	*monsters;
-	dunLevel_t	*dl;
+	b2level_t	level;
 
 	fp = openLevelFile();
 	nlevs = fp_read32le(fp) / sizeof(uint32_t);
@@ -517,15 +639,17 @@ void convertDungeons(void)
 			fp_moveToIndex32(fp, b2dungeons[dunno].levels[levno],0);
 
 			huf = dehuf_init(fp);
-			data = dehuf(huf, 0x900);
-			monsters = dehuf(huf, 0x300);
+			level.data	= dehuf(huf, 0x900);
+			level.monsters = dehuf(huf, 0x300);
+			level.dunno	= dunno;
+			level.levno	= levno;
 
-			dl = convertDunLevel(data, monsters, dunno, levno);
-			cnvList_add(d->levels, dl);
+			convertDunLevel(&level);
+			cnvList_add(d->levels, level.dst);
 
 			dehuf_free(huf);
-			bts_free(data);
-			bts_free(monsters);
+			bts_free(level.data);
+			bts_free(level.monsters);
 		}
 
 		cnvList_add(dungeons, d);

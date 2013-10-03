@@ -66,7 +66,7 @@ typedef struct {
 				/* item will be consumed after use.     */
 				/* This is to match BTI's use behavior  */
 
-  uint32_t value;               /* Item price                   */
+  uint32_t	value;          /* Item price                   */
   int8_t	shopCount;	/* Initial shop count		*/
 
   struct {                      /* Bits for classes that the    */

@@ -64,12 +64,13 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_b2cnv_OBJECTS = b2cnv.$(OBJEXT) bitmap.$(OBJEXT) city.$(OBJEXT) \
-	dun.$(OBJEXT) dun_data.$(OBJEXT) gfx.$(OBJEXT) \
+	class.$(OBJEXT) dun.$(OBJEXT) dun_data.$(OBJEXT) gfx.$(OBJEXT) \
 	gfx_bigpic.$(OBJEXT) gfx_city.$(OBJEXT) gfx_dun.$(OBJEXT) \
 	gfx_wild.$(OBJEXT) item.$(OBJEXT) item_data.$(OBJEXT) \
 	level_data.$(OBJEXT) mon.$(OBJEXT) mon_data.$(OBJEXT) \
-	picIndex.$(OBJEXT) spell.$(OBJEXT) spell_data.$(OBJEXT) \
-	summon_data.$(OBJEXT) wild.$(OBJEXT)
+	picIndex.$(OBJEXT) race.$(OBJEXT) spell.$(OBJEXT) \
+	spell_data.$(OBJEXT) trap_data.$(OBJEXT) summon_data.$(OBJEXT) \
+	wild.$(OBJEXT)
 b2cnv_OBJECTS = $(am_b2cnv_OBJECTS)
 b2cnv_DEPENDENCIES = $(top_builddir)/lib/libcnv/libcnv.a \
 	$(top_builddir)/lib/libbard/libbard.a \
@@ -529,6 +530,7 @@ b2cnv_SOURCES = \
 	b2lib.h		\
 	bitmap.c	\
 	city.c		\
+	class.c		\
 	dun.c		\
 	dun.h		\
 	dun_data.c	\
@@ -548,9 +550,12 @@ b2cnv_SOURCES = \
 	mon.h		\
 	mon_data.c	\
 	picIndex.c	\
+	race.c		\
 	spell.c		\
 	spell.h		\
 	spell_data.c	\
+	trap.h		\
+	trap_data.c	\
 	summon_data.c	\
 	wild.c
 
@@ -646,6 +651,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/b2cnv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitmap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/city.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/class.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dun.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dun_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gfx.Po@am__quote@
@@ -659,9 +665,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mon_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/picIndex.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/race.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spell.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spell_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/summon_data.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/trap_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wild.Po@am__quote@
 
 .c.o:

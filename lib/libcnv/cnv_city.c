@@ -41,17 +41,20 @@ typedef struct {
 /*				*/
 /********************************/
 
-static void citypath_free(const void *vbtc);
-static void citybldg_free(const void *vbl);
+static void		citypath_free(const void *vbtc);
+static void		citybldg_free(const void *vbl);
 
-static json_t *citypath_toJson(const void *vcp);
-static json_t *citybldg_toJson(const void *vcb);
+static json_t		*citypath_toJson(const void *vcp);
+static json_t		*citybldg_toJson(const void *vcb);
 
-static btstring_t *citypath_toName(const void *vcp);
-static btstring_t *citybldg_toname(const void *vcb);
+static btstring_t	*citypath_toName(const void *vcp);
+static btstring_t	*citybldg_toname(const void *vcb);
 
 static json_t		*btcity_toJson(const void *vc);
+static json_t		*btcity_toPath(const void *vc);
 static btstring_t	*btcity_toName(const void *vc);
+
+static void		cityList_toLevels(const void *vc);
 
 /********************************/
 /*				*/
@@ -164,6 +167,8 @@ static json_t *btcity_toJson(const void *vc)
 	root = json_object();
 
 	JSON_BTSTRING(root, "title", btc->title);
+	JSON_BTSTRING(root, "guildExitSquare", btc->guildExitSquare);
+	JSON_BTSTRING(root, "guildExitDir", btc->guildExitDir);
 	json_object_set_new(root, "squares", cnvList_toJsonObject(btc->sqs));
 	json_object_set_new(root, "buildings", cnvList_toJsonObject(btc->bls));
 
@@ -190,11 +195,27 @@ static json_t *btcity_toJson(const void *vc)
 	return root;
 }
 
+static json_t *btcity_toPath(const void *vc)
+{
+	btcity_t	*c = (btcity_t *)vc;
+
+	return json_string(c->name->buf);
+}
+
 static btstring_t *btcity_toName(const void *vc)
 {
 	btcity_t	*btc = (btcity_t *)vc;
 
 	return btc->name;
+}
+
+static void cityList_toLevels(const void *vc)
+{
+	btcity_t	*c = (btcity_t *)vc;
+	json_t		*node;
+
+	node = btcity_toJson(vc);
+	JSON_DUMP(node, bts_sprintf("%s/%s.json", c->path->buf, c->name->buf));
 }
 
 /********************************/
@@ -286,7 +307,7 @@ void btcity_to_json(btstring_t *fname, btcity_t *btc)
 
 cnvList_t *cityList_new(void)
 {
-	return cnvList_new(btcity_free, btcity_toJson, btcity_toName);
+	return cnvList_new(btcity_free, btcity_toPath, btcity_toName);
 }
 
 void cityList_to_json(cnvList_t *cl, btstring_t *fname)
@@ -295,4 +316,6 @@ void cityList_to_json(cnvList_t *cl, btstring_t *fname)
 
 	root = cnvList_toJsonObject(cl);
 	JSON_DUMP(root, fname);
+
+	cnvList_runForEach(cl, cityList_toLevels);
 }

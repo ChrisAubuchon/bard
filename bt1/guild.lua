@@ -225,18 +225,18 @@ local function enter()
 				currentLevel = city:new("skara")
 				currentLevel:enter(25, 15, "east")
 				globals.gameState = globals.STATE_CITY
+if false then
 				party.light.active = true
 				party.light.distance = 5
 				party.light.seeSecret = true
 				party.light.effect:__activate(-1)
+end
 				return
 			end
 		elseif (inkey == "L") then
 			leave_game()
 		elseif (inkey == "N") then
 			party:reorder()
-		elseif (inkey == "Q") then
-			os.exit()
 		elseif (inkey == "R") then
 			remove_member()
 		elseif (inkey == "S") then

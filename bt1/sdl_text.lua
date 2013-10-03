@@ -7,7 +7,7 @@ function textBox:new(inParent)
 		window	= false
 	}
 
-	self.window = sdl.NewTextbox(inParent.surface, 352, 34, 262, 192)
+	self.window = sdl.NewTextbox(inParent.surface, 21, 352, 34, 262, 192)
 	self.window.bg_color = sdl.NewColor(255, 255, 255)
 	self.window.fg_color = sdl.NewColor(0, 0, 0)
 	self.window.hg_color = sdl.NewColor(255, 255, 0)

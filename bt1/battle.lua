@@ -541,8 +541,6 @@ function battleData:getRunFightOption()
 			return false
 		elseif (inkey == "D") then
 			self:dumpBattleBonus()
-		elseif (inkey == "Q") then
-			os.exit(0)
 		end
 	until (inkey == "F")
 
@@ -605,7 +603,6 @@ function battleData:getPlayerOption(c)
 		while continue do
 			inkey = getkey()
 
-			if (inkey == "Q") then os.exit(0) end
 			if (options[inkey]) then
 				if (inkey == "A") then
 					action.action = "melee"

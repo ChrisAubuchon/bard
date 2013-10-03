@@ -67,9 +67,9 @@ am_bte_OBJECTS = bt_lua.$(OBJEXT) btf.$(OBJEXT) l_sdl.$(OBJEXT) \
 	l_surface.$(OBJEXT) l_anim.$(OBJEXT) l_img.$(OBJEXT) \
 	l_rect.$(OBJEXT) l_color.$(OBJEXT) l_font.$(OBJEXT) \
 	l_textbox.$(OBJEXT) l_timer.$(OBJEXT) font.$(OBJEXT) \
-	sdl.$(OBJEXT) l_sys.$(OBJEXT) l_utils.$(OBJEXT) \
-	l_module.$(OBJEXT) l_random.$(OBJEXT) l_jansson.$(OBJEXT) \
-	bte.$(OBJEXT)
+	sdl.$(OBJEXT) l_sprintf.$(OBJEXT) l_sys.$(OBJEXT) \
+	l_utils.$(OBJEXT) l_module.$(OBJEXT) l_random.$(OBJEXT) \
+	l_jansson.$(OBJEXT) bte.$(OBJEXT)
 bte_OBJECTS = $(am_bte_OBJECTS)
 bte_DEPENDENCIES = $(top_builddir)/lib/lua/liblua.a \
 	$(top_builddir)/lib/libbard/libbard.a \
@@ -78,7 +78,8 @@ bte_DEPENDENCIES = $(top_builddir)/lib/lua/liblua.a \
 am_bte_nosdl_OBJECTS = bte_nosdl-bt_lua.$(OBJEXT) \
 	bte_nosdl-l_sys.$(OBJEXT) bte_nosdl-l_utils.$(OBJEXT) \
 	bte_nosdl-l_module.$(OBJEXT) bte_nosdl-l_random.$(OBJEXT) \
-	bte_nosdl-l_jansson.$(OBJEXT) bte_nosdl-bte.$(OBJEXT)
+	bte_nosdl-l_jansson.$(OBJEXT) bte_nosdl-l_sprintf.$(OBJEXT) \
+	bte_nosdl-bte.$(OBJEXT)
 bte_nosdl_OBJECTS = $(am_bte_nosdl_OBJECTS)
 bte_nosdl_DEPENDENCIES = $(top_builddir)/lib/lua/liblua.a \
 	$(top_builddir)/lib/libbard/libbard.a \
@@ -549,6 +550,7 @@ bte_SOURCES = \
 	sdl.c \
 	sdl.h \
 	l_sdl.h \
+	l_sprintf.c	\
 	l_sys.c \
 	l_int.h \
 	l_utils.c \
@@ -579,6 +581,7 @@ bte_nosdl_SOURCES = \
 	l_module.c	\
 	l_random.c	\
 	l_jansson.c	\
+	l_sprintf.c	\
 	bte.c
 
 bte_nosdl_LDADD = \
@@ -681,6 +684,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bte_nosdl-l_jansson.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bte_nosdl-l_module.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bte_nosdl-l_random.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bte_nosdl-l_sprintf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bte_nosdl-l_sys.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bte_nosdl-l_utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/btf.Po@am__quote@
@@ -694,6 +698,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_random.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_rect.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_sdl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_sprintf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_surface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_sys.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_textbox.Po@am__quote@
@@ -910,6 +915,20 @@ bte_nosdl-l_jansson.obj: l_jansson.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='l_jansson.c' object='bte_nosdl-l_jansson.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-l_jansson.obj `if test -f 'l_jansson.c'; then $(CYGPATH_W) 'l_jansson.c'; else $(CYGPATH_W) '$(srcdir)/l_jansson.c'; fi`
+
+bte_nosdl-l_sprintf.o: l_sprintf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-l_sprintf.o -MD -MP -MF $(DEPDIR)/bte_nosdl-l_sprintf.Tpo -c -o bte_nosdl-l_sprintf.o `test -f 'l_sprintf.c' || echo '$(srcdir)/'`l_sprintf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bte_nosdl-l_sprintf.Tpo $(DEPDIR)/bte_nosdl-l_sprintf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='l_sprintf.c' object='bte_nosdl-l_sprintf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-l_sprintf.o `test -f 'l_sprintf.c' || echo '$(srcdir)/'`l_sprintf.c
+
+bte_nosdl-l_sprintf.obj: l_sprintf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-l_sprintf.obj -MD -MP -MF $(DEPDIR)/bte_nosdl-l_sprintf.Tpo -c -o bte_nosdl-l_sprintf.obj `if test -f 'l_sprintf.c'; then $(CYGPATH_W) 'l_sprintf.c'; else $(CYGPATH_W) '$(srcdir)/l_sprintf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bte_nosdl-l_sprintf.Tpo $(DEPDIR)/bte_nosdl-l_sprintf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='l_sprintf.c' object='bte_nosdl-l_sprintf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bte_nosdl-l_sprintf.obj `if test -f 'l_sprintf.c'; then $(CYGPATH_W) 'l_sprintf.c'; else $(CYGPATH_W) '$(srcdir)/l_sprintf.c'; fi`
 
 bte_nosdl-bte.o: bte.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-bte.o -MD -MP -MF $(DEPDIR)/bte_nosdl-bte.Tpo -c -o bte_nosdl-bte.o `test -f 'bte.c' || echo '$(srcdir)/'`bte.c

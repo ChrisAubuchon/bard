@@ -280,9 +280,7 @@ function party:display()
 	local hpString		= false
 	local member		= self:getFirst()
 
-	if (not member) then return end
-
-	if (member:isSummon()) then
+	if (member and member:isSummon()) then
 		charString, hpString = member:getStatusLine()
 		self:printStatusLine(charString, hpString, 0)
 		member = member.next

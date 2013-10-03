@@ -26,6 +26,7 @@ bte_SOURCES = 	\
 	sdl.c \
 	sdl.h \
 	l_sdl.h \
+	l_sprintf.c	\
 	l_sys.c \
 	l_int.h \
 	l_utils.c \
@@ -56,6 +57,7 @@ bte_nosdl_SOURCES =	\
 	l_module.c	\
 	l_random.c	\
 	l_jansson.c	\
+	l_sprintf.c	\
 	bte.c
 
 bte_nosdl_LDADD	=					\

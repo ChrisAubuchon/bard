@@ -96,7 +96,7 @@ static json_t *btitem_toJson(const void *vit)
 	JSON_NUMBER(item, "ndice", it->ndice);
 	JSON_NUMBER(item, "die", it->die);
 	JSON_STRING_IF(item, "sp_attack", getSpecialAttack(it->spAttack));
-	JSON_NUMBER(item, "max_charges", it->maxCount);
+	JSON_NUMBER_IF_NOT_ZERO(item, "max_charges", it->maxCount);
 	JSON_NUMBER(item, "value", it->value);
 
 	equip = json_object();

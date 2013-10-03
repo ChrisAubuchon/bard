@@ -85,7 +85,7 @@ typedef btstring_t *	(*btFunc_toName)(const void *data);
 		json_dump_file(jsonNode, jsonBtstring->buf,		\
 				JSON_PRESERVE_ORDER | JSON_INDENT(2));	\
 		json_decref(jsonNode);					\
-		bts_free(fname);					\
+		bts_free(jsonBtstring);					\
 	} while(0)
 #define JSON_BTSTRING_IF(obj, name, flag) 				\
 	do {								\

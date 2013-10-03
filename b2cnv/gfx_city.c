@@ -47,7 +47,7 @@ static uint8_t quadmap[] = {
 	QUAD_2R, QUAD_2R, QUAD_2R, QUAD_2R,
 	QUAD_1R, QUAD_1R, QUAD_1R, QUAD_1R,
 	QUAD_4M, QUAD_4M, QUAD_4M, QUAD_4M,
-	QUAD_3M, QUAD_3M, QUAD_3M,
+	QUAD_3M, QUAD_3M, QUAD_3M, QUAD_3M,
 	QUAD_2M
 };
 
@@ -61,8 +61,8 @@ static uint8_t qanimmap[] = {
 	0, 1, 2, 3,
 	0, 1, 2, 3,
 	0, 1, 2, 3,
-	0, 1, 2,
-	0,
+	0, 1, 2, 3,
+	0
 };
 
 static uint8_t *animstr[] = {
@@ -86,9 +86,9 @@ static uint8_t qdepthmap[] = {
 	3, 3, 3, 3,
 	2, 2, 2, 2,
 	1, 1, 1, 1,
-	4, 4, 4, 4,
-	3, 3, 3,
-	2
+	3, 3, 3, 3,
+	2, 2, 2, 2,
+	1
 };
 
 static uint8_t qfacets[] = {
@@ -101,7 +101,7 @@ static uint8_t qfacets[] = {
 	BLDG_FRONT | BLDG_SIDE, BLDG_FRONT | BLDG_SIDE, BLDG_FRONT | BLDG_SIDE, BLDG_FRONT | BLDG_SIDE,
 	BLDG_FRONT, BLDG_FRONT, BLDG_FRONT, BLDG_FRONT,
 	BLDG_FACE, BLDG_FACE, BLDG_FACE, BLDG_FACE,
-	BLDG_FACE, BLDG_FACE, BLDG_FACE,
+	BLDG_FACE, BLDG_FACE, BLDG_FACE, BLDG_FACE,
 	BLDG_FACE
 };
 
@@ -119,7 +119,7 @@ static uint8_t nfacets[] = {
 /*21*/ 2,
 /*22*/ 1, 1, 1, 1,
 /*26*/ 1, 1, 1, 1,
-/*30*/ 1, 1, 1,
+/*30*/ 1, 1, 1, 1,
 /*34*/ 1
 };
 
@@ -133,7 +133,7 @@ static uint8_t quadrightflag[] = {
 	1, 1, 1, 1,
 	1, 1, 1, 1,
 	2, 2, 2, 2,
-	2, 2, 2,
+	2, 2, 2, 2,
 	2
 };
 
@@ -146,8 +146,8 @@ static uint8_t quaddistmap[] = {
 	1, 2, 3, 4,
 	5, 6, 7, 8,
 	9, 10, 11, 12,
-	0, 1, 2, 3,
-	4, 5, 6,
+	0, 0, 1, 2, 
+	3, 4, 5, 6,
 	0xff
 };
 
@@ -347,7 +347,7 @@ static void outputCityFacet(bt_view_t *oview, uint8_t facet, uint8_t quad)
 				xy->y_lo << 1, img->width, img->height);
 		}
 
-		debug("%s-%d/%s%s/%s.png\n",
+		debug("%s-%d/%s%s/%s.png\n\n",
 				animstr[qanimmap[quad]],
 				qdepthmap[quad],
 				sideString[quadrightflag[quad]],
@@ -519,9 +519,18 @@ bta_cell_t *getImage(view_t *view, btstring_t *data)
 	}
 
 	rval = bta_cell_4bitTo8bit(rval);
+
+	debug("left  = %3d\n", view->left);
+	debug("right = %3d\n", view->right);
+	debug("x     = %3d\n", view->x);
 	if ((view->left & 1) == (view->x & 1)) {
 		if (view->left & 1)
 			left_skip = 1;
+		if (!(view->right & 1))
+			right_skip = 1;
+
+		rval = bta_trim(rval, left_skip, right_skip);
+	} else {
 		if (!(view->right & 1))
 			right_skip = 1;
 
@@ -557,8 +566,10 @@ void outputCitypics(void)
 
 	view = bt_view_new();
 
-	for (i = 0; i < 33; i++) 
+	for (i = 0; i < 34; i++) {
+		debug("i = %2d\n", i);
 		getCityGfx(view, i);
+	}
 
 	outputBldgFronts(view);
 

@@ -18,8 +18,11 @@ typedef struct {
 } citydata_t;
 
 typedef struct {
+	btstring_t	*path;
 	btstring_t 	*name;
 	btstring_t	*title;
+	btstring_t	*guildExitSquare;
+	btstring_t	*guildExitDir;
 	citydata_t	*day;
 	citydata_t	*night;
 	cnvList_t	*sqs;

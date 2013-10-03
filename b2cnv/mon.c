@@ -18,6 +18,7 @@
 static void printMonster(b2mon_t *mon, uint32_t fmon, int index);
 #endif
 
+static void		unmaskString(uint8_t *str, uint32_t size);
 static uint8_t		willAdvance(b2mon_t *b);
 static btstring_t	*prepName(uint8_t *name, int pflag);
 static monster_t	*convertMonster(b2mon_t *inMonster);
@@ -231,6 +232,20 @@ static btstring_t *prepName(uint8_t *name, int pflag)
 	return bts_resize(rval, length);
 }
 
+static void unmaskString(uint8_t *str, uint32_t size)
+{
+	uint32_t	i;
+
+	for (i = 0; i < size; i++) {
+		if (str[i] & 0x80)
+			str[i] ^= 0x80;
+		if ((str[i] == '/') || (str[i] == '\\'))
+			str[i] = '^';
+		if (str[i] == 0x7f)
+			str[i] = '\0';
+	}
+}
+
 /********************************/
 /*				*/
 /* Public functions		*/
@@ -411,6 +426,28 @@ void getMonsterNameList(cnvList_t *list, btstring_t *monList, uint8_t level)
 		cnvList_add(list, bts_sprintf("%s_%d", singular->buf, level));
 		bts_free(singular);
 	}
+}
+
+btstring_t *getMonsterByIndex(btstring_t *monList, uint32_t index, uint8_t level)
+{
+	uint32_t	numMonsters;
+	uint32_t	i, j;
+	b2mon_t		*bm;
+	btstring_t	*singular;
+	btstring_t	*rval;
+
+	numMonsters = monList->size / sizeof(b2mon_t);
+	if (index > numMonsters)
+		return NULL;
+
+	bm = (b2mon_t *)(&(monList->buf[index * sizeof(b2mon_t)]));
+	unmaskString(bm->name, 16);
+	if (bm->name[0] == '\0')
+		return NULL;
+	singular = prepName(bm->name, 0);
+	rval = bts_sprintf("%.*s_%d", singular->size, singular->buf, level);
+	bts_free(singular);
+	return rval;
 }
 
 

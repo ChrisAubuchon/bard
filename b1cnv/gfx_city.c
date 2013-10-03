@@ -278,6 +278,15 @@ bta_cell_t *getImage(view_t *view, btstring_t *data)
 			right_skip = 1;
 
 		rval = bta_trim(rval, left_skip, right_skip);
+	} else {
+		if (!(view->right & 1)) {
+			right_skip = 1;
+		}
+		/*
+		 * Added during BT2 conversion. It removes a
+		 * black line from some images.
+		 */
+		rval = bta_trim(rval, left_skip, right_skip);
 	}
 
 	if (view->rflag == 1)
@@ -546,8 +555,10 @@ void outputCitypics(uint8_t indent)
 
 	view = bt_view_new();
 
-	for (i = 0; i < 34; i++)
+	for (i = 0; i < 34; i++) {
+		debug("quad: %2d\n", i);
 		getCityGfx(view, i);
+	}
 
 	outputBldgFronts(view);
 

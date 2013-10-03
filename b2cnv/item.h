@@ -17,4 +17,7 @@ extern uint8_t itemDmgDice[];
 extern uint8_t itemValue[];
 extern uint8_t itemSummonMap[];
 
+extern uint8_t itemB1map[];
+extern uint8_t *itemB1name[];
+
 #endif

@@ -14,6 +14,7 @@ b2cnv_SOURCES = 	\
 	b2lib.h		\
 	bitmap.c	\
 	city.c		\
+	class.c		\
 	dun.c		\
 	dun.h		\
 	dun_data.c	\
@@ -33,9 +34,12 @@ b2cnv_SOURCES = 	\
 	mon.h		\
 	mon_data.c	\
 	picIndex.c	\
+	race.c		\
 	spell.c		\
 	spell.h		\
 	spell_data.c	\
+	trap.h		\
+	trap_data.c	\
 	summon_data.c	\
 	wild.c
 

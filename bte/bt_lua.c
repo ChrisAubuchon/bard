@@ -32,6 +32,7 @@ lua_State *bt_lua_state(void)
 		l_sdl_open(global_state);
 #endif
 		l_random_open(global_state);
+		l_sprintf_open(global_state);
 	}
 
 	return global_state;

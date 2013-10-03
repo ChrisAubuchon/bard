@@ -46,6 +46,9 @@ function btTable.addParent(inSelf, ...)
 
 	for i = 1,select('#', ...) do
 		local e = select(i, ...)
+		if (type(e) ~= "table") then
+			error("Trying to add a non-table parent", 2)
+		end
 		table.insert(inSelf.__parents, e)
 	end
 end

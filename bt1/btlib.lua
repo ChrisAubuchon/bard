@@ -80,8 +80,6 @@ function keyboardCommand(inkey)
 	elseif (inkey == btkeys.BTKEY_RANDOMBATTLE) then
 		battle:random()
 		return true
-	elseif (inkey == "Q") then
-		os.exit()
 	else
 		return false
 	end

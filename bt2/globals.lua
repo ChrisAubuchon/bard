@@ -1,5 +1,3 @@
-require "dataio"
-
 local colors = {}
 globals = {}
 
@@ -29,13 +27,13 @@ globals.colors		= colors
 globals.debug		= true
 globals.partyDied	= false
 globals.citySquare	= false
---globals.swapWallsAndDoors	= false
-globals.swapWallsAndDoors	= true
+globals.guildCity	= "Tangramayne"
 
 m_window		= gfxScreen:new()
 globals.fonts		= {}
 globals.fonts.mono	= gfxFont:new("fonts/bt2font.btf", true)
 globals.fonts.var	= gfxFont:new("fonts/bt2font.btf", false)
+text			= textBox:new(m_window)
 garths			= false
 
 currentLevel		= false
@@ -74,6 +72,34 @@ globals.STATE_DUNGEON	= 3
 globals.STATE_EXIT	= 4
 globals.STATE_PARTYDIED	= 5
 globals.gameState	= globals.STATE_GUILD
+
+globals.timeOfDay = {
+	"midnight.",
+	"midnight.",
+	"after midnight.",
+	"after midnight.",
+	"after midnight.",
+	"after midnight.",
+	"early morning.",
+	"early morning.",
+	"early morning.",
+	"mid-morning.",
+	"mid-morning.",
+	"noon.",
+	"noon.",
+	"noon.",
+	"afternoon.",
+	"afternoon.",
+	"afternoon.",
+	"dusk.",
+	"dusk.",
+	"evening.",
+	"evening.",
+	"evening.",
+	"evening.",
+	"evening.",
+	"midnight."
+}
 
 stringTables = {}
 stringTables.effects = {

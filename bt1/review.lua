@@ -95,7 +95,7 @@ function review:doAdvancement()
 		if (char.num_attacks > 8) then
 			char.num_attacks = 8
 		end
-	elseif (char.getSpellLevel()) then
+	elseif (char:getSpellLevel()) then
 		char.cur_sppt = char.cur_sppt + (rnd() % 3)
 		if (char.iq > 14) then
 			char.cur_sppt = char.cur_sppt + (char.iq - 14)
@@ -134,22 +134,22 @@ function review:doClassChange()
 	end
 
 	text:cdprint(true, false, char.name .. "\n\n")
-	if (char.conj_level == 0) then 
+	if (char.spellLevel.Conjurer == 0) then 
 		text:print("\nConjurer")
 		options["C"] = true
 		numAvailable = numAvailable + 1
 	end
-	if (char.magi_level == 0) then 
+	if (char.spellLevel.Magician == 0) then 
 		text:print("\nMagician")
 		options["M"] = true
 		numAvailable = numAvailable + 1
 	end
-	if (char.sorc_level == 0) then 
+	if (char.spellLevel.Sorcerer == 0) then 
 		text:print("\nSorcerer")
 		options["S"] = true
 		numAvailable = numAvailable + 1
 	end
-	if (char.wiza_level == 0) then 
+	if (char.spellLevel.Wizard == 0) then 
 		-- Must have two classes to level 3 to be a wizard
 		if (numAvailable < 2) then
 			text:print("\nWizard")
@@ -171,16 +171,16 @@ function review:doClassChange()
 		if (options[inkey] ~= nil) then
 			if (inkey == "C") then
 				char.class = "Conjurer"
-				char.conj_level = 1
+				char.spellLevel.Conjurer = 1
 			elseif (inkey == "M") then
 				char.class = "Magician"
-				char.magi_level = 1
+				char.spellLevel.Magician = 1
 			elseif (inkey == "S") then
 				char.class = "Sorcerer"
-				char.sorc_level = 1
+				char.spellLevel.Sorcerer = 1
 			elseif (inkey == "W") then
 				char.class = "Wizard"
-				char.wiza_level = 1
+				char.spellLevel.Wizard = 1
 			else
 				error("Invalid class option: "..tostring(inkey))
 			end
@@ -241,7 +241,7 @@ function review:doSpellAcquire()
 
 	if (char.gold < cost) then
 		text:cdprint(false, true, 
-			"\n\nThe spell Sages refure to teach you until " ..
+			"\n\nThe spell Sages refuse to teach you until " ..
 			"you can pay!"
 			)
 		return
@@ -251,16 +251,16 @@ function review:doSpellAcquire()
 	if (text:getYesNo()) then
 		char.gold = char.gold - cost
 		if (char.class == "Conjurer") then
-			char.conj_level = char.conj_level + 1
+			char.spellLevel.Conjurer = char.spellLevel.Conjurer + 1
 		end
 		if (char.class == "Magician") then
-			char.magi_level = char.magi_level + 1
+			char.spellLevel.Magician = char.spellLevel.Magician + 1
 		end
 		if (char.class == "Sorcerer") then
-			char.sorc_level = char.sorc_level + 1
+			char.spellLevel.Sorcerer = char.spellLevel.Sorcerer + 1
 		end
 		if (char.class == "Wizard") then
-			char.wiza_level = char.wiza_level + 1
+			char.spellLevel.Wizard = char.spellLevel.Wizard + 1
 		end
 		text:cdprint(true, true, 
 			"\n\nThe Spell Sages have taught you the lore.\n"

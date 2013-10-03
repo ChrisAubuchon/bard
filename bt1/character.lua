@@ -55,6 +55,7 @@ baseCharacter = {
 		Sorcerer = 0,
 		Wizard   = 0
 	},
+	version		= 1,
 	inventory	= false
 }
 
@@ -435,6 +436,7 @@ end
 function character.createCharacter()
 	local inkey
 	local newchar
+	local newclass
 	local i
 	local r
 
@@ -464,9 +466,11 @@ function character.createCharacter()
 	text:clear()
 	character.printAttributes(newchar)
 
-	if (not newchar:selectClass(newchar.race)) then
+	newclass = newchar:selectClass(newchar.race)
+	if (not newclass) then
 		goto restart
 	end
+	newchar:setClass(newclass)
 
 	bigpic:drawImage(newchar.pic)
 	bigpic:setTitle(newchar.class)

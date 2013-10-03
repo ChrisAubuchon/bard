@@ -20,8 +20,9 @@ end
 
 -- Set the data path
 --
+package.path = package.path .. ";" .. sys.dataPath .. "/../btlib/?.lua"
+sys.sharedPath = sys.dataPath .. "/share"
 sys.dataPath = sys.dataPath .. "/bt2"
-print(sys.dataPath)
 
 setmetatable(_G, {
 	__newindex = function(_, n)
@@ -34,6 +35,8 @@ setmetatable(_G, {
 
 
 require "declares"
+require "btlib_declares"
+require "diskio"
 require "sdl_video"
 require "sdl_timer"
 require "sdl_text"
@@ -48,29 +51,51 @@ getkey()
 m_window:Draw(nil, gfxImage:new("images/screen.png", "png"), nil)
 m_window:Update()
 
-getkey()
-
 require "icons"
 require "bigpic"
+require "random"
+require "btapi"
+require "linkedList"
+require "btroster"
+require "roster"
+require "character"
+require "durationSpell"
+require "battleBonus"
+require "party"
+require "action"
+require "guild"
+require "level"
+require "building"
+require "bank"
+require "temple"
+require "tavern"
+require "review"
+require "roscoes"
+require "shoppe"
+require "cityBuildings"
+require "city"
+require "dunSquares"
+require "dun"
 
-if false then
-local light = icons:new(icons.ICON_LIGHT)
-local levitate = icons:new(icons.ICON_LEVITATE)
-local shield = icons:new(icons.ICON_SHIELD)
-local detect = icons:new(icons.ICON_DETECT)
---local compass = icons:new(icons.ICON_COMPASS)
-light:activate()
-levitate:activate()
-shield:activate()
-detect:activate()
+repeat
+	if (globals.gameState == globals.STATE_GUILD) then	
+		globals.partyDied = false
+		if (party.song.singer) then
+			party.song.singer:songTimeout()
+		end
 
-getkey()
-light:deactivate()
-levitate:deactivate()
-shield:deactivate()
-detect:deactivate()
-getkey()
-end
+		party.detect:deactivate()
+		party.shield:deactivate()
+		party.levitate:deactivate()
+		party.light:deactivate()
+		party.compass:deactivate()
+		guild:enter()
+	elseif (globals.gameState == globals.STATE_CITY) then
+		currentLevel:main()
+	elseif (globals.gameState == globals.STATE_DUNGEON) then
+		currentLevel:main()
+	elseif (globals.gameState == globals.STATE_PARTYDIED) then
+		globals.gameState = globals.STATE_GUILD
+	end
+until (globals.gameState == globals.STATE_EXIT)
 
-bigpic:setBigpic("PIC_GUILDINT", "The Guild")
-getkey()

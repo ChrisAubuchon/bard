@@ -32,11 +32,13 @@ static uint16_t 	xy2index(int32_t x, int32_t y);
 static uint8_t		isPath(uint8_t sq);
 
 static uint32_t		getBuildingLabel(int32_t x, int32_t y,  uint8_t sq);
+static btstring_t	*toSquare(int32_t x, int32_t y);
 static btstring_t	*toLabel(int32_t x, int32_t y, btstring_t *data,
 				btstring_t *path);
 static btstring_t	*getFace(uint8_t hi, uint8_t lo);
 static btstring_t	*getStreet(btstring_t *data, uint32_t index);
-static btstring_t	*getEvent(int32_t x, int32_t y, uint8_t sq);
+static btstring_t	*getEvent(int32_t x, int32_t y, uint8_t sq,
+				uint32_t cityIndex);
 static btstring_t	*getTavernName(int32_t x, int32_t y);
 static btstring_t	*getTempleName(int32_t x, int32_t y);
 
@@ -213,15 +215,20 @@ static uint32_t getBuildingLabel(int32_t x, int32_t y, uint8_t sq)
 	}
 }
 
+static btstring_t *toSquare(int32_t x, int32_t y)
+{
+	return bts_sprintf("%02d-%02d", x, y);
+}
+
 static btstring_t *toLabel(int32_t x, int32_t y, btstring_t *data, btstring_t *path)
 {
 	uint32_t		index;
 
 	index = ((15 - y) * 16) + x;
 	if ((x < 0) || (y < 0) || (x > 15) || (y > 15)) {
-		return bts_strcpy("nil");
+		return bts_strcpy("entrance");
 	} else if (path->buf[index] == 0xff) {
-		return bts_sprintf("%02d-%02d", x, y);
+		return toSquare(x, y);
 	} else {
 		return bts_sprintf("b%08x", 
 			getBuildingLabel(x, y, data->buf[index]));
@@ -231,7 +238,7 @@ static btstring_t *toLabel(int32_t x, int32_t y, btstring_t *data, btstring_t *p
 static btstring_t *getFace(uint8_t hi, uint8_t lo)
 {
 	if (citySpecialFace[hi] == NULL)
-		return bts_strcpy(bldgFace[(lo & 3) + 1]);
+		return bts_strcpy(bldgFace[(lo > 4) ? (lo & 3) + 1 : lo]);
 	else
 		return bts_strcpy(citySpecialFace[hi]);
 }
@@ -285,7 +292,8 @@ static btstring_t *getTempleName(int32_t x, int32_t y)
 	return bts_sprintf("xxx->temple: x: %2d, y: %2d", x, 15-y);
 }
 
-static btstring_t *getEvent(int32_t x, int32_t y, uint8_t sq)
+static btstring_t *getEvent(int32_t x, int32_t y, uint8_t sq, 
+				uint32_t cityIndex)
 {
 	uint8_t		event;
 
@@ -300,6 +308,10 @@ static btstring_t *getEvent(int32_t x, int32_t y, uint8_t sq)
 		return getTavernName(x, y);
 	case 2:
 		return getTempleName(x, y);
+	case 0x0c:
+	case 0x0e:
+	case 0x0f:
+		return bts_strcpy(cityDungeon[cityIndex]);
 	default:
 		return bts_strcpy(cityEvent[event]);
 	}
@@ -336,6 +348,25 @@ static btcity_t *convertCity(btstring_t *data, uint32_t cityIndex)
 	y = cityStartY[cityIndex];
 	convertPath(pathData, x, y);
 
+	c->guildExitSquare = toSquare(guildExitSqE[cityIndex],
+					15 - guildExitSqN[cityIndex]);
+	c->guildExitDir = bts_strcpy(guildExitDir[cityIndex]);
+	c->title = bts_strcpy(locationTitleList[cityIndex]);
+	c->path = mkJsonPath("");
+
+	citypath_new(c,
+		bts_strcpy("entrance"),
+		bts_strcpy("nil"),
+		bts_strcpy("nil"),
+		bts_strcpy("nil"),
+		bts_strcpy("nil"),
+		bts_sprintf("cityBuildings:enter(\"enterwild\", %d, %d)", 
+			cityToWildX[cityIndex], cityToWildY[cityIndex]
+				),
+		bts_strcpy("nil")
+		);
+		
+
 	index = 0;
 	for (y = 15; y >= 0; y--) {
 		for (x = 0; x < 16; x++) {
@@ -347,7 +378,8 @@ static btcity_t *convertCity(btstring_t *data, uint32_t cityIndex)
 					toLabel(x, y - 1,data, pathData),
 					toLabel(x + 1, y,data, pathData),
 					toLabel(x - 1, y,data, pathData),
-					getEvent(x, y, data->buf[index]),
+					getEvent(x, y, data->buf[index], 
+						cityIndex),
 					getStreet(data, index)
 					);
 			} else if (pathData->buf[index]) {
@@ -365,7 +397,8 @@ static btcity_t *convertCity(btstring_t *data, uint32_t cityIndex)
 				lo = data->buf[index] & 0x0f;
 				hi = data->buf[index] >> 4;
 
-				event = getEvent(x, y, data->buf[index]);
+				event = getEvent(x, y, data->buf[index], 
+							cityIndex);
 
 				citybldg_new(c,
 					toLabel(x, y, data, pathData),
@@ -399,7 +432,7 @@ static void addItems(cnvList_t *cl)
 	uint32_t	i;
 
 	for (i = 0; i < rewardItemRange[CITY_LEVELINDEX]; i++) {
-		cnvList_add(cl, getItemName(rewardItemBase[CITY_LEVELINDEX]+1));
+		cnvList_add(cl, getItemName(rewardItemBase[CITY_LEVELINDEX]+i));
 	}
 }
 

@@ -56,7 +56,7 @@ static btstring_t *wpic;
 /****************************************/
 
 static dunfacet_t dunWall[] = {
-	{ "FL", "-edge",	4, 0,  0, WILD_EDGE	},
+	{ "FL", "",		4, 0,  0, WILD_EDGE	},
 	{ "L",  "",		4, 0,  0, WILD_FRONT	},
 	{ "L",  "-corner",	3, 0,  0, WILD_CORNER	},
 	{ "L",  "-side",	3, 0,  0, WILD_SIDE	},
@@ -65,7 +65,7 @@ static dunfacet_t dunWall[] = {
 	{ "L",  "-side",	2, 0,  1, WILD_SIDE	},
 	{ "L",  "",		2, 0,  2, WILD_FRONT	},
 	{ "L",  "-side",	1, 0,  2, WILD_SIDE	},
-	{ "FR", "-edge",	4, 2,  2, WILD_EDGE	},
+	{ "FR", "",		4, 2,  2, WILD_EDGE	},
 	{ "R",  "",		4, 2,  0, WILD_FRONT	},
 	{ "R",  "-corner",	3, 2,  0, WILD_CORNER	},
 	{ "R",  "-side",	3, 2,  0, WILD_SIDE	},
@@ -81,14 +81,14 @@ static dunfacet_t dunWall[] = {
 };
 
 static dunfacet_t dunEntr[] = {
-	{ "FL", "-edge",	4, 0,  0, WILD_EDGE	},
+	{ "FL", "",		4, 0,  0, WILD_EDGE	},
 	{ "L",  "",		4, 0,  0, WILD_FRONT	},
 	{ "L",  "-side",	3, 0,  0, WILD_SIDE	},
 	{ "L",  "",		3, 0,  1, WILD_FRONT	},
 	{ "L",  "-side",	2, 0,  1, WILD_SIDE	},
 	{ "L",  "",		2, 0,  2, WILD_FRONT	},
 	{ "L",  "-side",	1, 0,  2, WILD_SIDE	},
-	{ "FR", "-edge",	4, 2,  0, WILD_EDGE	},
+	{ "FR", "",		4, 2,  0, WILD_EDGE	},
 	{ "R",  "",		4, 2,  0, WILD_FRONT	},
 	{ "R",  "-side",	3, 2,  0, WILD_SIDE	},
 	{ "R",  "",		3, 2,  1, WILD_FRONT	},

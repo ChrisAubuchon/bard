@@ -39,6 +39,22 @@ uint8_t cityStartY[] = {
 	0xff, 7, 0, 0x0f, 9, 0x0f, 7, 0
 };
 
+uint8_t cityToWildX[] = {
+	0xff, 2, 15, 15, 21, 4, 26
+};
+
+uint8_t cityToWildY[] = {
+	0xff, 24, 5, 34, 15, 43, 40
+};
+
+uint8_t wildToCityX[] = {
+	0xff, 0, 4, 7, 0, 6, 15, 0
+};
+
+uint8_t wildToCityY[] = {
+	0xff, 8, 15, 0, 6, 0, 8
+};
+
 uint8_t *citySpecialFace[] = {
 	NULL,
 	"PIC_BAREXT",
@@ -77,16 +93,26 @@ uint8_t	*cityEvent[] = {
 	"cityBuildings:enter(\"guild\")",
 	"review:enter()",
 	"roscoes:enter()",
-	"return cityIrongate:new",
-	"xxx-invalid-code-7",
+	"cityBuildings:enter(\"gate\")",
+	"--xxx-invalid-code-7",
 	"garths:enter()",
 	"cityBuildings:enter(\"casino\")",
 	"bank:enter()",
-	"xxx-invalid-code-11",
-	"dungeon-C",
-	"xxx-invalid-code-12",
-	"dungeon-E",
-	"dungeon-F"
+	"--xxx-invalid-code-11",
+	"--dungeon-C",
+	"--xxx-invalid-code-12",
+	"--dungeon-E",
+	"--dungeon-F"
+};
+
+uint8_t *cityDungeon[] = {
+	NULL,
+	"cityBuildings:enter(\"domain\")",
+	"cityBuildings:enter(\"tombs\")",
+	"cityBuildings:enter(\"tower\")",
+	"cityBuildings:enter(\"stone\")",
+	"cityBuildings:enter(\"fort\")",
+	"cityBuildings:enter(\"maze\")",
 };
 
 int8_t cityTavernY[] = {
@@ -121,4 +147,23 @@ uint8_t *cityTempleName[] = {
 	"The Mad God", "Shadow Temple", "Bogus Shrine", "14 Miracles",
 	"Cool Cleric", "Funky Friar", "Limbo Time", "Party Shrine",
 	"15 Miracles", "Lone Disciple", "Manic Monk", "Temple"
+};
+
+uint8_t guildExitSqN[] = {
+	0, 7, 2, 13, 8, 13, 8, 0
+};
+
+uint8_t guildExitSqE[] = {
+	0, 1, 8, 7, 8, 2, 10, 0
+};
+
+uint8_t *guildExitDir[] = {
+	NULL,
+	"west",
+	"south",
+	"south",
+	"west",
+	"west",
+	"south",
+	NULL
 };

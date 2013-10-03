@@ -106,26 +106,26 @@ static btstring_t *getEvent(uint32_t x, uint32_t y, uint8_t sq)
 {
 	switch (sq) {
 	case 1:
-		return bts_strcpy("buildings:enter(\"emptyhut\")");
+		return bts_strcpy("cityBuildings:enter(\"emptyhut\")");
 	case 2:
-		return bts_strcpy("buildings:enter(\"wall\")");
+		return bts_strcpy("cityBuildings:enter(\"wall\")");
 	case 3:
 	case 4:
-		return bts_strcpy("buildings:enter(\"tree\")");
+		return bts_strcpy("cityBuildings:enter(\"tree\")");
 	case 5:
-		return bts_strcpy("buildings:enter(\"entercity\")");
+		return bts_strcpy("cityBuildings:enter(\"entercity\")");
 	case 0xbc:
-		return bts_strcpy("buildings:enter(\"sagehut\")");
+		return bts_strcpy("cityBuildings:enter(\"sagehut\")");
 	case 0xd1:
-		return bts_strcpy("buildings:enter(\"fanskar\")");
+		return bts_strcpy("cityBuildings:enter(\"fanskar\")");
 	case 0xf1:
 	{
 		if (y == 28) {
-			return bts_strcpy("buildings:enter(\"kazdek\")");
+			return bts_strcpy("cityBuildings:enter(\"kazdek\")");
 		} else if (y == 45) {
-			return bts_strcpy("buildings:enter(\"narn\")");
+			return bts_strcpy("cityBuildings:enter(\"narn\")");
 		} else if (y == 16) {
-			return bts_strcpy("buildings:enter(\"greycrypt\")");
+			return bts_strcpy("cityBuildings:enter(\"greycrypt\")");
 		}
 	}
 	default:

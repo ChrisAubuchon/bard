@@ -23,14 +23,15 @@
 /********************************/
 
 typedef struct {
-	SDL_Surface *parent;
-	SDL_Surface *s;
-	SDL_Rect *r;
-	font_t *font;
-	uint32_t x;		/* Cursor x coordinate		*/
-	uint32_t y;		/* Cursor y coordinate		*/
-	uint32_t ws;
-	uint32_t nchars;	
+	SDL_Surface	*parent;
+	SDL_Surface	*s;
+	SDL_Rect	*r;
+	font_t		*font;
+	uint32_t	maxChar;
+	uint32_t	x;		/* Cursor x coordinate		*/
+	uint32_t	y;		/* Cursor y coordinate		*/
+	uint32_t	ws;
+	uint32_t	nchars;	
 } l_textbox;
 
 /********************************/
@@ -191,7 +192,7 @@ static void _update_parent(l_textbox *tb, SDL_Rect *r)
  *
  * 20 looks like it wraps like the original
  */
-#define MAX_CHAR	21
+/*#define MAX_CHAR	21*/
 /*#define MAX_CHAR	20*/
 static uint32_t _textbox_wrap(l_textbox *tb, btstring_t *str, uint32_t base)
 {
@@ -200,18 +201,18 @@ static uint32_t _textbox_wrap(l_textbox *tb, btstring_t *str, uint32_t base)
 	uint32_t ncaps = 0;
 	uint8_t *textp;
 
-	max = MAX_CHAR - ((tb->ws + 4) / 6);
+	max = tb->maxChar - ((tb->ws + 4) / 6);
 
 	textp = &str->buf[base];
 
 	while ((*textp != '\0') && (*textp != '\n') && (nchars < max)) {
-		if ((tb->nchars + nchars) >= MAX_CHAR)
+		if ((tb->nchars + nchars) >= tb->maxChar)
 			break;
 
 		if ((*textp == 'm') || ((*textp != ' ') && (!islower(*textp)))){
 			ncaps++;
 
-			max = MAX_CHAR - (((ncaps * 2) + tb->ws + 4) / 6);
+			max = tb->maxChar - (((ncaps * 2) + tb->ws + 4) / 6);
 		}
 		nchars++;
 		textp++;
@@ -235,13 +236,14 @@ static uint32_t _textbox_wrap(l_textbox *tb, btstring_t *str, uint32_t base)
 static int l_textbox_new(lua_State *L)
 {
 	l_textbox *tb;
-	int index = 2;
+	int index = 3;
 
 	tb = lua_newuserdata(L, sizeof(l_textbox));
 	luaL_getmetatable(L, "l_sdl_textbox");
 	lua_setmetatable(L, -2);
 
 	tb->parent = l_checkSurface(L, 1);
+	tb->maxChar = (uint32_t)luaL_checkinteger(L, 2);
 	tb->r = sdl_rect_arg(L, &index);
 	tb->font = NULL;
 

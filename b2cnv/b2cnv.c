@@ -19,8 +19,12 @@ int main(int argc, char *argv[])
   extern char *optarg;
   int c;
 
-  while ((c = getopt(argc,argv,"dghimst")) != EOF) {
+  while ((c = getopt(argc,argv,"cdghimst")) != EOF) {
     switch (c) {
+	case 'c':
+		convertClasses();
+		convertRaces();
+		break;
 	case 'd':
 		convertCities();
 		convertWild();

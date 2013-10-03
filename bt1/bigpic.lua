@@ -36,7 +36,7 @@ function __bigpic:new()
 			local i
 			local nameFormat = "building%d"
 
-			f.rect = gfxRectangle:new(f.x, f.y, f.x, f.h)
+			f.rect = gfxRectangle:new(f.x, f.y, f.w, f.h)
 			for i = 1,4 do
 				local index = string.format(nameFormat, i)
 				local path=string.format(buildingString,qn,fn,i)

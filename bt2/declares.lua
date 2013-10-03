@@ -1,6 +1,9 @@
 -- action.lua
 declare_global("btAction")
 
+-- bank.lua
+declare_global("bank")
+
 -- bttable.lua
 declare_global("btTable")
 declare_global("btArray")
@@ -56,11 +59,6 @@ declare_global("citylib")
 
 -- classes.lua
 declare_global("classes")
-
--- dataio.lua
-declare_global("read_table")
-declare_global("write_table")
-declare_global("false_table")
 
 -- dun.lua
 declare_global("dun")
