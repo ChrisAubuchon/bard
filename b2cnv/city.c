@@ -356,15 +356,16 @@ static btcity_t *convertCity(btstring_t *data, uint32_t cityIndex)
 
 	citypath_new(c,
 		bts_strcpy("entrance"),
-		bts_strcpy("nil"),
-		bts_strcpy("nil"),
-		bts_strcpy("nil"),
-		bts_strcpy("nil"),
+		NULL,
+		NULL,
+		NULL,
+		NULL,
 		bts_sprintf("cityBuildings:enter(\"enterwild\", %d, %d)", 
-			cityToWildX[cityIndex], cityToWildY[cityIndex]
+			cityToWildX[cityIndex], 47 - cityToWildY[cityIndex]
 				),
-		bts_strcpy("nil")
-		);
+		NULL,
+		NULL
+	);
 		
 
 	index = 0;
@@ -380,7 +381,8 @@ static btcity_t *convertCity(btstring_t *data, uint32_t cityIndex)
 					toLabel(x - 1, y,data, pathData),
 					getEvent(x, y, data->buf[index], 
 						cityIndex),
-					getStreet(data, index)
+					getStreet(data, index),
+					NULL
 					);
 			} else if (pathData->buf[index]) {
 				/* Building */

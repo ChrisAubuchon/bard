@@ -196,3 +196,52 @@ void bta_toPNG(bta_cell_t *in, btstring_t *fname)
 	fclose(outfp);
 	bts_free(fname);
 }
+
+void bta_transparent_toPNG(bta_cell_t *in, btstring_t *fname)
+{
+	FILE		*outfp;
+	png_structp	png_ptr;
+	png_infop	info_ptr;
+	uint32_t	i;
+	int		trans = 0;
+
+	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	if (!png_ptr) {
+		printf("Failed allocating png_ptr\n");
+		return;
+	}
+
+	info_ptr = png_create_info_struct(png_ptr);
+	if (!info_ptr) {
+		printf("Failed allocating info_ptr\n");
+		return;
+	}
+
+	outfp = fopen(fname->buf, "wb");
+	if (outfp == NULL) {
+		printf("Error opening %s\n", fname->buf);
+		return;
+	}
+
+	png_init_io(png_ptr, outfp);
+	png_set_IHDR(png_ptr, info_ptr, in->width, in->height, 8, \
+		PNG_COLOR_TYPE_PALETTE, PNG_INTERLACE_NONE, \
+		PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+
+
+	png_set_PLTE(png_ptr, info_ptr, egapalette, 16);
+	png_set_tRNS(png_ptr, info_ptr, (png_bytep)&trans, 1, NULL);
+
+	png_write_info(png_ptr, info_ptr);
+
+	for (i = 0; i < in->height; i++)  
+		png_write_row(png_ptr, &in->gfx->buf[i * in->width]);
+
+	png_write_end(png_ptr, info_ptr);
+
+	png_destroy_write_struct(&png_ptr, &info_ptr);
+
+	fclose(outfp);
+	bts_free(fname);
+}
+

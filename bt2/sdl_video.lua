@@ -84,6 +84,7 @@ function gfxWindow:Draw(inDestRect, inWindow, inSrcRect)
 	if (inWindow == nil) then
 		error("Draw(): Nil window argument", 2)
 	end
+
 	self.surface:Blit(inDestRect, inWindow.surface, inSrcRect)
 end
 

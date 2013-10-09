@@ -139,6 +139,9 @@ declare_global("roscoes")
 -- roster.lua
 declare_global("roster")
 
+-- sagehut.lua
+declare_global("sagehut")
+
 -- sdl_video.lua
 declare_global("gfxScreen")
 declare_global("gfxWindow")
@@ -172,3 +175,4 @@ declare_global("timer")
 
 -- use.lua
 declare_global("use")
+declare_global("wild")

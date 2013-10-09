@@ -1,8 +1,6 @@
 #include <b2lib.h>
 #include <cnv_city.h>
 #include <dehuf.h>
-#include <gl_list.h>
-#include <gl_linkedhash_list.h>
 #include <mon.h>
 #include <level.h>
 
@@ -30,77 +28,20 @@
 /*				*/
 /********************************/
 
-static void		addEmptySpace(btcity_t *c, btstring_t *data, 
-					uint32_t x, uint32_t y);
-static void		addBuilding(btcity_t *c, gl_list_t oh, 
-					btstring_t *data, uint32_t x, 
-					uint32_t y, uint8_t sq);
+static void		addSquare(btcity_t *c, btstring_t *data,
+				uint32_t x, uint32_t y, uint8_t sq);
 static btstring_t	*toLabel(uint8_t dir, uint32_t x, uint32_t y, 
 					btstring_t *data);
-static btstring_t	*getBuildingLabel(uint32_t x, uint32_t y, uint8_t sq);
 static btstring_t	*getFace(uint8_t sq);
 static btstring_t	*getEvent(uint32_t x, uint32_t y, uint8_t sq);
 static void		addMonsters(cnvList_t *cl);
 static void		addItems(cnvList_t *cl);
-
-/* Hash functions */
-static uint32_t		objectGetHash(const void *vo);
-static bool		objectCompare(const void *vo, const void *cmp);
-static void		objectFree(const void *vo);
 
 /********************************/
 /*				*/
 /* Internal functions		*/
 /*				*/
 /********************************/
-
-static uint32_t objectGetHash(const void *vo)
-{
-	return (uint32_t)vo % 255;
-}
-
-static bool objectCompare(const void *vo, const void *cmp)
-{
-	if ((uint32_t)vo == (uint32_t)cmp)
-		return 1;
-
-	return 0;
-}
-
-static void objectFree(const void *vo)
-{
-}
-
-static btstring_t *getBuildingLabel(uint32_t x, uint32_t y, uint8_t sq)
-{
-	switch (sq) {
-	case 1:
-		return bts_strcpy("hut");
-	case 2:
-		return bts_strcpy("citywall");
-	case 3:
-	case 4:
-		return bts_strcpy("tree");
-	case 5:
-		return bts_strcpy("cityentrance");
-	case 0xbc:
-		return bts_strcpy("sagehut");
-	case 0xd1:
-		return bts_strcpy("fanskar");
-	case 0xf1:
-	{
-		if (y == 28) {
-			return bts_strcpy("kazdek");
-		} else if (y == 45) {
-			return bts_strcpy("narn");
-		} else if (y == 16) {
-			return bts_strcpy("greycrypt");
-		}
-	}
-	default:
-		return bts_strcpy("xxx-unknown-label");
-	}
-}
 
 static btstring_t *getEvent(uint32_t x, uint32_t y, uint8_t sq)
 {
@@ -120,14 +61,17 @@ static btstring_t *getEvent(uint32_t x, uint32_t y, uint8_t sq)
 		return bts_strcpy("cityBuildings:enter(\"fanskar\")");
 	case 0xf1:
 	{
-		if (y == 28) {
+		debug("y = %d\n", y);
+		if (y == 19) {
 			return bts_strcpy("cityBuildings:enter(\"kazdek\")");
-		} else if (y == 45) {
+		} else if (y == 2) {
 			return bts_strcpy("cityBuildings:enter(\"narn\")");
-		} else if (y == 16) {
+		} else if (y == 31) {
 			return bts_strcpy("cityBuildings:enter(\"greycrypt\")");
-		}
+		} 
 	}
+	case 0:
+		return NULL;
 	default:
 		return bts_strcpy("xxx-unknown-label");
 	}
@@ -146,6 +90,8 @@ static btstring_t *getFace(uint8_t sq)
 		return bts_strcpy("wall");
 	case 5:
 		return bts_strcpy("entr");
+	default:
+		return NULL;
 	}
 
 	return bts_strcpy("xxx-unknown-face");
@@ -160,10 +106,10 @@ static btstring_t *toLabel(uint8_t dir, uint32_t x, uint32_t y,
 
 	switch (dir) {
 	case INT_NORTH:
-		l_y = (y == 0) ? 47 : l_y - 1;
+		l_y = (y == 47) ? 0 : l_y + 1;
 		break;
 	case INT_SOUTH:
-		l_y = (y == 47) ? 0 : l_y + 1;
+		l_y = (y == 0) ? 47 : l_y - 1;
 		break;
 	case INT_EAST:
 		l_x = (x == 31) ? 0 : l_x + 1;
@@ -175,15 +121,11 @@ static btstring_t *toLabel(uint8_t dir, uint32_t x, uint32_t y,
 		break;
 	}
 
-	sq = data->buf[(l_y * 32) + l_x];
-	if (sq == 0) {
-		return bts_sprintf("x%02d-%02d", l_x, l_y);
-	} else {
-		return getBuildingLabel(l_x, l_y, sq);
-	}
+	return bts_sprintf("x%02d-%02d", l_x, l_y);
 }
 
-static void addEmptySpace(btcity_t *c, btstring_t *data, uint32_t x, uint32_t y)
+static void addSquare(btcity_t *c, btstring_t *data, uint32_t x, uint32_t y,
+		uint8_t sq)
 {
 	citypath_new(c,
 		toLabel(INT_NONE,  x, y, data),
@@ -191,36 +133,10 @@ static void addEmptySpace(btcity_t *c, btstring_t *data, uint32_t x, uint32_t y)
 		toLabel(INT_SOUTH, x, y, data),
 		toLabel(INT_EAST,  x, y, data),
 		toLabel(INT_WEST,  x, y, data),
+		getEvent(x, y, sq),
 		NULL,
-		NULL
-		);
-}
-
-static void addBuilding(btcity_t *c, gl_list_t oh, btstring_t *data, 
-				uint32_t x, uint32_t y, uint8_t sq)
-{
-	uint32_t	tag = sq;
-
-	/* 3 and 4 both are trees. Use 3 as the tag */
-	if (tag == 4)
-		tag = 3;
-
-	/* 
-	 * tags & 0xf0 are unique buildings. No need to add them
-	 * to the hash.
-	 */
-	if (!(tag & 0xf0)) {
-		if (gl_list_search(oh, (void *)tag) != NULL) 
-			return;
-
-		if (gl_list_nx_add_last(oh, (void *)tag) == NULL) {
-			bt_error("Out of memory: %d", gl_list_size(oh));
-		}
-	}
-
-	/* xxx - add building event */
-	citybldg_new(c, toLabel(INT_NONE, x, y, data),
-			getFace(sq), NULL, getEvent(x, y, sq));
+		getFace(sq)
+	);
 }
 
 static void addMonsters(cnvList_t *cl)
@@ -274,7 +190,6 @@ void convertWild(void)
 	uint32_t	i, x;
 	int32_t		y;
 	uint32_t	index;
-	gl_list_t	objectHash;
 
 	fp = xfopen(mkBardTwoPath("CITYS"), "rb");
 
@@ -284,20 +199,12 @@ void convertWild(void)
 	fclose(fp);
 
 	c = btcity_new(bts_strcpy("wild"));
-	objectHash = gl_list_nx_create_empty(GL_LINKEDHASH_LIST,
-		objectCompare, objectGetHash, objectFree, 0);
-
 	c->title = bts_strcpy(locationTitleList[0]);
 
-	for (y = 47; y > 0; y--) {
+	for (y = 0; y < 48; y++) {
 		for (x = 0; x < 32; x++) {
-			index = (y * 32) + x;
-			if (data->buf[index]) {
-				addBuilding(c, objectHash, data, x, y, 
-						data->buf[index]);
-			} else {
-				addEmptySpace(c, data, x, y);
-			}
+			index = ((47 - y) * 32) + x;
+			addSquare(c, data, x, y, data->buf[index]);
 		}
 	}
 

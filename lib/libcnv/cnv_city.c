@@ -20,6 +20,7 @@ typedef struct {
 	btstring_t *west;
 	btstring_t *onEnter;
 	btstring_t *location;
+	btstring_t *face;
 } citypath_t;
 
 typedef struct {
@@ -76,6 +77,7 @@ static void citypath_free(const void *vbtc)
 	bts_free(btc->west);
 	bts_free(btc->onEnter);
 	bts_free(btc->location);
+	bts_free(btc->face);
 }
 
 static void citybldg_free(const void *vbl)
@@ -122,11 +124,15 @@ static json_t *citypath_toJson(const void *vcp)
 	JSON_BTSTRING(node,	"west",		cp->west);
 	JSON_BTSTRING(node,	"east",		cp->east);
 	JSON_BTSTRING(node,	"location",	cp->location);
+	JSON_BTSTRING(node,	"face",		cp->face);
+	JSON_BTSTRING(node,	"enterFunction",cp->onEnter);
+#if 0
 	if (cp->onEnter == NULL) {
 		JSON_NULL(node, "enterFunction");
 	} else {
 		JSON_STRING(node, "enterFunction", cp->onEnter->buf);
 	}
+#endif
 
 	return node;
 }
@@ -263,7 +269,7 @@ void citypath_new(
 	btcity_t *btc,
 	btstring_t *label,
 	btstring_t *n, btstring_t *s, btstring_t *e, btstring_t *w,
-	btstring_t *o, btstring_t *l
+	btstring_t *o, btstring_t *l, btstring_t *f
 	)
 {
 	citypath_t *cp;
@@ -277,6 +283,7 @@ void citypath_new(
 	cp->west = w;
 	cp->onEnter = o;
 	cp->location = l;
+	cp->face = f;
 
 	cnvList_add(btc->sqs, cp);
 }

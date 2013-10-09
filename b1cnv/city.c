@@ -468,7 +468,8 @@ void convertLevels(void)
 					toLabel(x+1, y, pat->buf[index+1]),
 					toLabel(x-1, y, pat->buf[index-1]),
 					onEnter(x,y,pat->buf[index]),
-					getStreet(name->buf[index])
+					getStreet(name->buf[index]),
+					NULL
 					);
 				} else if ((x == 25) && (y == 3)) {
 					citypath_new(skara,
@@ -478,7 +479,8 @@ void convertLevels(void)
 					toLabel(x+1, y, pat->buf[index+1]),
 					toLabel(x-1, y, pat->buf[index-1]),
 					onEnter(x,y,pat->buf[index]),
-					getStreet(name->buf[index])
+					getStreet(name->buf[index]),
+					NULL
 					);
 				} else {
 					citypath_new(skara,
@@ -488,7 +490,8 @@ void convertLevels(void)
 					toLabel(x+1, y, pat->buf[index+1]),
 					toLabel(x-1, y, pat->buf[index-1]),
 					onEnter(x,y,pat->buf[index]),
-					getStreet(name->buf[index])
+					getStreet(name->buf[index]),
+					NULL
 					);
 				}
 			} else {

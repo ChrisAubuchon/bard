@@ -32,6 +32,8 @@ static int l_surface_get_pitch(lua_State *L);
 static int l_surface_update_rect(lua_State *L);
 static int l_surface_fill_rect(lua_State *L);
 static int l_surface_set_color(lua_State *L);
+static int l_surface_set_color_key(lua_State *L);
+static int l_surface_clear_color_key(lua_State *L);
 
 static int l_surface_create_rgb(lua_State *L);
 
@@ -156,6 +158,33 @@ static int l_surface_set_color(lua_State *L)
 	c = sdl_color_arg(L, &index);
 
 	rval = SDL_SetPalette(sur, SDL_LOGPAL | SDL_PHYSPAL, c, color, 1);
+
+	return 0;
+}
+
+static int l_surface_set_color_key(lua_State *L)
+{
+	SDL_Surface	*sur;
+	int		key;
+	int		rval;
+
+	sur = l_checkSurface(L, 1);
+	key = luaL_checkint(L, 2);
+
+	rval = SDL_SetColorKey(sur, SDL_SRCCOLORKEY, key);
+
+	return 0;
+}
+
+static int l_surface_clear_color_key(lua_State *L)
+{
+	SDL_Surface	*sur;
+	int		key;
+	int		rval;
+
+	sur = l_checkSurface(L, 1);
+
+	rval = SDL_SetColorKey(sur, 0, 0);
 
 	return 0;
 }
@@ -288,5 +317,7 @@ void l_sdl_surface_open(lua_State *L)
 	mod_function(L, "Blit",		l_surface_blit);
 	mod_function(L, "Flip",		l_surface_flip);
 	mod_function(L, "SetColor",	l_surface_set_color);
+	mod_function(L, "SetColorKey",	l_surface_set_color_key);
+	mod_function(L, "ClearColorKey",l_surface_clear_color_key);
 	class_end(L);
 }

@@ -74,7 +74,7 @@ static dunfacet_t dunWall[] = {
 	{ "R",  "-side",	2, 2,  1, WILD_SIDE	},
 	{ "R",  "",		2, 2,  2, WILD_FRONT	},
 	{ "R",  "-side",	1, 2,  2, WILD_SIDE	},
-	{ "M",  "",		4, 1,  2, WILD_FRONT	},
+	{ "M",  "",		4, 1,  0, WILD_FRONT	},
 	{ "M",  "",		3, 1,  1, WILD_FRONT	},
 	{ "M",  "",		2, 1,  2, WILD_FRONT	},
 	{ "",   "",		0, 0,  0, 0 }
@@ -95,7 +95,7 @@ static dunfacet_t dunEntr[] = {
 	{ "R",  "-side",	2, 2,  1, WILD_SIDE	},
 	{ "R",  "",		2, 2,  2, WILD_FRONT	},
 	{ "R",  "-side",	1, 2,  2, WILD_SIDE	},
-	{ "M",  "",		4, 1,  2, WILD_FRONT	},
+	{ "M",  "",		4, 1,  0, WILD_FRONT	},
 	{ "M",  "",		3, 1,  1, WILD_FRONT	},
 	{ "M",  "",		2, 1,  2, WILD_FRONT	},
 	{ "",   "",		0, 0,  0, 0 }
@@ -484,8 +484,8 @@ static void outputWildFacet(bt_view_t *oview, dunfacet_t *df, uint8_t facet)
 		break;
 	}
 
-	view.x = sz->x;
-	view.y = sz->y;
+	view.x = sz->x << 1;
+	view.y = sz->y << 1;
 	view.rflag = 0;
 	view.left = sz->left;
 	view.right = sz->right;
@@ -500,7 +500,7 @@ static void outputWildFacet(bt_view_t *oview, dunfacet_t *df, uint8_t facet)
 
 	xmkdir(mkImagePath("wpics/%d-%s", df->depth, df->name));	
 
-	bta_toPNG(img,
+	bta_transparent_toPNG(img,
 		mkImagePath("wpics/%d-%s/%s%s.png",
 				df->depth,
 				df->name,
@@ -529,7 +529,7 @@ static void outputBackground(void)
 	bg = bta_cell_new(0, 0, 56, 88, 0, b);
 	bg = bta_cell_convert(bg);
 
-	bta_toPNG(bg, mkImagePath("wpics/wpic.bg"));
+	bta_toPNG(bg, mkImagePath("wpics/wpic.png"));
 
 	bta_cell_free(bg);
 }

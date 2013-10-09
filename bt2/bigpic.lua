@@ -295,21 +295,24 @@ end
 ----------------------------------------
 -- wildAdd()
 ----------------------------------------
-function bigpic:wildAdd(inFacet, inBuilding)
+function bigpic:wildAdd(inDepth, inFacet, inBuilding)
+	local facet
 	local q
 
-	if (self.wild[inFacet][inBuilding] == nil) then
+	facet = inDepth .. "-" .. inFacet
+
+	if (self.wild[facet][inBuilding] == nil) then
 		return
 	end
 
-	q = self.wild[inFacet][inBuilding]
-	self.surface:Draw(q.rect, q, nil)
+	q = self.wild[facet][inBuilding]
+	self.surface:Draw(q.rect, q.gfx, nil)
 end
 
 ----------------------------------------
 -- wildDisplay()
 ----------------------------------------
-function wild:wildDisplay()
+function bigpic:wildDisplay()
 	self:cityDisplay()
 end
 

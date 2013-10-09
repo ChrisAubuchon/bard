@@ -44,7 +44,8 @@ void		btcity_free(const void *vc);
 void		citypath_new(btcity_t *btc, btstring_t *label,
 				btstring_t *n, btstring_t *s, 
 				btstring_t *e, btstring_t *w,
-				btstring_t *o, btstring_t *l);
+				btstring_t *o, btstring_t *l,
+				btstring_t *f);
 void		citybldg_new(btcity_t *btc, btstring_t *label, btstring_t *d,
 				btstring_t *n, btstring_t *o);
 void		city_addItem(btcity_t *btc, btstring_t *name, uint32_t weight);

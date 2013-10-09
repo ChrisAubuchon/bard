@@ -74,22 +74,43 @@ function empty:enter()
 	text:printExit()
 	getkey()
 	currentLevel:turnParty("back")
+
+	return true
 end
 
 ----------------------------------------
 -- emptyhut
 ----------------------------------------
-local emptyhut = {}
+local emptyhut = building:new("Empty Hut", "PIC_EMPTYHUT")
+function emptyhut:enter()
+	if (rnd_and_x(3) == 0) then
+		battle:random()
+		if (globals.partyDied) then
+			return true
+		end
+	end
+
+	self:resetBigpic()
+	text:cdprint(true, false, "You're in an empty hut.")
+	text:printExit()
+	getkey()
+	currentLevel:turnParty("back")
+
+	return true
+end
 
 local entercity = {}
 local enterwild = {}
 function enterwild:enter(...)
 	local x
 	local y
+	local dir = currentLevel.direction
 
 	x, y = ...
-	dprint("Entering wild (%d,%d)", x, y)
-	currentLevel.currentSquare = currentLevel.previousSquare
+	currentLevel.exit = true
+	currentLevel.exitLocation = "wild"
+	currentLevel = wild:new()
+	currentLevel:enter(x, y, dir)
 end
 
 ----------------------------------------
@@ -136,12 +157,129 @@ end
 local kazdek = {}
 local maze = {}
 local narn = {}
-local sagehut = {}
+
+----------------------------------------
+-- sagehut
+----------------------------------------
+local sagehut = building:new("The Sage", "PIC_SAGE")
+function sagehut:enter()
+--	if (party:hasWinner()) then
+--		bigpic:setBigpic("Empty Hut", "PIC_EMPTYHUT")
+--		text:csplash(true, true, "\nYou're in an empty hut.")
+--		text:clear()
+--	elseif (party:hasItem("The Scepter")) then
+--		self:resetBigpic()
+--		text:csplash(true, true,
+--			"\"Welcome, my friends, to the home of Lagoth " ..
+--			"Zanta! You have been cunning, it is true, " ..
+--			"buy your days have now come to an end. Your " ..
+--			"quest is through, fools. Prepare to die.\""
+--			)
+--		if (not battle:new("Balder Guard", 16, "Balder Guard", 16, 
+--				"Lagoth Zanta", 1)) then
+--			if (globals.partyDied) then
+--				return false
+--			end
+--			currentLevel:turnParty("back")
+--			return true
+--		else
+--			local xxx_add_one_million_xp_to_party
+--			local xxx_set_hasWon_flag_on_party
+--
+--			bigpic:drawImage("PIC_VICTORY")
+--			text:csplash(true, true, 
+--				"Well done! At the death of Zanta the armies "..
+--				"of the Realm and march to defeat the " ..
+--				"invading hordes, who will easily fall. " ..
+--				"The King himself enters the hut and salutes "..
+--				"you."
+--				)
+--			text:csplash(true, true,
+--				"\"Oh mighty ones, I thank thee truly for " ..
+--				"they service to the realm. May the All High "..
+--				"bless thee and keep thee strong and "..
+--				"prosperous. In my own little way, I give "..
+--				"you all a little bonus."
+--			)
+--			text:csplash(true, true,
+--				"Congratulations, your quest is over. But a " ..
+--				"new one is bound to begin..."
+--				)
+--			text:clear()
+--			self.exit = true
+--			globals.gameState = globals.STATE_GUILD
+--			return true
+--		end
+--	else
+		return self:askSage()
+--	end
+end
+
+function sagehut:askSage()
+	local inkey
+
+	self:resetBigpic()
+	repeat
+		text:cdprint(true, false, 
+			"The Sage says, \"Gold can buy thee the wisdom " ..
+			"of the ancients, my friends.\"" ..
+			"\n\nYou can:\n\n" ..
+			"(T)alk to the Sage\n" ..
+			"(E)xit his hut"
+			)
+		inkey = getkey()
+
+		if (inkey == "T") then
+			self:talkToSage()
+		end
+	until (inkey == "E")
+
+	return true
+end
+
+function sagehut:talkToSage()
+	local inkey
+	local c
+	local answer
+
+	text:cdprint(true, false, "Who will talk to the Sage?")
+	c = party:readSlot()
+	if (not c) then
+		return
+	end
+
+	text:cdprint(true, false, "What will you ask him about?\n")
+	answer = text:readString()
+	if (not answer) then
+		return
+	end
+
+	answer = string.gsub(answer, "THE ", "")
+end
+
 local stone = {}
 local tombs = {}
 local tower = {}
+
+----------------------------------------
+-- tree
+----------------------------------------
 local tree = {}
+function tree:enter()
+	text:cdprint(true, false, "You hit a tree!")
+	currentLevel:turnParty("back")
+	return true
+end
+
+----------------------------------------
+-- wall
+----------------------------------------
 local wall = {}
+function wall:enter()
+	text:cdprint(true, false, "You hit a city wall!")
+	currentLevel:turnParty("back")
+	return true
+end
 
 ----------------------------------------
 -- cityBuildings table

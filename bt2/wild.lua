@@ -9,17 +9,34 @@ local wildData = diskio:readTable("wild")
 -- buildings
 ----------------------------------------
 local square = {}
-square.new = function(lab, inEnterFunction, inEnterArgs) 
+square.new = function(inLabel, inSquare)
 	local self = {
-		label		= lab
+		label		= false,
+		north		= false,
+		south		= false,
+		east		= false,
+		west		= false,
+		enterFunction	= false,
+		face		= false,
+		isPath		= false,
+		isWall		= false
 	}
-	local enterFunction	= nil
-	local enterArgs		= inEnterArgs
 
-	enterFunction = compileString(inEnterFunction)
+	assert(type(inSquare) == "table", "inSquare not a table")
 
-	function self.isPath()		return false end
-	function self.isBuilding()	return false end
+	self.label		= inLabel
+	self.north		= inSquare.north
+	self.south		= inSquare.south
+	self.east		= inSquare.east
+	self.west		= inSquare.west
+	self.face		= inSquare.face
+	if (inSquare.enterFunction) then
+		self.enterFunction	= compileString("return " .. inSquare.enterFunction)
+	end
+
+	self.isPath		= not self.face
+	self.isWall		= ((self.face == "wall") or 
+				   (self.face == "entr"))
 
 	----------------------------------------
 	-- onEnter
@@ -35,11 +52,11 @@ square.new = function(lab, inEnterFunction, inEnterArgs)
 		local rval
 		local msg
 
-		if (enterFunction == nil) then
+		if (not self.enterFunction) then
 			return false
 		end
 
-		rval = enterFunction()
+		rval = self.enterFunction()
 
 		return rval
 	end
@@ -51,123 +68,94 @@ square.new = function(lab, inEnterFunction, inEnterArgs)
 	return self
 end
 
-----------------------------------------
--- City path square class
-----------------------------------------
-local citysq = {}
-citysq.new = function(inLabel, inSquare)
-	local self
+local function doWallSquare(sq, dir, depth, facet)
+	local back_sq
+	local front_sq
+	local face
 
-	self = square.new(inLabel, inSquare.enterFunction)
-	self.location	= inSquare.location
-	self.north	= inSquare.north
-	self.south	= inSquare.south
-	self.east	= inSquare.east
-	self.west	= inSquare.west
+	if (sq.isWall) then
+		back_sq		= sq[directions.back[dir]]
+		front_sq	= sq[directions.front[dir]]
 
-	function self.isPath() 	return true 	end
+		face = sq.face
+		if (back_sq.isWall) then
+			if (depth < 4) then
+				bigpic:wildAdd(depth, facet, face .. "-side")
+			end
+		else
+			if (depth == 4) then
+				bigpic:wildAdd(depth, facet, face)
+			elseif ((depth == 2) or (depth == 3)) then
+				bigpic:wildAdd(depth, facet, face .. "-corner")
+			else
+				bigpic:wildAdd(depth, facet, face .. "-side")
+			end
+		end
 
-	----------------------------------------
-	-- link
-	--
-	--   Link the edges of the map with the
-	-- the other nodes
-	----------------------------------------
+		return true
+	end
 
-	return self
-end
-
-----------------------------------------
--- City building class
-----------------------------------------
-local citybldg = {}
-citybldg.new = function(inLabel, inBuilding)
-	local self
-
-	self		= square.new(inLabel, inBuilding.enterFunction)
-	self.distFace	= inBuilding.distFace
-	self.nearFace	= inBuilding.nearFace
-
-	function self.isBuilding()	return true	end
-
-	return self
+	return false
 end
 
 ----------------------------------------
 -- __buildView
---
--- The graphics tiles aren't as well
--- matched up on BT2 as in BT1.
--- For example, the base-2 face 
--- overlaps the base-2 leftfront and
--- rightfront images.
---
--- Because of this we have to be very
--- specific in the order that we add the
--- tiles to the view. The order has to
--- go:
--- 1. left and right side
--- 2. middle
---
--- This matches DOS version behavior
 ----------------------------------------
 local function __buildView(maxdepth, sq, dir, depth)
-	local front_sq	= sq[directions.front[dir]]
-	local right_sq	= sq[directions.right[dir]]
-	local left_sq	= sq[directions.left[dir]]
-	local path_sq
-
-	if (front_sq == nil) then
-		return
+	if ((depth == 1) and (sq.face)) then
+		error("Not on previous square")
 	end
 
 	if (depth >= maxdepth) then
 		return
 	end
 
-	----------------------------------------
-	-- Recurse to the first middle building
-	-- or maxdepth
-	----------------------------------------
-	if (not front_sq.isBuilding()) then
-		__buildView(maxdepth, front_sq, dir, depth + 1, cycle)
-	end
+	__buildView(maxdepth, sq[directions.front[dir]], dir, depth + 1)
 
-	if (left_sq.isBuilding()) then
-		bigpic:wildAdd(cycle, depth, "leftfront", left_sq.distFace)
-	elseif ((depth + 1) < maxdepth) then
-		path_sq = left_sq[directions.front[dir]]
-		if (path_sq.isBuilding()) then
-			bigpic:wildAdd(cycle, depth + 1, "leftside", 
-					path_sq.distFace)
-		end
-	end
+	local left_sq	= sq[directions.left[dir]]
+	local right_sq	= sq[directions.right[dir]]
+	local leftDone	= false
+	local rightDone	= false
 
-	if (right_sq.isBuilding()) then
-		bigpic:wildAdd(cycle, depth, "rightfront", right_sq.distFace)
-	elseif ((depth + 1) < maxdepth) then
-		path_sq = right_sq[directions.front[dir]]
-		if (path_sq.isBuilding()) then
-			bigpic:wildAdd(cycle, depth + 1, "rightside", 
-				path_sq.distFace)
-		end
-	end
-
-	if (front_sq.isBuilding()) then
-		if (depth == 1) then
-			bigpic:wildAdd(cycle, depth, "face", front_sq.nearFace)
-			return 
+	if (depth == 4) then
+		local fl_sq = left_sq[directions.left[dir]]
+		if (fl_sq.isWall) then
+			bigpic:wildAdd(depth, "FL", fl_sq.face)
 		else
-			bigpic:wildAdd(cycle, depth, "face", front_sq.distFace)
+			fl_sq = right_sq[directions.right[dir]]
+			if (fl_sq.isWall) then
+				bigpic:wildAdd(depth, "FR", fl_sq.face)
+			end
 		end
 	end
+
+	if (not sq.isWall) then
+		leftDone	= doWallSquare(left_sq, dir, depth, "L")
+		rightDone	= doWallSquare(right_sq, dir, depth, "R")
+	end
+
+	if (not leftDone) then
+		if (left_sq.face) then
+			bigpic:wildAdd(depth, "L", left_sq.face)
+		end
+	end
+
+	if (sq.face) then
+		bigpic:wildAdd(depth, "M", sq.face)
+	end
+
+	if (not rightDone) then
+		if (right_sq.face) then
+			bigpic:wildAdd(depth, "R", right_sq.face)
+		end
+	end
+
 end
 
 wild = {}
 function wild:new()
 	local self = {
 		sqs	= {},
-		bldgs	= {},
 		day	= false,
 		night	= false,
 	}
@@ -177,32 +165,23 @@ function wild:new()
 	btTable.setClassMetatable(self)
 
 	self.name	= "wild"
-	self.title	= cities[inName].title
-	self.day	= cities[inName].day
-	self.night	= cities[inName].night
-	self.guildExitSquare	= cities[inName].guildExitSquare
-	self.guildExitDir	= cities[inName].guildExitDir
+	self.title	= wildData.title
+	self.day	= wildData.day
+	self.night	= wildData.night
+if false then
 	if (globals.isNight) then
 		self.level	= 2
 	else
 		self.level	= 1
 	end
+end
 
 	local function __initSquares()
 		local label
-		local square
+		local s
 
-		for label, square in pairs(cities[inName].squares) do
-			self.sqs[label] = citysq.new(label, square)
-		end
-	end
-
-	local function __initBuildings()
-		local label
-		local square
-
-		for label, square in pairs(cities[inName].buildings) do
-			self.sqs[label] = citybldg.new(label, square)
+		for label, s in pairs(wildData.squares) do
+			self.sqs[label] = square.new(label, s)
 		end
 	end
 
@@ -219,7 +198,6 @@ function wild:new()
 	end
 
 	__initSquares()
-	__initBuildings()
 	__linkSquares()
 
 	return self
@@ -229,18 +207,15 @@ end
 -- getSq()
 ----------------------------------------
 function wild:getSq(inLabel)
-	if (self.sqs[inLabel] ~= nil) then
-		return self.sqs[inLabel]
-	else
-		return self.bldgs[inLabel]
-	end
+	assert(self.sqs[inLabel], "inLabel: " .. tostring(inLabel))
+	return self.sqs[inLabel]
 end
 
 ----------------------------------------
 -- getLabelXY()
 ----------------------------------------
 function wild:getLabelXY(inX, inY)
-	return string.format("%d-%d", inX, inY)
+	return string.format("x%02d-%02d", inX, inY)
 end
 
 ----------------------------------------
@@ -254,34 +229,9 @@ end
 -- buildView()
 ----------------------------------------
 function wild:buildView()
-	bigpic:cityBackground()
-	__buildView(4, self.currentSquare, self.direction, 1,
-			"base", true, true)
-	bigpic:cityDisplay()
-end
-
-----------------------------------------
--- animateMove()
---
--- Animate the movement of the party in
--- the city. Very fast. Probably won't
--- notice.
-----------------------------------------
-function wild:animateMove()
-	bigpic:cityBackground()
-	__buildView(4, self.currentSquare, self.direction, 1,
-			"1", true, true)
-	bigpic:cityDisplay()
-
-	bigpic:cityBackground()
-	__buildView(4, self.currentSquare, self.direction, 1,
-			"2", true, true)
-	bigpic:cityDisplay()
-
-	bigpic:cityBackground()
-	__buildView(4, self.currentSquare, self.direction, 1,
-			"3", true, true)
-	bigpic:cityDisplay()
+	bigpic:wildBackground()
+	__buildView(5, self.currentSquare, self.direction, 1)
+	bigpic:wildDisplay()
 end
 
 ----------------------------------------
@@ -301,21 +251,15 @@ end
 function wild:moveForward()
 	local front_sq = self.currentSquare[self.direction]
 
-	if (front_sq.isBuilding()) then
-		front_sq.onEnter()
-		if (self.exit) then
-			return true
-		end
-		bigpic:setTitle("Skara Brae")
-	else
-		self:animateMove()
-		self.previousSquare = self.currentSquare
+	if (not front_sq.onEnter()) then
 		self.currentSquare = front_sq
-		if (self.currentSquare.onEnter()) then
-			self.currentSquare = self.previousSquare
-		end
-		self:buildView()
 	end
+
+	if (globals.partyDied) then
+		return
+	end
+
+	self:buildView()
 
 	text:clear()
 end
@@ -343,13 +287,8 @@ end
 -- enter()
 ----------------------------------------
 function wild:enter(inX, inY, inDirection)
-	if (not inX) then
-		self.direction = self.guildExitDir
-		self.currentSquare = self:getSq(self.guildExitSquare)
-	else
-		self.direction = inDirection
-		self.currentSquare = self:getSq(inX .. "-" .. inY)
-	end
+	self.direction = inDirection
+	self.currentSquare = self:getSq(self:getLabelXY(inX, inY))
 end
 
 ----------------------------------------

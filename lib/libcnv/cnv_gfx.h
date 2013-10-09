@@ -66,6 +66,7 @@ bta_cell_t *bta_cell_scale(bta_cell_t *in);
 bta_cell_t *bta_cell_4bitTo8bit(bta_cell_t *in);
 bta_cell_t *bta_trim(bta_cell_t *in, uint16_t left, uint16_t right);
 void bta_toPNG(bta_cell_t *in, btstring_t *fname);
+void bta_transparent_toPNG(bta_cell_t *in, btstring_t *fname);
 
 /* Bigpic list */
 bt_bigpicList_t *bigpic_list_new(uint32_t size);
