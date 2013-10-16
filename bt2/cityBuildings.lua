@@ -79,6 +79,7 @@ function domain:enter()
 				)
 		elseif (inkey == "T") then
 			city:enterDungeon("domain", 1)
+			buildingRval.turnParty = false
 			text:clear()
 			return
 		end

@@ -111,6 +111,9 @@ function gfxImage:new(inName, inType)
 	}
 
 	if (inType == "png") then
+		if (inName == nil) then
+			error("NIL image name", 2)
+		end
 		self.surface = sdl.img.LoadPNG(inName)
 	elseif (inType == "bta") then
 		self.surface = sdl.img.LoadBTA(inName)
@@ -159,6 +162,9 @@ end
 ----------------------------------------
 gfxRectangle = {}
 function gfxRectangle:new(x,y,w,h)
+	if (x == nil) then
+		error("NIL x value", 2)
+	end
 	return sdl.NewRect(x,y,w,h)
 end
 

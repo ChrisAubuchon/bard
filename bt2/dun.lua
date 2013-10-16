@@ -291,7 +291,7 @@ end
 ----------------------------------------
 -- exitToCity()
 ----------------------------------------
-function dun:exit()
+function dun:doExit()
 	self.exit = true
 
 	if (globals.guildCity == "Wild") then
@@ -350,7 +350,7 @@ end
 
 function dun:buildView()
 	bigpic:dunBackground(self.tileSet)
-	bigpic:dunDisplay()
+	--bigpic:dunDisplay()
 	if (party.light.active) then
 		__buildView(self.currentSquare, self.direction, 
 			self.tileSet, party.light.distance, 1)
@@ -604,8 +604,6 @@ end
 function dun:main()
 	local inkey
 
-	globals.swapWallsAndDoors = false
-
 	text:clear()
 	self:resetBigpic()
 
@@ -615,7 +613,8 @@ function dun:main()
 		globals.doTimeEvents = false
 
 		if (keyboardCommand(inkey)) then
-			self:resetBigpic()
+			--self:resetBigpic()
+			local xxx_doNothing = true
 		elseif (inkey == "A") then
 			if (self.currentSquare.hasCeilPortal) then
 				if (party.levitate.active) then

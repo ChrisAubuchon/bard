@@ -28,6 +28,20 @@ function specialSquare:printName(inSquare)
 	text:print(inSquare.name)
 end
 
+function dwhere(inDepth)
+	local dstring
+	local dinfo
+
+	dinfo = debug.getinfo(inDepth, "Sl")
+	dstring = string.format("%s:%s", 
+			string.match(dinfo.short_src, "[^/]*$"),
+			dinfo.currentline
+			)
+	__debugFile:write(dstring .. "\n")
+	__debugFile:flush()
+end
+		
+
 ----------------------------------------
 -- dprint()
 ----------------------------------------

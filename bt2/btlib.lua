@@ -54,6 +54,8 @@ function keyboardCommand(inkey)
 		if (globals.partyDied) then
 			return true
 		end
+		local xxx_might_need_to_reset_bigpic_here = true
+		currentLevel:resetBigpic()
 	elseif (inkey == "T") then
 		globals.isPaused = true
 

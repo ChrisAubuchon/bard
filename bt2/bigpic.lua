@@ -11,155 +11,24 @@ function __bigpic:new()
 		wild		= {}
 	}
 
-	local function readImages()
-		local k
-		local v
-
-		self.imgs = diskio:readTable("bigpic")
-		for k,v in pairs(self.imgs) do
-			v.img = gfxImage:new(v.path, v.type)
-		end
-	end
-
-	local function makeRectangles()
-		self.titleRect	= gfxRectangle:new(32, 212, 224, 16)
-		self.gfxRect	= gfxRectangle:new(32, 30, 224, 176)
-	end
-
-	local function readCityImages()
-		local quad
-		local quadname
-		local facet
-		local facetname
-		local buildingString = "images/citypics/%s/%s/building%d.png"
-
-		local function __readImages(f, fn, qn)
-			local i
-			local nameFormat = "building%d"
-
-			f.rect = gfxRectangle:new(f.x, f.y, f.w, f.h)
-			for i = 1,4 do
-				local index = string.format(nameFormat, i)
-				local path=string.format(buildingString,qn,fn,i)
-
-				f[index] = gfxImage:new(path, "png")
-			end
-		end
-		
-
-		self.city = diskio:readTable("cityview")
-		for quadname,quad in pairs(self.city) do
-			for facetname,facet in pairs(quad) do
-				__readImages(facet, facetname, quadname)
-			end
-		end
-
-		self.city.bg = gfxImage:new("images/citypics/citybg.png", "png")
-	end
-
-	local function readWildImages()
-		local quad = nil
-		local facet
-		local formatString = "images/wpics/%s/%s.png"
-		local wildData
-
-		wildData = diskio:readTable("wildview")
-
-		local function __readImage(q,f,data)
-			local path = string.format(formatString, q, f)
-			local rval = {}
-
-			rval.rect = gfxRectangle:new(data.x, data.y, 
-							data.w, data.h)
-			rval.gfx = gfxImage:new(path, "png")
-
-			return rval
-		end
-
-		repeat
-			quad = next(wildData, quad)
-			self.wild[quad] = {}
-
-			facet = nil
-			repeat
-				facet = next(wildData[quad], facet)
-				local f = wildData[quad][facet]
-				self.wild[quad][facet] = __readImage(quad,facet,f)
-			until (not next(wildData[quad], facet))
-		until (not next(wildData, quad))
-
-		self.wild.bg = gfxImage:new("images/wpics/wpic.png", "png")
-	end
-
-	local function readDunImages()
-		local quad
-		local quadname
-		local facet
-		local facetname
-
-		self.dun = diskio:readTable("dunview")
-		for quadname, quad in pairs(self.dun) do
-			for facetname, facet in pairs(quad) do
-				local path
-
-				path = "images/dpics/"..quadname.."/"..facetname
-				facet.rect = gfxRectangle:new(
-					facet.x, facet.y, facet.w, facet.h)
-
-				if (facetname == "portal") then
-					facet.floor = {}
-					facet.floor[0] = gfxImage:new(
-						path.."/0-floor.png", "png")
-					facet.floor[1] = gfxImage:new(
-						path.."/1-floor.png", "png")
-					facet.floor[2] = gfxImage:new(
-						path.."/2-floor.png", "png")
-					facet.ceiling = {}
-					facet.ceiling[0] = gfxImage:new(
-						path.."/0-ceiling.png", "png")
-					facet.ceiling[1] = gfxImage:new(
-						path.."/1-ceiling.png", "png")
-					facet.ceiling[2] = gfxImage:new(
-						path.."/2-ceiling.png", "png")
-				else
-					facet.door = {}
-					facet.door[0] = gfxImage:new(
-						path.."/0-door.png", "png")
-					facet.door[1] = gfxImage:new(
-						path.."/1-door.png", "png")
-					facet.door[2] = gfxImage:new(
-						path.."/2-door.png", "png")
-					facet.wall = {}
-					facet.wall[0] = gfxImage:new(
-						path.."/0-wall.png", "png")
-					facet.wall[1] = gfxImage:new(
-						path.."/1-wall.png", "png")
-					facet.wall[2] = gfxImage:new(
-						path.."/2-wall.png", "png")
-				end
-			end
-		end
-		self.dun.bg = {}
-		self.dun.bg[0] = gfxImage:new("images/dpics/0-bg.png", "png")
-		self.dun.bg[1] = gfxImage:new("images/dpics/1-bg.png", "png")
-		self.dun.bg[2] = gfxImage:new("images/dpics/2-bg.png", "png")
-
-		self.dun.lightRect = {}
-		self.dun.lightRect[0] = gfxRectangle:new(0, 0, 224, 176)
-		self.dun.lightRect[1] = gfxRectangle:new(0, 10, 224, 156)
-		self.dun.lightRect[2] = gfxRectangle:new(0, 26, 224, 108)
-		self.dun.lightRect[3] = gfxRectangle:new(0, 48, 224, 66)
-	end
-
-
 	btTable.addParent(self, __bigpic)
 	btTable.setClassMetatable(self)
 
-	readImages()
-	makeRectangles()
-	readCityImages()
-	readWildImages()
-	readDunImages()
+	self.imgs	= diskio:readTable("bigpic")
+	self.city	= diskio:readTable("cityview")
+	self.wild	= diskio:readTable("wildview")
+	self.dun	= diskio:readTable("dunview")
+	self.titleRect	= gfxRectangle:new(32, 212, 224, 16)
+	self.gfxRect	= gfxRectangle:new(32, 30, 224, 176)
+	self.dun.lightRect = {}
+	self.dun.lightRect[0] = gfxRectangle:new(0, 0, 224, 176)
+	self.dun.lightRect[1] = gfxRectangle:new(0, 10, 224, 156)
+	self.dun.lightRect[2] = gfxRectangle:new(0, 26, 224, 108)
+	self.dun.lightRect[3] = gfxRectangle:new(0, 48, 224, 66)
+	self.dun.bg = {}
+	self.dun.bg[0] = gfxImage:new("images/dpics/0-bg.png", "png")
+	self.dun.bg[1] = gfxImage:new("images/dpics/1-bg.png", "png")
+	self.dun.bg[2] = gfxImage:new("images/dpics/2-bg.png", "png")
 
 	self.surface = gfxWindow:new(224, 176, 8)
 
@@ -216,6 +85,14 @@ end
 function bigpic:drawImage(inName, inIsTimeAware)
 	local isTimeAware = inIsTimeAware or false
 
+	-- Dynamically create the graphics image if it
+	-- has not already been created
+	--
+	if (not self.imgs[inName].img) then
+		local v = self.imgs[inName]
+		v.img = gfxImage:new(v.path, v.type)
+	end
+
 	if (self.activeBigpic ~= nil) then
 		self.activeBigpic:Clear()
 		self.activeBigpic = nil
@@ -235,9 +112,31 @@ function bigpic:drawImage(inName, inIsTimeAware)
 end
 
 ----------------------------------------
+-- readCityImage()
+----------------------------------------
+function bigpic:readCityImage(inQuadName, inFacetName, inFacet, inBuilding)
+	local format = "images/citypics/%s/%s/%s.png"
+	local path
+
+	if (type(self.imgs[inBuilding]) == "table") then
+		local v = self.imgs[inBuilding]
+		v.img = gfxImage:new(v.path, v.type)
+		return
+	end
+
+	inFacet.rect = gfxRectangle:new(inFacet.x, inFacet.y,
+					inFacet.w, inFacet.h)
+	path = string.format(format, inQuadName, inFacetName, inBuilding)
+	inFacet[inBuilding] = gfxImage:new(path, "png")
+end
+
+----------------------------------------
 -- cityBackground()
 ----------------------------------------
 function bigpic:cityBackground()
+	if (not self.city.bg) then
+		self.city.bg = gfxImage:new("images/citypics/citybg.png", "png")
+	end
 	self.surface:Draw(nil, self.city.bg, nil)
 end
 
@@ -255,7 +154,9 @@ function bigpic:cityAdd(inCycle, inDepth, inFacet, inBuilding)
 	end
 
 	q = self.city[quad][inFacet]
-
+	if (not q[inBuilding]) then
+		self:readCityImage(quad, inFacet, q, inBuilding)
+	end
 
 	if (q[inBuilding] == nil) then
 		self.surface:Draw(nil, self.imgs[inBuilding].img, nil)
@@ -289,11 +190,27 @@ end
 -- wildBackground()
 ----------------------------------------
 function bigpic:wildBackground()
+	if (not self.wild.bg) then
+		self.wild.bg = gfxImage:new("images/wpics/wpic.png", "png")
+	end
 	self.surface:Draw(nil, self.wild.bg, nil)
 end
 
 ----------------------------------------
--- wildAdd()
+-- bigpic:readWildImage()
+----------------------------------------
+function bigpic:readWildImage(inFacetName, inFacet, inBuilding)
+	local format	= "images/wpics/%s/%s.png"
+	local path
+
+	inFacet.rect = gfxRectangle:new(inFacet.x, inFacet.y, 
+					inFacet.w, inFacet.h)
+	path = string.format(format, inFacetName, inBuilding)
+	inFacet.gfx = gfxImage:new(path, "png")
+end
+
+----------------------------------------
+-- bigpic:wildAdd()
 ----------------------------------------
 function bigpic:wildAdd(inDepth, inFacet, inBuilding)
 	local facet
@@ -306,6 +223,9 @@ function bigpic:wildAdd(inDepth, inFacet, inBuilding)
 	end
 
 	q = self.wild[facet][inBuilding]
+	if (not q.gfx) then
+		self:readWildImage(facet, q, inBuilding)
+	end
 	self.surface:Draw(q.rect, q.gfx, nil)
 end
 
@@ -333,6 +253,17 @@ function bigpic:dunBackground(inTileSet)
 end
 
 ----------------------------------------
+-- bigpic:readDunImage()
+----------------------------------------
+function bigpic:readDunImage(inQuadName, inFacetName, inGfx, inTileSet)
+	local format	= "images/dpics/%s/%s/%d-%s.png"
+	local path
+
+	path = string.format(format, inQuadName, inFacetName, inTileSet, inGfx)
+	return gfxImage:new(path, "png")
+end
+
+----------------------------------------
 -- dunAdd()
 ----------------------------------------
 function bigpic:dunAdd(inQuad, inTileSet, inFacet, inSq)
@@ -356,17 +287,22 @@ function bigpic:dunAdd(inQuad, inTileSet, inFacet, inSq)
 		else
 			gfx = inSq.gfx
 		end
-
-		if (globals.swapWallsAndDoors) then
-			if (gfx == "door") then
-				gfx = "wall"
-			else
-				gfx = "door"
-			end
-		end
 	end
 
 	q = self.dun[inQuad][inFacet]
+	if (not q.rect) then
+		q.rect = gfxRectangle:new(q.x, q.y, q.w, q.h)
+	end
+
+	if (not q[gfx]) then
+		q[gfx] = {}
+	end
+
+	if (not q[gfx][inTileSet]) then
+		q[gfx][inTileSet] = self:readDunImage(inQuad, inFacet, 
+						      gfx, inTileSet)
+	end
+	
 	self.surface:Draw(q.rect, q[gfx][inTileSet], nil)
 end
 

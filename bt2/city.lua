@@ -441,7 +441,6 @@ end
 function city:enterDungeon(inName, inLevel)
 	currentLevel.exit = true
 	globals.citySquare = currentLevel.currentSquare.label
-	dprint(currentLevel.currentSquare.label)
 	globals.cityDirection = currentLevel.direction
 	currentLevel = dun:new(inName, inLevel, 0, 0, "north")
 end

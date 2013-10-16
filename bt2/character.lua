@@ -273,7 +273,8 @@ end
 ----------------------------------------
 function character:isSpellCaster()
 	if ((self.class == "Magician") or (self.class == "Conjurer") or
-	    (self.class == "Sorcerer") or (self.class == "Wizard")) then
+	    (self.class == "Sorcerer") or (self.class == "Wizard") or
+	    (self.class == "Archmage")) then
 		return true
 	end
 

@@ -104,7 +104,8 @@ spells.scrySite = function()
 			outString = outString .. " squares "
 		end
 		outString = outString .. "east of the entry stairs"
-		text:splashMessage(outString)
+		text:csplash(false, true, outString)
+		text:clear()
 	end
 
 	text:clear()

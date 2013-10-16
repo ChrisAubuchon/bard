@@ -31,6 +31,7 @@ declare_global("building")
 
 -- btdebug.lua
 declare_global("dprint")
+declare_global("dwhere")
 declare_global("btdebug")
 
 -- btio.lua

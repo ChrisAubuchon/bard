@@ -286,6 +286,10 @@ function guild:doEnter()
 				globals.gameState = globals.STATE_INGAME
 				currentLevel = city:new(globals.guildCity)
 				currentLevel:enter()
+				party.light.effect:__activate(-1)
+				party.light.distance = 5
+				party.light.seeSecret = true
+				party.light.active = true
 
 				return
 			end
