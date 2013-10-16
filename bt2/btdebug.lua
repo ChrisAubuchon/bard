@@ -106,11 +106,46 @@ cityList.squares = {
 		city	= "Thessalonica"
 	},
 	{
+		name	= "Dargoth Tower",
+		city	= "Philippi",
+		x	= 13,
+		y	= 3,
+		dir	= "south"
+	},
+	{
 		name	= "Dark Domain",
 		city	= "Tangramayne",
 		x	= 14,
 		y	= 8,
 		dir	= "east"
+	},
+	{
+		name	= "Maze of Dread",
+		city	= "Thessalonica",
+		x	= 10,
+		y	= 14,
+		dir	= "east"
+	},
+	{
+		name	= "Oscon Fortress",
+		city	= "Corinth",
+		x	= 8,
+		y	= 14,
+		dir	= "south"
+	},
+	{
+		name	= "Stone",
+		city	= "Colosse",
+		x	= 1,
+		y	= 13,
+		dir	= "east"
+	},
+	{
+		name	= "Temple of Dark",
+		city	= "Ephesus",
+		x	= 8,
+		y	= 6,
+		dir	= "north"
 	}
 }
 

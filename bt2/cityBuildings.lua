@@ -155,7 +155,9 @@ function fanskar:enter()
 		inkey = getkey()
 
 		if (inkey == "T") then
-			currentLevel:enterDungeon("fort", 1);
+			currentLevel:enterDungeon("castle", 1);
+			text:clear()
+			buildingRval.turnParty = false
 			return
 		end
 	until (inkey == "E")
@@ -164,7 +166,33 @@ end
 ----------------------------------------
 -- fort
 ----------------------------------------
-local fort = {}
+local fort = building:new("Fortress", "PIC_EMPTYBLDG")
+function fort:enter()
+	local inkey
+	
+	self:resetBigpic()
+	text:cdprint(true, false, "You stand in the entry to Oscon's Fortress.")
+	if (not party:hasItem("Item of K")) then
+		text:csplash(false, true, 
+			"You see no entrance to the upper levels.")
+		text:clear()
+		return
+	end
+
+	text:print("A Stairway leads to the upper levels.\n\nYou can:\n\n" ..
+		"Take the stairway")
+	text:printExit()
+	repeat
+		inkey = getkey()
+		if (inkey == "T") then
+			currentLevel:enterDungeon("fort", 1);
+			text:clear()
+			buildingRval.turnParty = false
+			return true
+		end
+	until (inkey == "E")
+end
+
 
 ----------------------------------------
 -- gate
@@ -294,7 +322,41 @@ function kazdek:enter()
 end
 
 
+----------------------------------------
+-- maze
+----------------------------------------
 local maze = {}
+function maze:enter()
+	local answer
+
+	bigpic:drawImage("PIC_MAGICMOUTH")
+
+	text:cdprint(true, false,
+		"A voice says,\n " ..
+		"\"Where steel is bright\n" ..
+		"  and blood runs red\n" ..
+		" Walk down the stairs\n" ..
+		"  to the Maze of ...\n"
+		)
+
+	answer = text:readString()
+	if (answer ~= "DREAD") then
+		text:csplash(true, true, "\n\nWrong!")
+		text:clear()
+		return
+	end
+	bigpic:setTitle("The Rock")
+
+	if (takeStairs(
+		"You stand in the entry to the Maze of Dread. There are " ..
+		"stairs leading down to the main level.\n\nYou can:\n\n" ..
+		"Take the stairs"
+		)) then
+		currentLevel:enterDungeon("maze", 1)
+		buildingRval.turnParty = false
+	end
+end
+
 
 ----------------------------------------
 -- narn
@@ -396,7 +458,51 @@ function narn:doApproach()
 	return true
 end
 
-local stone = {}
+----------------------------------------
+-- stone
+----------------------------------------
+local stone = building:new("Strange Mage", "PIC_MAGE")
+function stone:enter()
+	local answer
+
+	self:resetBigpic()
+	text:cdprint(true, false, 
+		"A mage, standing by a large stone, blocks your way. He " ..
+		"says, \"Tell me two things, you knuckleheads, to split " ..
+		"the rocks.\"\n")
+
+	answer = text:readString()
+	if (answer ~= "FREEZE") then
+		text:csplash(true, true, 
+			"\"Seek the answer in the tombs, but don't return " ..
+			"here until you finish the crypt.\" The mage " ..
+			"disappears."
+			)
+		text:clear()
+		return
+	end
+
+	answer = text:readString()
+	if (answer ~= "PLEASE") then
+		text:csplash(true, true, 
+			"\"Seek the answer in the tombs, but don't return " ..
+			"here until you finish the crypt.\" The mage " ..
+			"disappears."
+			)
+		text:clear()
+		return
+	end
+
+	bigpic:setTitle("The Rock")
+	if (takeStairs(
+		"You stand before a large stone set in the city square. On "..
+		"one side is a crevice leading into darkness.\n\n" ..
+		"You can:\n\nTry the crevice"
+		)) then
+		currentLevel:enterDungeon("stone", 1)
+		buildingRval.turnParty = false
+	end
+end
 
 ----------------------------------------
 -- tombs
@@ -411,6 +517,7 @@ function tombs:enter()
 		"You can:\n\nTake the passage"
 		)) then
 		currentLevel:enterDungeon("tombs", 1)
+		buildingRval.turnParty = false
 	end
 end
 
@@ -427,6 +534,7 @@ function tower:enter()
 		"You can:\n\nTake the stairway"
 		)) then
 		currentLevel:enterDungeon("tower", 1)
+		buildingRval.turnParty = false
 	end
 end
 
