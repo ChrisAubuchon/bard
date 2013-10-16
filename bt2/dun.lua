@@ -296,13 +296,12 @@ function dun:exit()
 
 	if (globals.guildCity == "Wild") then
 		local xxx_implement_wild
-		currentlevel = wild:new()
+		currentLevel = wild:new()
 	else
 		currentLevel = city:new(globals.guildCity)
 	end
 	currentLevel.direction = globals.cityDirection
 	currentLevel.currentSquare = currentLevel:getSq(globals.citySquare)
-	globals.gameState = globals.STATE_CITY
 end
 
 ----------------------------------------

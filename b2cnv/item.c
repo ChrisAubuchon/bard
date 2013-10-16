@@ -170,8 +170,27 @@ void convertItems(void)
 	shopList_to_json(il, mkJsonPath("garthinv.json"));
 	cnvList_free(il);
 
+	
+	/*
+	 * This block of code generates IDC commands to define an
+	 * enum of all of the item names for IDA
+	 */
+	printf("static main() {\n");
+	printf("auto eid;\n");
+	printf("eid = GetEnum(\"itemName\");\n");
+	for (i = 0; i < 127; i++) {
+		btstring_t *buf;
+
+		buf = bts_strcpy(itemName[i]);
+		str2macro(buf->buf);
+		printf("AddConstEx(eid, \"item_%s\", %d, -1);\n",
+			buf->buf, i+1);
+		bts_free(buf);
+	}
+	printf("}");
+
 #if 0
-	for (i = 1; i < 128; i++) {
+	for (i = 1; i < 127; i++) {
 		if (itemB1map[i]) {
 			printf("%s:%s\n", itemB1name[i], itemName[itemB1map[i] - 1]);
 		}

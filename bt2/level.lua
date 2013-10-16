@@ -41,7 +41,32 @@ function level:doStairs(inDirection)
 	end
 end
 
+----------------------------------------
+-- toCity()
+----------------------------------------
+function level:toCity(inCity, inX, inY, inDirection)
+	if (not inDirection) then
+		inDirection = self.direction
+	end
 
+	self.exit = true
 
+	if (inCity == "Wild") then
+		currentLevel = wild:new()
+	else
+		currentLevel = city:new(inCity)
+	end
 
+	currentLevel:enter(inX, inY, inDirection)
+end
 
+function level:toDungeon(inName, inLevel)
+	self.exit = true
+
+	if (self:isCity()) then
+		globals.citySquare = self.currentSquare.label
+		globals.cityDirection = currentLevel.direction
+	end
+
+	currentLevel = dun:new(inName, inLevel, 0, 0, "north")
+end

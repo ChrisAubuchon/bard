@@ -12,14 +12,15 @@ local cities = {}
 -- buildings
 ----------------------------------------
 local square = {}
-square.new = function(lab, inEnterFunction, inEnterArgs) 
+square.new = function(lab, inEnterFunction) 
 	local self = {
+		enterFunction	= false,
 		label		= lab
 	}
-	local enterFunction	= nil
-	local enterArgs		= inEnterArgs
 
-	enterFunction = compileString(inEnterFunction)
+	if (inEnterFunction) then
+		self.enterFunction = compileString("return " .. inEnterFunction)
+	end
 
 	function self.isPath()		return false end
 	function self.isBuilding()	return false end
@@ -38,17 +39,17 @@ square.new = function(lab, inEnterFunction, inEnterArgs)
 		local rval
 		local msg
 
-		if (enterFunction == nil) then
+		if (not self.enterFunction) then
 			return false
 		end
 
-		rval = enterFunction()
+		rval = self.enterFunction()
 
 		return rval
 	end
 
 	function self.clearEnter()
-		enterFunction = nil
+		self.enterFunction = nil
 	end
 
 	return self
@@ -133,7 +134,7 @@ local function __buildView(maxdepth, sq, dir, depth, cycle, prevleft, prevright)
 		bigpic:cityAdd(cycle, depth, "leftfront", left_sq.distFace)
 	elseif ((depth + 1) < maxdepth) then
 		path_sq = left_sq[directions.front[dir]]
-		if (path_sq.isBuilding()) then
+		if (path_sq and path_sq.isBuilding()) then
 			bigpic:cityAdd(cycle, depth + 1, "leftside", 
 					path_sq.distFace)
 		end
@@ -143,7 +144,7 @@ local function __buildView(maxdepth, sq, dir, depth, cycle, prevleft, prevright)
 		bigpic:cityAdd(cycle, depth, "rightfront", right_sq.distFace)
 	elseif ((depth + 1) < maxdepth) then
 		path_sq = right_sq[directions.front[dir]]
-		if (path_sq.isBuilding()) then
+		if (path_sq and path_sq.isBuilding()) then
 			bigpic:cityAdd(cycle, depth + 1, "rightside", 
 				path_sq.distFace)
 		end
@@ -182,6 +183,7 @@ function city:new(inName)
 	self.night	= cities[inName].night
 	self.guildExitSquare	= cities[inName].guildExitSquare
 	self.guildExitDir	= cities[inName].guildExitDir
+	globals.guildCity	= inName
 	if (globals.isNight) then
 		self.level	= 2
 	else
@@ -240,7 +242,7 @@ end
 -- getLabelXY()
 ----------------------------------------
 function city:getLabelXY(inX, inY)
-	return string.format("%d-%d", inX, inY)
+	return string.format("%02d-%02d", inX, inY)
 end
 
 ----------------------------------------
@@ -300,23 +302,23 @@ end
 ----------------------------------------
 function city:moveForward()
 	local front_sq = self.currentSquare[self.direction]
+	local rval
 
-	if (front_sq.isBuilding()) then
-		front_sq.onEnter()
+	if (not front_sq.isBuilding()) then
+		self:animateMove()
+	end
+
+	if (not front_sq.onEnter()) then
 		if (self.exit) then
 			return true
 		end
-		bigpic:setTitle("Skara Brae")
-	else
-		self:animateMove()
-		self.previousSquare = self.currentSquare
 		self.currentSquare = front_sq
-		if (self.currentSquare.onEnter()) then
-			self.currentSquare = self.previousSquare
-		end
 		self:buildView()
 	end
 
+	if (globals.partyDied) then
+		return
+	end
 	text:clear()
 end
 
@@ -348,7 +350,7 @@ function city:enter(inX, inY, inDirection)
 		self.currentSquare = self:getSq(self.guildExitSquare)
 	else
 		self.direction = inDirection
-		self.currentSquare = self:getSq(inX .. "-" .. inY)
+		self.currentSquare = self:getSq(self:getLabelXY(inX, inY))
 	end
 end
 
@@ -438,8 +440,6 @@ end
 ----------------------------------------
 function city:enterDungeon(inName, inLevel)
 	currentLevel.exit = true
-	currentLevel.exitLocation = inName
-	globals.gameState = globals.STATE_DUNGEON
 	globals.citySquare = currentLevel.currentSquare.label
 	dprint(currentLevel.currentSquare.label)
 	globals.cityDirection = currentLevel.direction

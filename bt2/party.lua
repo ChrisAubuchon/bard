@@ -911,11 +911,11 @@ end
 -- member. Return the character that
 -- received the item.
 ----------------------------------------
-function party:giveItem(inItem, inIsIdentified)
+function party:giveItem(inItem, inIsIdentified, inCount)
 	local c
 
 	for c in self:characterIterator() do
-		if (c:giveItem(inItem, inIsIdentified)) then
+		if (c:giveItem(inItem, inIsIdentified, inCount)) then
 			return c
 		end
 	end

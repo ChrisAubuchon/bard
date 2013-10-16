@@ -5,7 +5,8 @@ local inventorySlot = {}
 function inventorySlot:new(inName)
 	local self = {
 		isEquipped	= false,
-		isIdentified	= false
+		isIdentified	= false,
+		count		= false
 	}
 
 	btTable.addParent(self, inventorySlot, items:new(inName))
@@ -118,7 +119,7 @@ function inventory:printScreen(inCharacter)
 	end
 end
 
-function inventory:addItem(inName, isIdentified)
+function inventory:addItem(inName, isIdentified, inCount)
 	assert(type(inName) == "string", 
 				"addItem() passed a non-string")
 	if (self:isFull()) then
@@ -129,6 +130,7 @@ function inventory:addItem(inName, isIdentified)
 
 	i = inventorySlot:new(inName)
 	i.isIdentified = isIdentified
+	i.count = inCount or 1
 	self:__add(i)
 
 	return true
@@ -157,7 +159,9 @@ function inventory:toTable()
 		t.name = slot.name
 		t.isEquipped = slot.isEquipped
 		t.isIdentified = slot.isIdentified
+		t.count = slot.count
 		table.insert(rval, t)
+
 	end
 
 	return rval

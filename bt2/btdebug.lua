@@ -8,9 +8,17 @@ local __debugFile = io.stdout
 ----------------------------------------
 -- specialSquare class
 ----------------------------------------
-local specialSquare = {
-	squares = {}
-}
+local specialSquare = {} 
+function specialSquare:new()
+	local self = {
+		squares	= {}
+	}
+
+	btTable.addParent(self, specialSquare)
+	btTable.setClassMetatable(self)
+
+	return self
+end
 
 function specialSquare:toArray()
 	return self.squares
@@ -19,323 +27,6 @@ end
 function specialSquare:printName(inSquare)
 	text:print(inSquare.name)
 end
-
-specialSquare.squares = {
-	{
-		name		= "Floor Portal",
-		dungeon		= "cellars",
-		level		= 3,
-		y		= 11,
-		x		= 21,
-		direction	= "north"
-	},
-	{
-		name		= "Ceiling Portal",
-		dungeon		= "cellars",
-		level		= 4,
-		y		= 11,
-		x		= 21,
-		direction	= "north"
-	},
-	{
-		name		= "SpiderGod",
-		dungeon		= "cellars",
-		level		= 2,
-		y		= 10,
-		x		= 4,
-		direction	= "south"
-	},
-	{
-		name		= "LightBeam",
-		dungeon		= "cellars",
-		level		= 3,
-		y		= 5,
-		x		= 0,
-		direction	= "south"
-	},
-	{
-		name		= "TarjanMouth",
-		dungeon		= "cellars",
-		level		= 3,
-		y		= 3,
-		x		= 3,
-		direction	= "north"
-	},
-	{
-		name		= "LongStairs",
-		dungeon		= "cellars",
-		level		= 4,
-		y		= 16,
-		x		= 18,
-		direction	= "west"
-	},
-	{
-		name		= "Bashar",
-		dungeon		= "catacombs",
-		level		= 2,
-		y		= 11,
-		x		= 10,
-		direction	= "north"
-	},
-	{
-		name		= "Sphynx",
-		dungeon		= "catacombs",
-		level		= 2,
-		y		= 12,
-		x		= 6,
-		direction	= "north"
-	},
-	{
-		name		= "WitchKing",
-		dungeon		= "catacombs",
-		level		= 3,
-		y		= 18,
-		x		= 20,
-		direction	= "north"
-	},
-	{
-		name		= "CrystalSword",
-		dungeon		= "castle",
-		level		= 1,
-		y		= 0,
-		x		= 20,
-		direction	= "west"
-	},
-	{
-		name		= "RobedMen",
-		dungeon		= "castle",
-		level		= 1,
-		y		= 5,
-		x		= 16,
-		direction	= "north"
-	},
-	{
-		name		= "BaronThrone",
-		dungeon		= "castle",
-		level		= 1,
-		y		= 13,
-		x		= 9,
-		direction	= "north"
-	},
-	{
-		name		= "GuardCap",
-		dungeon		= "castle",
-		level		= 1,
-		y		= 17,
-		x		= 9,
-		direction	= "north"
-	},
-	{
-		name		= "SilverSq",
-		dungeon		= "castle",
-		level		= 2,
-		y		= 1,
-		x		= 0,
-		direction	= "south"
-	},
-	{
-		name		= "ShieldMouth",
-		dungeon		= "castle",
-		level		= 2,
-		y		= 0,
-		x		= 18,
-		direction	= "east"
-	},
-	{
-		name		= "OldMan",
-		dungeon		= "castle",
-		level		= 2,
-		y		= 9,
-		x		= 8,
-		direction	= "east"
-	},
-	{
-		name		= "Eye Statue",
-		dungeon		= "castle",
-		level		= 3,
-		y		= 0,
-		x		= 21,
-		direction	= "north"
-	},
-	{
-		name		= "Tavern Q",
-		dungeon		= "castle",
-		level		= 3,
-		y		= 5,
-		x		= 2,
-		direction	= "east"
-	},
-	{
-		name		= "Robe Check",
-		dungeon		= "castle",
-		level		= 3,
-		y		= 5,
-		x		= 11,
-		direction	= "east"
-	},
-	{
-		name		= "Crystal Stat",
-		dungeon		= "kylr",
-		level		= 1,
-		y		= 0,
-		x		= 4,
-		direction	= "north"
-	},
-	{
-		name		= "Sinister Q",
-		dungeon		= "kylr",
-		level		= 1,
-		y		= 2,
-		x		= 13,
-		direction	= "west"
-	},
-	{
-		name		= "Stone Golem",
-		dungeon		= "kylr",
-		level		= 1,
-		y		= 10,
-		x		= 14,
-		direction	= "west"
-	},
-	{
-		name		= "Onyx Key",
-		dungeon		= "kylr",
-		level		= 1,
-		y		= 12,
-		x		= 17,
-		direction	= "north"
-	},
-	{
-		name		= "Silver Tri",
-		dungeon		= "kylr",
-		level		= 1,
-		y		= 19,
-		x		= 2,
-		direction	= "north"
-	},
-	{
-		name		= "Mouth Four",
-		dungeon		= "mangar",
-		level		= 1,
-		y		= 13,
-		x		= 21,
-		direction	= "west"
-	},
-	{
-		name		= "Silver Circle",
-		dungeon		= "mangar",
-		level		= 2,
-		y		= 15,
-		x		= 3,
-		direction	= "east"
-	},
-	{
-		name		= "Seven Q",
-		dungeon		= "mangar",
-		level		= 3,
-		y		= 5,
-		x		= 10,
-		direction	= "south"
-	},
-	{
-		name		= "Master Key",
-		dungeon		= "mangar",
-		level		= 3,
-		y		= 12,
-		x		= 20,
-		direction	= "west"
-	},
-	{
-		name		= "Large Coffin",
-		dungeon		= "mangar",
-		level		= 4,
-		y		= 8,
-		x		= 11,
-		direction	= "east"
-	},
-	{
-		name		= "Sleeping Dragons",
-		dungeon		= "mangar",
-		level		= 4,
-		y		= 7,
-		x		= 21,
-		direction	= "north"
-	},
-	{
-		name		= "Thor Figurine",
-		dungeon		= "mangar",
-		level		= 4,
-		y		= 9,
-		x		= 21,
-		direction	= "west"
-	},
-	{
-		name		= "Swap Doors",
-		dungeon		= "mangar",
-		level		= 4,
-		y		= 20,
-		x		= 2,
-		direction	= "east"
-	},
-	{
-		name		= "BoilingLiq",
-		dungeon		= "mangar",
-		level		= 5,
-		y		= 10,
-		x		= 20,
-		direction	= "east"
-	},
-	{
-		name		= "MangarTreas",
-		dungeon		= "mangar",
-		level		= 5,
-		y		= 18,
-		x		= 0,
-		direction	= "south"
-	},
-	{
-		name		= "SilverDest",
-		dungeon		= "mangar",
-		level		= 5,
-		y		= 14,
-		x		= 10,
-		direction	= "north"
-	},
-	{
-		name		= "PossessChar",
-		dungeon		= "mangar",
-		level		= 5,
-		y		= 0,
-		x		= 20,
-		direction	= "north"
-	},
-	{
-		name		= "DeathMouth",
-		dungeon		= "mangar",
-		level		= 5,
-		y		= 0,
-		x		= 10,
-		direction	= "north"
-	},
-	{
-		name		= "SpectreSnare",
-		dungeon		= "mangar",
-		level		= 5,
-		y		= 21,
-		x		= 11,
-		direction	= "west"
-	},
-	{
-		name		= "Mangar",
-		dungeon		= "mangar",
-		level		= 5,
-		y		= 19,
-		x		= 10,
-		direction	= "north"
-	}
-}
-
-
 
 ----------------------------------------
 -- dprint()
@@ -374,16 +65,121 @@ function btdebug.enterDungeon()
 	return true
 end
 
+local cityList = specialSquare:new()
+cityList.squares = {
+	{
+		name	= "Colosse",
+		city	= "Colosse"
+	},
+	{
+		name	= "Corinth",
+		city	= "Corinth"
+	},
+	{
+		name	= "Ephesus",
+		city	= "Ephesus"
+	},
+	{
+		name	= "Philippi",
+		city	= "Philippi"
+	},
+	{
+		name	= "Tangramayne",
+		city	= "Tangramayne"
+	},
+	{
+		name	= "Thessalonica",
+		city	= "Thessalonica"
+	},
+	{
+		name	= "Dark Domain",
+		city	= "Tangramayne",
+		x	= 14,
+		y	= 8,
+		dir	= "east"
+	}
+}
+
+local wildList = specialSquare:new()
+wildList.squares = {
+	{
+		name	= "Fanskar",
+		city	= "Wild",
+		x	= 16,
+		y	= 26,
+		dir	= "east"
+	},
+	{
+		name	= "Grey Crypt",
+		city	= "Wild",
+		x	= 8,
+		y	= 32,
+		dir	= "south"
+	},
+	{
+		name	= "Kazdek",
+		city	= "Wild",
+		x	= 25,
+		y	= 18,
+		dir	= "north"
+	},
+	{
+		name	= "Narn",
+		city	= "Wild",
+		x	= 10,
+		y	= 2,
+		dir	= "west"
+	},
+	{
+		name	= "Sage hut",
+		city	= "Wild",
+		x	= 0,
+		y	= 1,
+		dir	= "south"
+	}
+}
+
+
+function btdebug.toCity(inObject)
+	local newCity
+
+	newCity = text:scrollingSelect(inObject, inObject.printName)
+	if (not newCity) then
+		text:clear()
+		return false
+	end
+
+	currentLevel:toCity(newCity.city, newCity.x, newCity.y, newCity.dir)
+end
+
 function btdebug.cityDebug() 
 	local inkey
 
 	repeat
+		text:cdprint(true, false, 
+			"1. Change City\n" ..
+			"2. Enter Wild\n"
+			)
+		
+		text:printExit()
+
+		inkey = getkey() 
+
+		if (inkey == "1") then
+			btdebug.toCity(cityList)
+			return
+		elseif (inkey == "2") then
+			btdebug.toCity(wildList)
+			return
+		end
+if false then
 		text:cdprint(true, false, "1. Toggle night\n")
 		text:print("2. Enter dungeon\n")
 		text:print("3. Random battle\n")
 		text:print("4. Enter building\n")
 		text:print("5. Battle\n")
 		text:print("6. Add doppleganger\n")
+		text:print("7. Enter wild\n")
 		text:printExit()
 		inkey = getkey()
 
@@ -409,6 +205,11 @@ function btdebug.cityDebug()
 			text:clear()
 			battleMonster:doDoppleganger()
 			return
+		elseif (inkey == "7") then
+			text:clear()
+			
+			return
+end
 		end
 
 	until (inkey == "E")

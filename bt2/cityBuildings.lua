@@ -1,4 +1,33 @@
 ----------------------------------------
+-- Return structure
+----------------------------------------
+local buildingRval = {
+	turnParty	= true,
+	moveSquare	= true
+}
+
+----------------------------------------
+-- takeStairs()
+--
+-- Common code for (T)aking the stairs
+----------------------------------------
+local function takeStairs(inString)
+	local inkey
+
+	text:cdprint(true, false, inString)
+	text:printExit()
+	repeat
+		inkey = getkey()
+		if (inkey == "T") then
+			text:clear()
+			return true
+		end
+	until (inkey == "E")
+
+	return false
+end
+
+----------------------------------------
 -- casino
 ----------------------------------------
 local casino = {}
@@ -6,7 +35,6 @@ function casino:enter()
 	text:csplash(true, true, "Lagoth Zanta has stolen all the casino's " ..
 				"gold and put it out of business.")
 	text:clear()
-	currentLevel:turnParty("back")
 end
 
 
@@ -62,20 +90,20 @@ end
 ----------------------------------------
 local empty = building:new("Empty Building", "PIC_EMPTYBLDG")
 function empty:enter()
+if false then
 	if (rnd_and_x(3) == 0) then
 		battle:random()
 		if (globals.partyDied) then
 			return
 		end
 	end
+end
 
 	self:resetBigpic()
 	text:cdprint(true, false, "You're in an empty building.")
 	text:printExit()
 	getkey()
-	currentLevel:turnParty("back")
 
-	return true
 end
 
 ----------------------------------------
@@ -83,40 +111,54 @@ end
 ----------------------------------------
 local emptyhut = building:new("Empty Hut", "PIC_EMPTYHUT")
 function emptyhut:enter()
+if false then
 	if (rnd_and_x(3) == 0) then
 		battle:random()
 		if (globals.partyDied) then
 			return true
 		end
 	end
+end
 
 	self:resetBigpic()
 	text:cdprint(true, false, "You're in an empty hut.")
 	text:printExit()
 	getkey()
-	currentLevel:turnParty("back")
-
-	return true
-end
-
-local entercity = {}
-local enterwild = {}
-function enterwild:enter(...)
-	local x
-	local y
-	local dir = currentLevel.direction
-
-	x, y = ...
-	currentLevel.exit = true
-	currentLevel.exitLocation = "wild"
-	currentLevel = wild:new()
-	currentLevel:enter(x, y, dir)
 end
 
 ----------------------------------------
 -- fanskar
 ----------------------------------------
 local fanskar = {}
+function fanskar:enter()
+	local inkey
+
+	bigpic:drawImage("PIC_EMPTYBLDG")
+	if (not party:hasItem("Master Key")) then
+		text:csplash(false, true,
+			"You stand in the entry to Fanskar's fortress, but "..
+			"the door is locked."
+			)
+		text:clear()
+		return
+	end
+
+	text:cdprint(true, false,
+		"You stand in the entry to Fanskar's fortress. A stairway " ..
+		"leads to the main level.\n\nYou can:\n\n" ..
+		"Take the stairway"
+		)
+
+	repeat
+		text:printExit()
+		inkey = getkey()
+
+		if (inkey == "T") then
+			currentLevel:enterDungeon("fort", 1);
+			return
+		end
+	until (inkey == "E")
+end
 
 ----------------------------------------
 -- fort
@@ -129,20 +171,52 @@ local fort = {}
 local gate = building:new("Iron Gate", "PIC_IRONGATE")
 function gate:enter()
 	if (party:isItemEquipped("Master Key")) then
-		return false
+		buildingRval.moveSquare = false
+		buildingRval.turnParty = false
+		return
 	end
-
 	self:resetBigpic(true)
 	text:csplash(true, true, "\nYou stand before a locked iron gate.")
 	text:clear()
-	currentLevel.currentSquare = currentLevel.previousSquare
-	currentLevel:turnParty("back")
+
+	buildingRval.turnParty = false
 end
 
 ----------------------------------------
 -- greycrypt
 ----------------------------------------
-local greycrypt = {}
+local greycrypt = building:new("Crypt", "PIC_EMPTYBLDG")
+function greycrypt:enter()
+	local inkey
+	local answer
+
+	self:resetBigpic()
+	text:cdprint(true, false,
+		"You stand in the entry to an ancient crypt. A passage "..
+		"leads into the dark unknown.\n\nYou can:\n\nTake the passage"
+		)
+
+	repeat
+		text:printExit()
+		inkey = getkey()
+
+		if (inkey == "T") then
+			text:cdprint(true, false, 
+				"A statue comes to life before you, and "..
+				"says, \"Name this crypt to enter it.\"\n")
+			answer = text:readString()
+			if ((answer == "GREY") or (answer == "GREY CRYPT")) then
+				currentLevel:enterDungeon("crypt", 1)
+				text:clear()
+				return	
+			else
+				text:csplash(true, true, "Wrong!!")
+				text:clear()
+				return
+			end
+		end
+	until (inkey == "E")
+end
 
 ----------------------------------------
 -- doGuild
@@ -152,114 +226,208 @@ function doGuild:enter()
 	currentLevel.exit = true
 	globals.gameState = globals.STATE_GUILD
 	currentLevel = false
+
+	buildingRval.turnParty = false
 end
 
-local kazdek = {}
-local maze = {}
-local narn = {}
-
 ----------------------------------------
--- sagehut
+-- kazdek
 ----------------------------------------
-local sagehut = building:new("The Sage", "PIC_SAGE")
-function sagehut:enter()
---	if (party:hasWinner()) then
---		bigpic:setBigpic("Empty Hut", "PIC_EMPTYHUT")
---		text:csplash(true, true, "\nYou're in an empty hut.")
---		text:clear()
---	elseif (party:hasItem("The Scepter")) then
---		self:resetBigpic()
---		text:csplash(true, true,
---			"\"Welcome, my friends, to the home of Lagoth " ..
---			"Zanta! You have been cunning, it is true, " ..
---			"buy your days have now come to an end. Your " ..
---			"quest is through, fools. Prepare to die.\""
---			)
---		if (not battle:new("Balder Guard", 16, "Balder Guard", 16, 
---				"Lagoth Zanta", 1)) then
---			if (globals.partyDied) then
---				return false
---			end
---			currentLevel:turnParty("back")
---			return true
---		else
---			local xxx_add_one_million_xp_to_party
---			local xxx_set_hasWon_flag_on_party
---
---			bigpic:drawImage("PIC_VICTORY")
---			text:csplash(true, true, 
---				"Well done! At the death of Zanta the armies "..
---				"of the Realm and march to defeat the " ..
---				"invading hordes, who will easily fall. " ..
---				"The King himself enters the hut and salutes "..
---				"you."
---				)
---			text:csplash(true, true,
---				"\"Oh mighty ones, I thank thee truly for " ..
---				"they service to the realm. May the All High "..
---				"bless thee and keep thee strong and "..
---				"prosperous. In my own little way, I give "..
---				"you all a little bonus."
---			)
---			text:csplash(true, true,
---				"Congratulations, your quest is over. But a " ..
---				"new one is bound to begin..."
---				)
---			text:clear()
---			self.exit = true
---			globals.gameState = globals.STATE_GUILD
---			return true
---		end
---	else
-		return self:askSage()
---	end
-end
-
-function sagehut:askSage()
+local kazdek = building:new("Stone Man", "PIC_GOLEM")
+function kazdek:enter()
 	local inkey
+	local answer
+	local c
 
 	self:resetBigpic()
-	repeat
-		text:cdprint(true, false, 
-			"The Sage says, \"Gold can buy thee the wisdom " ..
-			"of the ancients, my friends.\"" ..
-			"\n\nYou can:\n\n" ..
-			"(T)alk to the Sage\n" ..
-			"(E)xit his hut"
+
+	if (party:isItemEquipped("Item of K")) then
+		text:csplash(true, true, 
+			"You stand in Kazdek's hut. There is no one here."
 			)
+		text:clear()
+		return
+	end
+
+	repeat
+		text:cdprint(true, false,
+			"\"Welcome, my friends,\" a stone man exclaims. " ..
+			"\"My home is, of course, your home. Stay as long " ..
+			"as you like.\" He falls asleep.\n\nYou can: \n" ..  
+			"Speak to him"
+		)
+		text:printExit()
 		inkey = getkey()
 
-		if (inkey == "T") then
-			self:talkToSage()
+		if (inkey == "S") then
+			text:cdprint(true, false, "What will you say?\n")
+			answer = text:readString()
+
+			if (answer ~= "KAZDEK") then
+				text:csplash(true, true, "He does not awake.")
+				text:clear()
+			else
+				text:csplash(true, true,
+					"\"You called?\" he says, as he " ..
+					"awakes. \"Oh, you would like an " ..
+					"item of mine.\" He pulls something " ..
+					"from the air. \"Take this.\" he " ..
+					"then vanishes."
+					)
+				text:clear()
+				c = party:giveItem("Item of K", true)
+				if (not c) then
+					text:cdprint(false, true,
+						"But nobody has room for it!"
+						)
+					return
+				else
+					text:cdprint(false, true,
+						"%s got it.", c.name
+						)
+					return 
+				end
+			end
 		end
 	until (inkey == "E")
+end
+
+
+local maze = {}
+
+----------------------------------------
+-- narn
+----------------------------------------
+local narn = building:new("Tmp. of Narn", "PIC_TEMPLEINT")
+function narn:enter()
+	local inkey
+	self:resetBigpic()
+
+if false then
+	if (party:hasWinner()) then
+		text:csplash(true, true,
+			"\"Welcome, oh great Knight! Thy presence blesses "..
+			"us all! Stay and rest as long as you desire.\""
+			)
+		text:clear()
+		return
+	end
+end
+
+	local function __printIntro()
+		text:cdprint(true, false, 
+			"You stand inside the Temple of Narn. There is a "..
+			"large green altar before you.\n\nYou can:\n\n" ..
+			"Approach the altar."
+			)
+		text:printExit()
+	end
+
+	__printIntro()
+	repeat
+		inkey = getkey()
+		if (inkey == "A") then
+			if (self:doApproach()) then
+				return
+			else
+				__printIntro()
+			end
+		end
+	until (inkey == "E")
+end
+
+----------------------------------------
+-- narn:doApproach
+----------------------------------------
+function narn:doApproach()
+	local c
+	local i
+	local segmentCount = 0
+
+	text:cdprint(true, false, "Who will approach it?")
+	c = party:readSlot()
+	if (not c) then
+		return false
+	end
+
+	for i = 1,7 do
+		if (c:hasItem(string.format("Seg %d", i))) then
+			segmentCount = segmentCount + 1
+		end
+	end
+
+	if ((segmentCount == 0) or (c.class ~= "Archmage")) then
+		text:csplash(true, true, "Nothing happened.")
+		return true
+	end
+
+	if (segmentCount < 7) then
+		text:csplash(true, true, 
+			"...and yet not all things are complete. It felt as "..
+			"if he was very close to great power..."
+			)
+		return
+	end
+
+	bigpic:drawImage("PIC_FORGESEGMENT")
+	text:csplash(true, true, "Something strange is happening to him...")
+	text:csplash(true, true, 
+		"%s has become the One of Legend, known to all men as the "..
+		"Destiny Knight! Power courses through him as never felt "..
+		"before. The full extend of his powers is as yet unknown...",
+		c.name
+		)
+	text:csplash(true, true,
+		"...but they appear to be incredible! It was foretold that " ..
+		"you shall receive power when the spirit has come upon you. "..
+		"You must now go and be a witness of this to all...")
+	
+	text:clear()
+
+	for i = 1,7 do
+		c.inventory:dropItem(string.format("Seg %d", i))
+	end
+
+	c:giveItem("The Scepter", true, false)
+	c.numAttacks = 8
+	c.hasScepterMaybe = true
 
 	return true
 end
 
-function sagehut:talkToSage()
-	local inkey
-	local c
-	local answer
+local stone = {}
 
-	text:cdprint(true, false, "Who will talk to the Sage?")
-	c = party:readSlot()
-	if (not c) then
-		return
+----------------------------------------
+-- tombs
+----------------------------------------
+local tombs = {}
+function tombs:enter()
+	bigpic:drawImage("PIC_TEMPLEINT")
+
+	if (takeStairs(
+		"You stand within the Temple of Darkness. A passage leads " ..
+		"down to what probably are some very ancient tombs.\n\n"..
+		"You can:\n\nTake the passage"
+		)) then
+		currentLevel:enterDungeon("tombs", 1)
 	end
-
-	text:cdprint(true, false, "What will you ask him about?\n")
-	answer = text:readString()
-	if (not answer) then
-		return
-	end
-
-	answer = string.gsub(answer, "THE ", "")
 end
 
-local stone = {}
-local tombs = {}
+----------------------------------------
+-- tower
+----------------------------------------
 local tower = {}
+function tower:enter()
+	bigpic:drawImage("PIC_EMPTYBLDG")
+	
+	if (takeStairs(
+		"You stand in the entry to Dargoth's Tower. " ..
+		"A stairway leads upward into the darkness.\n\n" ..
+		"You can:\n\nTake the stairway"
+		)) then
+		currentLevel:enterDungeon("tower", 1)
+	end
+end
 
 ----------------------------------------
 -- tree
@@ -267,8 +435,8 @@ local tower = {}
 local tree = {}
 function tree:enter()
 	text:cdprint(true, false, "You hit a tree!")
-	currentLevel:turnParty("back")
-	return true
+
+	buildingRval.turnParty = false
 end
 
 ----------------------------------------
@@ -277,8 +445,8 @@ end
 local wall = {}
 function wall:enter()
 	text:cdprint(true, false, "You hit a city wall!")
-	currentLevel:turnParty("back")
-	return true
+
+	buildingRval.turnParty = false
 end
 
 ----------------------------------------
@@ -289,8 +457,6 @@ cityBuildings = {
 	domain		= domain,
 	empty		= empty,
 	emptyhut	= emptyhut,
-	entercity	= entercity,
-	enterwild	= enterwild,
 	fanskar		= fanskar,
 	fort		= fort,
 	gate		= gate,
@@ -308,5 +474,14 @@ cityBuildings = {
 }
 
 function cityBuildings:enter(inBuilding, ...)
-	return self[inBuilding]:enter(...)
+	buildingRval.turnParty	= true
+	buildingRval.moveSquare	= true
+
+	self[inBuilding]:enter(...)
+
+	if (buildingRval.turnParty) then
+		currentLevel:turnParty("back")
+	end
+
+	return buildingRval.moveSquare
 end

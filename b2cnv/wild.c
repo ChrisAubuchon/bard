@@ -34,6 +34,7 @@ static btstring_t	*toLabel(uint8_t dir, uint32_t x, uint32_t y,
 					btstring_t *data);
 static btstring_t	*getFace(uint8_t sq);
 static btstring_t	*getEvent(uint32_t x, uint32_t y, uint8_t sq);
+static btstring_t	*enterCity(uint32_t y);
 static void		addMonsters(cnvList_t *cl);
 static void		addItems(cnvList_t *cl);
 
@@ -42,6 +43,40 @@ static void		addItems(cnvList_t *cl);
 /* Internal functions		*/
 /*				*/
 /********************************/
+
+static btstring_t *enterCity(uint32_t y)
+{
+	uint32_t	cityIndex = 0;
+
+	switch (y) {
+	case 23:
+		cityIndex = 1;
+		break;
+	case 41:
+		cityIndex = 2;
+		break;
+	case 14:
+		cityIndex = 3;
+		break;
+	case 32:
+		cityIndex = 4;
+		break;
+	case 5:
+		cityIndex = 5;
+		break;
+	case 7:
+		cityIndex = 6;
+		break;
+	default:
+		printf("Unknown city y coordinate: %d\n", y);
+		exit(1);
+	}
+
+	return bts_sprintf("currentLevel:toCity(\"%s\", %d, %d)",
+		locationTitleList[cityIndex],
+		wildToCityX[cityIndex], wildToCityY[cityIndex]
+		);
+}
 
 static btstring_t *getEvent(uint32_t x, uint32_t y, uint8_t sq)
 {
@@ -54,7 +89,7 @@ static btstring_t *getEvent(uint32_t x, uint32_t y, uint8_t sq)
 	case 4:
 		return bts_strcpy("cityBuildings:enter(\"tree\")");
 	case 5:
-		return bts_strcpy("cityBuildings:enter(\"entercity\")");
+		return enterCity(y);
 	case 0xbc:
 		return bts_strcpy("cityBuildings:enter(\"sagehut\")");
 	case 0xd1:

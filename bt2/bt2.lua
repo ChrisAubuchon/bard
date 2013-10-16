@@ -92,12 +92,8 @@ repeat
 		party.light:deactivate()
 		party.compass:deactivate()
 		guild:enter()
-	elseif (globals.gameState == globals.STATE_CITY) then
+	elseif (globals.gameState == globals.STATE_INGAME) then
 		currentLevel:main()
-	elseif (globals.gameState == globals.STATE_DUNGEON) then
-		currentLevel:main()
-	elseif (globals.gameState == globals.STATE_PARTYDIED) then
-		globals.gameState = globals.STATE_GUILD
 	end
 until (globals.gameState == globals.STATE_EXIT)
 

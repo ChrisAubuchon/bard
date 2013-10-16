@@ -67,10 +67,8 @@ directions = {
 }
 
 globals.STATE_GUILD	= 1
-globals.STATE_CITY	= 2
-globals.STATE_DUNGEON	= 3
-globals.STATE_EXIT	= 4
-globals.STATE_PARTYDIED	= 5
+globals.STATE_INGAME	= 2
+globals.STATE_PARTYDIED	= 3
 globals.gameState	= globals.STATE_GUILD
 
 globals.timeOfDay = {

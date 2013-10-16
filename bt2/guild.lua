@@ -283,7 +283,7 @@ function guild:doEnter()
 				globals.isNight = false
 				globals.gameHour = 7
 
-				globals.gameState = globals.STATE_CITY
+				globals.gameState = globals.STATE_INGAME
 				currentLevel = city:new(globals.guildCity)
 				currentLevel:enter()
 

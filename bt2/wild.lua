@@ -62,7 +62,7 @@ square.new = function(inLabel, inSquare)
 	end
 
 	function self.clearEnter()
-		enterFunction = nil
+		self.enterFunction = nil
 	end
 
 	return self
@@ -103,7 +103,7 @@ end
 ----------------------------------------
 local function __buildView(maxdepth, sq, dir, depth)
 	if ((depth == 1) and (sq.face)) then
-		error("Not on previous square")
+		error("Not on previous square", 3)
 	end
 
 	if (depth >= maxdepth) then
@@ -243,6 +243,7 @@ function wild:turnParty(inRelDirection)
 	if (party.compass.active) then
 		party.compass:update(self.direction)
 	end
+	text:clear()
 end
 
 ----------------------------------------
@@ -252,14 +253,16 @@ function wild:moveForward()
 	local front_sq = self.currentSquare[self.direction]
 
 	if (not front_sq.onEnter()) then
+		if (self.exit) then
+			return
+		end
 		self.currentSquare = front_sq
+		self:buildView()
 	end
 
 	if (globals.partyDied) then
 		return
 	end
-
-	self:buildView()
 
 	text:clear()
 end
@@ -378,9 +381,8 @@ end
 function wild:enterDungeon(inName, inLevel)
 	currentLevel.exit = true
 	currentLevel.exitLocation = inName
-	globals.gameState = globals.STATE_DUNGEON
+	globals.gameState = globals.STATE_INGAME
 	globals.citySquare = currentLevel.currentSquare.label
-	dprint(currentLevel.currentSquare.label)
 	globals.cityDirection = currentLevel.direction
 	currentLevel = dun:new(inName, inLevel, 0, 0, "north")
 end

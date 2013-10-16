@@ -191,8 +191,8 @@ end
 --
 -- Give an item to the character
 ----------------------------------------
-function character:giveItem(inName, isIdentified)
-	return self.inventory:addItem(inName, isIdentified)
+function character:giveItem(inName, isIdentified, inCount)
+	return self.inventory:addItem(inName, isIdentified, inCount)
 end
 
 ----------------------------------------
