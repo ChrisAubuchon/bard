@@ -23,7 +23,8 @@ party = {
 	},
 	battle	= {
 		acBonus		= 0,
-		antiMagic	= 0
+		antiMagic	= 0,
+		songHpRegen	= false
 	}
 }
 

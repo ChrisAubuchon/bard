@@ -386,7 +386,7 @@ function battleData:endRound()
 	party:doPoison()
 	party:doEquippedEffects()
 
-	if (party.songHpRegen) then
+	if (party.battle.songHpRegen) then
 		local char
 
 		for char in party:iterator("skipDisabled") do
