@@ -5,7 +5,7 @@ uint8_t *song_combatStrings[] = {
 	"local inBattle = inAction.inBattle; inBattle.songToHitBonus = inBattle.songToHitBonus + inAction.inData.data",
 	"local inBattle = inAction.inBattle; inBattle.songToHitPenalty = inBattle.songToHitPenalty + inAction.inData.data",
 	"inAction.inBattle.songHpRegen = true",
-	"party.battle.acBonus = party.battle.acBonus + inAction.inData.data",
+	"party.acBonus = party.acBonus + inAction.inData.data",
 	"party.battle.antiMagic = party.battle.antiMagic + 2"
 };
 

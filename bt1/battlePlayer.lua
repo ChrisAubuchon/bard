@@ -223,6 +223,23 @@ function battlePlayer:doUseItem(inAction)
 end
 
 ----------------------------------------
+-- battlePlayer:getBattleTune()
+----------------------------------------
+function battlePlayer:getBattleTune(inAction)
+	local tune
+
+	tune = self:getTune()
+	if (not tune) then
+		return false
+	end
+
+	inAction.func = tune.combatFunction.func
+	inAction.inData = tune.combatData[currentLevel.level].inData
+
+	return true
+end
+
+----------------------------------------
 -- doBardSong()
 ----------------------------------------
 function battlePlayer:doBardSong(inAction)
@@ -242,6 +259,7 @@ function battlePlayer:doBardSong(inAction)
 	if (inAction.func) then
 		inAction.func(inAction)
 		party:display()
+		timer:delay()
 	end
 end
 

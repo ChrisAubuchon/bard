@@ -612,7 +612,7 @@ function battleData:getPlayerOption(c)
 					continue = false
 				elseif (inkey == "B") then
 					action.action = "sing"
-					if (action.source:getTune(action, true)) then
+					if (action.source:getBattleTune(action, true)) then
 						return action
 					end
 					continue = false
@@ -626,7 +626,7 @@ function battleData:getPlayerOption(c)
 					action.action = "defend"
 					return action
 				elseif (inkey == "H") then
-					self:hideInShadows()
+					action.source:hideInShadows()
 					action.action = "hide"
 					return action
 				elseif (inkey == "P") then
