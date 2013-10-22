@@ -3,6 +3,11 @@ linkedList = {
 	tail	= false
 }
 
+----------------------------------------
+-- linkedListNode class
+----------------------------------------
+
+
 linkedListNode = {
 	prev	= false,
 	next	= false
@@ -12,6 +17,9 @@ function linkedListNode:compare(inValue)
 	return false
 end
 
+----------------------------------------
+-- linkedListNode:isLast()
+----------------------------------------
 function linkedListNode:isLast()
 	if (self.next) then
 		return false
@@ -19,6 +27,12 @@ function linkedListNode:isLast()
 		return true
 	end
 end
+
+----------------------------------------
+-- linkedList class
+--
+--
+----------------------------------------
 
 ----------------------------------------
 -- getFirst()
@@ -274,7 +288,7 @@ function linkedList:reverseIterator()
 end
 
 ----------------------------------------
--- ipairs()
+-- linkedList:ipairs()
 --
 -- Return an index,value iterator
 ----------------------------------------
@@ -297,4 +311,33 @@ function linkedList:ipairs()
 		return
 	end
 	return f, nil, 0
+end
+
+
+----------------------------------------
+-- linkedList:random()
+--
+-- Return a random node 
+----------------------------------------
+function linkedList:randomMember()
+	local node
+	local rval		= false
+	local numerator		= 1
+	local denominator	= 2
+	local comparator
+
+	for node in self:iterator() do
+		if (not rval) then
+			rval = node
+		else
+			comparator = (numerator / denominator) * 100000
+			if ((random:rnd() % 100000) > comparator) then
+				rval = node
+			end
+			numerator = numerator + 1
+			denominator = denominator + 1
+		end
+	end
+
+	return rval
 end

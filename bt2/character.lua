@@ -225,8 +225,8 @@ function character:calcAC()
 	self.ac = self.ac - party.acBonus
 	self.ac = self.ac - self.acBonus
 
-	if (self.ac < -10) then
-		self.ac = -10
+	if (self.ac < -21) then
+		self.ac = -21
 	end
 end
 

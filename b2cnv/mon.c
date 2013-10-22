@@ -57,6 +57,7 @@ static monster_t *convertMonster(b2mon_t *inMonster)
 	m->singular	= prepName(inMonster->name, 0);
 	m->plural	= prepName(inMonster->name, 1);
 	m->picture	= getPicMacro(inMonster->picindex);
+	m->reward	= ((inMonster->numattacks + 1) * inMonster->basemelee) << 7;
 
 	m->hpRndNdice	= 1;
 	m->hpRndDie	= inMonster->hpRnd;
@@ -352,6 +353,9 @@ static void printMonster(b2mon_t * mon, uint32_t fmon, int index)
 
 	for (j = 0; j < 4; j++) {
 		uint8_t type = mon->attTypes[j];
+
+		if (type == 55)
+			type = 61;
 
 		if (type == 0) {
 			m->att[j] = spellEffect_new(S_DMGSPELL);

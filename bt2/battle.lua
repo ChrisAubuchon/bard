@@ -122,8 +122,15 @@ function battleData:new()
 	return self
 end
 
+----------------------------------------
+-- battleData:addAction()
+----------------------------------------
 function battleData:addAction(inSource, inAction)
+	dprint(inSource.key)
+	dprint(inSource.singular)
+	dprint(inAction)
 	self.battleDataBySource[inSource.key] = inAction
+	dprint(self.battleDataBySource[inSource.key])
 end
 
 function battleData:removeAction(inSource)
@@ -134,6 +141,9 @@ function battleData:resetPriority()
 	self.battleDatabySource	= {}
 end
 
+----------------------------------------
+-- battleData:addPriority()
+----------------------------------------
 function battleData:addPriority(inSource, inPriority)
 	local action = self.battleDataBySource[inSource.key]
 
@@ -173,6 +183,9 @@ function battleData:addPriority(inSource, inPriority)
 	current.prev = action
 end
 
+----------------------------------------
+-- battleData:removePriority()
+----------------------------------------
 function battleData:removePriority(inSource)
 	local action = self.battleDataBySource[inSource.key]
 
@@ -231,9 +244,11 @@ function battleData:start()
 			break
 		end
 
+if false then
 		if (self.monParty) then
 			self.monParty:adjustMeleeGroups()
 		end
+end
 		self:getMonsterActions()
 		self:getPriorities()
 
@@ -336,8 +351,19 @@ end
 function battleData:doRound()
 	local currentAction
 
-	currentAction = self.actionHead
 	text:setCursor(0, 11)
+	if (party.advance) then
+		text:print("\nThe party advances!!\n\n")
+		local m
+		for m in self.monParty:iterator() do
+			if (m.range > 10) then
+				m.range = m.range - 10
+			end
+		end
+		party.advance = false
+	end
+
+	currentAction = self.actionHead
 	while (currentAction) do
 		currentAction.source:doAction(currentAction)
 
@@ -430,17 +456,19 @@ function battleData:getPriorities()
 	local p
 	local c
 
-	if (not party.missTurn) then
+	if ((not party.missTurn) and (not party.advance)) then
 		for c in party:characterIterator("skipDisabled") do
 			p = c:getBattlePriority()
 			self:addPriority(c, p)
 		end
 	end
 
+if false then
 	if (party.summon) then
 		p = party.summon:getBattlePriority()
 		self:addPriority(party.summon, p)
 	end
+end
 
 	if (self.isPartyAttack) then
 		return
@@ -467,6 +495,10 @@ function battleData:getPlayerOptions()
 
 	if (self:getRunFightOption()) then
 		return false
+	end
+
+	if (party.advance) then
+		return true
 	end
 
 if false then
@@ -528,9 +560,8 @@ function battleData:getRunFightOption()
 		inkey = getkey()
 
 		if (inkey == "A") then
-			local xxx_setting_a_temporary_party_doAdvance = true
-			party.doAdvance = true
-			return true
+			party.advance = true
+			return false
 		elseif (inkey == "R") then
 			local saveAction = btAction:new()
 			saveAction.target = party:getFirstCharacter()
@@ -702,11 +733,15 @@ function battleData:meleeTarget(inAction)
 	return true
 end
 
+----------------------------------------
+-- battleData:getMonsterActions()
+----------------------------------------
 function battleData:getMonsterActions()
 	local action
 	local mgroup
 	local m
 
+	dprint("getMonsterActions()")
 	if (self.isPartyAttack) then
 		return
 	end
@@ -720,6 +755,9 @@ function battleData:getMonsterActions()
 	end
 end
 
+----------------------------------------
+-- battleData:doReward()
+----------------------------------------
 function battleData:doReward()
 	local mgroup
 	local nmonsters

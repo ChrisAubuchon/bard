@@ -153,6 +153,10 @@ function battleParty:inflictStatus(inAction)
 		if (self:isSummon()) then
 			return
 		end
+
+		if (self.isOld) then
+			return
+		end
 		self.save_st = self.st
 		self.save_iq = self.iq
 		self.save_dx = self.dx

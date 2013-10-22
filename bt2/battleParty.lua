@@ -4,7 +4,9 @@
 -- Class methods that are common between
 -- characters and summoned monsters
 ----------------------------------------
-battleParty	= {}
+battleParty	= {
+	advance		= false
+}
 
 ----------------------------------------
 -- doMeleeAttack()
@@ -86,6 +88,7 @@ end
 function battleParty:doDamage(inAction)
 	local inData	= inAction.inData
 	local outData	= inAction.outData
+	local rval
 
 	if (self.isDead) then
 		if (inData.specialAttack ~= "possess") then
@@ -123,11 +126,11 @@ function battleParty:doDamage(inAction)
 		return false
 	end
 
-	self:inflictStatus(inAction)
+	rval = self:inflictStatus(inAction)
 
 	party:isLive()
 
-	return true
+	return rval
 end
 
 ----------------------------------------
@@ -137,7 +140,9 @@ function battleParty:inflictStatus(inAction)
 	local inData	= inAction.outData
 
 	if (inData.specialAttack == "poison") then
-		self.isPoisoned = true
+		if (not self.isDestinyKnight) then
+			self.isPoisoned = true
+		end
 	elseif (inData.specialAttack == "drain") then
 		if (self:isSummon()) then
 			return
@@ -148,11 +153,19 @@ function battleParty:inflictStatus(inAction)
 		end
 		return true
 	elseif (inData.specialAttack == "nuts") then
-		self.isNuts = true
-	elseif (inData.specialAttack == "old") then
-		if (self:isSummon()) then
-			return
+		if (not self.isDestinyKnight) then
+			self.isNuts = true
 		end
+	elseif (inData.specialAttack == "old") then
+		if (self.isOld) then
+			return true
+		end
+
+		-- Don't print special attack if isDestinyKnight
+		if (self.isDestinyKnight) then
+			return false
+		end
+
 		self.save_st = self.st
 		self.save_iq = self.iq
 		self.save_dx = self.dx
@@ -165,14 +178,15 @@ function battleParty:inflictStatus(inAction)
 		self.lk = 1
 		self.isOld = true
 	elseif (inData.specialAttack == "possess") then
-		self.cur_hp = 100
-
-		-- self.possessed indicates whether or not a monster
-		-- has possessed the player
-		--
-		if (inAction.source:isMonster()) then
-			self.possessed = true
+		if (not inAction.source:isMonster()) then
+			if (self:hasItem("Kato's Bracer")) then
+				self.isDocile = true
+			end
 		end
+		if (self.isDestinyKnight) then
+			return true
+		end
+		self.cur_hp = 100
 		self.isPossessed	= true
 		self.isDead		= false
 		self.isPoisoned		= false
@@ -181,15 +195,36 @@ function battleParty:inflictStatus(inAction)
 		self.isNuts		= false
 		self.isParalyzed	= false
 	elseif (inData.specialAttack == "stone") then
+		if (self.isDestinyKnight) then
+			return true
+		end
 		self.cur_hp		= 0
 		self.isStoned		= true
 		self:songTimeout()
-	elseif (inData.specialAttack == "critical") then
-		self.cur_hp		= 0
-		self.possessed		= false
-		self.isDead		= true
+	elseif ((inData.specialAttack == "critical") or 
+		(inData.specialAttack == "kill")) then
+		if (self.isDestinyKnight) then
+			self.cur_hp = self.max_hp
+		else
+			self.cur_hp		= 0
+			self.possessed		= false
+			self.isDead		= true
+		end
 		self:songTimeout()
+	elseif (inData.specialAttack == "unequip") then
+		local i
+
+		for i in self.inventory:iterator() do
+			i:unequip()
+		end
+
+		self:songTimeout()
+		party:display()
+
+		return false
 	end
+
+	return true
 end
 
 ----------------------------------------

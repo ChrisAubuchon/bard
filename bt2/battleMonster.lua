@@ -24,6 +24,10 @@ function battleMonster:doAction(inAction)
 				inAction.inData = attack.action.inData
 				self:meleeAttack(inAction)
 				return
+			else
+				self:advanceGroup(inAction)
+				timer:delay()
+				return
 			end
 		elseif (attack.type == "spell") then
 			if (inAction.target:isDisabled()) then
@@ -58,6 +62,9 @@ function battleMonster:doAction(inAction)
 	end
 end
 
+----------------------------------------
+-- battleMonster:meleeAttack()
+----------------------------------------
 function battleMonster:meleeAttack(inAction)
 	local inData	= inAction.inData
 	local outData	= inAction.outData
@@ -75,13 +82,10 @@ function battleMonster:meleeAttack(inAction)
 
 	if (self:checkMeleeHits(inAction)) then
 		self:getMeleeDamage(inAction)
-		text:print(", and hits for %d ", outData.damage)
-		if (outData.damage == 1) then
-			text:print("point ")
-		else
-			text:print("points ")
-		end
-		text:print("of damage")
+		text:print(", and hits for %d point%s of damage", 
+			outData.damage,
+			string.pluralize(outData.damage, "", "s")
+			)
 
 		if (inAction.target:doDamage(inAction)) then
 			text:print(stringTables.effects[outData.specialAttack])
@@ -102,6 +106,9 @@ function battleMonster:meleeAttack(inAction)
 	return
 end
 
+----------------------------------------
+-- battleMonster:checkMeleeHits()
+----------------------------------------
 function battleMonster:checkMeleeHits(inAction)
 	local target	= inAction.target
 	local sourceAttack
@@ -119,7 +126,7 @@ function battleMonster:checkMeleeHits(inAction)
 	--targetAC = targetAC + self.parentGroup.toHitPenalty
 
 	if (targetAC >  10) then targetAC =  10 end
-	if (targetAC < -10) then targetAC = -10 end
+	if (targetAC < -20) then targetAC = -20 end
 
 	sourceAttack = random:betweenInclusive(self.toHitLo, self.toHitHi)
 	sourceAttack = sourceAttack + 2 + self.parentGroup.toHitBonus
@@ -132,6 +139,9 @@ function battleMonster:checkMeleeHits(inAction)
 	return true
 end
 
+----------------------------------------
+-- battleMonster:getMeleeDamage()
+----------------------------------------
 function battleMonster:getMeleeDamage(inAction)
 	local inData	= inAction.inData
 	local outData	= inAction.outData
@@ -139,24 +149,23 @@ function battleMonster:getMeleeDamage(inAction)
 	outData.damage = random:xdy(inData.ndice, inData.dieval)
 	outData.damage = outData.damage + self.parentGroup.damageBonus
 
-	outData.specialAttack = inData.specialAttack
+	if (random:band(1) == 0) then
+		outData.specialAttack = inData.specialAttack
+	end
 end
 	
 
+----------------------------------------
+-- battleMonster:doDamage()
+----------------------------------------
 function battleMonster:doDamage(inAction)
 	local outData		= inAction.outData
 	local target		= false
 	local m
 
-	for m in self:iterator() do
-		if (not m.beenAttacked) then
-			target = m
-			break
-		end
-	end
-
+	target = self:randomMember()
 	if (not target) then
-		target = self.head
+		error("randomMember() failed to select a member")
 	end
 
 	if ((outData.specialAttack ~= "stone") and
@@ -285,6 +294,9 @@ function battleMonster:attackSpell(inAction)
 	end
 end
 
+----------------------------------------
+-- battleMonster:doDoppleganger()
+----------------------------------------
 function battleMonster:doDoppleganger(inAction)
 	local randomCharacter
 	local doppleganger
