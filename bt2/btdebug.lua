@@ -207,7 +207,11 @@ function btdebug.cityDebug()
 	repeat
 		text:cdprint(true, false, 
 			"1. Change City\n" ..
-			"2. Enter Wild\n"
+			"2. Enter Wild\n" ..
+			"3. Enter Dungeon\n" ..
+			"4. Random battle\n" ..
+			"5. Toggle night\n"  ..
+			"6. Battle\n"
 			)
 		
 		text:printExit()
@@ -220,6 +224,17 @@ function btdebug.cityDebug()
 		elseif (inkey == "2") then
 			btdebug.toCity(wildList)
 			return
+		elseif (inkey == "4") then
+			battle:random()
+		elseif (inkey == "5") then
+			if (globals.isNight) then
+				globals.isNight = false
+			else
+				globals.isNight = true
+			end
+			currentLevel:buildView()
+		elseif (inkey == "6") then
+			btdebug.doBattle()
 		end
 if false then
 		text:cdprint(true, false, "1. Toggle night\n")

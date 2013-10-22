@@ -42,7 +42,7 @@ function level:doStairs(inDirection)
 end
 
 ----------------------------------------
--- toCity()
+-- level:toCity()
 ----------------------------------------
 function level:toCity(inCity, inX, inY, inDirection)
 	if (not inDirection) then
@@ -60,6 +60,9 @@ function level:toCity(inCity, inX, inY, inDirection)
 	currentLevel:enter(inX, inY, inDirection)
 end
 
+----------------------------------------
+-- level:toDungeon()
+----------------------------------------
 function level:toDungeon(inName, inLevel)
 	self.exit = true
 
@@ -69,4 +72,36 @@ function level:toDungeon(inName, inLevel)
 	end
 
 	currentLevel = dun:new(inName, inLevel, 0, 0, "north")
+end
+
+----------------------------------------
+-- level:getBattleOpponents()
+----------------------------------------
+function level:getBattleOpponents()
+	local numGroups = 1
+	local monGroups	= {}
+	local picked	= {}
+	local monType
+	local i
+	local monP
+
+	if (self:isCity()) then
+		monP = self.day.monsters
+		if (globals.isNight) then
+			numGroups = rnd_and_x(1) + 1
+		end
+	else
+		monP = self.monsters
+		numGroups = rnd_xdy(1,4)
+	end
+
+	for i = 1,numGroups do
+		repeat
+			monType = rnd_xdy(1,16)
+		until (not picked[monType])
+		picked[monType] = true
+		monGroups[i] = monP[monType]
+	end
+
+	return monGroups
 end

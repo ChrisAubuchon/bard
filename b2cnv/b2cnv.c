@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
 	break;
       case 's':
 	convertSpells();
+	convertSongs();
 	break;
 #if 0
       case 't':

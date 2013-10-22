@@ -412,26 +412,8 @@ function city:getBattleReward()
 	end
 end
 
-----------------------------------------
--- getBattleOpponents()
-----------------------------------------
-function city:getBattleOpponents()
-	local timeTable
-	local monGroup = {}
-
-	if (globals.isNight) then
-		timeTable = self.night
-	else
-		timeTable = self.day
-	end
-
-	monGroup[1] = timeTable.monsters[rnd_xdy(1,#timeTable.monsters)]
-
-	return monGroup
-end
-
 function city:printCredits()
-	text:splashMessage("Bard's Tale I: Reimplemented by me")
+	text:csplash(true, true, "Bard's Tale I: Reimplemented by me")
 end
 	
 

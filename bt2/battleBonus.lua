@@ -8,7 +8,8 @@ battleBonus = {
 	damageBonus	= 0,
 	damagePenalty	= 0,
 	missTurn	= false,
-	disbelieve	= false
+	disbelieve	= false,
+	extraAttacks	= false
 }
 
 function battleBonus:resetBattleBonus()
@@ -20,6 +21,8 @@ function battleBonus:resetBattleBonus()
 	self.damageBonus	= 0
 	self.damagePenalty	= 0
 	self.missTurn		= false
+	self.disbelieve		= false
+	self.extraAttacks	= false
 end
 
 function battleBonus:addBattleBonus(inStat, inAmount, inStack)

@@ -829,6 +829,11 @@ function character:getUseItem(inAction)
 		return false
 	end
 
+	if ((item.type == "Quiver") and (not self:isTypeEquipped("Bow"))) then
+		cantUse()
+		return false
+	end
+
 	inAction.inData = item.action.inData
 	inAction.inData.item = item
 	inAction.func = item.action.func
@@ -1055,13 +1060,7 @@ function character:getActionTarget(inTargetOptions)
 			count = count + 1
 		end
 
-		text:print("\nMember #[1-%d", party.size)
-		if (inTargetOptions.summon and party.summon) then
-			optionKeys["S"] = party.summon
-			text:print("S]")
-		else
-			text:print("]")
-		end
+		text:print("\nMember #[1-%d]", party.size)
 	end
 
 	if (currentBattle and (not currentBattle.isPartyAttack)) then
@@ -1076,18 +1075,15 @@ function character:getActionTarget(inTargetOptions)
 
 			text:print("\n")
 			for i,monGroup in currentBattle.monParty:ipairs() do
-				if ((i > 2) and (inTargetOptions.melee)) then
-					break
-				end
-
 				local key = string.toLetterOption(i - 1, "A")
 				optionKeys[key]=monGroup
-				text:print("[%s] %d %s\n",
+				text:print("[%s] %d %s (%d')\n",
 					string.toLetterOption(i - 1, "a"),
 					monGroup.size,
 					string.pluralize(monGroup.size,
 						monGroup.singular,
-						monGroup.plural)
+						monGroup.plural),
+					monGroup.range
 					)
 			end
 		end
@@ -1101,22 +1097,6 @@ function character:getActionTarget(inTargetOptions)
 	return optionKeys[inkey]
 end
 
-----------------------------------------
--- hideInShadows()
-----------------------------------------
-function character:hideInShadows()
-	if (self:isEffectEquipped("hasAlwaysHide")) then
-		self.isHiding = true
-		return
-	end
-
-	-- The DOS version has a bug where the check for a successful
-	-- hide uses the wrong field of the character structure for
-	-- comparison. It uses the word at offset 0x48 while the Review
-	-- Board uses offset 0x44 for the Rogue ability.
-	--
-	self.isHiding = true
-end
 
 
 

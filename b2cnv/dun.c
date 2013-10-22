@@ -339,7 +339,7 @@ static void setVertex(b2level_t *level, int32_t x, int32_t y, uint32_t index)
 	}
 
 	if (level->src->hiFlags[index] & HI_DRAINSPPT) {
-		vertex->isSpptRegen = level->src->songLevel;
+		vertex->isSpptDrain = level->src->songLevel;
 	}
 
 	if (level->src->hiFlags[index] & HI_HOSTILEMON) {
@@ -468,7 +468,8 @@ static void addSpecialSquares(b2level_t *level)
 
 static void addMonsters(b2level_t *level)
 {
-	getMonsterNameList(level->dst->monsters, level->monsters, level->levno);
+	getMonsterNameList(level->dst->monsters, level->monsters, 
+		b2dungeons[level->dunno].levels[level->levno]);
 }
 
 static void addItems(b2level_t *level)

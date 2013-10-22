@@ -18,11 +18,13 @@ party = {
 		timer		= 0,
 		acBonus		= 0,
 		lightSong	= false,
-		singer		= false,
+		trapProtect	= false,
+		singer		= false
 	},
 	battle	= {
 		acBonus		= 0,
-		antiMagic	= 0
+		antiMagic	= 0,
+		songHpRegen	= 0
 	}
 }
 
@@ -923,7 +925,20 @@ function party:giveItem(inItem, inIsIdentified, inCount)
 	return false
 end	
 
+----------------------------------------
+-- meleeMarch()
+----------------------------------------
+function party:meleeMarch()
+	local c
 
+	for c in self:characterIterator() do
+		local xxx_check_melee_march_effect = true
+		if ((c.max_hp - 3) <= c.cur_hp) then
+			c.cur_hp = c.cur_hp + 3
+		end
+	end
+	end
+end
 
 
 

@@ -35,6 +35,9 @@ b2cnv_SOURCES = 	\
 	mon_data.c	\
 	picIndex.c	\
 	race.c		\
+	song.c		\
+	song.h		\
+	song_data.c	\
 	spell.c		\
 	spell.h		\
 	spell_data.c	\

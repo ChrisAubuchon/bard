@@ -330,6 +330,13 @@ function dun:doDetect()
 		if (sq.isStairs) then	found.stairs  = true end
 		if (sq.isTrap) then	found.traps   = true end
 		if (sq.isSpecial) then	found.special = true end
+		if (sq.isSpinner) then	found.spinner = true end
+		if (sq.isAntiMagic) then
+			found.antimagic = true
+		end
+		if (sq.isLifeDrain) or (sq.isSpptDrain) then
+			found.something = true
+		end
 		sq = sq[self.direction].path
 	end
 
@@ -341,8 +348,19 @@ function dun:doDetect()
 		if ((found.traps) and (party.detect.traps)) then
 			text:print("\nThere is a trap near.\n")
 		end
-		if ((found.special) and (party.detect.special)) then
-			text:print("\nThere is something special near.\n")
+		if (party.detect.special) then
+			if (found.special) then
+				text:print("\nThere is something special near.\n")
+			end
+			if (found.spinner) then
+				text:print("\nA spinner is near.\n")
+			end
+			if (found.antimagic) then
+				text:print("\nYou spells waver.\n")
+			end
+			if (found.something) then
+				text:print("\nSomething ahead.\n")
+			end
 		end
 		text:print("\n")
 	end
@@ -350,7 +368,6 @@ end
 
 function dun:buildView()
 	bigpic:dunBackground(self.tileSet)
-	--bigpic:dunDisplay()
 	if (party.light.active) then
 		__buildView(self.currentSquare, self.direction, 
 			self.tileSet, party.light.distance, 1)
@@ -676,22 +693,6 @@ function dun:doLifeDrain()
 	end
 
 	party:display()
-end
-
-----------------------------------------
--- getBattleOpponents()
-----------------------------------------
-function dun:getBattleOpponents()
-	local numGroups
-	local monGroups = {}
-	local i
-
-	numGroups = rnd_xdy(1,4)
-	for i = 1,numGroups do
-		monGroups[i]  = self.monsters[rnd_xdy(1,#self.monsters)]
-	end
-
-	return monGroups
 end
 
 ----------------------------------------

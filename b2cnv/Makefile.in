@@ -68,9 +68,9 @@ am_b2cnv_OBJECTS = b2cnv.$(OBJEXT) bitmap.$(OBJEXT) city.$(OBJEXT) \
 	gfx_bigpic.$(OBJEXT) gfx_city.$(OBJEXT) gfx_dun.$(OBJEXT) \
 	gfx_wild.$(OBJEXT) item.$(OBJEXT) item_data.$(OBJEXT) \
 	level_data.$(OBJEXT) mon.$(OBJEXT) mon_data.$(OBJEXT) \
-	picIndex.$(OBJEXT) race.$(OBJEXT) spell.$(OBJEXT) \
-	spell_data.$(OBJEXT) trap_data.$(OBJEXT) summon_data.$(OBJEXT) \
-	wild.$(OBJEXT)
+	picIndex.$(OBJEXT) race.$(OBJEXT) song.$(OBJEXT) \
+	song_data.$(OBJEXT) spell.$(OBJEXT) spell_data.$(OBJEXT) \
+	trap_data.$(OBJEXT) summon_data.$(OBJEXT) wild.$(OBJEXT)
 b2cnv_OBJECTS = $(am_b2cnv_OBJECTS)
 b2cnv_DEPENDENCIES = $(top_builddir)/lib/libcnv/libcnv.a \
 	$(top_builddir)/lib/libbard/libbard.a \
@@ -551,6 +551,9 @@ b2cnv_SOURCES = \
 	mon_data.c	\
 	picIndex.c	\
 	race.c		\
+	song.c		\
+	song.h		\
+	song_data.c	\
 	spell.c		\
 	spell.h		\
 	spell_data.c	\
@@ -666,6 +669,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mon_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/picIndex.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/race.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/song.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/song_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spell.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spell_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/summon_data.Po@am__quote@
