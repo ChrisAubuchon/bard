@@ -6,7 +6,7 @@
 #include <dehuf.h>
 #include <fpio.h>
 
-/*#define DEBUG */
+#define DEBUG 
 #include <debug.h>
 
 /****************************************/
@@ -88,6 +88,9 @@ static void getAnimLoops(bta_t *bta, btstring_t *anim, uint8_t nloops)
 
 		ncells = anim_countCells(anim, cur->anims[i].cur_offset, 
 					cur->anims[i].cycleCount);
+		debug("ncells: %d\n", ncells);
+		if (!ncells) 
+			continue;
 		l = bta_loop_new(bta, i, ncells);
 
 		offset = cur->anims[i].cur_offset;
@@ -100,6 +103,7 @@ static void getAnimLoops(bta_t *bta, btstring_t *anim, uint8_t nloops)
 			}
 
 			off = cur->anims[i].base_offset + str_read16le(&anim->buf[offset + 2]);
+			debug("off = %04x\n", off);
 			ab = getAnimBox(anim, off);
 
 			c = bta_cell_new(ab->x, ab->y, 
@@ -194,8 +198,8 @@ static void anim_parse(btstring_t * data)
 	new = anim_newNode();
 
 	for (counter = 0; counter < 5; counter++) {
-		debug("off = %x\n", off);
-		if (str_read16le(&data->buf[off])) {
+		debug("off = %04x\n", off);
+		if ((int)str_read16le(&data->buf[off])) {
 			new->anims[counter].base_offset = off + 2;
 			new->anims[counter].base_segment = 1;
 			off += (str_read16le(&data->buf[off]) & 0xfffe) + 2;
@@ -240,18 +244,37 @@ static uint8_t anim_countLoops(void)
  * anim_countCells()
  * Counter the number of cells in a loop
  */
-static uint8_t anim_countCells(btstring_t * anim, uint16_t base_offset, uint16_t base_cycleCount)
+static uint8_t anim_countCells(btstring_t *anim, uint16_t base_offset, uint16_t base_cycleCount)
 {
-	uint16_t offset = base_offset;
-	int16_t cycleCount = base_cycleCount;
-	uint8_t ncells = 0;
+	uint16_t	cellOffset	= base_offset + 2;
+	uint16_t	toffset;
+	uint16_t	offset		= base_offset;
+	int16_t		cycleCount	= base_cycleCount;
+	uint8_t		ncells		= 0;
+	uint16_t	cell;
 
-	while (cycleCount >= 0) {
+	debug("offset = %04x\n", offset);
+	toffset = str_read16le(&anim->buf[cellOffset]) + 2;
+	cell = str_read16le(&anim->buf[toffset]);
+	debug("cellOffset: 0x%04x, toffset: 0x%04x, cell: 0x%04x, cycleCount = %4d\n", cellOffset, toffset, cell, cycleCount);
+	while ((cycleCount >= 0) && (cell != 0xffff)) {
 		offset += 4;
+		cellOffset += 4;
+		toffset = str_read16le(&anim->buf[cellOffset]) + 2;
+		cell = str_read16le(&anim->buf[toffset]);
 		cycleCount = str_read16be(&anim->buf[offset]);
+	debug("cellOffset: 0x%04x, toffset: 0x%04x, cell: 0x%04x, cycleCount = %4d\n", cellOffset, toffset, cell, cycleCount);
 
 		ncells++;
 	}
+
+#if 0
+	while (cycleCount >= 0) {
+		offset += 4;
+		cycleCount = str_read16be(&anim->buf[offset]);
+		ncells++;
+	}
+#endif
 
 	return ncells;
 }
@@ -354,7 +377,8 @@ void outputBigpic(void)
 
 	bpl = bigpic_list_new(npics);
 
-	for (i = 0; i < npics; i++) {
+/*	for (i = 0; i < npics; i++) {*/
+	i = 10; {
 		debug("Bigpic: %d\n", i);
 		fp_moveToIndex32(fp, i, 0);
 
