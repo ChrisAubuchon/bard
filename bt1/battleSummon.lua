@@ -78,7 +78,7 @@ end
 function battleSummon:getMeleeAttackString(inAction)
 	return string.format("%s%s%s",
 			self.singular,
-			inAction.inData.meleeString[rnd_xdy(1,2)],
+			inAction.inData.meleeString[random:xdy(1,2)],
 			inAction.target:getTargetString()
 			)
 end
@@ -93,10 +93,10 @@ function battleSummon:getMeleeDamage(inAction)
 	-- Summoned monsters use d8 instead of d4 for their
 	-- attack
 	--
-	outData.damage = rnd_xdy(inData.ndice, 8)
+	outData.damage = random:xdy(inData.ndice, 8)
 
 	outData.damage = outData.damage + self.damageBonus
-	outData.damage = outData.damage + rnd_xdy(self.damageRandom, 8)
+	outData.damage = outData.damage + random:xdy(self.damageRandom, 8)
 	outData.damage = outData.damage - self.damagePenalty
 	outData.specialAttack = inData.specialAttack
 end
@@ -106,7 +106,7 @@ end
 -- calculateSavingThrow()
 ----------------------------------------
 function battleSummon:calculateSavingThrow()
-	return rnd_between_xy_inc(self.spellSaveLo, self.spellSaveHi)
+	return random:betweenInclusive(self.spellSaveLo, self.spellSaveHi)
 end
 
 ----------------------------------------
@@ -136,7 +136,7 @@ function battleSummon:attackSpell(inAction)
 			outData.specialAttack = inData.specialAttack
 			outData.damage = 0
 		else
-			outData.damage = rnd_xdy(inData.ndice, inData.dieval)
+			outData.damage = random:xdy(inData.ndice, inData.dieval)
 		end
 		inAction:singleTargetSpell()
 	end

@@ -69,7 +69,7 @@ function battleMonster:meleeAttack(inAction)
 
 	text:print("A %s%s%s", 
 			self.singular,
-			inData.meleeString[rnd_xdy(1,2)],
+			inData.meleeString[random:xdy(1,2)],
 			inAction.target:getSingularName()
 		)
 
@@ -121,7 +121,7 @@ function battleMonster:checkMeleeHits(inAction)
 	if (targetAC >  10) then targetAC =  10 end
 	if (targetAC < -10) then targetAC = -10 end
 
-	sourceAttack = rnd_between_xy_inc(self.toHitLo, self.toHitHi)
+	sourceAttack = random:betweenInclusive(self.toHitLo, self.toHitHi)
 	sourceAttack = sourceAttack + 2 + self.parentGroup.toHitBonus
 	sourceAttack = 10 - sourceAttack
 
@@ -136,7 +136,7 @@ function battleMonster:getMeleeDamage(inAction)
 	local inData	= inAction.inData
 	local outData	= inAction.outData
 
-	outData.damage = rnd_xdy(inData.ndice, inData.dieval)
+	outData.damage = random:xdy(inData.ndice, inData.dieval)
 	outData.damage = outData.damage + self.parentGroup.damageBonus
 
 	outData.specialAttack = inData.specialAttack
@@ -182,7 +182,7 @@ function battleMonster:doDamage(inAction)
 end
 
 function battleMonster:calculateSavingThrow()
-	return rnd_between_xy_inc(self.spellSaveLo, self.spellSaveHi)
+	return random:betweenInclusive(self.spellSaveLo, self.spellSaveHi)
 end
 
 ----------------------------------------
@@ -279,7 +279,7 @@ function battleMonster:attackSpell(inAction)
 			outData.specialAttack = inData.specialAttack
 			outData.damage = 0
 		else
-			outData.damage = rnd_xdy(inData.ndice, inData.dieval)
+			outData.damage = random:xdy(inData.ndice, inData.dieval)
 		end
 		inAction:singleTargetSpell()
 	end
@@ -297,7 +297,7 @@ function battleMonster:doDoppleganger(inAction)
 	dprint("cloneCharacter = %s", randomCharacter.name)
 	doppleganger = randomCharacter:clone()
 	party:addCharacter(doppleganger)
-	if (rnd_and_x(1) == 1) then
+	if (random:band(1) == 1) then
 		dprint("randomCharacter is the doppleganger")
 		randomCharacter.isDoppleganger = true
 		randomCharacter.possessed = true

@@ -33,7 +33,6 @@ setmetatable(_G, {
 	end,
 	})
 
-
 require "declares"
 require "btlib_declares"
 require "diskio"

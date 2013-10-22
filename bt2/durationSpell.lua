@@ -13,7 +13,7 @@ end
 
 function durationSpell:__activate(inDuration)
 	if (inDuration > 0) then
-		self.duration = inDuration + rnd_xdy(1,16)
+		self.duration = inDuration + random:xdy(1,16)
 	else
 		self.duration = inDuration
 	end
@@ -170,7 +170,7 @@ end
 function compassEffect:activate(inDuration)
 	self.active	= true
 	if (inDuration > 0) then
-		self.duration = inDuration + rnd_xdy(1,16)
+		self.duration = inDuration + random:xdy(1,16)
 	else
 		self.duration = inDuration
 	end

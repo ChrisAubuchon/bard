@@ -233,7 +233,7 @@ function btAction:multiTargetSpell()
 		local half
 
 		repeat
-			outData.damage = rnd_xdy(inData.ndice, inData.dieval)
+			outData.damage = random:xdy(inData.ndice, inData.dieval)
 		until (outData.damage ~= lastDamage)
 		lastDamage = outData.damage
 

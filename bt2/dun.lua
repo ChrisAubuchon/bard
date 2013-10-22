@@ -382,7 +382,7 @@ end
 function dun:doSpinnerCheck()
 	if (self.currentSquare.isSpinner) then
 		text:cdprint(true, false, "isSpinner")
-		local r = rnd_xdy(1,4)
+		local r = random:xdy(1,4)
 
 		if (r == 1) then
 			self.direction = "north"
@@ -451,7 +451,7 @@ end
 
 local trapSave = {}
 function trapSave:calculateSavingThrow()
-	return rnd_between_xy_inc(self.saveLo, self.saveHi)
+	return random:betweenInclusive(self.saveLo, self.saveHi)
 end
 
 ----------------------------------------
@@ -461,7 +461,7 @@ function dun:doFloorTrap()
 	local trap
 	local action
 
-	trap = self.floorTraps[rnd_xdy(1,#self.floorTraps)]
+	trap = self.floorTraps[random:xdy(1,#self.floorTraps)]
 	btTable.addParent(trap, trapSave)
 	btTable.setClassMetatable(trap)
 
@@ -472,7 +472,7 @@ function dun:doFloorTrap()
 		local half
 
 		inAction.source = inTrap
-		inAction.outData.damage = rnd_xdy(inTrap.ndice, inTrap.dieval)
+		inAction.outData.damage = random:xdy(inTrap.ndice, inTrap.dieval)
 		inAction.inData.specialAttack = inTrap.specialAttack
 
 		save, half = inAction:savingThrow()
@@ -593,7 +593,7 @@ function dun:runSquareCode()
 		self:buildView()
 	end
 	if (curSq.isTrap) then
-		if (not (party.levitate.active and (rnd_and_x(3) ~= 0))) then
+		if (not (party.levitate.active and (random:band(3) ~= 0))) then
 			text:cdprint(true, false, "TRAP! You've hit a ")
 		
 			self:doFloorTrap()
@@ -703,7 +703,7 @@ function dun:wanderingMonster()
 	local mtype
 	local inkey
 
-	mtype = self.monsters[rnd_xdy(1,#self.monsters)]
+	mtype = self.monsters[random:xdy(1,#self.monsters)]
 	m = monster:new(mtype)
 
 	bigpic:setBigpic(m.picture, m.singular)
@@ -739,14 +739,14 @@ end
 -- getBattleReward()
 ----------------------------------------
 function dun:getBattleReward()
-	return self.items[rnd_xdy(1,#self.items)]
+	return self.items[random:xdy(1,#self.items)]
 end
 
 ----------------------------------------
 -- doTreasureChest()
 ----------------------------------------
 function dun:doTreasureChest()
-	return chest:new(self.chestTraps[rnd_xdy(1,4)])
+	return chest:new(self.chestTraps[random:xdy(1,4)])
 end
 
 local function __init()

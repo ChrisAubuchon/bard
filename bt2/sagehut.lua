@@ -323,7 +323,7 @@ function sagehut:talkToSage()
 	if (amount >= sageTopics[answer].cost) then
 		text:csplash(true, true, sageTopics[answer].text)
 	else
-		text:csplash(true, true, sageNoAnswer[rnd_xdy(1,4)])
+		text:csplash(true, true, sageNoAnswer[random:xdy(1,4)])
 	end
 end
 

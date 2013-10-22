@@ -9,7 +9,6 @@ local function initSongs()
 	local w
 	local l
 
-if false then
 	for _,s in pairs(songs) do
 		if (s.activate) then
 			compileAction(s.activate)
@@ -17,6 +16,5 @@ if false then
 		end
 		compileAction(s.combatFunction)
 	end
-end
 end
 initSongs()

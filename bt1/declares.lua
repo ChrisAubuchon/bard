@@ -124,13 +124,7 @@ declare_global("party")
 declare_global("race")
 
 -- random.lua
-declare_global("rnd_xdy")
-declare_global("rnd_between_xy_inc")
-declare_global("rnd_between_xy")
-declare_global("rnd_xdy_z")
-declare_global("rnd_and_x")
-declare_global("rnd")
-declare_global("rnd_hash")
+declare_global("random")
 
 -- review.lua
 declare_global("review")

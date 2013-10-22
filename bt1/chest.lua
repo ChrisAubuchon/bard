@@ -111,7 +111,7 @@ function chest:disarm()
 			return true
 		end
 
-		if (char.lk >= rnd_xdy(1,256)) then
+		if (char.lk >= random:xdy(1,256)) then
 			dprint("Lucky trap disarm")
 			return true
 		end
@@ -124,7 +124,7 @@ function chest:disarm()
 		return true
 	end
 
-	if (rnd_and_x(3) ~= 0) then
+	if (random:band(3) ~= 0) then
 		text:cdprint(true, true, "\n\nDisarm failed!")
 		return false
 	end
@@ -150,7 +150,7 @@ function chest:examine()
 		return
 	end
 
-	if ((not self.isTrapped) and (rnd_and_x(3) ~= 0)) then
+	if ((not self.isTrapped) and (random:band(3) ~= 0)) then
 		text:cdprint(true, false, "\n\nYou found nothing.")
 		timer:delay(6)
 		return
@@ -197,7 +197,7 @@ function chest:setOffTrap(inTarget)
 
 	text:cdprint(true, true, "You set off a %s", self.name)
 
-	damage = rnd_xdy(self.ndice, self.dieval)
+	damage = random:xdy(self.ndice, self.dieval)
 
 	action = btAction:new()
 	action.source = self
@@ -222,7 +222,7 @@ end
 -- calculateSavingThrow()
 ----------------------------------------
 function chest:calculateSavingThrow()
-	return rnd_between_xy_inc(self.saveLo, self.saveHi)
+	return random:betweenInclusive(self.saveLo, self.saveHi)
 end
 
 ----------------------------------------

@@ -313,7 +313,7 @@ function battleData:printEncounter()
 	if (self.isPartyAttack) then
 		text:print("\nThere is dissention in your ranks...\n\n")
 	else
-		text:print(encounterStringList[rnd_xdy(1,#encounterStringList)])
+		text:print(encounterStringList[random:xdy(1,#encounterStringList)])
 		self:printMonsterGroups()
 	end
 end
@@ -539,11 +539,11 @@ function battleData:getRunFightOption()
 				return true
 			end
 
-			if (rnd_and_x(7) == 0) then
+			if (random:band(7) == 0) then
 				return true
 			end
 			if (currentLevel:isCity() and not globals.isNight) then
-				if (rnd_and_x(3) == 0) then
+				if (random:band(3) == 0) then
 					return true
 				end
 			end
@@ -741,16 +741,16 @@ function battleData:doReward()
 	for mgroup,nmonsters in pairs(self.killCount) do
 		for i = 1,nmonsters do
 			xp = xp + monster.getXPReward(mgroup)
-			if (rnd_and_x(7) == 0) then
+			if (random:band(7) == 0) then
 				itemsToGive = itemsToGive + 1
 			end
 
 			if (giveGold) then
 				if ((globals.gameState == globals.STATE_CITY)
 				    and (not globals.isNight)) then
-					au = au + rnd_between_xy_inc(1,128)
+					au = au + random:betweenInclusive(1,128)
 				else
-					au = au + rnd_between_xy_inc(1,256)
+					au = au + random:betweenInclusive(1,256)
 				end
 			end
 		end
@@ -772,7 +772,7 @@ function battleData:doReward()
 	end
 
 	local function giveItem(inTarget, inItem)
-		local isIdentified = (rnd_and_x(7) ~= 7)
+		local isIdentified = (random:band(7) ~= 7)
 		local item = items:new(inItem)
 
 		if (not inTarget:isSummon()) then

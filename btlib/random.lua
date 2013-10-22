@@ -1,13 +1,17 @@
-local mt = nil
+random = {
+	mt = mt_random.new()
+}
 
---------------------------------
+----------------------------------------
+-- random:xdy()
+--
 -- x <= r <= (x*y)
---------------------------------
-function rnd_xdy(x, y)
+----------------------------------------
+function random:xdy(x, y)
 	local value = 0
 
 	for i = 1,x do
-		value = value + ((mt() % y) + 1)
+		value = value + ((self.mt() % y) + 1)
 	end
 
 	return value
@@ -15,9 +19,11 @@ end
 
 
 --------------------------------
+-- random:betweenInclusive()
+--
 -- x <= r <= y
 --------------------------------
-function rnd_between_xy_inc(x, y)
+function random:betweenInclusive(x, y)
 	if (x == y) then
 		return x
 	end
@@ -29,22 +35,26 @@ function rnd_between_xy_inc(x, y)
 		y = t
 	end
 
-	return mt:value(x, y)
+	return self.mt:value(x, y)
 end
 
 --------------------------------
+-- random:between()
+--
 -- x < r < y
 --------------------------------
-function rnd_between_xy(x, y)
-	return rnd_between_xy_inc(x+1, y-1)
+function random:between(x, y)
+	return random:betweenInclusive(x+1, y-1)
 end
 
 --------------------------------
+-- random:xdy_z()
+--
 -- This function generates the
 -- random number XdY minus a
 -- number of the smallest rolls
 --------------------------------
-function rnd_xdy_z(x, y, z)
+function random:xdy_z(x, y, z)
 	local rolls = {}
 	local value = 0
 	local i, j
@@ -55,7 +65,7 @@ function rnd_xdy_z(x, y, z)
 	end
 
 	for i = 1,x do
-		rolls[i] = mt(y)
+		rolls[i] = self.mt(y)
 	end
 
 	table.sort(rolls)
@@ -67,25 +77,30 @@ function rnd_xdy_z(x, y, z)
 	return value
 end
 
-function rnd_and_x(x)
-	return bit32.band(mt(), x)
+----------------------------------------
+-- random:band()
+--
+-- r & x
+----------------------------------------
+function random:band(x)
+	return bit32.band(self.mt(), x)
 end
 
 ----------------------------------------
+-- random:random:rnd()
+--
 -- Return a random number
 ----------------------------------------
-function rnd()
-	return mt()
+function random:rnd()
+	return self.mt()
 end
 
 ----------------------------------------
--- rnd_hash()
+-- random:hash()
 --
 -- Return a random hexadecimal string
 -- for use as a hash key
 ----------------------------------------
-function rnd_hash()
-	return string.format("0x%08X", mt())
+function random:hash()
+	return string.format("0x%08X", self.mt())
 end
-
-mt = mt_random.new()

@@ -38,7 +38,7 @@ _race.init = function ()
 
 		assert(races[race][stat] ~= nil)
 
-		s = races[race][stat] + rnd_xdy_z(2, 7, 1)
+		s = races[race][stat] + random:xdy_z(2, 7, 1)
 
 		if (s > 18) then
 			s = 18

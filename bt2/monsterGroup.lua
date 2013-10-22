@@ -28,7 +28,7 @@ function monsterGroup:new(inName, inSize)
 			error("rndGroupSize == false", 4)
 		end
 
-		inSize = rnd_xdy(1, self.groupSize)
+		inSize = random:xdy(1, self.groupSize)
 	end
 
 	for _ = 1,inSize do

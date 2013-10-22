@@ -69,7 +69,7 @@ function battlePlayer:doAction(inAction)
 
 		-- A nuts attack randomly attacks player or monster
 		if (self.isNuts) then
-			if (rnd_and_x(1) == 1) then	
+			if (random:band(1) == 1) then	
 				attackParty = true
 			end
 		else
@@ -153,14 +153,14 @@ function battlePlayer:getMeleeDamage(inAction)
 
 	for i = 1,self.numAttacks do
 		outData.damage = outData.damage + damageBonus
-		outData.damage = outData.damage + rnd_xdy(ndice, dieValue)
+		outData.damage = outData.damage + random:xdy(ndice, dieValue)
 		outData.damage = outData.damage + self.damageBonus
-		outData.damage = outData.damage + rnd_xdy(self.damageRandom,8)
+		outData.damage = outData.damage + random:xdy(self.damageRandom,8)
 		outData.damage = outData.damage - self.damagePenalty
 	end
 
 	if (self.class == "Hunter") then
-		if (rnd_xdy(1,256) < self.rogu_level) then
+		if (random:xdy(1,256) < self.rogu_level) then
 			outData.specialAttack = "critical"
 		end
 	end
@@ -352,13 +352,13 @@ function battlePlayer:attackSpell(inAction)
 			outData.damage = 0
 			for i = 1,inData.ndice do
 				outData.damage = outData.damage +
-					rnd_xdy(self.cur_level + 1, inData.dieval)
+					random:xdy(self.cur_level + 1, inData.dieval)
 			end
 		elseif (inData.specialAttack) then
 			outData.specialAttack = inData.specialAttack
 			outData.damage = 0
 		else
-			outData.damage = rnd_xdy(inData.ndice, inData.dieval)
+			outData.damage = random:xdy(inData.ndice, inData.dieval)
 		end
 
 		inAction:singleTargetSpell()

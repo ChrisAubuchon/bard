@@ -568,7 +568,7 @@ function party:randomMeleeCharacter()
 				randomCharacter = c
 			else
 				comparator = (numerator / denominator) * 100000
-				if ((rnd() % 100000) > comparator) then
+				if ((random:rnd() % 100000) > comparator) then
 					randomCharacter = c
 				end
 				numerator = numerator + 1
@@ -602,7 +602,7 @@ function party:randomCharacter(inSummonFlag)
 			randomCharacter = c
 		else
 			comparator = (numerator / denominator) * 100000
-			if ((rnd() % 100000) > comparator) then
+			if ((random:rnd() % 100000) > comparator) then
 				randomCharacter = c
 			end
 			numerator = numerator + 1
@@ -848,10 +848,12 @@ function party:singSong()
 		party.song.singer:songTimeout()
 	end
 
+	dprint(tune.activate)
 	if (tune.activate) then
 		action.func = tune.activate.func
 		action.inData = tune.nonCombatData[currentLevel.level].inData
 
+		dprint(action.func)
 		if (action.func) then
 			action.func(action)
 		end
@@ -932,12 +934,12 @@ function party:meleeMarch()
 	local c
 
 	for c in self:characterIterator() do
-		local xxx_check_melee_march_effect = true
-		if ((c.max_hp - 3) <= c.cur_hp) then
+		if ((c.cur_hp + 3) <= c.max_hp) then
 			c.cur_hp = c.cur_hp + 3
 		end
 	end
-	end
+
+	self:display()
 end
 
 

@@ -27,7 +27,7 @@ function review:advanceRandomStat(char)
 	if (char.lk < 18) then table.insert(canAdvance, "lk") end
 
 	if (#canAdvance > 0) then
-		rndStat = (rnd() % #canAdvance) + 1
+		rndStat = (random:rnd() % #canAdvance) + 1
 		char[canAdvance[rndStat]] = char[canAdvance[rndStat]] + 1
 		text:print("\n+1 to ")
 		if (canAdvance[rndStat] == "st") then text:print("strength.") end
@@ -64,7 +64,7 @@ function review:doAdvancement()
 	char.cur_level = char.cur_level + 1
 	char.max_level = char.cur_level
 
-	char.cur_hp = char.cur_hp + (rnd() % char.hpDice)
+	char.cur_hp = char.cur_hp + (random:rnd() % char.hpDice)
 	if (char.cn > 14) then
 		char.cur_hp = char.cur_hp + (char.cn - 14)
 	end
@@ -72,7 +72,7 @@ function review:doAdvancement()
 	char.max_hp = char.cur_hp
 
 	if (char.class == "Rogue") then
-		char.rogu_level = char.rogu_level + (rnd() % 7)
+		char.rogu_level = char.rogu_level + (random:rnd() % 7)
 		if (char.dx > 14) then
 			char.rogu_level = char.rogu_level + (char.dx - 14)
 		end
@@ -81,7 +81,7 @@ function review:doAdvancement()
 			char.rogu_level = 255
 		end
 	elseif (char.class == "Hunter") then
-		char.hunt_level = char.hunt_level + (rnd() % 31)
+		char.hunt_level = char.hunt_level + (random:rnd() % 31)
 		if (char.dx > 14) then
 			char.hunt_level = char.hunt_level + (char.dx - 14)
 		end
@@ -96,7 +96,7 @@ function review:doAdvancement()
 			char.num_attacks = 8
 		end
 	elseif (char:getSpellLevel()) then
-		char.cur_sppt = char.cur_sppt + (rnd() % 3)
+		char.cur_sppt = char.cur_sppt + (random:rnd() % 3)
 		if (char.iq > 14) then
 			char.cur_sppt = char.cur_sppt + (char.iq - 14)
 		end

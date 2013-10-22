@@ -27,7 +27,7 @@ end
 ----------------------------------------
 local empty = building:new("Empty Building", "PIC_EMPTYBLDG")
 function empty:enter()
-	if (rnd_xdy(1,4) == 1) then
+	if (random:xdy(1,4) == 1) then
 		battle:random()
 		if (globals.partyDied) then
 			return

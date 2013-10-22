@@ -29,7 +29,7 @@ function monster:new(inName)
 			)
 	btTable.setClassMetatable(self)
 
-	self.maxHP = self.hpBase + rnd_xdy(self.hpRndNDice, self.hpRndDie)
+	self.maxHP = self.hpBase + random:xdy(self.hpRndNDice, self.hpRndDie)
 	self.curHP = self.maxHP
 	self.ac		= self.baseAC
 
@@ -59,7 +59,7 @@ function monster:getSingularName()
 end
 
 function monster:getBattlePriority()
-	return rnd_between_xy_inc(self.priorityLo, self.priorityHi)
+	return random:betweenInclusive(self.priorityLo, self.priorityHi)
 end
 
 function monster:getPronoun()
@@ -81,7 +81,7 @@ function monster:attackIterator()
 			return
 		end
 		if (index == 0) then
-			index = rnd_xdy(1,4)
+			index = random:xdy(1,4)
 		else
 			index = index + 1
 			if (index > 4) then	

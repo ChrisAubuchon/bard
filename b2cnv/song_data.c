@@ -1,7 +1,7 @@
 #include <b2lib.h>
 
 uint8_t *song_combatStrings[] = {
-	"-- missile damage bonus/penalty",
+	"local missile_damage_bonus_penalty = true",
 	"party.battle.antiMagic = party.battle.antiMagic + 2",
 	"party.acBonus = party.acBonus + inAction.inData.data",
 	"party.toHitBonus = party.toHitBonus + inAction.inData.data; party.damageBonus = party.damageBonus + inAction.inData.data",

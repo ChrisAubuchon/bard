@@ -10,7 +10,7 @@ local function getPassiveDuration(inData)
 	local duration
 
 	if (inData.duration > 0) then
-		return inData.duration + rnd_xdy(1,16)
+		return inData.duration + random:xdy(1,16)
 	else
 		return -1
 	end
@@ -254,7 +254,7 @@ function spells.summon(inAction)
 	local summon	= {}
 
 	summon.isIllusion = inData.isIllusion
-	summon.type = inData.summons[rnd_xdy(1,#inData.summons)]
+	summon.type = inData.summons[random:xdy(1,#inData.summons)]
 
 	if (inAction.source:isCharacter()) then
 		party:doSummon(summon)
@@ -277,7 +277,7 @@ local function __doHeal(inAction, inTarget)
 
 		if (inData.randomHeal) then
 			assert(inData.ndice ~= 0)
-			hpHealed = rnd_xdy(inData.ndice, inData.dieval)
+			hpHealed = random:xdy(inData.ndice, inData.dieval)
 		end
 
 		inTarget.cur_hp = inTarget.cur_hp + hpHealed

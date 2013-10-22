@@ -92,7 +92,7 @@ end
 local empty = building:new("Empty Building", "PIC_EMPTYBLDG")
 function empty:enter()
 if false then
-	if (rnd_and_x(3) == 0) then
+	if (random:band(3) == 0) then
 		battle:random()
 		if (globals.partyDied) then
 			return
@@ -113,7 +113,7 @@ end
 local emptyhut = building:new("Empty Hut", "PIC_EMPTYHUT")
 function emptyhut:enter()
 if false then
-	if (rnd_and_x(3) == 0) then
+	if (random:band(3) == 0) then
 		battle:random()
 		if (globals.partyDied) then
 			return true

@@ -406,9 +406,9 @@ end
 ----------------------------------------
 function city:getBattleReward()
 	if (globals.isNight) then
-		return self.night.items[rnd_xdy(1,#self.night.items)]
+		return self.night.items[random:xdy(1,#self.night.items)]
 	else
-		return self.day.items[rnd_xdy(1,#self.day.items)]
+		return self.day.items[random:xdy(1,#self.day.items)]
 	end
 end
 

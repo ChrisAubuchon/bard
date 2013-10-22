@@ -88,16 +88,16 @@ function level:getBattleOpponents()
 	if (self:isCity()) then
 		monP = self.day.monsters
 		if (globals.isNight) then
-			numGroups = rnd_and_x(1) + 1
+			numGroups = random:band(1) + 1
 		end
 	else
 		monP = self.monsters
-		numGroups = rnd_xdy(1,4)
+		numGroups = random:xdy(1,4)
 	end
 
 	for i = 1,numGroups do
 		repeat
-			monType = rnd_xdy(1,16)
+			monType = random:xdy(1,16)
 		until (not picked[monType])
 		picked[monType] = true
 		monGroups[i] = monP[monType]

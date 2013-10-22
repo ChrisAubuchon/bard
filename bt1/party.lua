@@ -585,7 +585,7 @@ function party:randomMeleeCharacter()
 				randomCharacter = c
 			else
 				comparator = (numerator / denominator) * 100000
-				if ((rnd() % 100000) > comparator) then
+				if ((random:rnd() % 100000) > comparator) then
 					randomCharacter = c
 				end
 				numerator = numerator + 1
@@ -619,7 +619,7 @@ function party:randomCharacter(inSummonFlag)
 			randomCharacter = c
 		else
 			comparator = (numerator / denominator) * 100000
-			if ((rnd() % 100000) > comparator) then
+			if ((random:rnd() % 100000) > comparator) then
 				randomCharacter = c
 			end
 			numerator = numerator + 1

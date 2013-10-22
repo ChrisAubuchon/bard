@@ -13,7 +13,7 @@ function objectHash:new(inObject)
 	btTable.setClassMetatable(self)
 
 	while true do
-		self.key = rnd_hash()
+		self.key = random:hash()
 		if (not objects[self.key]) then
 			objects[self.key] = inObject
 			return self

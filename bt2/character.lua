@@ -360,7 +360,7 @@ function character:getBattlePriority()
 	if (self.dx > 14) then
 		priority = priority + bit32.lshift(self.dx - 14, 3)
 	end
-	priority = priority + (rnd() % 32)
+	priority = priority + (random:rnd() % 32)
 
 	levelBonus = bit32.rshift(self.cur_level, 1)
 	if ((self.class == "Conjurer") or
@@ -418,7 +418,7 @@ function character.createCharacter()
 	----------------------------------------
 	-- Set hit points
 	----------------------------------------
-	newchar.max_hp = rnd_xdy_z(2, 16, 1) + 14
+	newchar.max_hp = random:xdy_z(2, 16, 1) + 14
 	newchar.cur_hp = newchar.max_hp
 
 	text:clear()
@@ -443,7 +443,7 @@ function character.createCharacter()
 	----------------------------------------
 	-- Initial gold
 	----------------------------------------
-	newchar.gold = rnd_xdy_z(2, 60, 1) + 110
+	newchar.gold = random:xdy_z(2, 60, 1) + 110
 
 	----------------------------------------
 	-- Assign initial songs for bard
@@ -469,7 +469,7 @@ function character.createCharacter()
 			newchar.max_sppt = 10
 		end
 
-		newchar.max_sppt = newchar.max_sppt + (rnd() % 8)
+		newchar.max_sppt = newchar.max_sppt + (random:rnd() % 8)
 		newchar.cur_sppt = newchar.max_sppt
 	end
 
@@ -878,7 +878,7 @@ function character:consumeItem(inAction)
 	local inItem	= inAction.inData.item
 
 	if ((inItem.max_charges == 1) or
-	    ((inItem.max_charges == 0) and (rnd_and_x(63) == 1))) then
+	    ((inItem.max_charges == 0) and (random:band(63) == 1))) then
 		self.inventory:dropItem(self.inventory:findItem(inItem))
 	end
 end
