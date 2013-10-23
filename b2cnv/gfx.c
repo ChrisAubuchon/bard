@@ -287,7 +287,6 @@ static void outputMousePointers(void)
 void convertGFX(void)
 {
 	outputBigpic();
-	return;
 	outputScreens();
 	outputIcons();
 	outputBitmapFont();

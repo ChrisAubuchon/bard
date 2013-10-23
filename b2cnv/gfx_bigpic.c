@@ -33,8 +33,8 @@ static b2anim_t		*anim_parse(btstring_t * data);
 /*					*/
 /****************************************/
 
-static uint8_t		anim_countCells(btstring_t * anim, uint16_t base_offset,
-					uint16_t base_cycleCount);
+static uint8_t		anim_countCells(btstring_t * anim, 
+					uint16_t base_offset);
 static animbox_t	*getAnimBox(btstring_t *data, uint16_t off);
 static void		copyCell(btstring_t *anim, uint16_t offset, 
 					btstring_t *big, animbox_t *ab);
@@ -73,9 +73,7 @@ static void getAnimLoops(bta_t *bta, btstring_t *anim, b2anim_t *b2a)
 
 	for (i = 0; i < b2a->nloops; i++) {
 		debug("*************************************\n");
-		ncells = anim_countCells(anim, b2a->base[i].offset,
-					       b2a->base[i].cycles
-					);
+		ncells = anim_countCells(anim, b2a->base[i].offset);
 		l = bta_loop_new(bta, i, ncells);
 
 		offset = b2a->base[i].offset;
@@ -144,7 +142,7 @@ static b2anim_t *anim_parse(btstring_t *data)
 		debug("Base Offset: 0x%04x\n", loopOffset);
 		debug("Cycle count: %3d\n", loopCount);
 
-		loopCells = anim_countCells(data, loopOffset, loopCount);
+		loopCells = anim_countCells(data, loopOffset);
 		debug("Loop cells: %3d\n", loopCells);
 
 		if (!loopCells) {
@@ -173,7 +171,7 @@ static b2anim_t *anim_parse(btstring_t *data)
  * anim_countCells()
  * Counter the number of cells in a loop
  */
-static uint8_t anim_countCells(btstring_t *anim, uint16_t base_offset, uint16_t base_cycleCount)
+static uint8_t anim_countCells(btstring_t *anim, uint16_t base_offset)
 {
 	b2animCell_t	cell;
 	uint16_t	offset	= base_offset;
@@ -183,9 +181,11 @@ static uint8_t anim_countCells(btstring_t *anim, uint16_t base_offset, uint16_t 
 
 	do {
 		cell.cycles = str_read16le(&anim->buf[offset]);
-		offset += 2;
-		cell.offset = str_read16le(&anim->buf[offset]) + offset;
-		offset += 2;
+		cell.offset = str_read16le(&anim->buf[offset + 2]) + offset;
+		offset += 4;
+
+		if (str_read16le(&anim->buf[cell.offset]) == 0xffff)
+			break;
 
 		debug("cell %d:\n", ncells);
 		debug("  cycleCount: %4d\n", cell.cycles);
