@@ -24,4 +24,14 @@ typedef struct {
   uint8_t height;
 } animbox_t;
 
+typedef struct {
+	uint16_t	cycles;
+	uint16_t	offset;
+} b2animCell_t;
+
+typedef struct {
+	uint8_t		nloops;
+	b2animCell_t	base[5];
+} b2anim_t;
+
 #endif
