@@ -19,8 +19,10 @@ bte_SOURCES = 	\
 	sdl/l_rect.c \
 	sdl/l_color.c \
 	sdl/l_font.c \
+	sdl/l_renderer.c		\
 	sdl/l_textbox.c \
 	sdl/l_timer.c \
+	sdl/l_window.c \
 	font.c \
 	font.h \
 	sdl.c \
@@ -37,10 +39,10 @@ bte_SOURCES = 	\
 
 bte_LDADD = \
 	-lmingw32				\
-	-lSDLmain				\
-	-lSDL					\
+	-lSDl2main				\
+	-lSDL2					\
 	-lSDL_image				\
-	-lSDL_TTF				\
+	-lSDL_ttf				\
 	-lz					\
 	$(top_builddir)/lib/lua/liblua.a	\
 	$(top_builddir)/lib/libbard/libbard.a	\

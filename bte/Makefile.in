@@ -66,10 +66,11 @@ PROGRAMS = $(bin_PROGRAMS)
 am_bte_OBJECTS = bt_lua.$(OBJEXT) btf.$(OBJEXT) l_sdl.$(OBJEXT) \
 	l_surface.$(OBJEXT) l_anim.$(OBJEXT) l_img.$(OBJEXT) \
 	l_rect.$(OBJEXT) l_color.$(OBJEXT) l_font.$(OBJEXT) \
-	l_textbox.$(OBJEXT) l_timer.$(OBJEXT) font.$(OBJEXT) \
-	sdl.$(OBJEXT) l_sprintf.$(OBJEXT) l_sys.$(OBJEXT) \
-	l_utils.$(OBJEXT) l_module.$(OBJEXT) l_random.$(OBJEXT) \
-	l_jansson.$(OBJEXT) bte.$(OBJEXT)
+	l_renderer.$(OBJEXT) l_textbox.$(OBJEXT) l_timer.$(OBJEXT) \
+	l_window.$(OBJEXT) font.$(OBJEXT) sdl.$(OBJEXT) \
+	l_sprintf.$(OBJEXT) l_sys.$(OBJEXT) l_utils.$(OBJEXT) \
+	l_module.$(OBJEXT) l_random.$(OBJEXT) l_jansson.$(OBJEXT) \
+	bte.$(OBJEXT)
 bte_OBJECTS = $(am_bte_OBJECTS)
 bte_DEPENDENCIES = $(top_builddir)/lib/lua/liblua.a \
 	$(top_builddir)/lib/libbard/libbard.a \
@@ -543,8 +544,10 @@ bte_SOURCES = \
 	sdl/l_rect.c \
 	sdl/l_color.c \
 	sdl/l_font.c \
+	sdl/l_renderer.c		\
 	sdl/l_textbox.c \
 	sdl/l_timer.c \
+	sdl/l_window.c \
 	font.c \
 	font.h \
 	sdl.c \
@@ -561,10 +564,10 @@ bte_SOURCES = \
 
 bte_LDADD = \
 	-lmingw32				\
-	-lSDLmain				\
-	-lSDL					\
+	-lSDl2main				\
+	-lSDL2					\
 	-lSDL_image				\
-	-lSDL_TTF				\
+	-lSDL_ttf				\
 	-lz					\
 	$(top_builddir)/lib/lua/liblua.a	\
 	$(top_builddir)/lib/libbard/libbard.a	\
@@ -697,6 +700,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_module.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_random.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_rect.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_renderer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_sdl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_sprintf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_surface.Po@am__quote@
@@ -704,6 +708,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_textbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_utils.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_window.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sdl.Po@am__quote@
 
 .c.o:
@@ -804,6 +809,20 @@ l_font.obj: sdl/l_font.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o l_font.obj `if test -f 'sdl/l_font.c'; then $(CYGPATH_W) 'sdl/l_font.c'; else $(CYGPATH_W) '$(srcdir)/sdl/l_font.c'; fi`
 
+l_renderer.o: sdl/l_renderer.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT l_renderer.o -MD -MP -MF $(DEPDIR)/l_renderer.Tpo -c -o l_renderer.o `test -f 'sdl/l_renderer.c' || echo '$(srcdir)/'`sdl/l_renderer.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/l_renderer.Tpo $(DEPDIR)/l_renderer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdl/l_renderer.c' object='l_renderer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o l_renderer.o `test -f 'sdl/l_renderer.c' || echo '$(srcdir)/'`sdl/l_renderer.c
+
+l_renderer.obj: sdl/l_renderer.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT l_renderer.obj -MD -MP -MF $(DEPDIR)/l_renderer.Tpo -c -o l_renderer.obj `if test -f 'sdl/l_renderer.c'; then $(CYGPATH_W) 'sdl/l_renderer.c'; else $(CYGPATH_W) '$(srcdir)/sdl/l_renderer.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/l_renderer.Tpo $(DEPDIR)/l_renderer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdl/l_renderer.c' object='l_renderer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o l_renderer.obj `if test -f 'sdl/l_renderer.c'; then $(CYGPATH_W) 'sdl/l_renderer.c'; else $(CYGPATH_W) '$(srcdir)/sdl/l_renderer.c'; fi`
+
 l_textbox.o: sdl/l_textbox.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT l_textbox.o -MD -MP -MF $(DEPDIR)/l_textbox.Tpo -c -o l_textbox.o `test -f 'sdl/l_textbox.c' || echo '$(srcdir)/'`sdl/l_textbox.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/l_textbox.Tpo $(DEPDIR)/l_textbox.Po
@@ -831,6 +850,20 @@ l_timer.obj: sdl/l_timer.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdl/l_timer.c' object='l_timer.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o l_timer.obj `if test -f 'sdl/l_timer.c'; then $(CYGPATH_W) 'sdl/l_timer.c'; else $(CYGPATH_W) '$(srcdir)/sdl/l_timer.c'; fi`
+
+l_window.o: sdl/l_window.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT l_window.o -MD -MP -MF $(DEPDIR)/l_window.Tpo -c -o l_window.o `test -f 'sdl/l_window.c' || echo '$(srcdir)/'`sdl/l_window.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/l_window.Tpo $(DEPDIR)/l_window.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdl/l_window.c' object='l_window.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o l_window.o `test -f 'sdl/l_window.c' || echo '$(srcdir)/'`sdl/l_window.c
+
+l_window.obj: sdl/l_window.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT l_window.obj -MD -MP -MF $(DEPDIR)/l_window.Tpo -c -o l_window.obj `if test -f 'sdl/l_window.c'; then $(CYGPATH_W) 'sdl/l_window.c'; else $(CYGPATH_W) '$(srcdir)/sdl/l_window.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/l_window.Tpo $(DEPDIR)/l_window.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdl/l_window.c' object='l_window.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o l_window.obj `if test -f 'sdl/l_window.c'; then $(CYGPATH_W) 'sdl/l_window.c'; else $(CYGPATH_W) '$(srcdir)/sdl/l_window.c'; fi`
 
 bte_nosdl-bt_lua.o: bt_lua.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(bte_nosdl_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bte_nosdl-bt_lua.o -MD -MP -MF $(DEPDIR)/bte_nosdl-bt_lua.Tpo -c -o bte_nosdl-bt_lua.o `test -f 'bt_lua.c' || echo '$(srcdir)/'`bt_lua.c

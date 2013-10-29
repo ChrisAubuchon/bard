@@ -1,7 +1,6 @@
 #include <btlib.h>
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #include <SDL/SDL_image.h>
-#include <SDL/SDL_ttf.h>
 #include <l_int.h>
 #include <l_sdl.h>
 
@@ -22,12 +21,9 @@
 
 
 static int l_init(lua_State *L);
-static int l_set_video_mode(lua_State *L);
 
 static int l_get_key(lua_State *L);
 static int _l_io_loop(lua_State *L);
-
-static int keyDownEventHandler(lua_State *L, SDL_Event *e);
 
 /********************************/
 /*				*/
@@ -63,55 +59,13 @@ static int l_init(lua_State *L)
 	return 0;
 }
 
-static int l_set_video_mode(lua_State *L)
-{
-	SDL_Surface **sur;
-
-	int top, i;
-	int width;
-	int height;
-	int depth;
-	uint32_t flags = 0;
-
-	top = lua_gettop(L);
-
-	width = luaL_checkint(L, 1);
-	height = luaL_checkint(L, 2);
-	depth = luaL_checkint(L, 3);
-
-	for (i = 4; i < top; i++) 
-		flags |= (uint32_t)luaL_checkinteger(L, i);
-
-	l_surface_new(L);
-	sur = l_checkSurfaceP(L, -1);
-
-	*sur = SDL_SetVideoMode(width, height, depth, flags);
-	if (*sur == NULL) 
-		sdl_error(L);
-
-	return 1;
-}
-
 static int l_get_key(lua_State *L)
 {
 	int key;
 
 	_l_io_loop(L);
-#if 0
-	key = _l_io_loop(L);
-
-	lua_pushnumber(L, key);
-#endif
 
 	return 1;
-}
-
-static int keyDownEventHandler(lua_State *L, SDL_Event *e)
-{
-	if (e->key.keysym.unicode)
-		return e->key.keysym.unicode;
-	else
-		return e->key.keysym.sym;
 }
 
 static int _l_io_loop(lua_State *L)
@@ -119,7 +73,6 @@ static int _l_io_loop(lua_State *L)
 	SDL_Event sdlevent;
 
 
-	SDL_EnableUNICODE(1);
 	while (1) {
 		SDL_WaitEvent(&sdlevent);
 		switch(sdlevent.type) {
@@ -146,13 +99,8 @@ static int _l_io_loop(lua_State *L)
 			}
 			case SDL_KEYDOWN:
 			{
-				int key;
-
-				key = keyDownEventHandler(L, &sdlevent);
-				if (key != 0)
-					lua_pushnumber(L, key);
-					return key;
-				break;
+				lua_pushnumber(L, sdlevent.key.keysym.sym);
+				return 1;
 			}
 			case SDL_QUIT:
 				exit(0);
@@ -170,63 +118,90 @@ void l_sdl_open(lua_State *L)
 {
 	global_begin(L, "sdl");
 
-	L_REGNUMBER(L,	"SDL_INIT_TIMER",	SDL_INIT_TIMER);
-	L_REGNUMBER(L,	"SDL_INIT_AUDIO",	SDL_INIT_AUDIO);
-	L_REGNUMBER(L,	"SDL_INIT_VIDEO",	SDL_INIT_VIDEO);
-	L_REGNUMBER(L,	"SDL_INIT_JOYSTICK",	SDL_INIT_JOYSTICK);
-	L_REGNUMBER(L,	"SDL_INIT_EVERYTHING",	SDL_INIT_EVERYTHING);
-	L_REGNUMBER(L,	"SDL_INIT_NOPARACHUTE",	SDL_INIT_NOPARACHUTE);
+	/* Initilization flags */
+	mod_constant(L,	"SDL_INIT_TIMER",	SDL_INIT_TIMER);
+	mod_constant(L,	"SDL_INIT_AUDIO",	SDL_INIT_AUDIO);
+	mod_constant(L,	"SDL_INIT_VIDEO",	SDL_INIT_VIDEO);
+	mod_constant(L,	"SDL_INIT_JOYSTICK",	SDL_INIT_JOYSTICK);
+	mod_constant(L,	"SDL_INIT_HAPTIC",	SDL_INIT_HAPTIC);
+	mod_constant(L,	"SDL_INIT_GAMECONTROLLER",SDL_INIT_GAMECONTROLLER);
+	mod_constant(L,	"SDL_INIT_EVENTS",	SDL_INIT_EVENTS);
+	mod_constant(L,	"SDL_INIT_EVERYTHING",	SDL_INIT_EVERYTHING);
+	mod_constant(L,	"SDL_INIT_NOPARACHUTE",	SDL_INIT_NOPARACHUTE);
 
-	L_REGNUMBER(L,	"SDL_SWSURFACE",	SDL_SWSURFACE);
-	L_REGNUMBER(L,	"SDL_HWSURFACE",	SDL_HWSURFACE);
-	L_REGNUMBER(L,	"SDL_ASYNCBLIT",	SDL_ASYNCBLIT);
-	L_REGNUMBER(L,	"SDL_ANYFORMAT",	SDL_ANYFORMAT);
-	L_REGNUMBER(L,	"SDL_HWPALETTE",	SDL_HWPALETTE);
-	L_REGNUMBER(L,	"SDL_DOUBLEBUF",	SDL_DOUBLEBUF);
-	L_REGNUMBER(L,	"SDL_FULLSCREEN",	SDL_FULLSCREEN);
-	L_REGNUMBER(L,	"SDL_OPENGL",		SDL_OPENGL);
-	L_REGNUMBER(L,	"SDL_OPENGLBLIT",	SDL_OPENGLBLIT);
-	L_REGNUMBER(L,	"SDL_RESIZABLE",	SDL_RESIZABLE);
-	L_REGNUMBER(L,	"SDL_NOFRAME",	SDL_NOFRAME);
+	/* Window States */
+	mod_constant(L, "SDL_WINDOW_FULLSCREEN",SDL_WINDOW_FULLSCREEN);
+	mod_constant(L, "SDL_WINDOW_FULLSCREEN_DESKTOP",
+				SDL_WINDOW_FULLSCREEN_DESKTOP);
+	mod_constant(L, "SDL_WINDOW_OPENGL",SDL_WINDOW_OPENGL);
+	mod_constant(L, "SDL_WINDOW_SHOWN",SDL_WINDOW_SHOWN);
+	mod_constant(L, "SDL_WINDOW_HIDDEN",SDL_WINDOW_HIDDEN);
+	mod_constant(L, "SDL_WINDOW_BORDERLESS",SDL_WINDOW_BORDERLESS);
+	mod_constant(L, "SDL_WINDOW_RESIZABLE",SDL_WINDOW_RESIZABLE);
+	mod_constant(L, "SDL_WINDOW_MINIMIZED",SDL_WINDOW_MINIMIZED);
+	mod_constant(L, "SDL_WINDOW_MAXIMIZED",SDL_WINDOW_MAXIMIZED);
+	mod_constant(L, "SDL_WINDOW_INPUT_GRABBED",SDL_WINDOW_INPUT_GRABBED);
+	mod_constant(L, "SDL_WINDOW_INPUT_FOCUS",SDL_WINDOW_INPUT_FOCUS);
+	mod_constant(L, "SDL_WINDOW_MOUSE_FOCUS",SDL_WINDOW_MOUSE_FOCUS);
+	mod_constant(L, "SDL_WINDOW_FOREIGN",SDL_WINDOW_FOREIGN);
+	mod_constant(L, "SDL_WINDOW_ALLOW_HIGHDPI",SDL_WINDOW_ALLOW_HIGHDPI);
 
-	L_REGNUMBER(L,	"IMG_SURFACE",		IMG_SURFACE);
-	L_REGNUMBER(L,	"IMG_PNG",		IMG_PNG);
-	L_REGNUMBER(L,	"IMG_BTA_SIMPLE",	IMG_BTA_SIMPLE);
-	L_REGNUMBER(L,	"IMG_BTA_XOR",		IMG_BTA_XOR);
+#if 0
+	mod_constant(L,	"SDL_SWSURFACE",	SDL_SWSURFACE);
+	mod_constant(L,	"SDL_HWSURFACE",	SDL_HWSURFACE);
+	mod_constant(L,	"SDL_ASYNCBLIT",	SDL_ASYNCBLIT);
+	mod_constant(L,	"SDL_ANYFORMAT",	SDL_ANYFORMAT);
+	mod_constant(L,	"SDL_HWPALETTE",	SDL_HWPALETTE);
+	mod_constant(L,	"SDL_DOUBLEBUF",	SDL_DOUBLEBUF);
+	mod_constant(L,	"SDL_FULLSCREEN",	SDL_FULLSCREEN);
+	mod_constant(L,	"SDL_OPENGL",		SDL_OPENGL);
+	mod_constant(L,	"SDL_OPENGLBLIT",	SDL_OPENGLBLIT);
+	mod_constant(L,	"SDL_RESIZABLE",	SDL_RESIZABLE);
+	mod_constant(L,	"SDL_NOFRAME",	SDL_NOFRAME);
+#endif
 
-	L_REGFUNC(L, "Init",		l_init);
-	L_REGFUNC(L, "SetVideoMode",	l_set_video_mode);
+	mod_constant(L,	"IMG_SURFACE",		IMG_SURFACE);
+	mod_constant(L,	"IMG_PNG",		IMG_PNG);
+	mod_constant(L,	"IMG_BTA_SIMPLE",	IMG_BTA_SIMPLE);
+	mod_constant(L,	"IMG_BTA_XOR",		IMG_BTA_XOR);
 
-	L_REGFUNC(L, "GetKey",		l_get_key);
+	mod_function(L, "Init",		l_init);
+#if 0
+	mod_function(L, "SetVideoMode",	l_set_video_mode);
+#endif
 
-	L_REGNUMBER(L,	"SDLK_BACKSPACE",	SDLK_BACKSPACE);
-	L_REGNUMBER(L,	"SDLK_RETURN",		SDLK_RETURN);
-	L_REGNUMBER(L, "SDLK_ESCAPE",		SDLK_ESCAPE);
-	L_REGNUMBER(L, "SDLK_UP",		SDLK_UP);
-	L_REGNUMBER(L, "SDLK_DOWN",		SDLK_DOWN);
-	L_REGNUMBER(L, "SDLK_RIGHT",		SDLK_RIGHT);
-	L_REGNUMBER(L, "SDLK_LEFT",		SDLK_LEFT);
-	L_REGNUMBER(L, "SDLK_PAGEUP",		SDLK_PAGEUP);
-	L_REGNUMBER(L, "SDLK_PAGEDOWN",	SDLK_PAGEDOWN);
-	L_REGNUMBER(L,	"SDLK_F1",		SDLK_F1);
-	L_REGNUMBER(L,	"SDLK_F2",		SDLK_F2);
-	L_REGNUMBER(L,	"SDLK_F3",		SDLK_F3);
-	L_REGNUMBER(L,	"SDLK_F4",		SDLK_F4);
-	L_REGNUMBER(L,	"SDLK_F5",		SDLK_F5);
-	L_REGNUMBER(L,	"SDLK_F6",		SDLK_F6);
-	L_REGNUMBER(L,	"SDLK_F7",		SDLK_F7);
-	L_REGNUMBER(L,	"SDLK_F8",		SDLK_F8);
-	L_REGNUMBER(L,	"SDLK_F9",		SDLK_F9);
-	L_REGNUMBER(L,	"SDLK_F10",		SDLK_F10);
-	L_REGNUMBER(L,	"SDLK_F11",		SDLK_F11);
-	L_REGNUMBER(L,	"SDLK_F12",		SDLK_F12);
+	mod_function(L, "GetKey",		l_get_key);
+
+	mod_constant(L,	"SDLK_BACKSPACE",	SDLK_BACKSPACE);
+	mod_constant(L,	"SDLK_RETURN",		SDLK_RETURN);
+	mod_constant(L, "SDLK_ESCAPE",		SDLK_ESCAPE);
+	mod_constant(L, "SDLK_UP",		SDLK_UP);
+	mod_constant(L, "SDLK_DOWN",		SDLK_DOWN);
+	mod_constant(L, "SDLK_RIGHT",		SDLK_RIGHT);
+	mod_constant(L, "SDLK_LEFT",		SDLK_LEFT);
+	mod_constant(L, "SDLK_PAGEUP",		SDLK_PAGEUP);
+	mod_constant(L, "SDLK_PAGEDOWN",	SDLK_PAGEDOWN);
+	mod_constant(L,	"SDLK_F1",		SDLK_F1);
+	mod_constant(L,	"SDLK_F2",		SDLK_F2);
+	mod_constant(L,	"SDLK_F3",		SDLK_F3);
+	mod_constant(L,	"SDLK_F4",		SDLK_F4);
+	mod_constant(L,	"SDLK_F5",		SDLK_F5);
+	mod_constant(L,	"SDLK_F6",		SDLK_F6);
+	mod_constant(L,	"SDLK_F7",		SDLK_F7);
+	mod_constant(L,	"SDLK_F8",		SDLK_F8);
+	mod_constant(L,	"SDLK_F9",		SDLK_F9);
+	mod_constant(L,	"SDLK_F10",		SDLK_F10);
+	mod_constant(L,	"SDLK_F11",		SDLK_F11);
+	mod_constant(L,	"SDLK_F12",		SDLK_F12);
 
 	lua_pushstring(L, "img");
 	lua_newtable(L);
-	L_REGFUNC(L, "LoadPNG",	l_img_load_png);
-	L_REGFUNC(L, "LoadBTA",	l_img_load_bta);
+	mod_function(L, "LoadPNG",	l_img_load_png);
+	mod_function(L, "LoadBTA",	l_img_load_bta);
 	lua_rawset(L, -3);
 
+	l_sdl_window_open(L);
+	l_sdl_renderer_open(L);
 	l_sdl_timer_open(L);
 	l_sdl_textbox_open(L);
 	l_sdl_font_open(L);

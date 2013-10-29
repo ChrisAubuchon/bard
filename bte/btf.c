@@ -33,7 +33,9 @@ SDL_Surface *BTF_RenderText(btf_t *btf, const char *text, SDL_Color color)
    	palette->colors[1].r = color.r;
    	palette->colors[1].g = color.g;
    	palette->colors[1].b = color.b;
+#if 0
    	SDL_SetColorKey(rval, SDL_SRCCOLORKEY, 0 );
+#endif
 
 
 	if (SDL_MUSTLOCK(rval))

@@ -1,6 +1,6 @@
 #include <btlib.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <l_int.h>
 #include <l_sdl.h>
 
@@ -132,12 +132,11 @@ static int l_surface_update_rect(lua_State *L)
 {
 	SDL_Surface *sur;
 	SDL_Rect *r;
-	int index = 2;
 
 	sur = l_checkSurface(L, 1);
-	r = sdl_rect_arg(L, &index);
+	r = l_checkRect(L, 2);
 
-	SDL_UpdateRect(sur, r->x, r->y, r->w, r->h);
+/*	SDL_UpdateRect(sur, r->x, r->y, r->w, r->h);*/
 
 	free(r);
 
@@ -157,7 +156,9 @@ static int l_surface_set_color(lua_State *L)
 	color = luaL_checkint(L, 2);
 	c = sdl_color_arg(L, &index);
 
+#if 0
 	rval = SDL_SetPalette(sur, SDL_LOGPAL | SDL_PHYSPAL, c, color, 1);
+#endif
 
 	return 0;
 }
@@ -171,7 +172,9 @@ static int l_surface_set_color_key(lua_State *L)
 	sur = l_checkSurface(L, 1);
 	key = luaL_checkint(L, 2);
 
+#if 0
 	rval = SDL_SetColorKey(sur, SDL_SRCCOLORKEY, key);
+#endif
 
 	return 0;
 }
@@ -194,16 +197,16 @@ static int l_surface_fill_rect(lua_State *L)
 	SDL_Surface *sur;
 	SDL_Rect *r;
 	SDL_Color *c;
-	int index = 2;
+	int index = 3;
 	uint32_t color;
 
 	sur = l_checkSurface(L, 1);
-	r = sdl_rect_arg(L, &index);
+	r = l_checkRect(L, 2);
 	c = sdl_color_arg(L, &index);
 
 	color = SDL_MapRGB(sur->format, c->r, c->g, c->b);
 
-	SDL_FillRect(sur, r, color);
+/*	SDL_FillRect(sur, r, color);*/
 
 	free(r);
 	free(c);
@@ -217,12 +220,11 @@ static int l_surface_blit(lua_State *L)
 	SDL_Surface *dest;
 	SDL_Rect *sr;
 	SDL_Rect *dr;
-	int index = 1;
 
-	dest = l_checkSurface(L, index++);
-	dr = sdl_rect_arg(L, &index);
-	src = l_checkSurface(L, index++);
-	sr = sdl_rect_arg(L, &index);
+	dest = l_checkSurface(L, 1);
+	dr = l_checkRect(L, 2);
+	src = l_checkSurface(L, 3);
+	sr = l_checkRect(L, 4);
 
 	if (SDL_BlitSurface(src, sr, dest, dr)) {
 		sdl_error(L);
@@ -240,7 +242,7 @@ static int l_surface_flip(lua_State *L)
 
 	sur = l_checkSurface(L, 1);
 
-	SDL_Flip(sur);
+/*	SDL_Flip(sur);*/
 
 	return 0;
 }
@@ -261,14 +263,13 @@ static int l_surface_create_rgb(lua_State *L)
 
 	*s = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, depth, \
 					0,0,0,0);
-	SDL_SetColors(*s, egapal, 0, 16);
+/*	SDL_SetColors(*s, egapal, 0, 16);*/
 
 	if (*s == NULL)
 		sdl_error(L);
 
 	return 1;
 }
-
 
 /********************************/
 /*				*/
@@ -321,3 +322,4 @@ void l_sdl_surface_open(lua_State *L)
 	mod_function(L, "ClearColorKey",l_surface_clear_color_key);
 	class_end(L);
 }
+

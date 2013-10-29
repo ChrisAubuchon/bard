@@ -1,6 +1,6 @@
 #include <btlib.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <l_int.h>
 #include <l_sdl.h>
 #include <gl_list.h>
@@ -175,8 +175,10 @@ static void simpleAnim(void *data)
 	SDL_UnlockSurface(a->s);
 
 	SDL_BlitSurface(a->s, NULL, a->dest, a->dest_rect);
+#if 0
 	SDL_UpdateRect(a->dest, a->dest_rect->x, a->dest_rect->y, \
 				a->dest_rect->w, a->dest_rect->h);
+#endif
 }
 
 static void xorAnim(void *data)
@@ -207,8 +209,10 @@ static void xorAnim(void *data)
 	SDL_UnlockSurface(a->s);
 
 	SDL_BlitSurface(a->s, NULL, a->dest, a->dest_rect);
+#if 0
 	SDL_UpdateRect(a->dest, a->dest_rect->x, a->dest_rect->y, \
 				a->dest_rect->w, a->dest_rect->h);
+#endif
 
 	/* Update the current cell after updating the surface */
 	l->c_cell++;
@@ -248,8 +252,7 @@ static int l_anim_start(lua_State *L)
 
 	a = l_checkAnim(L, 1);
 	win = l_checkSurface(L, 2);
-	index = 3;
-	r = sdl_rect_arg(L, &index);
+	r = l_checkRect(L, 3);
 
 	a->dest = win;
 	a->dest_rect = r;
@@ -266,8 +269,10 @@ static int l_anim_start(lua_State *L)
 	SDL_UnlockSurface(a->s);
 
 	SDL_BlitSurface(a->s, NULL, a->dest, a->dest_rect);
+#if 0
 	SDL_UpdateRect(a->dest, a->dest_rect->x, a->dest_rect->y, \
 				a->dest_rect->w, a->dest_rect->h);
+#endif
 
 	/* Create a timer for each loop */
 	for (index = 0; index < bta_getNumLoops(a->bta); index++) {
@@ -311,8 +316,12 @@ static int l_anim_stop(lua_State *L)
 	 * each loop pointer of the current animation. If they don't match
 	 * push the event back into the event queue. 
 	 */
+#if 0
 	nevents = SDL_PeepEvents(event, 20, SDL_GETEVENT,
-				SDL_EVENTMASK(BT_ANIM_EVENT));
+				SDL_EVENTMASK(BT_ANIM_EVENT),
+				SDL_EVENTMASK(BT_ANIM_EVENT)
+				);
+#endif
 	for (i = 0; i < nevents; i++) {
 		push = 1;
 		for (j = 0; j < bta_getNumLoops(a->bta); j++) {
@@ -326,8 +335,12 @@ static int l_anim_stop(lua_State *L)
 			SDL_PushEvent(&event[i]);
 		}
 	}
+#if 0
 	nevents = SDL_PeepEvents(event, 20, SDL_GETEVENT,
-				SDL_EVENTMASK(BT_ANIM_EVENT));
+				SDL_EVENTMASK(BT_ANIM_EVENT),
+				SDL_EVENTMASK(BT_ANIM_EVENT)
+				);
+#endif
 		
 
 	return 0;
@@ -361,6 +374,7 @@ static l_anim *l_checkAnim(lua_State *L, int index)
 
 void l_sdl_anim_open(lua_State *L)
 {
+#if 0
 	class_begin(L, "l_sdl_anim");
 	mod_variable(L, "isAnim", l_anim_isAnim, l_var_readonly);
 	mod_variable(L, "w", l_anim_get_w, l_var_readonly);
@@ -371,6 +385,7 @@ void l_sdl_anim_open(lua_State *L)
 	mod_function(L, "start", l_anim_start);
 	mod_function(L, "stop", l_anim_stop);
 	class_end(L);
+#endif
 }
 
 int l_img_load_bta(lua_State *L)
@@ -413,7 +428,7 @@ int l_img_load_bta(lua_State *L)
 
 	a->s = SDL_CreateRGBSurface(SDL_SWSURFACE, c->width, c->height,
 			8, 0, 0, 0, 0);
-	SDL_SetColors(a->s, egapal, 0, 16);
+/*	SDL_SetColors(a->s, egapal, 0, 16);*/
 
 	return 1;
 }

@@ -1,6 +1,6 @@
 #include <btlib.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <l_int.h>
 #include <l_sdl.h>
 
@@ -116,10 +116,10 @@ static int l_new_rect(lua_State *L)
 	r = lua_newuserdata(L, sizeof(SDL_Rect));
 	L_SETMETATABLE(L, "l_sdl_rect");
 
-	r->x = (int16_t)luaL_checkinteger(L, 1);
-	r->y = (int16_t)luaL_checkinteger(L, 2);
-	r->w = (uint16_t)luaL_checkinteger(L, 3);
-	r->h = (uint16_t)luaL_checkinteger(L, 4);
+	r->x = (int16_t)luaL_checkinteger(L, 2);
+	r->y = (int16_t)luaL_checkinteger(L, 3);
+	r->w = (uint16_t)luaL_checkinteger(L, 4);
+	r->h = (uint16_t)luaL_checkinteger(L, 5);
 
 	return 1;
 }
@@ -155,7 +155,23 @@ static SDL_Rect *sdl_new_rect(int x, int y, int w, int h)
 /*				*/
 /********************************/
 
+/*
+ * l_testRect()
+ */
+SDL_Rect *l_testRect(lua_State *L, int index)
+{
+	return (SDL_Rect *)luaL_testudata(L, index, "l_sdl_rect");
+}
 
+/*
+ * l_checkRect()
+ */
+SDL_Rect *l_checkRect(lua_State *L, int index)
+{
+	return (SDL_Rect *)luaL_checkudata(L, index, "l_sdl_rect");
+}
+
+#if 0
 /*
  * sdl_rect_arg()
  * Returns a pointer to a SDL_Rect structure. 
@@ -192,9 +208,14 @@ SDL_Rect *sdl_rect_arg(lua_State *L, int *index)
 		return NULL;
 	}
 }
+#endif
 
 void l_sdl_rect_open(lua_State *L)
 {
+	mod_begin(L, "Rect");
+	mod_function(L, "New", l_new_rect);
+	mod_end(L);
+
 	class_begin(L, "l_sdl_rect");
 	mod_function(L,	"__tostring",	l_rect_tostring);
 	mod_variable(L, "x",	sdl_rect_get_x, sdl_rect_set_x);
