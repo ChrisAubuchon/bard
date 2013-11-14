@@ -57,4 +57,6 @@ typedef struct {
 
 bta_cell_t *getImage(view_t *view, btstring_t *data);
 
+extern bta_color_t cityPalette[];
+
 #endif

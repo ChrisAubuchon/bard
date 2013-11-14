@@ -25,14 +25,16 @@ btstring_t *zlib_compress(btstring_t * fb)
 	return rb;
 }
 
-btstring_t *zlib_uncompress(btstring_t * fb, uLongf size)
+btstring_t *zlib_uncompress(btstring_t *fb, uLongf size)
 {
 	btstring_t *rb;
 
 	rb = bts_new(size);
 
-	if (uncompress(rb->buf, &size, fb->buf, fb->size) != Z_OK)
+	if (uncompress(rb->buf, &size, fb->buf, fb->size) != Z_OK)  {
 		printf("Error uncompressing\n");
+		exit(1);
+	}
 
 	bts_free(fb);
 

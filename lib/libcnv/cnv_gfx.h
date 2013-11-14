@@ -2,41 +2,7 @@
 #define _CNV_GFX_H
 
 #include <bt_string.h>
-/*#include <bt_gds.h>*/
 #include <bt_bta.h>
-
-#define COMPRESS_SIZE	128
-
-#define GRID_CITY	1
-#define GRID_DUN	2
-#define GRID_WILD	3
-
-#define QUAD_2M		0
-#define QUAD_3M		1
-#define QUAD_4M		2
-#define QUAD_5M		3
-#define QUAD_1L		4
-#define QUAD_2L		5
-#define QUAD_3L		6
-#define QUAD_4L		7
-#define QUAD_5L		8
-#define QUAD_1R		9
-#define QUAD_2R		10
-#define QUAD_3R		11
-#define QUAD_4R		12
-#define QUAD_5R		13
-#define QUAD_5FL	14
-#define QUAD_5FR	15
-#define QUAD_1M		16
-#define QUAD_3FL	17
-#define QUAD_4FL	18
-#define QUAD_3FR	19
-#define QUAD_4FR	20
-#define QUAD_4WL	21
-#define QUAD_5WL	22
-#define QUAD_4WR	23
-#define QUAD_5WR	24
-
 
 /********************************/
 /*				*/
@@ -44,7 +10,10 @@
 /*				*/
 /********************************/
 
-#define bta_cell_convert(x)	bta_cell_scale(bta_cell_4bitTo8bit((x)))
+#define	IMAGE_PNG		1
+#define IMAGE_BTA		2
+
+#define bta_cell_convert(x)	bta_cell_toRGBA(bta_cell_scale(bta_cell_4bitTo8bit((x))), egapal)
 
 /********************************/
 /*				*/
@@ -52,7 +21,13 @@
 /*				*/
 /********************************/
 
-/*typedef struct bt_dllist_t bt_view_t;*/
+typedef struct {
+	uint8_t		red;
+	uint8_t		green;
+	uint8_t		blue;
+	uint8_t		alpha;
+} bta_color_t;
+
 typedef struct bt_view_t bt_view_t;
 typedef struct bt_bigpicList_t bt_bigpicList_t;
 
@@ -62,18 +37,23 @@ typedef struct bt_bigpicList_t bt_bigpicList_t;
 /*				*/
 /********************************/
 
-bta_cell_t *bta_cell_scale(bta_cell_t *in);
-bta_cell_t *bta_cell_4bitTo8bit(bta_cell_t *in);
-bta_cell_t *bta_trim(bta_cell_t *in, uint16_t left, uint16_t right);
+extern 		bta_color_t egapal[];
+
+bta_cell_t	*bta_cell_scale(bta_cell_t *in);
+bta_cell_t	*bta_cell_4bitTo8bit(bta_cell_t *in);
+bta_cell_t	*bta_trim(bta_cell_t *in, uint16_t left, uint16_t right);
+bta_cell_t	*bta_cell_toRGBA(bta_cell_t *in, bta_color_t *pal);
 void bta_toPNG(bta_cell_t *in, btstring_t *fname);
 void bta_transparent_toPNG(bta_cell_t *in, btstring_t *fname);
 
+#if 0
 /* Bigpic list */
 bt_bigpicList_t *bigpic_list_new(uint32_t size);
 void bigpic_list_free(bt_bigpicList_t *bpl);
 void bigpic_list_set(bt_bigpicList_t *bpl, btstring_t *name, \
 		     btstring_t *path, uint8_t type);
 void bigpic_list_to_json(bt_bigpicList_t *bpl, btstring_t *fname);
+#endif
 
 /* View list */
 bt_view_t *bt_view_new(void);

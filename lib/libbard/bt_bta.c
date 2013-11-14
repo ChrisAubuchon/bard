@@ -16,8 +16,7 @@
 
 static void _bta_write_cell(FILE *fp, bta_cell_t *btac);
 static void _bta_write_loops(FILE *fp, bta_t *bta);
-/*static bt_array_t *_bta_read_loops(FILE *fp);*/
-static bta_t *_bta_read_loops(FILE *fp, uint8_t type);
+static bta_t *_bta_read_loops(FILE *fp);
 static bta_cell_t *_bta_read_cell(FILE *fp);
 
 /********************************/
@@ -59,7 +58,8 @@ static bta_cell_t *_bta_read_cell(FILE *fp)
 	debug("width = %d\n", rval->width);
 	debug("height = %d\n", rval->height);
 	debug("compsize = %d\n", compsize);
-	size = rval->height * rval->width;
+	debug("size = %d\n", (rval->height * rval->width) * 4);
+	size = (rval->height * rval->width) * 4;
 
 	rval->gfx = bts_new(compsize);
 	xfread(rval->gfx->buf, sizeof(uint8_t), compsize, fp);
@@ -92,12 +92,12 @@ static void _bta_write_loops(FILE *fp, bta_t *bta)
 	}
 }
 
-static bta_t *_bta_read_loops(FILE *fp, uint8_t type)
+static bta_t *_bta_read_loops(FILE *fp)
 {
-	bta_loop_t *l;
-	uint32_t nloops, ncells;
-	uint32_t lnum, cnum;
-	bta_t *rval;
+	bta_loop_t	*l;
+	uint32_t	nloops, ncells;
+	uint32_t	lnum, cnum;
+	bta_t	*rval;
 
 	debug("ftell(fp) = %x\n", ftell(fp));
 	lnum = ftell(fp);
@@ -105,7 +105,7 @@ static bta_t *_bta_read_loops(FILE *fp, uint8_t type)
 	nloops = fp_read32le(fp);
 	debug("nloops = %d\n", nloops);
 
-	rval = bta_new(type, nloops);
+	rval = bta_new(nloops);
 	
 	for (lnum = 0; lnum < nloops; lnum++) {
 
@@ -128,6 +128,9 @@ static bta_t *_bta_read_loops(FILE *fp, uint8_t type)
 /*				*/
 /********************************/
 
+/*
+ * bta_cell_new()
+ */
 bta_cell_t *bta_cell_new(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t delay, btstring_t *gfx)
 {
 	bta_cell_t *new;
@@ -144,6 +147,9 @@ bta_cell_t *bta_cell_new(uint16_t x, uint16_t y, uint16_t width, uint16_t height
 	return new;
 }
 
+/*
+ * bta_cell_free()
+ */
 void bta_cell_free(const void *vbtac)
 {
 	bta_cell_t *btac = (bta_cell_t *)vbtac;
@@ -155,6 +161,9 @@ void bta_cell_free(const void *vbtac)
 	free(btac);
 }
 
+/*
+ * bta_loop_new()
+ */
 bta_loop_t *bta_loop_new(bta_t *bta, uint32_t lnum, uint32_t ncells)
 {
 	bta_loop_t *new;
@@ -173,6 +182,9 @@ bta_loop_t *bta_loop_new(bta_t *bta, uint32_t lnum, uint32_t ncells)
 	return new;
 }
 
+/*
+ * bta_loop_free()
+ */
 void bta_loop_free(const void *vbtal)
 {
 	bta_loop_t *btal = (bta_loop_t *)vbtal;
@@ -181,14 +193,16 @@ void bta_loop_free(const void *vbtal)
 	free(btal);
 }
 
-bta_t *bta_new(uint8_t type, uint32_t nloops)
+/*
+ * bta_new()
+ */
+bta_t *bta_new(uint32_t nloops)
 {
 	bta_t *new;
 	void *data;
 	uint32_t i;
 
 	new = (bta_t *)xzalloc(sizeof(bta_t));
-	new->type = type;
 
 	if (nloops) {
 		data = xzalloc(nloops * sizeof(void *));
@@ -201,6 +215,9 @@ bta_t *bta_new(uint8_t type, uint32_t nloops)
 	return new;
 }
 
+/*
+ * bta_free()
+ */
 void bta_free(bta_t *bta)
 {
 	bta_cell_free(bta->base);
@@ -208,45 +225,45 @@ void bta_free(bta_t *bta)
 	free(bta);
 }
 
+/*
+ * bta_write_bta()
+ */
 void bta_write_bta(btstring_t *fname, bta_t *bta)
 {
-	FILE *fp;
+	FILE		*fp;
+	uint16_t	flags = 0;
 
 	fp = xfopen(fname, "wb");
-	xfwrite(&bta->type, sizeof(uint8_t), 1, fp);
-	switch (bta->type) {
-		case BTA_TYPE_SIMPLELOOP:
-			_bta_write_loops(fp, bta);
-			break;
-		case BTA_TYPE_XORLOOP:
-			_bta_write_loops(fp, bta);
-			_bta_write_cell(fp, bta->base);
-			break;
-	}
 
+	if (bta->base != NULL) 
+		flags |= BTA_HASBASE;
+
+	fp_write16le(fp, flags);
+	_bta_write_loops(fp, bta);
+
+	if (flags & BTA_HASBASE)
+		_bta_write_cell(fp, bta->base);
+	
 	bts_free(fname);
 	fclose(fp);
 }
 
+/*
+ * bta_read_bta()
+ */
 bta_t *bta_read_bta(btstring_t *fname)
 {
-	FILE *fp;
-	bta_t *rval;
-	uint8_t type;
+	FILE		*fp;
+	bta_t		*rval;
+	uint16_t	flags = 0;
 
 	fp = xfopen(fname, "rb");
 
-	xfread(&type, sizeof(uint8_t), 1, fp);
-	debug("type = %d\n", type);
-	switch (type) {
-		case BTA_TYPE_SIMPLELOOP:
-			rval = _bta_read_loops(fp, type);
-			break;
-		case BTA_TYPE_XORLOOP:	
-			rval = _bta_read_loops(fp, type);
-			rval->base = _bta_read_cell(fp);
-			break;
-	}
+	flags = fp_read16le(fp);
+	rval = _bta_read_loops(fp);
+
+	if (flags & BTA_HASBASE)
+		rval->base = _bta_read_cell(fp);
 
 	bts_free(fname);
 	fclose(fp);
@@ -254,6 +271,11 @@ bta_t *bta_read_bta(btstring_t *fname)
 	return rval;
 }
 
+/*
+ * bta_cell_get()
+ *
+ * Return the cell data at loop->cell
+ */
 bta_cell_t *bta_cell_get(bta_t *bta, uint32_t loop, uint32_t cell)
 {
 	const bta_loop_t *l;
@@ -264,6 +286,11 @@ bta_cell_t *bta_cell_get(bta_t *bta, uint32_t loop, uint32_t cell)
 	return (bta_cell_t *)gl_list_get_at((gl_list_t)l->cellData, cell);
 }
 
+/*
+ * bta_cell_set()
+ *
+ * Insert cell data at loop->cell
+ */
 void bta_cell_set(bta_t *bta, uint32_t lnum, uint32_t cnum, bta_cell_t *img)
 {
 	const bta_loop_t *l;
@@ -275,22 +302,21 @@ void bta_cell_set(bta_t *bta, uint32_t lnum, uint32_t cnum, bta_cell_t *img)
 	gl_list_set_at(l->cellData, cnum, img);
 }
 
+/*
+ * bta_get_base()
+ */
 bta_cell_t *bta_get_base(bta_t *bta)
 {
-	bta_cell_t *rval;
 
-	switch (bta->type) {
-		case BTA_TYPE_SIMPLELOOP:
-			rval = bta_cell_get(bta, 0, 0);
-			break;
-		case BTA_TYPE_XORLOOP:
-			rval = bta->base;
-			break;
-	}
+	if (bta->base == NULL)
+		return bta_cell_get(bta, 0, 0);
 
-	return rval;
+	return bta->base;
 }
 
+/*
+ * bta_get_base()
+ */
 uint32_t bta_getNumCells(bta_t *bta, uint32_t lnum)
 {
 	assert(bta != NULL);
@@ -300,6 +326,9 @@ uint32_t bta_getNumCells(bta_t *bta, uint32_t lnum)
 	return gl_list_size(btl->cellData);
 }
 
+/*
+ * bta_getNumLoops()
+ */
 uint32_t bta_getNumLoops(bta_t *bta)
 {
 	assert(bta != NULL);
@@ -307,6 +336,9 @@ uint32_t bta_getNumLoops(bta_t *bta)
 	return gl_list_size(bta->loopData);
 }
 
+/*
+ * bta_loop_get()
+ */
 bta_loop_t *bta_loop_get(bta_t *bta, uint32_t lnum)
 {
 	assert(bta != NULL);

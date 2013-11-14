@@ -4,7 +4,7 @@ local vid_conf = {
 	main_window = {
 		width = 640,
 		height = 400,
-		depth = 8
+		depth = 32
 	},
 	title = "Bard's Tale Engine"
 }

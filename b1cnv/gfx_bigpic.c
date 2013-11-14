@@ -2,6 +2,7 @@
 #include <gfx_bigpic.h>
 #include <gfx.h>
 #include <cnv_gfx.h>
+#include <cnv_bigpic.h>
 #include <dehuf.h>
 #include <fpio.h>
 
@@ -13,7 +14,25 @@
 /* Global variables			*/
 /*					*/
 /****************************************/
-static animGfx_t *head = NULL;
+
+static uint8_t isTimeAware[] = {
+/*  0*/	0, 0, 0, 0,
+/*  4*/	0, 0, 0, 0,
+/*  8*/	0, 0, 0, 0,
+/* 12*/	0, 0, 0, 0,
+/* 16*/	0, 0, 0, 0,
+/* 20*/	0, 0, 0, 0,
+/* 24*/	0, 0, 0, 0,
+/* 28*/	0, 0, 0, 0,
+/* 32*/	0, 0, 0, 1,
+/* 36*/	1, 1, 1, 0,
+/* 40*/	0, 0, 1, 1,
+/* 44*/	0, 1, 0, 0,
+/* 48*/	0, 0, 0, 0,
+/* 52*/	1, 0, 0, 0,
+/* 56*/	0, 0, 0, 0,
+/* 60*/	0, 1, 0
+};
 
 /****************************************/
 /*					*/
@@ -21,19 +40,10 @@ static animGfx_t *head = NULL;
 /*					*/
 /****************************************/
 
-static void bigpic_flate(btstring_t * in, btstring_t ** big, btstring_t ** anim, uint16_t size);
-void getAnimLoops(bta_t *bta, btstring_t *anim, uint8_t nloops);
-
-/****************************************/
-/*					*/
-/* Animation structure prototypes	*/
-/*					*/
-/****************************************/
-static animGfx_t *anim_newNode(void);
-static void anim_initList(void);
-static void anim_freeList(void);
-static void anim_insert(animGfx_t * new, btstring_t * data);
-static void anim_parse(btstring_t * data);
+static void	bigpic_flate(btstring_t *in, btstring_t **big, 
+				btstring_t **anim, uint16_t size);
+static		bta_cell_t *cellToRGBA(bta_cell_t *in, btstring_t *big);
+void		getAnimLoops(bta_t *bta, btstring_t *anim, anim_t *ba);
 
 /****************************************/
 /*					*/
@@ -41,11 +51,11 @@ static void anim_parse(btstring_t * data);
 /*					*/
 /****************************************/
 
-static uint8_t anim_countLoops(void);
-static uint8_t anim_countCells(btstring_t * anim, uint16_t base_offset, uint16_t base_cycleCount);
-static uint16_t anim_skipCell(btstring_t * anim, uint16_t offset);
+static anim_t	*anim_parse(btstring_t * data);
+static uint8_t		anim_countCells(btstring_t *data, uint16_t base_offset);
 static animbox_t *getAnimBox(btstring_t *data, uint16_t off);
-static uint16_t copyCell(btstring_t * anim, uint16_t offset, btstring_t * big, animbox_t *box);
+static uint16_t	copyCell(btstring_t * anim, uint16_t offset, 
+			btstring_t * big, animbox_t *box);
 
 /****************************************/
 /*					*/
@@ -53,7 +63,8 @@ static uint16_t copyCell(btstring_t * anim, uint16_t offset, btstring_t * big, a
 /*					*/
 /****************************************/
 
-static void bigpic_flate(btstring_t * in, btstring_t ** big, btstring_t ** anim, uint16_t size)
+static void bigpic_flate(btstring_t *in, btstring_t **big, 
+			btstring_t **anim, uint16_t size)
 {
 	uint8_t *src;
 	uint8_t *dest;
@@ -87,34 +98,35 @@ static void bigpic_flate(btstring_t * in, btstring_t ** big, btstring_t ** anim,
 	}
 }
 
-void getAnimLoops(bta_t *bta, btstring_t *anim, uint8_t nloops)
+/*
+ * getAnimLoops()
+ */
+void getAnimLoops(bta_t *bta, btstring_t *anim, anim_t *ba)
 {
-	animGfx_t *cur;
-	bta_loop_t *l;
-	bta_cell_t *c;
-	uint8_t i, j;
-	uint16_t offset;
-	int16_t cycleCount;
-	uint8_t ncells;
-	animbox_t *ab;
+	bta_loop_t	*l;
+	bta_cell_t	*c;
+	uint8_t		i, j;
+	uint16_t	offset;
+	int16_t		cycleCount;
+	uint8_t		ncells;
+	animbox_t	*ab;
+	btstring_t	*buf;
 
-	cur = head;
-	for (i = 0; i < nloops; i++) {
-		while (cur->anims[i].base_offset == cur->anims[i].base_segment)
-			cur = cur->next;
 
-		ncells = anim_countCells(anim, cur->anims[i].cur_offset,
-				cur->anims[i].cycleCount);
+	for (i = 0; i < ba->nloops; i++) {
+		ncells = anim_countCells(anim, ba->base[i].offset);
 		l = bta_loop_new(bta, i, ncells);
 
-		offset = cur->anims[i].cur_offset;
-		cycleCount = cur->anims[i].cycleCount;
+		offset = ba->base[i].offset;
+		cycleCount = ba->base[i].cycles;
+		offset += 2;
+
+		buf = bts_copy(bta->base->gfx);
 
 		for (j = 0; j < ncells; j++) {
 			if (cycleCount == 0) {
 				cycleCount = 1;
 			}
-			debug("delay = %d\n", cycleCount);
 			ab = getAnimBox(anim, offset);
 
 			c = bta_cell_new(ab->x, ab->y, ab->width, ab->height, 
@@ -122,7 +134,12 @@ void getAnimLoops(bta_t *bta, btstring_t *anim, uint8_t nloops)
 			c->gfx = bts_new(ab->height * ab->width);
 
 			offset = copyCell(anim, offset, c->gfx, ab);
-			c = bta_cell_convert(c);
+			dump_btstring(bts_strcpy("cell0-pre8.dat"), c->gfx, 0);
+			c = bta_cell_4bitTo8bit(c);
+			c = bta_cell_scale(c);
+			c = cellToRGBA(c, buf);
+
+			bta_toPNG(c, mkImagePath("loop_%d_cell_%d.png", i, j));
 
 			bta_cell_set(bta, i, j, c);
 
@@ -131,9 +148,64 @@ void getAnimLoops(bta_t *bta, btstring_t *anim, uint8_t nloops)
 
 			free(ab);
 		}
+
+		bts_free(buf);
 	}
 }
 
+/*
+ * cellToRGBA()
+ *
+ * Convert a palettized and XOR'd cell to a transparent/RGBA cell
+ *
+ * XXX: This might remove the need for the BTA_TYPE_XORLOOP...
+ */
+static bta_cell_t *cellToRGBA(bta_cell_t *in, btstring_t *big)
+{
+	bta_cell_t	*rval;
+	uint32_t	i, j;
+	uint8_t		*inp;
+	uint8_t		*rvalp;
+	uint32_t	index;
+
+	rval = bta_cell_new(in->x, in->y, in->width, in->height, in->delay, NULL);
+	rval->gfx = bts_new(in->gfx->size * 4);
+
+	inp = in->gfx->buf;
+	rvalp = rval->gfx->buf;
+
+	debug("*******************************\n");
+	debug("in->width:  %3d\n", in->width);
+	debug("in->height: %3d\n", in->height);
+	debug("in->x:      %3d\n", in->x);
+	debug("in->y:      %3d\n", in->y);
+	debug("in-delay:   %3d\n", in->delay);
+
+	for (i = 0; i < in->height; i++) {
+		for (j = 0; j < in->width; j++) {
+			if (*inp == 0) {
+				*rvalp++ = 0;
+				*rvalp++ = 0;
+				*rvalp++ = 0;
+				*rvalp++ = 0;
+				inp++;
+			} else {
+				index = ((224 * in->y) + (in->x)) + ((i * 224) + j);
+				big->buf[index] ^= *inp++;
+				*rvalp++ = egapal[big->buf[index]].red;
+				*rvalp++ = egapal[big->buf[index]].green;
+				*rvalp++ = egapal[big->buf[index]].blue;
+				*rvalp++ = egapal[big->buf[index]].alpha;
+			}
+		}
+	}
+
+	debug("*******************************\n");
+
+	bta_cell_free(in);
+	
+	return rval;
+}
 
 /****************************************/
 /*					*/
@@ -141,86 +213,45 @@ void getAnimLoops(bta_t *bta, btstring_t *anim, uint8_t nloops)
 /*					*/
 /****************************************/
 
-static animGfx_t *anim_newNode(void)
+static anim_t *anim_parse(btstring_t *data)
 {
-	animGfx_t *new;
-	int i;
+	uint16_t	offset		= 0;
+	uint16_t	deltaOffset;
+	uint16_t	loopOffset;
+	uint16_t	loopCount;
+	uint16_t	loopCells;
+	anim_t		*rval;
 
-	new = (animGfx_t *) xzalloc(sizeof(animGfx_t));
-	new->next = NULL;
-	new->prev = NULL;
-	for (i = 0; i < 5; i++) {
-		new->anims[i].base_offset = 0;
-		new->anims[i].base_segment = 0;
-		new->anims[i].cur_offset = 0;
-		new->anims[i].cur_segment = 0;
-		new->anims[i].cycleCount = 0;
-	}
+	rval = (anim_t *)xzalloc(sizeof(anim_t));
+	rval->nloops = 0;
 
-	return new;
-}
+	while (1) {
+		loopOffset = offset + 2;
+		loopCount = str_read16be(&data->buf[loopOffset]);
 
-static void anim_initList(void)
-{
-	head = anim_newNode();
-}
+		deltaOffset = str_read16be(&data->buf[offset]);
+		if (!deltaOffset)
+			break;
+		offset += deltaOffset + 2;
 
-static void anim_freeList(void)
-{
-	animGfx_t *cur = head;
-	animGfx_t *old;
+		debug("=====================================\n");
+		debug("Loop %2d:\n", rval->nloops);
+		debug("Base Offset: 0x%04x\n", loopOffset);
+		debug("Cycle count: %3d\n", loopCount);
 
-	while (cur->next != NULL) {
-		old = cur;
-		cur = cur->next;
-		free(old);
-	}
-}
-
-static void anim_insert(animGfx_t * new, btstring_t * data)
-{
-	int counter = 0;
-	animGfx_t *listp = head;
-
-	while (listp->next != NULL)
-		listp = listp->next;
-
-	new->prev = listp;
-	listp->next = new;
-
-	while (new->anims[counter].base_offset != new->anims[counter].base_segment) {
-		new->anims[counter].cur_offset = new->anims[counter].base_offset;
-		new->anims[counter].cur_segment = new->anims[counter].base_segment;
-		new->anims[counter].cycleCount = str_read16be(&data->buf[new->anims[counter].base_offset]);
-		new->anims[counter].cur_offset += 2;
-		counter++;
-	}
-}
-
-static void anim_parse(btstring_t * data)
-{
-	animGfx_t *new;
-
-	int counter;
-	uint16_t off = 0;
-
-	new = anim_newNode();
-
-	for (counter = 0; counter < 5; counter++) {
-/*		debug("off = %x\n", off);*/
-/*		debug("data->buf[off] = %x\n", data->buf[off]);*/
-/*		debug("str_read16be(&data->buf[off]) = %x\n", str_read16be(&data->buf[off]));*/
-		if (str_read16be(&data->buf[off])) {
-			new->anims[counter].base_offset = off + 2;
-			new->anims[counter].base_segment = 1;
-			off += ((str_read16be(&data->buf[off]) + 1) & 0xfffe) + 2;
-		} else {
-			new->anims[counter].base_offset = 0;
-			new->anims[counter].base_segment = 0;
+		loopCells = anim_countCells(data, loopOffset);
+		debug("Loop cells: %3d\n", loopCells);
+		if (!loopCells) {
+			continue;
 		}
+		rval->base[rval->nloops].offset = loopOffset;
+		rval->base[rval->nloops].cycles = loopCount;
+		rval->nloops++;
+		if (rval->nloops > 5)
+			break;
 	}
 
-	anim_insert(new, data);
+	return rval;
 }
 
 
@@ -231,59 +262,26 @@ static void anim_parse(btstring_t * data)
 /****************************************/
 
 /*
- * anim_countLoops()
- * Count the number of loops an animation has
- */
-static uint8_t anim_countLoops(void)
-{
-	uint8_t nloops = 0;
-	animGfx_t *cur = head;
-
-	while (cur != NULL) {
-		if (cur->anims[nloops].base_offset == cur->anims[nloops].base_segment) {
-			cur = cur->next;
-			continue;
-		}
-
-		nloops++;
-	}
-
-	return nloops;
-}
-
-/*
  * anim_countCells()
  * Counter the number of cells in a loop
  */
-static uint8_t anim_countCells(btstring_t * anim, uint16_t base_offset, uint16_t base_cycleCount)
+static uint8_t anim_countCells(btstring_t *data, uint16_t base_offset)
 {
-	uint16_t offset = base_offset;
-	int16_t cycleCount = base_cycleCount;
-	uint8_t ncells = 0;
 
-	while (cycleCount >= 0) {
-		offset = anim_skipCell(anim, offset);
-		cycleCount = str_read16be(&anim->buf[offset]);
+	uint16_t	cycles;
+	uint16_t	offset = base_offset;
+	uint8_t		ncells = 0;
+
+	while ((cycles = str_read16be(&data->buf[offset])) != 0xffff) {
+/*		debug("offset: 0x%04x\n", offset);*/
 		offset += 2;
-
+		while (str_read16le(&data->buf[offset]) != 0xffff)
+			offset += 6;
+		offset += 2;
 		ncells++;
-	}
+	} 
 
 	return ncells;
-}
-
-/*
- * anim_skipCell()
- * Skip the cell data for counting purposes
- */
-static uint16_t anim_skipCell(btstring_t * anim, uint16_t offset)
-{
-	uint16_t o = offset;
-
-	while (str_read16le(&anim->buf[o]) != 0xffff)
-		o += 6;
-
-	return o + 2;
 }
 
 /*
@@ -305,6 +303,7 @@ static animbox_t *getAnimBox(btstring_t *data, uint16_t off)
 	x_hi = y_hi = 0;
 
 	while (str_read16le(&data->buf[o]) != 0xffff) {
+/*		debug("o: 0x%04x\n", o);*/
 		y = data->buf[o] - 15;
 		x = data->buf[o + 1] - 8;
 		o += 2;
@@ -343,12 +342,10 @@ static uint16_t copyCell(btstring_t *anim, uint16_t offset, btstring_t *big, ani
 
 		index = ((y - box->y) * (box->width)) + (x - box->x);
 
-		big->buf[index++] ^= anim->buf[o++];
-		big->buf[index++] ^= anim->buf[o++];
-		big->buf[index++] ^= anim->buf[o++];
-		big->buf[index++] ^= anim->buf[o++];
-
-		index += 4;
+		big->buf[index++] = anim->buf[o++];
+		big->buf[index++] = anim->buf[o++];
+		big->buf[index++] = anim->buf[o++];
+		big->buf[index++] = anim->buf[o++];
 	}
 
 	return o + 2;
@@ -362,20 +359,23 @@ void outputBigpic(uint8_t indent)
 	btstring_t *big;
 	btstring_t *anim;
 	uint16_t npics;
-	bt_bigpicList_t *bpl;
+	cnvList_t	*bpl;
+	bt_bigpic_t	*bp;
 
 	bta_t *img;
 	bta_cell_t *c;
 	uint8_t nloops;
 
-	FILE *fp;
+	FILE		*fp;
+	anim_t		*ba;
 
 	fp = xfopen(mkBardOnePath("bigpic"), "rb");
 	npics = fp_read32le(fp) / sizeof(uint32_t);
 
-	bpl = bigpic_list_new(npics);
+	bpl = bigpicList_new();
 
 	for (i = 0; i < npics; i++) {
+/*	i = 0; {*/
 		debug("Picture %d:\n", i);
 		fp_moveToIndex32(fp, i, 0);
 
@@ -387,50 +387,58 @@ void outputBigpic(uint8_t indent)
 		if (anim == NULL) {
 			nloops = 0;
 		} else {
-			anim_initList();
-			anim_parse(anim);
-
-			nloops = anim_countLoops();
+			ba = anim_parse(anim);
+			nloops = ba->nloops;
 		}
 
+		bp = bigpic_new();
+		bp->name = getPicMacro(i);
+		bp->isTimeAware = isTimeAware[i];
+
 		if (nloops) {
-			img = bta_new(BTA_TYPE_XORLOOP, nloops);
+			img = bta_new(nloops);
 
 			c = bta_cell_new(0, 0, 56, 88, 0, big);
-			c = bta_cell_convert(c);
+			c = bta_cell_4bitTo8bit(c);
+			c = bta_cell_scale(c);
 			img->base = c;
+ 
+			getAnimLoops(img, anim, ba);
 
-			getAnimLoops(img, anim, nloops);
-
+			img->base = bta_cell_toRGBA(img->base, egapal);
+			
 			bts_free(anim);
-			anim_freeList();
 
 			bta_write_bta(mkImagePath("bigpic_%d.bta", i), img);
 
-			bigpic_list_set(bpl, \
-					getPicMacro(i),			\
-					mkImagePathRel("bigpic_%d.bta", i),  \
-					BTA_TYPE_XORLOOP);
+			bp->type = IMAGE_BTA;
+			bp->path = mkImagePathRel("bigpic_%d.bta", i);
 
 			bta_free(img);
+			free(ba);
 		} else {
 			c = bta_cell_new(0, 0, 56, 88, 0, big);
-			c = bta_cell_convert(c);
+			if (isTimeAware[i]) {
+				c = bta_cell_4bitTo8bit(c);
+				c = bta_cell_scale(c);
+				c = bta_cell_toRGBA(c, cityPalette);
+			} else {
+				c = bta_cell_convert(c);
+			}
 			bta_toPNG(c, mkImagePath("bigpic_%d.png", i));
 
-			bigpic_list_set(bpl, \
-					getPicMacro(i),			\
-					mkImagePathRel("bigpic_%d.png", i),  \
-					BTA_PNG);
+			bp->type = IMAGE_PNG;
+			bp->path = mkImagePathRel("bigpic_%d.png", i);
 			bta_cell_free(c);
 		}
 
+		cnvList_add(bpl, bp);
 		anim = NULL;
 		dehuf_free(huf);
 	}
 
-	bigpic_list_to_json(bpl, mkJsonPath("bigpic.json"));
-	bigpic_list_free(bpl);
+	bigpicList_toJson(bpl, mkJsonPath("bigpic.json"));
+	cnvList_free(bpl);
 
 	fclose(fp);
 }

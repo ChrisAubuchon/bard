@@ -12,6 +12,25 @@
 /*				*/
 /********************************/
 
+bta_color_t egapal[16] = {
+ {   0,   0,   0, 255 }, /*0*/
+ {   0,   0, 170, 255 }, /*1*/
+ {   0, 170,   0, 255 }, /*2*/
+ {   0, 170, 170, 255 }, /*3*/
+ { 170,   0,   0, 255 }, /*4*/
+ { 170,   0, 170, 255 }, /*5*/
+ { 170,  85,   0, 255 }, /*6*/
+ { 170, 170, 170, 255 }, /*7*/
+ {  85,  85,  85, 255 }, /*8*/
+ {  85,  85, 255, 255 }, /*9*/
+ {  85, 255,  85, 255 }, /*a*/
+ {  85, 255, 255, 255 }, /*b*/
+ { 255,  85,  85, 255 }, /*c*/
+ { 255,  85, 255, 255 }, /*d*/
+ { 255, 255,  85, 255 }, /*e*/
+ { 255, 255, 255, 255 }  /*f*/
+};
+
 static png_color egapalette[16] = {
  {   0,   0,   0 }, /*0*/
  {   0,   0, 170 }, /*1*/
@@ -44,18 +63,17 @@ static png_color egapalette[16] = {
 /*				*/
 /********************************/
 
-
-btstring_t *prepDataXML(btstring_t *in)
-{
-	return in;
-}
-
 /********************************/
 /*				*/
 /* Public interface		*/
 /*				*/
 /********************************/
 
+/*
+ * bta_cell_scale()
+ *
+ * Scale from 320x200 to 640x400
+ */
 bta_cell_t *bta_cell_scale(bta_cell_t *in)
 {
 	uint16_t x, y;
@@ -129,13 +147,22 @@ bta_cell_t *bta_trim(bta_cell_t *in, uint16_t left, uint16_t right)
 	return rval;
 }
 
+/*
+ * bta_cell_4bitTo8bit()
+ *
+ * Unpack 4 bit data to 8 bit
+ */
 bta_cell_t *bta_cell_4bitTo8bit(bta_cell_t *in)
 {
 	bta_cell_t *rval;
 	uint8_t *tobuf, *frombuf;
 	uint32_t i;
 
-	rval = bta_cell_new(in->x * 2, in->y, in->width * 2, in->height, in->delay, NULL);
+	rval = bta_cell_new(
+		in->x * 2, in->y, 
+		in->width * 2, in->height, 
+		in->delay, NULL
+		);
 	rval->gfx = bts_new(rval->width * rval->height);
 
 	tobuf = rval->gfx->buf;
@@ -144,6 +171,36 @@ bta_cell_t *bta_cell_4bitTo8bit(bta_cell_t *in)
 	for (i = 0; i < in->gfx->size; i++) {
 		*tobuf++ = *frombuf >> 4;
 		*tobuf++ = *frombuf++ & 0x0f;
+	}
+
+	bta_cell_free(in);
+
+	return rval;
+}
+
+/*
+ * bta_cell_toRGBA()
+ *
+ * Convert a palettized image to RGBA
+ */
+bta_cell_t *bta_cell_toRGBA(bta_cell_t *in, bta_color_t *pal)
+{
+	bta_cell_t	*rval;
+	uint8_t		*tobuf, *frombuf;
+	uint32_t	i;
+
+	rval = bta_cell_new(in->x, in->y, in->width, in->height, 
+				in->delay, NULL);
+	rval->gfx = bts_new((rval->width * rval->height) * 4);
+
+	tobuf = rval->gfx->buf;
+	frombuf = in->gfx->buf;
+
+	for (i = 0; i < in->gfx->size; i++) {
+		*tobuf++ = pal[*frombuf].red;
+		*tobuf++ = pal[*frombuf].green;
+		*tobuf++ = pal[*frombuf].blue;
+		*tobuf++ = pal[*frombuf++].alpha;
 	}
 
 	bta_cell_free(in);
@@ -177,17 +234,23 @@ void bta_toPNG(bta_cell_t *in, btstring_t *fname)
 	}
 
 	png_init_io(png_ptr, outfp);
+
+	png_set_IHDR(png_ptr, info_ptr, in->width, in->height, 8, \
+		PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, \
+		PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+#if 0
 	png_set_IHDR(png_ptr, info_ptr, in->width, in->height, 8, \
 		PNG_COLOR_TYPE_PALETTE, PNG_INTERLACE_NONE, \
 		PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
 
 	png_set_PLTE(png_ptr, info_ptr, egapalette, 16);
+#endif
 
 	png_write_info(png_ptr, info_ptr);
 
 	for (i = 0; i < in->height; i++)  
-		png_write_row(png_ptr, &in->gfx->buf[i * in->width]);
+		png_write_row(png_ptr, &in->gfx->buf[(i * in->width) * 4]);
 
 	png_write_end(png_ptr, info_ptr);
 
@@ -197,6 +260,9 @@ void bta_toPNG(bta_cell_t *in, btstring_t *fname)
 	bts_free(fname);
 }
 
+/*
+ * bta_transparent_toPNG
+ */
 void bta_transparent_toPNG(bta_cell_t *in, btstring_t *fname)
 {
 	FILE		*outfp;
@@ -244,4 +310,3 @@ void bta_transparent_toPNG(bta_cell_t *in, btstring_t *fname)
 	fclose(outfp);
 	bts_free(fname);
 }
-

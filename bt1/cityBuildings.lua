@@ -9,6 +9,7 @@ function cityGates:enter()
 	text:printContinue()
 	getkey()
 
+	currentLevel.currentSquare = currentLevel.previousSquare
 	currentLevel:turnParty("back")
 end
 

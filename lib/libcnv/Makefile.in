@@ -63,9 +63,9 @@ CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 libcnv_a_AR = $(AR) $(ARFLAGS)
 libcnv_a_LIBADD =
-am_libcnv_a_OBJECTS = libcnv_a-bigpic_gfx.$(OBJEXT) \
-	libcnv_a-d3comp.$(OBJEXT) libcnv_a-dehuf.$(OBJEXT) \
-	libcnv_a-cnv_action.$(OBJEXT) libcnv_a-cnv_city.$(OBJEXT) \
+am_libcnv_a_OBJECTS = libcnv_a-d3comp.$(OBJEXT) \
+	libcnv_a-dehuf.$(OBJEXT) libcnv_a-cnv_action.$(OBJEXT) \
+	libcnv_a-cnv_bigpic.$(OBJEXT) libcnv_a-cnv_city.$(OBJEXT) \
 	libcnv_a-cnv_dun.$(OBJEXT) libcnv_a-cnv_function.$(OBJEXT) \
 	libcnv_a-cnv_gfx.$(OBJEXT) libcnv_a-cnv_item.$(OBJEXT) \
 	libcnv_a-cnv_mon.$(OBJEXT) libcnv_a-cnv_song.$(OBJEXT) \
@@ -522,7 +522,6 @@ AM_CFLAGS = @CFLAGS@ \
 		-I../jansson
 
 libcnv_a_SOURCES = \
-	bigpic_gfx.c	\
 	cnvlib.h	\
 	d3comp.c	\
 	dehuf.c		\
@@ -530,6 +529,8 @@ libcnv_a_SOURCES = \
 	cnv.h	\
 	cnv_action.h	\
 	cnv_action.c	\
+	cnv_bigpic.c	\
+	cnv_bigpic.h	\
 	cnv_city.h	\
 	cnv_city.c	\
 	cnv_code.h	\
@@ -613,9 +614,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-bigpic_gfx.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-bt_gfx.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-cnv_action.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-cnv_bigpic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-cnv_city.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-cnv_class.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-cnv_dun.Po@am__quote@
@@ -647,20 +648,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
-
-libcnv_a-bigpic_gfx.o: bigpic_gfx.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-bigpic_gfx.o -MD -MP -MF $(DEPDIR)/libcnv_a-bigpic_gfx.Tpo -c -o libcnv_a-bigpic_gfx.o `test -f 'bigpic_gfx.c' || echo '$(srcdir)/'`bigpic_gfx.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libcnv_a-bigpic_gfx.Tpo $(DEPDIR)/libcnv_a-bigpic_gfx.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bigpic_gfx.c' object='libcnv_a-bigpic_gfx.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-bigpic_gfx.o `test -f 'bigpic_gfx.c' || echo '$(srcdir)/'`bigpic_gfx.c
-
-libcnv_a-bigpic_gfx.obj: bigpic_gfx.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-bigpic_gfx.obj -MD -MP -MF $(DEPDIR)/libcnv_a-bigpic_gfx.Tpo -c -o libcnv_a-bigpic_gfx.obj `if test -f 'bigpic_gfx.c'; then $(CYGPATH_W) 'bigpic_gfx.c'; else $(CYGPATH_W) '$(srcdir)/bigpic_gfx.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libcnv_a-bigpic_gfx.Tpo $(DEPDIR)/libcnv_a-bigpic_gfx.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='bigpic_gfx.c' object='libcnv_a-bigpic_gfx.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-bigpic_gfx.obj `if test -f 'bigpic_gfx.c'; then $(CYGPATH_W) 'bigpic_gfx.c'; else $(CYGPATH_W) '$(srcdir)/bigpic_gfx.c'; fi`
 
 libcnv_a-d3comp.o: d3comp.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-d3comp.o -MD -MP -MF $(DEPDIR)/libcnv_a-d3comp.Tpo -c -o libcnv_a-d3comp.o `test -f 'd3comp.c' || echo '$(srcdir)/'`d3comp.c
@@ -703,6 +690,20 @@ libcnv_a-cnv_action.obj: cnv_action.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cnv_action.c' object='libcnv_a-cnv_action.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-cnv_action.obj `if test -f 'cnv_action.c'; then $(CYGPATH_W) 'cnv_action.c'; else $(CYGPATH_W) '$(srcdir)/cnv_action.c'; fi`
+
+libcnv_a-cnv_bigpic.o: cnv_bigpic.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-cnv_bigpic.o -MD -MP -MF $(DEPDIR)/libcnv_a-cnv_bigpic.Tpo -c -o libcnv_a-cnv_bigpic.o `test -f 'cnv_bigpic.c' || echo '$(srcdir)/'`cnv_bigpic.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libcnv_a-cnv_bigpic.Tpo $(DEPDIR)/libcnv_a-cnv_bigpic.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cnv_bigpic.c' object='libcnv_a-cnv_bigpic.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-cnv_bigpic.o `test -f 'cnv_bigpic.c' || echo '$(srcdir)/'`cnv_bigpic.c
+
+libcnv_a-cnv_bigpic.obj: cnv_bigpic.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-cnv_bigpic.obj -MD -MP -MF $(DEPDIR)/libcnv_a-cnv_bigpic.Tpo -c -o libcnv_a-cnv_bigpic.obj `if test -f 'cnv_bigpic.c'; then $(CYGPATH_W) 'cnv_bigpic.c'; else $(CYGPATH_W) '$(srcdir)/cnv_bigpic.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libcnv_a-cnv_bigpic.Tpo $(DEPDIR)/libcnv_a-cnv_bigpic.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cnv_bigpic.c' object='libcnv_a-cnv_bigpic.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-cnv_bigpic.obj `if test -f 'cnv_bigpic.c'; then $(CYGPATH_W) 'cnv_bigpic.c'; else $(CYGPATH_W) '$(srcdir)/cnv_bigpic.c'; fi`
 
 libcnv_a-cnv_city.o: cnv_city.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-cnv_city.o -MD -MP -MF $(DEPDIR)/libcnv_a-cnv_city.Tpo -c -o libcnv_a-cnv_city.o `test -f 'cnv_city.c' || echo '$(srcdir)/'`cnv_city.c

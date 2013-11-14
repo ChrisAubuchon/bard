@@ -326,9 +326,11 @@ function city:moveForward()
 		self:animateMove()
 		self.previousSquare = self.currentSquare
 		self.currentSquare = front_sq
+		dprint("Current square: " .. self.currentSquare.label)
 		if (self.currentSquare.onEnter()) then
 			self.currentSquare = self.previousSquare
 		end
+		dprint("Current square: " .. self.currentSquare.label)
 		self:buildView()
 	end
 

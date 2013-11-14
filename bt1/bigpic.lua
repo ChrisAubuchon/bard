@@ -53,7 +53,8 @@ function __bigpic:new()
 			end
 		end
 
-		self.city.bg = gfxImage:new("images/citypics/citybg.png", "png")
+		self.city.daybg = gfxImage:new("images/citypics/citybg-day.png", "png")
+		self.city.nightbg = gfxImage:new("images/citypics/citybg-night.png", "png")
 	end
 
 	local function readDunImages()
@@ -125,7 +126,8 @@ function __bigpic:new()
 	readCityImages()
 	readDunImages()
 
-	self.surface = gfxWindow:new(224, 176, 8)
+	--self.surface = gfxWindow:new(224, 176, 8)
+	self.surface = gfxWindow:new(224, 176, 32)
 
 	return self
 end
@@ -177,32 +179,33 @@ end
 ----------------------------------------
 -- drawImage()
 ----------------------------------------
-function bigpic:drawImage(inName, inIsTimeAware)
-	local isTimeAware = inIsTimeAware or false
-
+function bigpic:drawImage(inName)
 	if (self.activeBigpic ~= nil) then
 		self.activeBigpic:Clear()
 		self.activeBigpic = nil
 	end
 
 	self.activeBigpic = self.imgs[inName].img
-	if (globals.isNight and isTimeAware) then
-		self.surface:Draw(nil, self.activeBigpic, nil)
-		self.surface:Update()
-		self.surface:SetColor(11, globals.colors[1])
-		m_window:Draw(self.gfxRect, self.surface, nil)
-		m_window:Update(self.gfxRect)
-		self.surface:SetColor(11, globals.colors[12])
-	else
-		self.activeBigpic:Draw(m_window, self.gfxRect)
+	if (self.imgs[inName].isTimeAware) then
+		if (globals.isNight) then
+			m_window:Fill(self.gfxRect, globals.colors[1])
+		else
+			m_window:Fill(self.gfxRect, globals.colors[12])
+		end
 	end
+
+	self.activeBigpic:Draw(m_window, self.gfxRect)
 end
 
 ----------------------------------------
 -- cityBackground()
 ----------------------------------------
 function bigpic:cityBackground()
-	self.surface:Draw(nil, self.city.bg, nil)
+	if (globals.isNight) then
+		self.surface:Draw(nil, self.city.nightbg)
+	else
+		self.surface:Draw(nil, self.city.daybg)
+	end
 end
 
 function bigpic:cityAdd(inQuad, inFacet, inBuilding)

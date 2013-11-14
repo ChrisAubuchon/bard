@@ -3,7 +3,7 @@
 #include <cnv_gfx.h>
 #include <dehuf.h>
 
-#define DEBUG
+/*#define DEBUG*/
 #include <debug.h>
 
 #define DUN_FRONT	0x01
@@ -238,6 +238,7 @@ static void getDunFacet(bt_view_t *outView, uint8_t tileset, dunfacet_t *fxxx, u
 		view.offset = dun->offset;
 
 		img = getImage(&view, dundata);
+		img = bta_cell_toRGBA(img, egapal);
 
 		switch (facet) {
 		case DUN_FRONT:

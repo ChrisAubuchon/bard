@@ -6,7 +6,7 @@
 #include <gl_list.h>
 #include <gl_array_list.h>
 
-/*#define DEBUG 1*/
+#define DEBUG 1
 #include <debug.h>
 
 
@@ -47,10 +47,12 @@ typedef struct {
 /*				*/
 /********************************/
 
-static uint32_t simpleCallback(uint32_t interval, void *param);
+#if 0
 static uint32_t xorCallback(uint32_t interval, void *param);
-static void simpleAnim(void *data);
 static void xorAnim(void *data);
+#endif
+static uint32_t simpleCallback(uint32_t interval, void *param);
+static void simpleAnim(void *data);
 static void l_loop_free(const void *data);
 
 static int l_anim_isAnim(lua_State *L);
@@ -108,10 +110,16 @@ static uint32_t simpleCallback(uint32_t interval, void *param)
 	SDL_UserEvent u;
 	l_loop_t *l = (l_loop_t *)param;
 	bta_cell_t *c;
+	uint32_t	cell;
 
+#if 0
 	l->c_cell++;
 	if (l->c_cell == bta_getNumCells(l->anim->bta, l->loopNumber))
 		l->c_cell = 0;
+#endif
+	cell = l->c_cell + 1;
+	if (cell == bta_getNumCells(l->anim->bta, l->loopNumber))
+		cell = 0;
 
 	u.type = BT_ANIM_EVENT;
 	u.data1 = simpleAnim;
@@ -122,11 +130,15 @@ static uint32_t simpleCallback(uint32_t interval, void *param)
 
 	SDL_PushEvent(&e);
 
+#if 0
 	c = bta_cell_get(l->anim->bta, l->loopNumber, l->c_cell);
+#endif
+	c = bta_cell_get(l->anim->bta, l->loopNumber, cell);
 
 	return c->delay;
 }
 
+#if 0
 static uint32_t xorCallback(uint32_t interval, void *param)
 {
 	SDL_Event e;
@@ -148,16 +160,22 @@ static uint32_t xorCallback(uint32_t interval, void *param)
 
 	SDL_PushEvent(&e);
 
+#if 0
 	c = bta_cell_get(l->anim->bta, l->loopNumber, l->c_cell);
+#endif
+	c = bta_cell_get(l->anim->bta, l->loopNumber, cell);
 
 	return c->delay;
 }
+#endif
 
 static void simpleAnim(void *data)
 {
-	l_loop_t *l = (l_loop_t *)data;
-	bta_cell_t *c;
-	l_anim *a = (l_anim *)l->anim;
+	bta_cell_t	*c;
+	l_loop_t 	*l = (l_loop_t *)data;
+	l_anim		*a = (l_anim *)l->anim;
+	SDL_Rect	r;
+	SDL_Surface	*s;
 
 	/* 
 	 * The current cell number is updated by the timer.
@@ -165,6 +183,18 @@ static void simpleAnim(void *data)
 	 */
 	c = bta_cell_get(l->anim->bta, l->loopNumber, l->c_cell);
 
+	r.x = c->x;
+	r.y = c->y;
+	r.w = c->width;
+	r.h = c->height;
+
+	s = SDL_CreateRGBSurfaceFrom(c->gfx->buf, c->width, c->height, 
+		32, 4*c->width, 
+		0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+
+	SDL_BlitSurface(s, NULL, a->s, &r);
+	SDL_FreeSurface(s);
+#if 0
 	/*
 	 * This assumes that the entire graphic is replaced
 	 * In order to make it more generic it should only update
@@ -174,11 +204,17 @@ static void simpleAnim(void *data)
 	memcpy(a->s->pixels, c->gfx->buf, c->gfx->size);
 	SDL_UnlockSurface(a->s);
 
+#endif
 	SDL_BlitSurface(a->s, NULL, a->dest, a->dest_rect);
 	SDL_UpdateRect(a->dest, a->dest_rect->x, a->dest_rect->y, \
 				a->dest_rect->w, a->dest_rect->h);
+
+	l->c_cell++;
+	if (l->c_cell == bta_getNumCells(l->anim->bta, l->loopNumber))
+		l->c_cell = 0;
 }
 
+#if 0
 static void xorAnim(void *data)
 {
 	l_loop_t *l = (l_loop_t *)data;
@@ -193,18 +229,32 @@ static void xorAnim(void *data)
 	 */
 	c = bta_cell_get(l->anim->bta, l->loopNumber, l->c_cell);
 
+#if 0
 	SDL_LockSurface(a->s);
 
-	dest = (uint8_t *)a->s->pixels + ((c->y * a->s->pitch) + c->x);
+	dest = (uint8_t *)a->s->pixels + ((c->y * a->s->pitch) + c->x * 4);
 	src = c->gfx->buf;
 
 	for (i = 0; i < c->height; i++) {
-		for (j = 0; j < c->width; j++)
+		for (j = 0; j < c->width * 4; j++)
 			*dest++ ^= *src++;
 
-		dest += a->s->pitch - c->width;
+		dest += (a->s->pitch - c->width) * 4;
 	}
 	SDL_UnlockSurface(a->s);
+#endif
+
+	SDL_Surface *new;
+	SDL_Rect r;
+
+	r.x = c->x;
+	r.y = c->y;
+	r.w = c->width;
+	r.h = c->height;
+	new = SDL_CreateRGBSurfaceFrom(c->gfx->buf, c->width, c->height, 32, 4*c->width, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+
+	SDL_BlitSurface(new, NULL, a->s, &r);
+	SDL_FreeSurface(new);
 
 	SDL_BlitSurface(a->s, NULL, a->dest, a->dest_rect);
 	SDL_UpdateRect(a->dest, a->dest_rect->x, a->dest_rect->y, \
@@ -215,6 +265,7 @@ static void xorAnim(void *data)
 	if (l->c_cell == bta_getNumCells(l->anim->bta, l->loopNumber))
 		l->c_cell = 0;
 }
+#endif
 
 static int l_anim_free(lua_State *L)
 {
@@ -254,12 +305,16 @@ static int l_anim_start(lua_State *L)
 	a->dest = win;
 	a->dest_rect = r;
 
+#if 0
 	/* Initialize the surface with the base image */
 	if (a->bta->type == BTA_TYPE_SIMPLELOOP) {
 		btac = bta_cell_get(a->bta, 0, 0);
 	} else {
 		btac = a->bta->base;
 	}
+#endif
+
+	btac = bta_get_base(a->bta);
 
 	SDL_LockSurface(a->s);
 	memcpy(a->s->pixels, btac->gfx->buf, btac->gfx->size);
@@ -277,11 +332,14 @@ static int l_anim_start(lua_State *L)
 		loop = (l_loop_t *)gl_list_get_at(a->loopData, index);
 		c = bta_cell_get(a->bta, index, 0);
 
+		loop->timer = SDL_AddTimer(c->delay, simpleCallback, loop);
+#if 0
 		if (a->bta->type == BTA_TYPE_SIMPLELOOP)
 			loop->timer = SDL_AddTimer(c->delay, simpleCallback, loop);
 		else
 			loop->timer = SDL_AddTimer(c->delay, xorCallback, loop);
 	
+#endif
 	}
 
 	return 0;
@@ -385,11 +443,14 @@ int l_img_load_bta(lua_State *L)
 	a = l_checkAnim(L, -1);
 
 	a->bta = bta_read_bta(fname);
+	c = bta_get_base(a->bta);
+#if 0
 	if (a->bta->type == BTA_TYPE_SIMPLELOOP) {
 		c = bta_cell_get(a->bta, 0, 0);
 	} else {
 		c = a->bta->base;
 	}
+#endif
 
 	a->loopData = gl_list_nx_create_empty(GL_ARRAY_LIST,
 				NULL, NULL, l_loop_free, 1);
@@ -410,10 +471,8 @@ int l_img_load_bta(lua_State *L)
 		}
 	}
 
-
 	a->s = SDL_CreateRGBSurface(SDL_SWSURFACE, c->width, c->height,
-			8, 0, 0, 0, 0);
-	SDL_SetColors(a->s, egapal, 0, 16);
+			32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 
 	return 1;
 }

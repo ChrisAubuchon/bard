@@ -6,7 +6,6 @@ AM_CFLAGS = @CFLAGS@ \
 		-I../jansson
 
 libcnv_a_SOURCES = \
-	bigpic_gfx.c	\
 	cnvlib.h	\
 	d3comp.c	\
 	dehuf.c		\
@@ -14,6 +13,8 @@ libcnv_a_SOURCES = \
 	cnv.h	\
 	cnv_action.h	\
 	cnv_action.c	\
+	cnv_bigpic.c	\
+	cnv_bigpic.h	\
 	cnv_city.h	\
 	cnv_city.c	\
 	cnv_code.h	\

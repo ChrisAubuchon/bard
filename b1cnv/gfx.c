@@ -74,7 +74,7 @@ static void icon_write_detect(huffile_t *huf, int index)
 	int i, j;
 	btstring_t *data;
 
-	bta = bta_new(BTA_TYPE_SIMPLELOOP, 1);
+	bta = bta_new(1);
 	l = bta_loop_new(bta, 0, 6);
 
 	offset = 0;
@@ -110,7 +110,7 @@ static void icon_write_bta(huffile_t *huf, int index)
 	int i, j;
 	btstring_t *data;
 
-	bta = bta_new(BTA_TYPE_SIMPLELOOP, 1);
+	bta = bta_new(1);
 
 	offset = 0;
 	size = icons[index].height * icons[index].width;
