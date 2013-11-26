@@ -1,35 +1,39 @@
 #ifndef _L_INT_H
 #define _L_INT_H
 
-#include <btlib.h>
-#include <xalloc.h>
-#include <lua.h>
-#include <lauxlib.h>
-
-
 /********************************/
 /*				*/
 /* Helper macros		*/
 /*				*/
 /********************************/
 
-#define L_REGSTRING(state, name, c_str) { \
+
+#define mod_constant_s(state, name, c_str) do { \
 	lua_pushstring(state, name);		\
 	lua_pushstring(state, c_str);		\
 	lua_rawset(state, -3);			\
-	}
+	} while(0)
 
-#define L_REGFUNC(state, name, function) { \
+#define mod_function(state, name, function) do {\
 	lua_pushstring(state, name);		\
 	lua_pushcfunction(state, function);	\
 	lua_rawset(state, -3);			\
-	}
+	} while(0)
 
-#define L_REGNUMBER(state, name, c_num) {	\
+#define mod_constant_n(state, name, c_num) do {	\
 	lua_pushstring(state, name);		\
 	lua_pushnumber(state, c_num);		\
 	lua_rawset(state, -3);			\
-	}
+	} while(0)
+
+#define mod_begin_table(state, name) do {	\
+	lua_pushstring(state, name);		\
+	lua_newtable(state);			\
+	} while (0)
+
+#define mod_end_table(state, name) do {		\
+	lua_rawset(L, -3);			\
+	} while (0)
 
 #define L_GETMETATABLE(state, index) {		\
 	lua_pushvalue(state, index);		\
@@ -56,27 +60,20 @@
 /*				*/
 /********************************/
 
-btstring_t *_l_getFilePath(lua_State *L, uint8_t index);
-FILE *_l_openFileFP(lua_State *L, uint8_t index, char *flags);
+void	global_begin(lua_State *L, const char *name);
+void	global_end(lua_State *L);
 
-void l_video_open(lua_State *L);
-void l_xml_open(lua_State *L);
-void l_sys_open(lua_State *L);
+void	mod_begin(lua_State *L, const char *name);
+void	mod_end(lua_State *L);
 
-void global_begin(lua_State *L, const char *name);
-void global_end(lua_State *L);
-void mod_begin(lua_State *L, const char *name);
-void mod_end(lua_State *L);
-void class_begin(lua_State *L, const char *name);
-void class_end(lua_State *L);
-int mod_index_handler(lua_State *L);
-int mod_newindex_handler(lua_State *L);
-void mod_constant(lua_State *L, const char *name, lua_Number value);
-void mod_variable(lua_State *L, const char *name, 
+void	class_begin(lua_State *L, const char *name);
+void	class_end(lua_State *L);
+
+int	mod_index_handler(lua_State *L);
+int	mod_newindex_handler(lua_State *L);
+void	mod_variable(lua_State *L, const char *name, 
 			lua_CFunction get, lua_CFunction set);
-void mod_function(lua_State *L, const char *name, 
-			lua_CFunction func);
 
-int l_var_readonly(lua_State *L);
+int	l_var_readonly(lua_State *L);
 
 #endif

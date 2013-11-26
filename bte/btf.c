@@ -1,6 +1,9 @@
-#include <btlib.h>
+#include <bte.h>
 #include <bt_btf.h>
 #include <font.h>
+
+/*#define DEBUG 1*/
+#include <debug.h>
 
 /********************************/
 /*				*/
@@ -24,17 +27,32 @@ SDL_Surface *BTF_RenderText(btf_t *btf, const char *text, SDL_Color color)
 	BTF_SizeText(btf, text, &w, &h);
 
 	/* Create the surface */
-	rval = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, 8, 0, 0, 0, 0);
-/*	if (rval == NULL)*/
+	rval = SDL_CreateRGBSurface(0, w, h, 8, 0, 0, 0, 0);
+	if (rval == NULL) {
+		return NULL;
+	}
+	debug("rval->format = %s\n", SDL_GetPixelFormatName(rval->format->format));
 	palette = rval->format->palette;
 	palette->colors[0].r = 255 - color.r;
-   	palette->colors[0].g = 255 - color.g;
-   	palette->colors[0].b = 255 - color.b;
-   	palette->colors[1].r = color.r;
-   	palette->colors[1].g = color.g;
-   	palette->colors[1].b = color.b;
-   	SDL_SetColorKey(rval, SDL_SRCCOLORKEY, 0 );
+	palette->colors[0].g = 255 - color.g;
+	palette->colors[0].b = 255 - color.b;
+	palette->colors[0].a = 0;
+	palette->colors[1].r = color.r;
+	palette->colors[1].g = color.g;
+	palette->colors[1].b = color.b;
+	palette->colors[1].a = 255;
+   	SDL_SetColorKey(rval, SDL_TRUE, 0);
 
+	debug("rval->format->palette[0] = { %3d, %3d, %3d }\n",
+		rval->format->palette->colors[0].r,
+		rval->format->palette->colors[0].g,
+		rval->format->palette->colors[0].b
+	);
+	debug("rval->format->palette[1] = { %3d, %3d, %3d }\n",
+		rval->format->palette->colors[1].r,
+		rval->format->palette->colors[1].g,
+		rval->format->palette->colors[1].b
+	);
 
 	if (SDL_MUSTLOCK(rval))
 		SDL_LockSurface(rval);

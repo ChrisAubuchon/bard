@@ -1,7 +1,4 @@
-#include <btlib.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-#include <l_int.h>
+#include <bte.h>
 #include <l_sdl.h>
 
 #define DEBUG 1
@@ -29,7 +26,6 @@ static int l_surface_get_h(lua_State *L);
 static int l_surface_get_pitch(lua_State *L);
 
 /* Methods */
-static int l_surface_update_rect(lua_State *L);
 static int l_surface_fill_rect(lua_State *L);
 static int l_surface_set_color(lua_State *L);
 static int l_surface_set_color_key(lua_State *L);
@@ -62,31 +58,8 @@ static int l_surface_tostring(lua_State *L)
 
 	luaL_buffinit(L, &b);
 
-	for (x = 0; x < 256; x++) {
-		sprintf(buf, "colors[%3d]: r = %3d, g = %3d, b = %3d\n",
-			x, 
-			sur->format->palette->colors[x].r,
-			sur->format->palette->colors[x].g,
-			sur->format->palette->colors[x].b
-			);
-		luaL_addstring(&b, buf);
-	}
-
-	if (SDL_MUSTLOCK(sur))
-		SDL_LockSurface(sur);
-
-	pixels = (uint8_t *)sur->pixels;
-	for (y = 0; y < sur->h; y++) {
-		for (x = 0; x < sur->w; x++) {
-			luaL_addchar(&b, *pixels + '0');
-			pixels++;
-		}
-		luaL_addchar(&b, '\n');
-	}
-
-	if (SDL_MUSTLOCK(sur))
-		SDL_UnlockSurface(sur);
-
+	sprintf(buf, "w: %4d, h: %4d\n", sur->w, sur->h);
+	luaL_addstring(&b, buf);
 	luaL_pushresult(&b);
 
 
@@ -128,40 +101,6 @@ static int l_surface_get_pitch(lua_State *L)
 	return 1;
 }
 
-static int l_surface_update_rect(lua_State *L)
-{
-	SDL_Surface *sur;
-	SDL_Rect *r;
-	int index = 2;
-
-	sur = l_checkSurface(L, 1);
-	r = sdl_rect_arg(L, &index);
-
-	SDL_UpdateRect(sur, r->x, r->y, r->w, r->h);
-
-	free(r);
-
-	return 0;
-}
-
-static int l_surface_set_color(lua_State *L)
-{
-	SDL_Surface *sur;
-	SDL_Color *c;
-	int index = 3;
-	int color;
-	int rval;
-	
-
-	sur = l_checkSurface(L, 1);
-	color = luaL_checkint(L, 2);
-	c = sdl_color_arg(L, &index);
-
-	rval = SDL_SetPalette(sur, SDL_LOGPAL | SDL_PHYSPAL, c, color, 1);
-
-	return 0;
-}
-
 static int l_surface_set_color_key(lua_State *L)
 {
 	SDL_Surface	*sur;
@@ -171,7 +110,7 @@ static int l_surface_set_color_key(lua_State *L)
 	sur = l_checkSurface(L, 1);
 	key = luaL_checkint(L, 2);
 
-	rval = SDL_SetColorKey(sur, SDL_SRCCOLORKEY, key);
+	rval = SDL_SetColorKey(sur, SDL_TRUE, key);
 
 	return 0;
 }
@@ -184,84 +123,85 @@ static int l_surface_clear_color_key(lua_State *L)
 
 	sur = l_checkSurface(L, 1);
 
-	rval = SDL_SetColorKey(sur, 0, 0);
+	rval = SDL_SetColorKey(sur, SDL_FALSE, 0);
 
 	return 0;
 }
 
 static int l_surface_fill_rect(lua_State *L)
 {
-	SDL_Surface *sur;
-	SDL_Rect *r;
-	SDL_Color *c;
-	int index = 2;
-	uint32_t color;
+	SDL_Surface	*sur;
+	SDL_Rect	*rect;
+	uint8_t		r, g, b, a;
 
 	sur = l_checkSurface(L, 1);
-	r = sdl_rect_arg(L, &index);
-	c = sdl_color_arg(L, &index);
+	rect = l_testRect(L, 2);
+	r = (uint8_t)luaL_checkint(L, 3);
+	g = (uint8_t)luaL_checkint(L, 4);
+	b = (uint8_t)luaL_checkint(L, 5);
+	a = (uint8_t)luaL_optint(L, 6, 255);
 
-	color = SDL_MapRGB(sur->format, c->r, c->g, c->b);
-
-	SDL_FillRect(sur, r, color);
-
-	free(r);
-	free(c);
+	SDL_FillRect(sur, rect, SDL_MapRGBA(sur->format, r, g, b, a));
 
 	return 0;
 }
 
 static int l_surface_blit(lua_State *L)
 {
-	SDL_Surface *src;
-	SDL_Surface *dest;
-	SDL_Rect *sr;
-	SDL_Rect *dr;
-	int index = 1;
+	SDL_Surface	*src;
+	SDL_Surface	*dest;
+	SDL_Rect	*sr;
+	SDL_Rect	*dr;
 
-	dest = l_checkSurface(L, index++);
-	dr = sdl_rect_arg(L, &index);
-	src = l_checkSurface(L, index++);
-	sr = sdl_rect_arg(L, &index);
+	dest = l_checkSurface(L, 1);
+	dr = l_testRect(L, 2);
+	src = l_checkSurface(L, 3);
+	sr = l_testRect(L, 4);
 
 	if (SDL_BlitSurface(src, sr, dest, dr)) {
 		sdl_error(L);
 	}
-
-	free(sr);
-	free(dr);
-
-	return 0;
-}
-
-static int l_surface_flip(lua_State *L)
-{
-	SDL_Surface *sur;
-
-	sur = l_checkSurface(L, 1);
-
-	SDL_Flip(sur);
 
 	return 0;
 }
 
 static int l_surface_create_rgb(lua_State *L)
 {
-	int width;
-	int height;
-	int depth;
-	SDL_Surface **s;
+	/* Args */
+	int		width;
+	int		height;
+	int		depth;
 
+	SDL_Surface	**s;
+	uint32_t	rmask, gmask, bmask, amask;
+
+	/*
+	 * There are some endian-ness issues. SDL2_image reads in
+	 * PNG files in ABGR8888 on x86. PNG is in RGBA8888. So we
+	 * swap the endian check here. I'm thinking that it's an
+	 * issue with SDL_image. If it is going to create an ABGR
+	 * image then it needs to run a transform on the png file.
+	 */
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	rmask = 0xff000000;
+	gmask = 0x00ff0000;
+	bmask = 0x0000ff00;
+	amask = 0x000000ff;
+#else
+	rmask = 0x000000ff;
+	gmask = 0x0000ff00;
+	bmask = 0x00ff0000;
+	amask = 0xff000000;
+#endif
 	width = luaL_checkint(L, 1);
 	height = luaL_checkint(L, 2);
-	depth = luaL_optint(L, 3, 8);	/* Default to 8-bit depth */
+	depth = luaL_optint(L, 3, 32);
 
 	l_surface_new(L);
 	s = l_checkSurfaceP(L, -1);
 
 	*s = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, depth, \
-					0,0,0,0);
-	SDL_SetColors(*s, egapal, 0, 16);
+				rmask, gmask, bmask, amask);
 
 	if (*s == NULL)
 		sdl_error(L);
@@ -308,15 +248,11 @@ void l_sdl_surface_open(lua_State *L)
 	class_begin(L, "l_sdl_surface");
 	mod_function(L,	"__gc",		l_surface_free);
 	mod_function(L, "__tostring",	l_surface_tostring);
-	mod_variable(L, "isAnim",	l_surface_get_isanim,	l_var_readonly);
 	mod_variable(L, "w",		l_surface_get_w, 	l_var_readonly);
 	mod_variable(L, "h",		l_surface_get_h, 	l_var_readonly);
 	mod_variable(L, "pitch",	l_surface_get_pitch,	l_var_readonly);
-	mod_function(L, "UpdateRect",	l_surface_update_rect);
 	mod_function(L, "FillRect",	l_surface_fill_rect);
 	mod_function(L, "Blit",		l_surface_blit);
-	mod_function(L, "Flip",		l_surface_flip);
-	mod_function(L, "SetColor",	l_surface_set_color);
 	mod_function(L, "SetColorKey",	l_surface_set_color_key);
 	mod_function(L, "ClearColorKey",l_surface_clear_color_key);
 	class_end(L);

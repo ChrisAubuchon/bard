@@ -1,5 +1,4 @@
-#include <btlib.h>
-#include <l_int.h>
+#include <bte.h>
 
 #define DEBUG 1
 #include <debug.h>
@@ -17,6 +16,7 @@
 /*				*/
 /********************************/
 
+#if 0
 void mod_function(lua_State *L, const char *name, lua_CFunction func)
 {
 	lua_pushstring(L, name);
@@ -30,6 +30,7 @@ void mod_constant(lua_State *L, const char *name, lua_Number value)
 	lua_pushnumber(L, value);
 	lua_rawset(L, -3);
 }
+#endif
 
 /*
  * mod_variable()
@@ -163,8 +164,8 @@ void class_begin(lua_State *L, const char *name)
 {
 	luaL_newmetatable(L, name);
 
-	L_REGFUNC(L, "__index", mod_index_handler);
-	L_REGFUNC(L, "__newindex", mod_newindex_handler);
+	mod_function(L, "__index", mod_index_handler);
+	mod_function(L, "__newindex", mod_newindex_handler);
 }
 
 void class_end(lua_State *L)

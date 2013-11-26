@@ -1,6 +1,5 @@
-#include <btlib.h>
+#include <bte.h>
 #include <font.h>
-#include <l_int.h>
 #include <l_sdl.h>
 
 #define DEBUG 1
@@ -23,9 +22,11 @@
 /********************************/
 
 typedef struct {
-	SDL_Surface	*parent;
+	SDL_Renderer	*renderer;
+	SDL_Texture	*texture;
+	SDL_Surface	*screen;
+	SDL_Rect	*rect;
 	SDL_Surface	*s;
-	SDL_Rect	*r;
 	font_t		*font;
 	uint32_t	maxChar;
 	uint32_t	x;		/* Cursor x coordinate		*/
@@ -41,39 +42,43 @@ typedef struct {
 /********************************/
 
 /* Helper functions */
-static void set_color(l_textbox *tb, uint8_t index, SDL_Color *c);
-static void get_color(l_textbox *tb, uint8_t index, SDL_Color *c);
-static l_textbox *l_checkTextbox(lua_State *L, int index);
-static void _textbox_newline(l_textbox *tb);
-static void _textbox_scroll(l_textbox *tb);
-static void _textbox_highlight(l_textbox *tb, uint8_t srci, uint8_t desti, \
-				uint32_t lineno);
-static void _update_parent(l_textbox *tb, SDL_Rect *r);
-static uint32_t _textbox_wrap(l_textbox *tb, btstring_t *str, uint32_t base);
+static void		set_color(l_textbox *tb, uint8_t index, SDL_Color *c);
+static void		get_color(l_textbox *tb, uint8_t index, SDL_Color *c);
+static l_textbox	*l_checkTextbox(lua_State *L, int index);
+static void		_textbox_newline(l_textbox *tb);
+static void		_textbox_scroll(l_textbox *tb);
+static void		_textbox_highlight(l_textbox *tb, uint8_t srci,
+				uint8_t desti, uint32_t lineno);
+static void		_update_parent(l_textbox *tb, SDL_Rect *r);
+static uint32_t		_textbox_wrap(l_textbox *tb, btstring_t *str,
+				uint32_t base);
+static void		_update_screen(l_textbox *tb);
+static void		_color_table_to_color(lua_State *L, int index,
+				SDL_Color *c);
 
 /* Class methods */
-static int l_textbox_free(lua_State *L);
-static int l_textbox_getbg(lua_State *L);
-static int l_textbox_setbg(lua_State *L);
-static int l_textbox_getfg(lua_State *L);
-static int l_textbox_setfg(lua_State *L);
-static int l_textbox_gethg(lua_State *L);
-static int l_textbox_sethg(lua_State *L);
-static int l_textbox_draw(lua_State *L);
-static int l_textbox_clear(lua_State *L);
+static int		l_textbox_free(lua_State *L);
+static int		l_textbox_getbg(lua_State *L);
+static int		l_textbox_setbg(lua_State *L);
+static int		l_textbox_getfg(lua_State *L);
+static int		l_textbox_setfg(lua_State *L);
+static int		l_textbox_gethg(lua_State *L);
+static int		l_textbox_sethg(lua_State *L);
+static int		l_textbox_draw(lua_State *L);
+static int		l_textbox_clear(lua_State *L);
 
-static int l_textbox_setcursor(lua_State *L);
-static int l_textbox_getcursor(lua_State *L);
-static int l_textbox_setfont(lua_State *L);
-static int l_textbox_print(lua_State *L);
-static int l_textbox_highlight(lua_State *L);
-static int l_textbox_unhighlight(lua_State *L);
-static int l_textbox_putc(lua_State *L);
-static int l_textbox_erasechar(lua_State *L);
-static int l_textbox_clearline(lua_State *L);
+static int		l_textbox_setcursor(lua_State *L);
+static int		l_textbox_getcursor(lua_State *L);
+static int		l_textbox_setfont(lua_State *L);
+static int		l_textbox_print(lua_State *L);
+static int		l_textbox_highlight(lua_State *L);
+static int		l_textbox_unhighlight(lua_State *L);
+static int		l_textbox_putc(lua_State *L);
+static int		l_textbox_erasechar(lua_State *L);
+static int		l_textbox_clearline(lua_State *L);
 
 /* Module methods */
-static int l_textbox_new(lua_State *L);
+static int		l_textbox_new(lua_State *L);
 
 /********************************/
 /*				*/
@@ -88,7 +93,7 @@ static l_textbox *l_checkTextbox(lua_State *L, int index)
 
 static void set_color(l_textbox *tb, uint8_t index, SDL_Color *c)
 {
-	SDL_SetColors(tb->s, c, index, 1);
+	SDL_SetPaletteColors(tb->s->format->palette, c, index, 1);
 }
 
 static void get_color(l_textbox *tb, uint8_t index, SDL_Color *c)
@@ -100,20 +105,23 @@ static void get_color(l_textbox *tb, uint8_t index, SDL_Color *c)
 
 static void _textbox_scroll(l_textbox *tb)
 {
-	SDL_Rect r;
+	SDL_Rect	r;
 
 	r.x = 0;	
 	r.y = font_height(tb->font) / 2;
 	r.w = tb->s->w;
 	r.h = tb->s->h - font_height(tb->font) / 2;
-	SDL_BlitSurface_RP(tb->s, &r, tb->s, NULL);
+	SDL_BlitSurface(tb->s, &r, tb->s, NULL);
 
 	r.y = r.h;
 	r.h = font_height(tb->font) / 2;
-	SDL_FillRect_RP(tb->s, &r, BG_INDEX);
+	SDL_FillRect(tb->s, &r, BG_INDEX);
 
-	SDL_BlitSurface_RP(tb->s, NULL, tb->parent, tb->r);
-	SDL_UpdateRect_RP(tb->parent, tb->r);
+	_update_screen(tb);
+#if 0
+	SDL_BlitSurface(tb->s, NULL, tb->screen, tb->rect);
+	SDL_UpdateRect(tb->screen, tb->rect);
+#endif
 }
 
 static void _textbox_newline(l_textbox *tb)
@@ -129,7 +137,7 @@ static void _textbox_newline(l_textbox *tb)
 	tb->nchars = 0;
 
 	/* Scroll the text */
-	if (tb->y >= tb->r->h) {
+	if (tb->y >= tb->rect->h) {
 		_textbox_scroll(tb);
 		_textbox_scroll(tb);
 
@@ -160,23 +168,39 @@ static void _textbox_highlight(l_textbox *tb, uint8_t srci, uint8_t desti, \
 	if (SDL_MUSTLOCK(tb->s))
 		SDL_UnlockSurface(tb->s);
 
-	SDL_BlitSurface_RP(tb->s, NULL, tb->parent, tb->r);
+	_update_screen(tb);
+#if 0
+	SDL_BlitSurface_RP(tb->s, NULL, tb->screen, tb->rect);
 
-	SDL_UpdateRect_RC(tb->parent, tb->r->x, \
-			  tb->r->y + (lineno * font_height(tb->font)), \
-			  tb->r->w, font_height(tb->font));
+	SDL_UpdateRect_RC(tb->screen, tb->rect->x, \
+			  tb->rect->y + (lineno * font_height(tb->font)), \
+			  tb->rect->w, font_height(tb->font));
+#endif
+}
+
+static void _update_screen(l_textbox *tb)
+{
+	SDL_BlitSurface_r(tb->s, NULL, tb->screen, tb->rect);
+	SDL_UpdateTexture(tb->texture, NULL,
+			tb->screen->pixels,  tb->screen->pitch);
+	SDL_RenderCopy(tb->renderer, tb->texture, NULL, NULL);
+	SDL_RenderPresent(tb->renderer);
 }
 
 static void _update_parent(l_textbox *tb, SDL_Rect *r)
 {
 	SDL_Rect pr;
 
-	pr.x = r->x + tb->r->x;
-	pr.y = r->y + tb->r->y;
+	pr.x = r->x + tb->rect->x;
+	pr.y = r->y + tb->rect->y;
 	pr.w = r->w;
 	pr.h = r->h;
-	SDL_BlitSurface_RP(tb->s, r, tb->parent, &pr);
-	SDL_UpdateRect_RP(tb->parent, &pr);
+	SDL_BlitSurface(tb->s, r, tb->screen, &pr);
+
+	SDL_UpdateTexture(tb->texture, NULL,
+			tb->screen->pixels,  tb->screen->pitch);
+	SDL_RenderCopy(tb->renderer, tb->texture, NULL, NULL);
+	SDL_RenderPresent(tb->renderer);
 }
 
 /*
@@ -233,22 +257,31 @@ static uint32_t _textbox_wrap(l_textbox *tb, btstring_t *str, uint32_t base)
 /*				*/
 /********************************/
 
+/*
+ * l_textbox_new()
+ */
 static int l_textbox_new(lua_State *L)
 {
-	l_textbox *tb;
-	int index = 3;
+	l_textbox	*tb;
 
 	tb = lua_newuserdata(L, sizeof(l_textbox));
 	luaL_getmetatable(L, "l_sdl_textbox");
 	lua_setmetatable(L, -2);
 
-	tb->parent = l_checkSurface(L, 1);
-	tb->maxChar = (uint32_t)luaL_checkinteger(L, 2);
-	tb->r = sdl_rect_arg(L, &index);
+	tb->renderer	= l_checkRenderer(L, 1);
+	tb->texture	= l_checkTexture(L, 2);
+	tb->screen	= l_checkSurface(L, 3);
+	tb->rect	= l_checkRect(L, 4);
+	tb->maxChar	= (uint32_t)luaL_checkinteger(L, 5);
 	tb->font = NULL;
 
-	if (tb->r) {
-		tb->s = SDL_CreateRGBSurface(SDL_SWSURFACE, tb->r->w, tb->r->h,
+	tb->x = 0;
+	tb->y = 0;
+	tb->ws = 0;
+	tb->nchars = 0;
+
+	if (tb->rect) {
+		tb->s = SDL_CreateRGBSurface(0, tb->rect->w, tb->rect->h,
 					     8, 0, 0, 0, 0);
 	} else {
 		luaL_error(L, "Rectangle not specified for textbox");
@@ -260,78 +293,143 @@ static int l_textbox_new(lua_State *L)
 
 static int l_textbox_getbg(lua_State *L)
 {
-	SDL_Color *bg;
-	l_textbox *tb = l_checkTextbox(L, 1);
+	l_textbox	*tb;
+	SDL_Color	c;
 
-	L_NEWUSERDATA(L, bg, sizeof(SDL_Color), "l_sdl_color");
-	get_color(tb, BG_INDEX, bg);
+	tb = l_checkTextbox(L, 1);
+	get_color(tb, BG_INDEX, &c);
+
+	lua_newtable(L);
+
+	lua_pushnumber(L, 1);
+	lua_pushnumber(L, c.r);
+	lua_rawset(L, -3);
+	lua_pushnumber(L, 2);
+	lua_pushnumber(L, c.g);
+	lua_rawset(L, -3);
+	lua_pushnumber(L, 3);
+	lua_pushnumber(L, c.b);
+	lua_rawset(L, -3);
 
 	return 1;
 }
 
+/*
+ * _color_table_to_color()
+ */
+static void _color_table_to_color(lua_State *L, int index, SDL_Color *c)
+{
+	if (c == NULL)
+		return;
+
+	lua_pushvalue(L, index);
+
+	lua_pushnumber(L, 1);
+	lua_rawget(L, -2);
+	c->r = (uint8_t)luaL_checkint(L, -1);
+	lua_pop(L, 1);
+
+	lua_pushnumber(L, 2);
+	lua_rawget(L, -2);
+	c->g = (uint8_t)luaL_checkint(L, -1);
+	lua_pop(L, 1);
+
+	lua_pushnumber(L, 3);
+	lua_rawget(L, -2);
+	c->b = (uint8_t)luaL_checkint(L, -1);
+	lua_pop(L, 1);
+
+	lua_pushnumber(L, 4);
+	lua_rawget(L, -2);
+	c->a = (uint8_t)luaL_optint(L, -1, 255);
+	lua_pop(L, 1);
+
+	lua_pop(L, 1);
+}
+
 static int l_textbox_setbg(lua_State *L)
 {
-	int index = 2;
-	l_textbox *tb = l_checkTextbox(L, 1);
-	SDL_Color *c;
+	l_textbox	*tb;
+	SDL_Color	c;
 
-	c = sdl_color_arg(L, &index);
+	tb = l_checkTextbox(L, 1);
 
-	set_color(tb, BG_INDEX, c);
+	luaL_checktype(L, 2, LUA_TTABLE);
+	_color_table_to_color(L, 2, &c);
 
-	free(c);
+	set_color(tb, BG_INDEX, &c);
 
 	return 0;
 }
 
 static int l_textbox_getfg(lua_State *L)
 {
-	SDL_Color *fg;
-	l_textbox *tb = l_checkTextbox(L, 1);
+	l_textbox	*tb;
+	SDL_Color	c;
 
-	L_NEWUSERDATA(L, fg, sizeof(SDL_Color), "l_sdl_color");
-	get_color(tb, FG_INDEX, fg);
+	tb = l_checkTextbox(L, 1);
+	get_color(tb, FG_INDEX, &c);
+
+	lua_newtable(L);
+
+	lua_pushnumber(L, 1);
+	lua_pushnumber(L, c.r);
+	lua_rawset(L, -3);
+	lua_pushnumber(L, 2);
+	lua_pushnumber(L, c.g);
+	lua_rawset(L, -3);
+	lua_pushnumber(L, 3);
+	lua_pushnumber(L, c.b);
+	lua_rawset(L, -3);
 
 	return 1;
 }
 
 static int l_textbox_setfg(lua_State *L)
 {
-	int index = 2;
-	l_textbox *tb = l_checkTextbox(L, 1);
-	SDL_Color *c;
+	l_textbox	*tb;
+	SDL_Color	c;
 
-	c = sdl_color_arg(L, &index);
+	tb = l_checkTextbox(L, 1);
+	_color_table_to_color(L, 2, &c);
 
-	set_color(tb, FG_INDEX, c);
-
-	free(c);
+	set_color(tb, FG_INDEX, &c);
 
 	return 0;
 }
 
 static int l_textbox_gethg(lua_State *L)
 {
-	SDL_Color *hg;
-	l_textbox *tb = l_checkTextbox(L, 1);
+	l_textbox	*tb;
+	SDL_Color	c;
 
-	L_NEWUSERDATA(L, hg, sizeof(SDL_Color), "l_sdl_color");
-	get_color(tb, HG_INDEX, hg);
+	tb = l_checkTextbox(L, 1);
+	get_color(tb, HG_INDEX, &c);
+
+	lua_newtable(L);
+
+	lua_pushnumber(L, 1);
+	lua_pushnumber(L, c.r);
+	lua_rawset(L, -3);
+	lua_pushnumber(L, 2);
+	lua_pushnumber(L, c.g);
+	lua_rawset(L, -3);
+	lua_pushnumber(L, 3);
+	lua_pushnumber(L, c.b);
+	lua_rawset(L, -3);
 
 	return 1;
 }
 
 static int l_textbox_sethg(lua_State *L)
 {
-	int index = 2;
-	l_textbox *tb = l_checkTextbox(L, 1);
-	SDL_Color *c;
+	l_textbox	*tb;
+	SDL_Color	c;
 
-	c = sdl_color_arg(L, &index);
+	tb = l_checkTextbox(L, 1);
+	_color_table_to_color(L, 2, &c);
 
-	set_color(tb, HG_INDEX, c);
-
-	free(c);
+	set_color(tb, HG_INDEX, &c);
 
 	return 0;
 }
@@ -340,7 +438,10 @@ static int l_textbox_draw(lua_State *L)
 {
 	l_textbox *tb = l_checkTextbox(L, 1);
 
-	SDL_UpdateRect(tb->parent, tb->r->x, tb->r->y, tb->r->w, tb->r->h);
+	_update_screen(tb);
+#if 0
+	SDL_UpdateRect(tb->screen, tb->rect->x, tb->rect->y, tb->rect->w, tb->rect->h);
+#endif
 
 	return 0;
 }
@@ -349,12 +450,14 @@ static int l_textbox_clear(lua_State *L)
 {
 	l_textbox *tb = l_checkTextbox(L, 1);
 
-	if (SDL_FillRect_RP(tb->s, NULL, BG_INDEX) < 0)
-		luaL_error(L, "Fillrect failed...");
+	if (SDL_FillRect(tb->s, NULL, BG_INDEX) < 0)
+		sdl_error(L);
 
-	SDL_BlitSurface_RP(tb->s, NULL, tb->parent, tb->r);
-	SDL_UpdateRect_RP(tb->parent, tb->r);
-
+#if 0
+	SDL_BlitSurface_RP(tb->s, NULL, tb->screen, tb->rect);
+	SDL_UpdateRect_RP(tb->screen, tb->rect);
+#endif
+	_update_screen(tb);
 
 	/* Reset the cursor */
 	tb->x = 0;
@@ -367,7 +470,6 @@ static int l_textbox_free(lua_State *L)
 {
 	l_textbox *tb = l_checkTextbox(L, 1);
 
-	free(tb->r);
 	SDL_FreeSurface(tb->s);
 
 	return 0;
@@ -414,14 +516,14 @@ static int l_textbox_setfont(lua_State *L)
 
 static int l_textbox_print(lua_State *L)
 {
-	l_textbox *tb;
-	btstring_t *text;
-	const char *instring;
-	SDL_Surface *s;
-	SDL_Color fg;
-	SDL_Rect srect, prect;
-	uint32_t nchars;
-	uint32_t index = 0;
+	l_textbox	*tb;
+	btstring_t	*text;
+	const char	*instring;
+	SDL_Surface	*s;
+	SDL_Color	fg;
+	SDL_Rect	srect, prect;
+	uint32_t	nchars;
+	uint32_t	index = 0;
 
 	tb = l_checkTextbox(L, 1);
 	text = bts_strcpy(luaL_checkstring(L, 2));
@@ -436,7 +538,7 @@ static int l_textbox_print(lua_State *L)
 		 * character's to do text wrapping.
 		 */
 		nchars = font_wrap(tb->font, text->buf, index, \
-					(tb->r->w - tb->x));
+					(tb->rect->w - tb->x));
 #endif
 		nchars = _textbox_wrap(tb, text, index);
 
@@ -451,9 +553,10 @@ static int l_textbox_print(lua_State *L)
 			srect.y = tb->y;
 			srect.w = s->w;
 			srect.h = s->h;
-			SDL_BlitSurface_RP(s, NULL, tb->s, &srect);
 
-			_update_parent(tb, &srect);
+			if (SDL_BlitSurface_r(s, NULL, tb->s, &srect))
+				sdl_error(L);
+			_update_screen(tb);
 
 			tb->x += s->w;
 
@@ -496,13 +599,18 @@ static int l_textbox_putc(lua_State *L)
 
 	width = font_putc(tb->font, c, tb->s, tb->x, tb->y, &fg);
 
+#if 0
 	srect.x = tb->x;
 	srect.y = tb->y;
 	srect.w = width;
 	srect.h = font_height(tb->font);
-	SDL_UpdateRect_RP(tb->s, &srect);
+	SDL_UpdateRect(tb->s, &srect);
+#endif
 
+	_update_screen(tb);
+#if 0
 	_update_parent(tb, &srect);
+#endif
 
 	tb->x += width;
 
@@ -545,9 +653,12 @@ static int l_textbox_erasechar(lua_State *L)
 	srect.y = tb->y;
 	srect.w = w;
 	srect.h = h;
-	SDL_FillRect_RP(tb->s, &srect, BG_INDEX);
+	SDL_FillRect(tb->s, &srect, BG_INDEX);
 
+#if 0
 	_update_parent(tb, &srect);
+#endif
+	_update_screen(tb);
 
 	lua_pushnumber(L, w);
 
@@ -567,11 +678,14 @@ static int l_textbox_clearline(lua_State *L)
 
 	srect.x = 0;
 	srect.y = tb->y;
-	srect.w = tb->r->w;
+	srect.w = tb->rect->w;
 	srect.h = font_height(tb->font);
-	SDL_FillRect_RP(tb->s, &srect, BG_INDEX);
+	SDL_FillRect(tb->s, &srect, BG_INDEX);
 
+	_update_screen(tb);
+#if 0
 	_update_parent(tb, &srect);
+#endif
 
 	return 0;
 }

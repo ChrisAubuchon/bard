@@ -1,7 +1,4 @@
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <l_int.h>
+#include <bte.h>
 
 
 /********************************/
@@ -27,7 +24,7 @@ void l_sys_open(lua_State *L)
 {
 	lua_newtable(L);
 
-	L_REGSTRING(L, "dataPath",	DATADIR);
+	mod_constant_s(L, "dataPath",	DATADIR);
 
 	lua_setglobal(L, "sys");
 }

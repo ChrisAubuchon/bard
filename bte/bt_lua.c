@@ -1,7 +1,4 @@
-#include <config.h>
-#include <bt_lua.h>
-#include <tolua.h>
-#include <l_int.h>
+#include <bte.h>
 
 
 /********************************/
@@ -20,6 +17,11 @@ static lua_State *global_state = NULL;
 /********************************/
 
 
+/*
+ * bt_lua_state()
+ *
+ * Initialize LUA
+ */
 lua_State *bt_lua_state(void)
 {
 	if (global_state == NULL) {
@@ -28,9 +30,7 @@ lua_State *bt_lua_state(void)
 		luaL_openlibs(global_state);
 		l_jansson_open(global_state);
 		l_sys_open(global_state);
-#ifndef NOSDL
 		l_sdl_open(global_state);
-#endif
 		l_random_open(global_state);
 		l_sprintf_open(global_state);
 	}
@@ -38,6 +38,9 @@ lua_State *bt_lua_state(void)
 	return global_state;
 }
 
+/*
+ * bt_lua_doFile()
+ */
 void bt_lua_doFile(lua_State *L, uint8_t *script)
 {
 	int error;

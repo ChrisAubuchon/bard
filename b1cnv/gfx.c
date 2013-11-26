@@ -223,7 +223,9 @@ void convertGFX(void)
 	outputScreens(2);
 	outputIcons(2);
 	outputBigpic(2);
+#if 0
 	outputBitmapFont();
 	outputCitypics(2);
 	outputDunpics(2);
+#endif
 }

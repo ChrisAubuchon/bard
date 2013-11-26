@@ -1,6 +1,8 @@
 #include <btlib.h>
 #include <font.h>
+#if 0
 #include <SDL/SDL_ttf.h>
+#endif
 
 
 /********************************/
@@ -14,7 +16,9 @@ struct font_t {
 	uint8_t type;
 
 	btf_t *btf;
+#if 0
 	TTF_Font *ttf;
+#endif
 };
 
 /********************************/
@@ -24,7 +28,9 @@ struct font_t {
 /********************************/
 
 #define FONT_BTF	1
+#if 0
 #define FONT_TTF	2
+#endif
 
 /********************************/
 /*				*/
@@ -35,9 +41,11 @@ struct font_t {
 void font_close(font_t *font)
 {
 	switch (font->type) {
+#if 0
 	case FONT_TTF:
 		TTF_CloseFont(font->ttf);
 		break;
+#endif
 	case FONT_BTF:
 		BTF_CloseFont(font->btf);
 		break;
@@ -52,6 +60,7 @@ font_t *font_open(btstring_t *fname,  uint8_t type, int flags)
 
 	font->type = type;
 	switch (type) {
+#if 0
 	case FONT_TTF:
 		if (!TTF_WasInit() && TTF_Init() == -1) {
 			SDL_SetError(TTF_GetError());
@@ -65,6 +74,7 @@ font_t *font_open(btstring_t *fname,  uint8_t type, int flags)
 		}
 
 		break;
+#endif
 	case FONT_BTF:
 		font->btf = BTF_OpenFont(fname, flags);
 		break;
@@ -78,12 +88,14 @@ font_t *font_open(btstring_t *fname,  uint8_t type, int flags)
 
 int font_size_text(font_t *font, const char *text, int *w, int *h)
 {
-	switch (font->type)
+	switch (font->type) {
+#if 0
 	case FONT_TTF:
 		if (TTF_SizeText(font->ttf, text, w, h) < 0) {
 			SDL_SetError(TTF_GetError());
 			return 1;
 		break;
+#endif
 	case FONT_BTF:
 		BTF_SizeText(font->btf, text, w, h);
 		break;
@@ -98,8 +110,10 @@ int font_size_text(font_t *font, const char *text, int *w, int *h)
 uint8_t font_height(font_t *font)
 {
 	switch (font->type) {
+#if 0
 	case FONT_TTF:
 		return TTF_FontHeight(font->ttf);
+#endif
 	case FONT_BTF:
 		return BTF_FontHeight(font->btf);
 	default:
@@ -116,8 +130,10 @@ SDL_Surface *font_render(font_t *font, const char *text, SDL_Color *c)
 	}
 
 	switch (font->type) {
+#if 0
 	case FONT_TTF:
 		return TTF_RenderText_Solid(font->ttf, text, *c);
+#endif
 	case FONT_BTF:
 		return BTF_RenderText(font->btf, text, *c);
 	default:
@@ -134,9 +150,11 @@ uint32_t font_wrap(font_t *font, const char *text, uint32_t base, uint32_t max)
 	}
 
 	switch (font->type) {
+#if 0
 	case FONT_TTF:
 		SDL_SetError("font_wrap for TTF not implemented");
 		return 0;
+#endif
 	case FONT_BTF:
 		return BTF_WrapText(font->btf, text, base, max);
 	default:
@@ -154,9 +172,11 @@ uint32_t font_putc(font_t *font, uint32_t c, SDL_Surface *s,
 	}
 
 	switch (font->type) {
+#if 0
 	case FONT_TTF:
 		SDL_SetError("font_putc for TTF not implemented");
 		return 0;
+#endif
 	case FONT_BTF:
 		return BTF_putc(font->btf, c, s, x, y, fg);
 	default:
@@ -173,9 +193,11 @@ void font_glyph_dim(font_t *font, uint32_t c, int *w, int *h)
 	}
 
 	switch (font->type) {
+#if 0
 	case FONT_TTF:
 		SDL_SetError("font_glyph_dim for TTF not implemented");
 		return;
+#endif
 	case FONT_BTF:
 		return BTF_glyph_dim(font->btf, c, w, h);
 	default:

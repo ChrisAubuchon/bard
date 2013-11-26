@@ -5,8 +5,7 @@
  * function. This function will replace numbers that are too large
  * for their format with a string filled with '*'
  */
-#include <btlib.h>
-#include <l_int.h>
+#include <bte.h>
 
 
 /********************************/

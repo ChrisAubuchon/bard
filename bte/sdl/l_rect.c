@@ -1,20 +1,9 @@
-#include <btlib.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-#include <l_int.h>
+#include <bte.h>
 #include <l_sdl.h>
 
 #define DEBUG 1
 #include <debug.h>
 
-/********************************/
-/*				*/
-/* Helper macros		*/
-/*				*/
-/********************************/
-
-#define TO_SDL_RECT(state, index) (SDL_Rect *)luaL_checkudata(state, \
-						index, "l_sdl_rect")
 /********************************/
 /*				*/
 /* Private function prototypes	*/
@@ -33,7 +22,6 @@ static int sdl_rect_set_h(lua_State *L);
 
 static int l_new_rect(lua_State *L);
 static int l_rect_tostring(lua_State *L);
-static SDL_Rect *sdl_new_rect(int x, int y, int w, int h);
 
 /********************************/
 /*				*/
@@ -43,36 +31,51 @@ static SDL_Rect *sdl_new_rect(int x, int y, int w, int h);
 
 static int sdl_rect_get_x(lua_State *L)
 {
-	SDL_Rect *r = TO_SDL_RECT(L, 1);
+	SDL_Rect	*r;
+
+	r = l_checkRect(L, 1);
+
 	lua_pushnumber(L, r->x);
 	return 1;
 }
 
 static int sdl_rect_get_y(lua_State *L)
 {
-	SDL_Rect *r = TO_SDL_RECT(L, 1);
+	SDL_Rect	*r;
+
+	r = l_checkRect(L, 1);
+
 	lua_pushnumber(L, r->y);
 	return 1;
 }
 
 static int sdl_rect_get_w(lua_State *L)
 {
-	SDL_Rect *r = TO_SDL_RECT(L, 1);
+	SDL_Rect	*r;
+
+	r = l_checkRect(L, 1);
+
 	lua_pushnumber(L, r->w);
 	return 1;
 }
 
 static int sdl_rect_get_h(lua_State *L)
 {
-	SDL_Rect *r = TO_SDL_RECT(L, 1);
+	SDL_Rect	*r;
+
+	r = l_checkRect(L, 1);
+
 	lua_pushnumber(L, r->h);
 	return 1;
 }
 
 static int sdl_rect_set_x(lua_State *L)
 {
-	SDL_Rect *r = TO_SDL_RECT(L, 1);
-	uint8_t val = (uint8_t)luaL_checknumber(L, 2);
+	SDL_Rect	*r;
+	uint8_t		val;
+
+	r = l_checkRect(L, 1);
+	val = (uint8_t)luaL_checknumber(L, 2);
 
 	r->x = val;
 
@@ -81,8 +84,11 @@ static int sdl_rect_set_x(lua_State *L)
 
 static int sdl_rect_set_y(lua_State *L)
 {
-	SDL_Rect *r = TO_SDL_RECT(L, 1);
-	uint8_t val = (uint8_t)luaL_checknumber(L, 2);
+	SDL_Rect	*r;
+	uint8_t		val;
+
+	r = l_checkRect(L, 1);
+	val = (uint8_t)luaL_checknumber(L, 2);
 
 	r->y = val;
 
@@ -91,8 +97,11 @@ static int sdl_rect_set_y(lua_State *L)
 
 static int sdl_rect_set_w(lua_State *L)
 {
-	SDL_Rect *r = TO_SDL_RECT(L, 1);
-	uint8_t val = (uint8_t)luaL_checknumber(L, 2);
+	SDL_Rect	*r;
+	uint8_t		val;
+
+	r = l_checkRect(L, 1);
+	val = (uint8_t)luaL_checknumber(L, 2);
 
 	r->w = val;
 
@@ -101,8 +110,11 @@ static int sdl_rect_set_w(lua_State *L)
 
 static int sdl_rect_set_h(lua_State *L)
 {
-	SDL_Rect *r = TO_SDL_RECT(L, 1);
-	uint8_t val = (uint8_t)luaL_checknumber(L, 2);
+	SDL_Rect	*r;
+	uint8_t		val;
+
+	r = l_checkRect(L, 1);
+	val = (uint8_t)luaL_checknumber(L, 2);
 
 	r->h = val;
 
@@ -111,24 +123,33 @@ static int sdl_rect_set_h(lua_State *L)
 
 static int l_new_rect(lua_State *L)
 {
-	SDL_Rect *r;
+	SDL_Rect	*r;
+	int		index = 1;
 
-	r = lua_newuserdata(L, sizeof(SDL_Rect));
-	L_SETMETATABLE(L, "l_sdl_rect");
+	l_rect_new(L);
+	r = l_checkRect(L, -1);
 
-	r->x = (int16_t)luaL_checkinteger(L, 1);
-	r->y = (int16_t)luaL_checkinteger(L, 2);
-	r->w = (uint16_t)luaL_checkinteger(L, 3);
-	r->h = (uint16_t)luaL_checkinteger(L, 4);
+	/* Handle the Rect:new() case */
+	if (lua_istable(L, 1))
+		index = 2;
+
+
+	r->x = (int16_t)luaL_checkinteger(L, index++);
+	r->y = (int16_t)luaL_checkinteger(L, index++);
+	r->w = (uint16_t)luaL_checkinteger(L, index++);
+	r->h = (uint16_t)luaL_checkinteger(L, index++);
 
 	return 1;
 }
 
 static int l_rect_tostring(lua_State *L)
 {
-	SDL_Rect *r = TO_SDL_RECT(L, 1);
+	SDL_Rect	*r;
 
-	lua_pushfstring(L, "x: %d, y: %d, w: %d, h: %d\n", r->x, r->y, r->w, r->h);
+	r = l_checkRect(L, 1);
+
+	lua_pushfstring(L, "x: %d, y: %d, w: %d, h: %d\n",
+			r->x, r->y, r->w, r->h);
 
 	return 1;
 }
@@ -155,42 +176,32 @@ static SDL_Rect *sdl_new_rect(int x, int y, int w, int h)
 /*				*/
 /********************************/
 
+/*
+ * l_rect_new()
+ */
+int l_rect_new(lua_State *L)
+{
+	lua_newuserdata(L, sizeof(SDL_Rect));
+	luaL_getmetatable(L, "l_sdl_rect");
+	lua_setmetatable(L, -2);
+
+	return 1;
+}
 
 /*
- * sdl_rect_arg()
- * Returns a pointer to a SDL_Rect structure. 
+ * l_testRect()
  */
-SDL_Rect *sdl_rect_arg(lua_State *L, int *index)
+SDL_Rect *l_testRect(lua_State *L, int index)
 {
-	SDL_Rect *r;
+	return (SDL_Rect *)luaL_testudata(L, index, "l_sdl_rect");
+}
 
-	if (lua_isnil(L, *index)) {
-		*index = *index + 1;
-		return NULL;
-	} else if (lua_isnumber(L, *index)) {
-		int x, y, w, h;
-
-		x = (int16_t)luaL_checkinteger(L, *index);
-		y = (int16_t)luaL_checkinteger(L, *index + 1);
-		w = (uint16_t)luaL_checkinteger(L, *index + 2);
-		h = (uint16_t)luaL_checkinteger(L, *index + 3);
-
-		*index = *index + 4;
-
-		return sdl_new_rect(x, y, w, h);
-	} else if (lua_isuserdata(L, *index)) {
-		/*
-		 * Make a copy of the passed in l_sdl_rect userdata.
-		 */
-		r = (SDL_Rect *)luaL_checkudata(L, *index, "l_sdl_rect");
-
-		*index = *index + 1;
-
-		return sdl_new_rect(r->x, r->y, r->w, r->h);
-	} else {
-		luaL_error(L, "SDL_Rect argument expected at #%d\n", *index);
-		return NULL;
-	}
+/*
+ * l_checkRect()
+ */
+SDL_Rect *l_checkRect(lua_State *L, int index)
+{
+	return (SDL_Rect *)luaL_checkudata(L, index, "l_sdl_rect");
 }
 
 void l_sdl_rect_open(lua_State *L)
@@ -203,5 +214,7 @@ void l_sdl_rect_open(lua_State *L)
 	mod_variable(L, "h",	sdl_rect_get_h, sdl_rect_set_h);
 	class_end(L);
 
-	mod_function(L, "NewRect", l_new_rect);
+	mod_begin_table(L, "Rect");
+	mod_function(L, "New", l_new_rect);
+	mod_end_table(L, "Rect");
 }
