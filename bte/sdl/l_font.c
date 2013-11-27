@@ -77,10 +77,7 @@ static int l_font_render_text(lua_State *L)
 
 	font = l_checkFont(L, 1);
 	text = luaL_checkstring(L, 2);
-	col.r = (uint8_t)luaL_checkint(L, 3);
-	col.g = (uint8_t)luaL_checkint(L, 4);
-	col.b = (uint8_t)luaL_checkint(L, 5);
-	col.a = (uint8_t)luaL_optint(L, 6, 255);
+	l_checkColor(L, 3, &col);
 
 	l_surface_new(L);
 	sur = l_checkSurfaceP(L, -1);

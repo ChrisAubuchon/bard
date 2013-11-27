@@ -4,7 +4,7 @@
 #include <gl_list.h>
 #include <gl_array_list.h>
 
-#define DEBUG 1
+/*#define DEBUG 1*/
 #include <debug.h>
 
 
@@ -40,15 +40,6 @@ typedef struct {
 
 /********************************/
 /*				*/
-/* Helper macros		*/
-/*				*/
-/********************************/
-
-#define TO_SDL_ANIM(state, index) (l_anim *)luaL_checkudata(state, \
-						index, "l_sdl_anim")
-
-/********************************/
-/*				*/
 /* Private function prototypes	*/
 /*				*/
 /********************************/
@@ -63,7 +54,7 @@ static int l_anim_get_h(lua_State *L);
 static int l_anim_free(lua_State *L);
 static int l_anim_tostring(lua_State *L);
 static int l_anim_start(lua_State *L);
-static int l_anim_top(lua_State *L);
+static int l_anim_stop(lua_State *L);
 
 static int l_anim_new(lua_State *L);
 static l_anim *l_checkAnim(lua_State *L, int index);
@@ -182,6 +173,11 @@ static int l_anim_free(lua_State *L)
 	a = l_checkAnim(L, 1);
 
 	if (a != NULL) {
+		/* 
+		 * Call l_anim_stop() to eliminate a race condition
+		 * between the free'ing of the bta and the events.
+		 */
+		l_anim_stop(L);
 		SDL_FreeSurface(a->s);
 		bta_free(a->bta);
 	}
@@ -256,6 +252,7 @@ static int l_anim_stop(lua_State *L)
 		if (SDL_RemoveTimer(l->timer) == SDL_FALSE) {
 			luaL_error(L, "Error removing animation timer");
 		}
+		l->timer = 0;
 	}
 
 	/*
@@ -354,6 +351,7 @@ int l_img_load_bta(lua_State *L)
 		l->anim = a;
 		l->c_cell = 0;
 		l->loopNumber = i;
+		l->timer = 0;
 
 		if (gl_list_nx_add_last(a->loopData, l) == NULL) {
 			luaL_error(L, "Out of memory");

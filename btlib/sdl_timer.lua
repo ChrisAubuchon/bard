@@ -8,7 +8,7 @@ function timer:new(inFunction, inInterval)
 		timer	= false
 	}
 
-	self.timer = sdl.AddTimer(inFunction, inInterval)
+	self.timer = SDL.AddTimer(inFunction, inInterval)
 
 	btTable.addParent(self, timer)
 	btTable.setClassMetatable(self)
@@ -20,7 +20,7 @@ end
 -- stop()
 ---------------------------------------- 
 function timer:stop()
-	sdl.removeTimer(self.timer)
+	SDL.removeTimer(self.timer)
 end
 
 local delayIndex	= 8
@@ -37,7 +37,7 @@ function timer:delay(inDelayTime)
 		local inkey
 		local timer
 
-		timer = sdl.Sleep(180 * inTime)
+		timer = SDL.Sleep(180 * inTime)
 
 		while true do
 			inkey = getkey()
@@ -48,7 +48,7 @@ function timer:delay(inDelayTime)
 			elseif ((inkey == "<") or (inkey == ",")) then
 				self:defaultSlower()
 			else
-				sdl.RemoveTimer(timer)
+				SDL.RemoveTimer(timer)
 				return
 			end
 		end

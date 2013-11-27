@@ -1,27 +1,37 @@
-require "test/bttable"
+require "bttable"
 
-local m_screen = nil
-m_renderer = nil
-m_texture = nil
-m_surface = nil
+----------------------------------------
+-- gfx class
+--
+-- Main window class
+----------------------------------------
 
-function gfxInit(inTitle)
+gfx = {
+	screen		= nil,
+	renderer	= nil,	
+	texture		= nil,
+	surface		= nil
+}
+function gfx:Init(inTitle)
 	SDL.Init(SDL.INIT.TIMER, SDL.INIT.AUDIO, SDL.INIT.VIDEO)
 
-	m_screen = SDL.CreateWindow(
+	self.screen = SDL.CreateWindow(
 			inTitle,
 			SDL.WINDOWPOS.CENTERED,
 			SDL.WINDOWPOS.CENTERED,
 			640, 400, 0
 			)
-	m_renderer = SDL.CreateRenderer(m_screen, -1, SDL.RENDERER.SOFTWARE)
-	m_texture = SDL.CreateTexture(m_renderer, 
+	self.renderer = SDL.CreateRenderer(gfx.screen, -1,
+					SDL.RENDERER.SOFTWARE)
+	self.texture = SDL.CreateTexture(gfx.renderer, 
 			SDL.PIXELFORMAT.ABGR8888,
 			SDL.TEXTUREACCESS.STREAMING,
 			640,
 			400)
-	m_surface = SDL.CreateRGBSurface(640, 400, 32)
+	self.surface = SDL.CreateRGBSurface(640, 400, 32)
 end
+
+---------------------------------------------------------------------
 
 ----------------------------------------
 -- gfxImage class
@@ -59,12 +69,13 @@ end
 ----------------------------------------
 function gfxImage:Draw(inDstRect)
 	if (self.isAnim) then
-		self.surface:start(m_renderer, m_texture,m_surface, inDstRect)
+		self.surface:start(gfx.renderer, gfx.texture, gfx.surface, 
+					inDstRect)
 	else
-		m_surface:Blit(inDstRect, self.surface, nil)
-		m_texture:Update(nil, m_surface)
-		m_renderer:Copy(m_texture, nil, nil)
-		m_renderer:Present()
+		gfx.surface:Blit(inDstRect, self.surface, nil)
+		gfx.texture:Update(nil, gfx.surface)
+		gfx.renderer:Copy(gfx.texture, nil, nil)
+		gfx.renderer:Present()
 	end
 end
 
@@ -77,6 +88,8 @@ function gfxImage:Clear()
 	end
 end
 
+---------------------------------------------------------------------
+
 ----------------------------------------
 -- gfxRect class
 ----------------------------------------
@@ -85,78 +98,98 @@ function gfxRect:New(inX, inY, inW, inH)
 	return SDL.Rect:New(inX, inY, inW, inH)
 end
 
-
-btkeys = {
-	RETURN = ":A:",
-	ESCAPE = ":B:",
-	BACKSPACE = ":C:",
-	UP = ":D:",
-	DOWN = ":E:",
-	LEFT = ":F:",
-	RIGHT = ":G:",
-	PAGEUP = ":H:",
-	PAGEDOWN = ":I:",
-	F1 = ":J:",
-	F2 = ":K:",
-	F3 = ":L:",
-	F4 = ":M:",
-	F5 = ":N:",
-	F6 = ":O:",
-	F7 = ":P:",
-	RANDOMBATTLE = ":Q:",
-	WANDERING = ":R:"
-}
+---------------------------------------------------------------------
 
 ----------------------------------------
--- getkey()
---
--- Main IO loop
+-- gfxFont class
 ----------------------------------------
-function getkey()
-	local inkey
+gfxFont = {}
+function gfxFont:new(inName, inMonoFlag)
+	local self = {
+		font	= false
+	}
 
-	while true do
-		inkey = SDL.GetKey()
-
-		if (not inkey) then
-			return nil
-		elseif (inkey == 0) then
-			return inkey
-		elseif (inkey == SDL.K.RETURN) then
-			return btkeys.RETURN
-		elseif (inkey == SDL.K.BACKSPACE) then
-			return btkeys.BACKSPACE
-		elseif (inkey == SDL.K.ESCAPE) then
-			return btkeys.ESCAPE
-		elseif (inkey == SDL.K.UP) then
-			return btkeys.UP
-		elseif (inkey == SDL.K.DOWN) then
-			return btkeys.DOWN
-		elseif (inkey == SDL.K.LEFT) then
-			return btkeys.LEFT
-		elseif (inkey == SDL.K.RIGHT) then
-			return btkeys.RIGHT
-		elseif (inkey == SDL.K.PAGEUP) then
-			return btkeys.PAGEUP
-		elseif (inkey == SDL.K.PAGEDOWN) then
-			return btkeys.PAGEDOWN
-		elseif (inkey == SDL.K.F1) then
-			return btkeys.F1
-		elseif (inkey == SDL.K.F2) then
-			return btkeys.F2
-		elseif (inkey == SDL.K.F3) then
-			return btkeys.F3
-		elseif (inkey == SDL.K.F4) then
-			return btkeys.F4
-		elseif (inkey == SDL.K.F5) then
-			return btkeys.F5
-		elseif (inkey == SDL.K.F6) then
-			return btkeys.F6
-		elseif (inkey == SDL.K.F7) then
-			return btkeys.F7
-		elseif (inkey < 255) then
-			return string.upper(string.char(inkey))
-		end
+	if (inMonoFlag) then
+		self.font = SDL.font.Open(inName,
+				SDL.font.FONT_BTF,
+				SDL.font.BTF_MONOSPACE)
+	else
+		self.font = SDL.font.Open(inName,
+				SDL.font.FONT_BTF,
+				SDL.font.BTF_VARWIDTH)
 	end
+
+	btTable.addParent(self, gfxFont)
+	btTable.setClassMetatable(self)
+
+	return self
 end
 
+----------------------------------------
+-- Size()
+----------------------------------------
+function gfxFont:Size(inText)
+	return self.font:SizeText(inText)
+end
+
+----------------------------------------
+-- Render()
+----------------------------------------
+function gfxFont:Render(inText, inColor)
+	local rval = {
+		surface = false,
+		w	= 0,
+		h	= 0
+	}
+	rval.surface = self.font:RenderText(inText, inColor)
+	rval.w = rval.surface.w
+	rval.h = rval.surface.h
+	return rval
+end
+
+---------------------------------------------------------------------
+
+----------------------------------------
+-- gfxSurface class
+----------------------------------------
+gfxSurface = {}
+function gfxSurface:New(inWidth, inHeight)
+	local self = {
+		surface = false
+	}
+
+	if ((inWidth) and (inHeight)) then
+		self.surface = SDL.CreateRGBSurface(inWidth, inHeight, 32)
+	end
+
+	btTable.addParent(self, gfxSurface)
+	btTable.setClassMetatable(self)
+
+	return self
+end
+
+----------------------------------------
+-- Blit()
+----------------------------------------
+function gfxSurface:Blit(inDstRect, inSrc, inSrcRect)
+	assert(inSrc.surface, "Trying to Blit a non-surface")
+
+	self.surface:Blit(inDstRect, inSrc.surface, inSrcRect)
+end
+
+----------------------------------------
+-- Fill()
+----------------------------------------
+function gfxSurface:Fill(inRectangle, inColor)
+	self.surface:FillRect(inRectangle, inColor)
+end
+
+----------------------------------------
+-- Draw()
+----------------------------------------
+function gfxSurface:Draw(inDstRect)
+	gfx.surface:Blit(inDstRect, self.surface, nil)
+	gfx.texture:Update(nil, gfx.surface)
+	gfx.renderer:Copy(gfx.texture, nil, nil)
+	gfx.renderer:Present()
+end

@@ -707,13 +707,13 @@ function party:printStatusLine(inCharString, inHpString, inSlot)
 
 	y = 266 + (16 * inSlot)
 	fontP = globals.fonts.mono
-	m_window:Fill(gfxRectangle:new(32, y, 580, 16), globals.colors[8])
+	m_window:Fill(gfxRect:New(32, y, 580, 16), globals.colors[8])
 
 	if (inCharString) then
 		renderedText = fontP:Render(inCharString, globals.colors[16])
-		m_window:Draw(gfxRectangle:new(32, y, 0, 0), renderedText, nil)
+		m_window:Draw(gfxRect:New(32, y, 0, 0), renderedText, nil)
 		renderedText = fontP:Render(inHpString, globals.colors[1])
-		m_window:Draw(gfxRectangle:new(416, y, 0, 0), renderedText, nil)
+		m_window:Draw(gfxRect:New(416, y, 0, 0), renderedText, nil)
 	end
 
 	m_window:Update()

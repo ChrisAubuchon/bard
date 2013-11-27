@@ -13,6 +13,7 @@ bte_SOURCES = 	\
 	bt_lua.h				\
 	btf.c					\
 	sdl/l_anim.c				\
+	sdl/l_color.c				\
 	sdl/l_font.c				\
 	sdl/l_timer.c				\
 	sdl/l_img.c				\

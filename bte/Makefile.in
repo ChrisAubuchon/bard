@@ -64,13 +64,13 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_bte_OBJECTS = bt_lua.$(OBJEXT) btf.$(OBJEXT) l_anim.$(OBJEXT) \
-	l_font.$(OBJEXT) l_timer.$(OBJEXT) l_img.$(OBJEXT) \
-	l_rect.$(OBJEXT) l_renderer.$(OBJEXT) l_sdl.$(OBJEXT) \
-	l_surface.$(OBJEXT) l_textbox.$(OBJEXT) l_texture.$(OBJEXT) \
-	l_window.$(OBJEXT) sdl_util.$(OBJEXT) font.$(OBJEXT) \
-	l_sprintf.$(OBJEXT) l_sys.$(OBJEXT) l_utils.$(OBJEXT) \
-	l_module.$(OBJEXT) l_random.$(OBJEXT) l_jansson.$(OBJEXT) \
-	bte.$(OBJEXT)
+	l_color.$(OBJEXT) l_font.$(OBJEXT) l_timer.$(OBJEXT) \
+	l_img.$(OBJEXT) l_rect.$(OBJEXT) l_renderer.$(OBJEXT) \
+	l_sdl.$(OBJEXT) l_surface.$(OBJEXT) l_textbox.$(OBJEXT) \
+	l_texture.$(OBJEXT) l_window.$(OBJEXT) sdl_util.$(OBJEXT) \
+	font.$(OBJEXT) l_sprintf.$(OBJEXT) l_sys.$(OBJEXT) \
+	l_utils.$(OBJEXT) l_module.$(OBJEXT) l_random.$(OBJEXT) \
+	l_jansson.$(OBJEXT) bte.$(OBJEXT)
 bte_OBJECTS = $(am_bte_OBJECTS)
 bte_DEPENDENCIES = $(top_builddir)/lib/lua/liblua.a \
 	$(top_builddir)/lib/libbard/libbard.a \
@@ -528,6 +528,7 @@ bte_SOURCES = \
 	bt_lua.h				\
 	btf.c					\
 	sdl/l_anim.c				\
+	sdl/l_color.c				\
 	sdl/l_font.c				\
 	sdl/l_timer.c				\
 	sdl/l_img.c				\
@@ -649,6 +650,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/btf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/font.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_anim.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_color.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_font.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_img.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/l_jansson.Po@am__quote@
@@ -694,6 +696,20 @@ l_anim.obj: sdl/l_anim.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdl/l_anim.c' object='l_anim.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o l_anim.obj `if test -f 'sdl/l_anim.c'; then $(CYGPATH_W) 'sdl/l_anim.c'; else $(CYGPATH_W) '$(srcdir)/sdl/l_anim.c'; fi`
+
+l_color.o: sdl/l_color.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT l_color.o -MD -MP -MF $(DEPDIR)/l_color.Tpo -c -o l_color.o `test -f 'sdl/l_color.c' || echo '$(srcdir)/'`sdl/l_color.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/l_color.Tpo $(DEPDIR)/l_color.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdl/l_color.c' object='l_color.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o l_color.o `test -f 'sdl/l_color.c' || echo '$(srcdir)/'`sdl/l_color.c
+
+l_color.obj: sdl/l_color.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT l_color.obj -MD -MP -MF $(DEPDIR)/l_color.Tpo -c -o l_color.obj `if test -f 'sdl/l_color.c'; then $(CYGPATH_W) 'sdl/l_color.c'; else $(CYGPATH_W) '$(srcdir)/sdl/l_color.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/l_color.Tpo $(DEPDIR)/l_color.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='sdl/l_color.c' object='l_color.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o l_color.obj `if test -f 'sdl/l_color.c'; then $(CYGPATH_W) 'sdl/l_color.c'; else $(CYGPATH_W) '$(srcdir)/sdl/l_color.c'; fi`
 
 l_font.o: sdl/l_font.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT l_font.o -MD -MP -MF $(DEPDIR)/l_font.Tpo -c -o l_font.o `test -f 'sdl/l_font.c' || echo '$(srcdir)/'`sdl/l_font.c

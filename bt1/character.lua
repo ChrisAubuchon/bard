@@ -1,7 +1,7 @@
 require "btTable"
 require "inventory"
 require "entity"
-require "dataio"
+require "diskio"
 require "battleParty"
 require "battlePlayer"
 require "race"

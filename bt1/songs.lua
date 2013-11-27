@@ -1,8 +1,8 @@
-require "dataio"
+require "diskio"
 require "spells"
 require "btdebug"
 
-songs = read_table("songs")
+songs = diskio:readTable("songs")
 
 local function initSongs()
 	local s

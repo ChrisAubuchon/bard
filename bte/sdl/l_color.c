@@ -1,180 +1,148 @@
-#include <btlib.h>
-#include <l_int.h>
+#include <bte.h>
 #include <l_sdl.h>
 
 /********************************/
 /*				*/
-/* Macros			*/
+/* Internal function prototypes	*/
 /*				*/
 /********************************/
 
-#define TO_SDL_COLOR(state, index) (SDL_Color *)luaL_checkudata(state, \
-						index, "l_sdl_color")
+static void l_read_RGBAtable(lua_State *L, SDL_Color *rwColor);
+static void l_read_RGBAarray(lua_State *L, SDL_Color *rwColor);
 
 /********************************/
 /*				*/
-/* Private function prototypes	*/
+/* Internal functions		*/
 /*				*/
 /********************************/
 
-/* Meta-methods */
-static int l_sdl_color_tostring(lua_State *L);
+/*
+ * l_read_RGBAtable()
+ *
+ * This function assumes that the top of the stack is
+ * the color table.
+ */
+static void l_read_RGBAtable(lua_State *L, SDL_Color *rwColor)
+{
+	lua_pushstring(L, "r");
+	lua_rawget(L, -2);
+	rwColor->r = (uint8_t)luaL_checkint(L, -1);
+	lua_pop(L, 1);
 
-/* Methods */
-static int l_sdl_color_new(lua_State *L);
+	lua_pushstring(L, "g");
+	lua_rawget(L, -2);
+	rwColor->g = (uint8_t)luaL_checkint(L, -1);
+	lua_pop(L, 1);
 
-/* Member access functions */
-static int sdl_color_get_r(lua_State *L);
-static int sdl_color_get_g(lua_State *L);
-static int sdl_color_get_b(lua_State *L);
-static int sdl_color_set_r(lua_State *L);
-static int sdl_color_set_g(lua_State *L);
-static int sdl_color_set_b(lua_State *L);
+	lua_pushstring(L, "b");
+	lua_rawget(L, -2);
+	rwColor->b = (uint8_t)luaL_checkint(L, -1);
+	lua_pop(L, 1);
 
-/* Internal functions */
-static SDL_Color *sdl_new_color(uint8_t r, uint8_t g, uint8_t b);
+	lua_pushstring(L, "a");
+	lua_rawget(L, -2);
+	rwColor->a = (uint8_t)luaL_optint(L, -1, 255);
+	lua_pop(L, 1);
+}
 
+/*
+ * l_read_RGBAarray()
+ *
+ * This function reads a table with "r" in slot 1, "g" in slot 2,
+ * "b" in slot 3 and "a" in slot 4
+ */
+static void l_read_RGBAarray(lua_State *L, SDL_Color *rwColor)
+{
+	lua_pushnumber(L, 1);
+	lua_rawget(L, -2);
+	rwColor->r = (uint8_t)luaL_checkint(L, -1);
+	lua_pop(L, 1);
+
+	lua_pushnumber(L, 2);
+	lua_rawget(L, -2);
+	rwColor->g = (uint8_t)luaL_checkint(L, -1);
+	lua_pop(L, 1);
+
+	lua_pushnumber(L, 3);
+	lua_rawget(L, -2);
+	rwColor->b = (uint8_t)luaL_checkint(L, -1);
+	lua_pop(L, 1);
+
+	lua_pushnumber(L, 4);
+	lua_rawget(L, -2);
+	rwColor->a = (uint8_t)luaL_optint(L, -1, 255);
+	lua_pop(L, 1);
+
+}
 
 /********************************/
 /*				*/
-/* Lua functions		*/
+/* Public functions		*/
 /*				*/
 /********************************/
 
-static int l_sdl_color_tostring(lua_State *L)
+/*
+ * l_checkColor()
+ */
+void l_checkColor(lua_State *L, int index, SDL_Color *rwColor)
 {
-	SDL_Color *c = TO_SDL_COLOR(L, 1);
+	if (rwColor == NULL)
+		luaL_error(L, "NULL pointer passed to l_checkColor");
+	
+	/*
+	 * Check for an { R, G, B, A } table
+	 */
+	if (lua_type(L, index) == LUA_TTABLE) {
+		lua_pushvalue(L, index);	/* Push a copy of the table */
 
-	lua_pushfstring(L, "r: %d, g: %d, b: %d", c->r, c->g, c->b);
+		/* Check for an RGBA array */
+		lua_pushnumber(L, 1);
+		lua_rawget(L, -2);
+		if (!lua_isnil(L, -1)) {
+			lua_pop(L, 1);		/* Remove the result */
+			l_read_RGBAarray(L, rwColor);
+			lua_pop(L, 1);		/* Pop the table copy */
+			return;
+		}
+		lua_pop(L, 1);
 
-	return 1;
-}
+		/* Check for an RGBA dictionary */
+		lua_pushstring(L, "r");
+		lua_rawget(L, -2);
+		if (!lua_isnil(L, -1)) {
+			lua_pop(L, 1);		/* Remove the result */
+			l_read_RGBAtable(L, rwColor);
+			lua_pop(L, 1);		/* Pop the table copy */
+			return;
+		}
+		lua_pop(L, 1);
 
-static int l_sdl_color_new(lua_State *L)
-{
-	SDL_Color *c;
-	uint8_t r = 0, g = 0, b = 0;
-	int top;
-
-	top = lua_gettop(L);
-
-	if (top == 3) {
-		r = (uint8_t)luaL_checknumber(L, 1);
-		g = (uint8_t)luaL_checknumber(L, 2);
-		b = (uint8_t)luaL_checknumber(L, 3);
-	} 
-
-	L_NEWUSERDATA(L, c, sizeof(SDL_Color), "l_sdl_color");
-
-	c->r = r;
-	c->g = g;
-	c->b = b;
-
-	return 1;
-}
-
-static int sdl_color_get_r(lua_State *L)
-{
-	SDL_Color *c = TO_SDL_COLOR(L, 1);
-
-	lua_pushnumber(L, c->r);
-	return 1;
-}
-
-static int sdl_color_get_g(lua_State *L)
-{
-	SDL_Color *c = TO_SDL_COLOR(L, 1);
-
-	lua_pushnumber(L, c->g);
-	return 1;
-}
-
-static int sdl_color_get_b(lua_State *L)
-{
-	SDL_Color *c = TO_SDL_COLOR(L, 1);
-
-	lua_pushnumber(L, c->b);
-	return 1;
-}
-
-static int sdl_color_set_r(lua_State *L)
-{
-	SDL_Color *c = TO_SDL_COLOR(L, 1);
-	uint8_t value = (uint8_t)luaL_checknumber(L, 2);
-
-	c->r = value;
-
-	return 0;
-}
-
-static int sdl_color_set_g(lua_State *L)
-{
-	SDL_Color *c = TO_SDL_COLOR(L, 1);
-	uint8_t value = (uint8_t)luaL_checknumber(L, 2);
-
-	c->g = value;
-
-	return 0;
-}
-
-static int sdl_color_set_b(lua_State *L)
-{
-	SDL_Color *c = TO_SDL_COLOR(L, 1);
-	uint8_t value = (uint8_t)luaL_checknumber(L, 2);
-
-	c->b = value;
-
-	return 0;
-}
-
-
-SDL_Color *sdl_color_new(uint8_t r, uint8_t g, uint8_t b)
-{
-	SDL_Color *c;
-
-	c = (SDL_Color *)xzalloc(sizeof(SDL_Color));
-	c->r = r;
-	c->g = g;
-	c->b = b;
-
-	return c;
-}
-
-SDL_Color *sdl_color_arg(lua_State *L, int *index)
-{
-	SDL_Color *c;
-
-	if (lua_isnil(L, *index)) {
-		luaL_error(L, "Color argument expected at #%d", *index);
-	} else if (lua_isnumber(L, *index)) {
-		uint8_t r,g,b;
-
-		r = (uint8_t)luaL_checknumber(L, *index);
-		g = (uint8_t)luaL_checknumber(L, *index + 1);
-		b = (uint8_t)luaL_checknumber(L, *index + 2);
-
-		*index = *index + 3;
-
-		return sdl_color_new(r, g, b);
-	} else if (lua_isuserdata(L, *index)) {
-		c = TO_SDL_COLOR(L, *index);
-
-		*index = *index + 1;
-
-		return sdl_color_new(c->r, c->g, c->b);
+		luaL_error(L, "Expected an RGBA table");
+	} else if (lua_type(L, index) == LUA_TNUMBER) {
+		/* 
+		 * Read the RGBA values. Leave the Red value on
+		 * the stack and remove the others. This hides
+		 * the fact that the color is actually 3 or 4 stack
+		 * slots and lets the caller assume that a color
+		 * is only one slot.
+		 *
+		 * color = l_checkColor(L, 1);
+		 * otherValue = l_checkValue(L, 2);
+		 **/
+		rwColor->r = (uint8_t)luaL_checkint(L, index);
+		index++;
+		rwColor->g = (uint8_t)luaL_checkint(L, index);
+		lua_remove(L, index);
+		rwColor->b = (uint8_t)luaL_checkint(L, index);
+		lua_remove(L, index);
+		if (lua_isnumber(L, index)) {
+			rwColor->a = (uint8_t)luaL_checkint(L, index);
+			lua_remove(L, index);
+		} else {
+			rwColor->a = 255;
+		}
 	} else {
-		luaL_error(L, "Color argument expected at #%d", *index);
+		luaL_error(L, "Expecting a color");
 	}
 }
-		
-void l_sdl_color_open(lua_State *L)
-{
-	class_begin(L, "l_sdl_color");
-	mod_function(L, "__tostring", l_sdl_color_tostring);
-	mod_variable(L, "r", sdl_color_get_r, sdl_color_set_r);
-	mod_variable(L, "g", sdl_color_get_g, sdl_color_set_g);
-	mod_variable(L, "b", sdl_color_get_b, sdl_color_set_b);
-	class_end(L);
 
-	mod_function(L,	"NewColor",	l_sdl_color_new);
-}

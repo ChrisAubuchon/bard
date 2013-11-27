@@ -2,7 +2,7 @@
 #include <SDL2/SDL_image.h>
 #include <l_sdl.h>
 
-#define DEBUG 1
+/*#define DEBUG 1*/
 #include <debug.h>
 
 /********************************/

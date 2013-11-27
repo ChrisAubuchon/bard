@@ -1,4 +1,4 @@
-local __classes = read_table("classes")
+local __classes = diskio:readTable("classes")
 
 
 classes = {}

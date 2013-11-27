@@ -199,7 +199,7 @@ function dun:new(inName, inLevel, inX, inY, inDirection)
 	self.direction		= inDirection
 
 	if (type(dunData[inName][inLevel].level) == "string") then
-		dunData[inName][inLevel].level = read_table(
+		dunData[inName][inLevel].level = diskio:readTable(
 				dunData[inName][inLevel].level, false
 				)
 	end
@@ -746,7 +746,7 @@ function dun:doTreasureChest()
 end
 
 local function __init()
-	dunData = read_table("dungeons", false)
+	dunData = diskio:readTable("dungeons", false)
 end
 
 __init()

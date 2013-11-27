@@ -1,17 +1,19 @@
-require "test/bttable"
+require "sdl_video"
+require "bttable"
 
 textBox = {}
-function textBox:new(inRect)
+function textBox:new(inRect, inChars, inFont)
 	local self = {
 		rect	= inRect,
 		tb	= false
 	}
 
-	self.tb = SDL.NewTextbox(m_renderer, m_texture, m_surface, self.rect, 21)
+	self.tb = SDL.NewTextbox(gfx.renderer, gfx.texture, gfx.surface, 
+				self.rect, inChars)
 	self.tb.bg_color = { 255, 255, 255, 255 }
 	self.tb.fg_color = {   0,   0,   0, 255 }
 	self.tb.hg_color = { 255, 255,   0, 255 }
-	self.tb:SetFont(globals.fonts.var.font)
+	self.tb:SetFont(inFont.font)
 
 	btTable.addParent(self, textBox)
 	btTable.setClassMetatable(self)

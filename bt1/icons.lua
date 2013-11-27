@@ -95,7 +95,7 @@ function icons:new(inType)
 	end
 
 	self.clear = gfxImage:new(data.clear, data.clearType)
-	self.rectangle = gfxRectangle:new(data.x, data.y, data.w, data.h)
+	self.rectangle = gfxRect:New(data.x, data.y, data.w, data.h)
 
 	btTable.addParent(self, icons)
 	btTable.setClassMetatable(self)

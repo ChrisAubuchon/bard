@@ -2,6 +2,7 @@ local __bigpic = {}
 function __bigpic:new()
 	local self = {
 		titleRect	= false,
+		titleSurface	= false,
 		gfxRect		= false,
 		activeBigpic	= nil,
 		surface		= false,
@@ -14,15 +15,15 @@ function __bigpic:new()
 		local k
 		local v
 
-		self.imgs = read_table("bigpic")
+		self.imgs = diskio:readTable("bigpic")
 		for k,v in pairs(self.imgs) do
 			v.img = gfxImage:new(v.path, v.type)
 		end
 	end
 
 	local function makeRectangles()
-		self.titleRect	= gfxRectangle:new(32, 212, 224, 16)
-		self.gfxRect	= gfxRectangle:new(32, 30, 224, 176)
+		self.titleRect	= gfxRect:New(32, 212, 224, 16)
+		self.gfxRect	= gfxRect:New(32, 30, 224, 176)
 	end
 
 	local function readCityImages()
@@ -36,7 +37,7 @@ function __bigpic:new()
 			local i
 			local nameFormat = "building%d"
 
-			f.rect = gfxRectangle:new(f.x, f.y, f.w, f.h)
+			f.rect = gfxRect:New(f.x, f.y, f.w, f.h)
 			for i = 1,4 do
 				local index = string.format(nameFormat, i)
 				local path=string.format(buildingString,qn,fn,i)
@@ -46,7 +47,7 @@ function __bigpic:new()
 		end
 		
 
-		self.city = read_table("cityview")
+		self.city = diskio:readTable("cityview")
 		for quadname,quad in pairs(self.city) do
 			for facetname,facet in pairs(quad) do
 				__readImages(facet, facetname, quadname)
@@ -63,13 +64,13 @@ function __bigpic:new()
 		local facet
 		local facetname
 
-		self.dun = read_table("dunview")
+		self.dun = diskio:readTable("dunview")
 		for quadname, quad in pairs(self.dun) do
 			for facetname, facet in pairs(quad) do
 				local path
 
 				path = "images/dpics/"..quadname.."/"..facetname
-				facet.rect = gfxRectangle:new(
+				facet.rect = gfxRect:New(
 					facet.x, facet.y, facet.w, facet.h)
 
 				if (facetname == "portal") then
@@ -111,10 +112,10 @@ function __bigpic:new()
 		self.dun.bg[2] = gfxImage:new("images/dpics/2-bg.png", "png")
 
 		self.dun.lightRect = {}
-		self.dun.lightRect[0] = gfxRectangle:new(0, 0, 224, 176)
-		self.dun.lightRect[1] = gfxRectangle:new(0, 10, 224, 156)
-		self.dun.lightRect[2] = gfxRectangle:new(0, 26, 224, 108)
-		self.dun.lightRect[3] = gfxRectangle:new(0, 48, 224, 66)
+		self.dun.lightRect[0] = gfxRect:New(0, 0, 224, 176)
+		self.dun.lightRect[1] = gfxRect:New(0, 10, 224, 156)
+		self.dun.lightRect[2] = gfxRect:New(0, 26, 224, 108)
+		self.dun.lightRect[3] = gfxRect:New(0, 48, 224, 66)
 	end
 
 
@@ -127,7 +128,9 @@ function __bigpic:new()
 	readDunImages()
 
 	--self.surface = gfxWindow:new(224, 176, 8)
-	self.surface = gfxWindow:new(224, 176, 32)
+	--self.surface = gfxWindow:new(224, 176, 32)
+	self.surface		= gfxSurface:New(224, 176)
+	self.titleSurface	= gfxSurface:New(224, 16)
 
 	return self
 end
@@ -169,11 +172,11 @@ function bigpic:setTitle(format, ...)
 	end
 
 	surface = fontP:Render(title, globals.colors[16])
-	x = ((224 - w) / 2) + 36
+	x = ((224 - w) / 2) 
 
-	m_window:Fill(self.titleRect, globals.colors[1])
-	m_window:Draw(gfxRectangle:new(x,212,0,0), surface, nil)
-	m_window:Update(self.titleRect)
+	self.titleSurface:Fill(nil, globals.colors[1])
+	self.titleSurface:Blit(gfxRect:New(x,0,0,0), surface, nil)
+	self.titleSurface:Draw(self.titleRect)
 end
 
 ----------------------------------------
@@ -188,15 +191,16 @@ function bigpic:drawImage(inName)
 	self.activeBigpic = self.imgs[inName].img
 	if (self.imgs[inName].isTimeAware) then
 		if (globals.isNight) then
-			m_window:Fill(self.gfxRect, globals.colors[1])
+			gfx.surface:Fill(self.gfxRect, globals.colors[1])
 		else
-			m_window:Fill(self.gfxRect, globals.colors[12])
+			gfx.surface:Fill(self.gfxRect, globals.colors[12])
 		end
 	end
 
-	self.activeBigpic:Draw(m_window, self.gfxRect)
+	self.activeBigpic:Draw(self.gfxRect)
 end
 
+if false then
 ----------------------------------------
 -- cityBackground()
 ----------------------------------------
@@ -301,7 +305,7 @@ function bigpic:dunDisplay()
 	m_window:Update(self.gfxRect)
 end
 
-
+end
 
 
 

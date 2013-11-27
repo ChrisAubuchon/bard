@@ -6,7 +6,7 @@ _race.init = function ()
 	local self = {}
 	local races = nil
 
-	races = read_table("races")
+	races = diskio:readTable("races")
 
 	local function race_iter(t, state)
 		state = state + 1

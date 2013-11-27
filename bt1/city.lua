@@ -1,4 +1,4 @@
-require "dataio"
+require "diskio"
 
 ----------------------------------------
 -- Local variables
@@ -460,7 +460,7 @@ function city:enterDungeon(inName, inLevel)
 end
 
 local function __init()
-	cities.skara = read_table("skara", false)
+	cities.skara = diskio:readTable("skara", false)
 end
 
 __init()

@@ -1,4 +1,4 @@
-require "dataio"
+require "diskio"
 require "bttable"
 require "entity"
 require "random"

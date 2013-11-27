@@ -1,6 +1,6 @@
 #include <bte.h>
 
-#define DEBUG 1
+/*#define DEBUG 1*/
 #include <debug.h>
 
 /********************************/
@@ -205,22 +205,6 @@ void l_sdl_open(lua_State *L)
 	mod_constant_n(L,	"F11",		SDLK_F11);
 	mod_constant_n(L,	"F12",		SDLK_F12);
 	mod_end_table(L, "K");
-
-#if 0
-	lua_pushstring(L, "img");
-	lua_newtable(L);
-	L_REGFUNC(L, "LoadPNG",	l_img_load_png);
-	L_REGFUNC(L, "LoadBTA",	l_img_load_bta);
-	lua_rawset(L, -3);
-
-	l_sdl_timer_open(L);
-	l_sdl_textbox_open(L);
-	l_sdl_font_open(L);
-	l_sdl_surface_open(L);
-	l_sdl_color_open(L);
-	l_sdl_anim_open(L);
-	l_sdl_rect_open(L);
-#endif
 
 	global_end(L);
 

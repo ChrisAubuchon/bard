@@ -1,7 +1,7 @@
-require "dataio"
+require "diskio"
 require "spells"
 
-local _items = read_table("items")
+local _items = diskio:readTable("items")
 
 items = {}
 function items:new(inName)

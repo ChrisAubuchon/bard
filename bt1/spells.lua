@@ -1,4 +1,4 @@
-require "dataio"
+require "diskio"
 require "bttable"
 require "btdebug"
 
@@ -437,7 +437,7 @@ local function __initSpellList()
 	local func
 	local w
 
-	spellList = read_table("spells")
+	spellList = diskio:readTable("spells")
 	for _,s in pairs(spellList) do
 		local inFunc
 		local mesg

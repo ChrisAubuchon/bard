@@ -9,6 +9,9 @@
 /*				*/
 /********************************/
 
+/* l_color.c */
+void		l_checkColor(lua_State *L, int index, SDL_Color *rwColor);
+
 /* l_font.c */
 void		l_sdl_font_open(lua_State *L);
 

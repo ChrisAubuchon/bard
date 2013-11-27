@@ -1,7 +1,7 @@
 #include <bte.h>
 #include <l_sdl.h>
 
-#define DEBUG 1
+/*#define DEBUG 1*/
 #include <debug.h>
 
 /********************************/
@@ -132,16 +132,13 @@ static int l_surface_fill_rect(lua_State *L)
 {
 	SDL_Surface	*sur;
 	SDL_Rect	*rect;
-	uint8_t		r, g, b, a;
+	SDL_Color	c;
 
 	sur = l_checkSurface(L, 1);
 	rect = l_testRect(L, 2);
-	r = (uint8_t)luaL_checkint(L, 3);
-	g = (uint8_t)luaL_checkint(L, 4);
-	b = (uint8_t)luaL_checkint(L, 5);
-	a = (uint8_t)luaL_optint(L, 6, 255);
+	l_checkColor(L, 3, &c);
 
-	SDL_FillRect(sur, rect, SDL_MapRGBA(sur->format, r, g, b, a));
+	SDL_FillRect(sur, rect, SDL_MapRGBA(sur->format, c.r, c.g, c.b, c.a));
 
 	return 0;
 }

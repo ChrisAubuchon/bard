@@ -1,4 +1,4 @@
-require "dataio"
+require "diskio"
 require "bttable"
 require "entity"
 require "random"
@@ -8,7 +8,7 @@ require "battleMonster"
 monster = {}
 
 local _monsters
-_monsters = read_table("monsters")
+_monsters = diskio:readTable("monsters")
 
 local m
 local a

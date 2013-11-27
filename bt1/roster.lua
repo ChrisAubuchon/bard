@@ -2,13 +2,13 @@ require "character"
 
 local __roster = {}
 function __roster:new(inFileName)
-	local self = read_table(inFileName, true)
+	local self = diskio:readTable(inFileName, true)
 	self.fileName = inFileName
 
 	if (not self.characters) then
 		self.characters = {}
 		self.parties = {}
-		write_table(inFileName)
+		diskio:writeTable(inFileName)
 	end
 
 	btTable.addParent(self, __roster)
@@ -21,7 +21,7 @@ function __roster:write()
 	local t = {}
 	t.characters = self.characters
 	t.parties = self.parties
-	write_table(t, self.fileName)
+	diskio:writeTable(t, self.fileName)
 end
 
 ----------------------------------------
