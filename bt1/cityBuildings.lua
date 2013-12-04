@@ -160,7 +160,7 @@ function mangar:enter()
 	if (not party:isItemEquipped("Onyx Key")) then
 		bigpic:drawImage("PIC_MAGICMOUTH")
 		bigpic:setTitle("Magic Mouth")
-		text:splashMessage(
+		text:csplash(true, true, 
 			"A magic mouth on the wall speaks " ..
 			"to you: \"Despised ones, none save Mangar may " ..
 			"enter his demesne."

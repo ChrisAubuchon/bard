@@ -21,12 +21,12 @@ end
 
 local function __addPortal(sq, quad, tileSet)
 	if (sq.hasCeilPortal) then
-		bigpic:dunAdd(quad, tileSet, "portal", sq, "ceil")
+		bigpic:dunAdd(quad, tileSet, "ceiling", sq)
 	end
 
 	if (sq.hasFloorPortal) then
 		dprint(quad)
-		bigpic:dunAdd(quad, tileSet, "portal", sq, "floor")
+		bigpic:dunAdd(quad, tileSet, "floor", sq)
 	end
 end
 
@@ -344,9 +344,11 @@ function dun:doDetect()
 	end
 end
 
+----------------------------------------
+-- buildView
+----------------------------------------
 function dun:buildView()
 	bigpic:dunBackground(self.tileSet)
-	bigpic:dunDisplay()
 	if (party.light.active) then
 		__buildView(self.currentSquare, self.direction, 
 			self.tileSet, party.light.distance, 1)
@@ -358,6 +360,9 @@ function dun:buildView()
 	end
 end
 
+----------------------------------------
+-- doSpinnerCheck()
+----------------------------------------
 function dun:doSpinnerCheck()
 	if (self.currentSquare.isSpinner) then
 		text:cdprint(true, false, "isSpinner")
@@ -378,6 +383,9 @@ function dun:doSpinnerCheck()
 	end
 end
 
+----------------------------------------
+-- turnParty()
+----------------------------------------
 function dun:turnParty(inRelDirection)
 	self.direction = directions[inRelDirection][self.direction]
 	self.isPhasedFlag = false
@@ -611,7 +619,8 @@ function dun:main()
 		globals.doTimeEvents = false
 
 		if (keyboardCommand(inkey)) then
-			self:resetBigpic()
+			local doNothing = true
+			--self:resetBigpic()
 		elseif (inkey == "A") then
 			if (self.currentSquare.hasCeilPortal) then
 				if (party.levitate.active) then
@@ -628,7 +637,7 @@ function dun:main()
 				end
 				self:doPortal(1, -1)
 			end
-		elseif (inkey == btkeys.BTKEY_WANDERING) then
+		elseif (inkey == btkeys.WANDERING) then
 			self:wanderingMonster()
 			self:resetBigpic()
 		elseif (inkey == "Z") then

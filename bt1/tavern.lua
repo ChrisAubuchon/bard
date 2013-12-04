@@ -146,7 +146,7 @@ function tavern:orderDrink()
 			)
 		return true
 	elseif (inkey == "W") then
-		text:splashMessage(
+		text:csplash(true, true, 
 			"The barkeep says, \"Go down to the cellar and " ..
 			"pick out a bottle.\""
 			)

@@ -66,6 +66,10 @@ function getkey()
 			return btkeys.F6
 		elseif (inkey == SDL.K.F7) then
 			return btkeys.F7
+		elseif (inkey == btkeys.RANDOMBATTLE) then
+			return btkeys.RANDOMBATTLE
+		elseif (inkey == btkeys.WANDERING) then
+			return btkeys.WANDERING
 		elseif (inkey < 255) then
 			return string.upper(string.char(inkey))
 		end

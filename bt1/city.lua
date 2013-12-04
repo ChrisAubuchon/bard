@@ -303,6 +303,7 @@ end
 -- turnParty()
 ----------------------------------------
 function city:turnParty(inRelDirection) 
+	dprint("turnParty(%s)", inRelDirection)
 	self.direction = directions[inRelDirection][self.direction]
 	self:buildView()
 	if (party.compass.active) then
@@ -443,7 +444,7 @@ function city:getBattleOpponents()
 end
 
 function city:printCredits()
-	text:splashMessage("Bard's Tale I: Reimplemented by me")
+	text:csplash(true, true, "Bard's Tale I: Reimplemented by me")
 end
 	
 

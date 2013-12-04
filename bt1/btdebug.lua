@@ -358,6 +358,20 @@ function dprint(format, ...)
 	end
 end
 
+declare_global("dwhere")
+function dwhere(inDepth)
+	local dstring
+	local dinfo
+
+	dinfo = debug.getinfo(inDepth, "Sl")
+	dstring = string.format("%s:%s\n",
+			string.match(dinfo.short_src, "[^/]*$"),
+			dinfo.currentline
+			)
+	__debugFile:write(dstring)
+	__debugFile:flush()
+end
+
 function btdebug.enterDungeon()
 	local destination
 
@@ -540,13 +554,13 @@ function btdebug.moveToSquare()
 		text:print(tostring(newCoords[3]))
 
 		inkey = getkey()
-		if ((inkey == "-") or (inkey == btkeys.BTKEY_LEFT)) then
+		if ((inkey == "-") or (inkey == btkeys.LEFT)) then
 			newCoords[cursor] = newCoords[cursor] - 1
 			if (newCoords[cursor] < 0) then
 				newCoords[cursor] = 0
 			end
 		elseif ((inkey == "+") or (inkey == "=") or
-			(inkey == btkeys.BTKEY_RIGHT)) then
+			(inkey == btkeys.RIGHT)) then
 			newCoords[cursor] = newCoords[cursor] + 1
 			if (newCoords[cursor] > 21) then
 				newCoords[cursor] = 21
@@ -555,12 +569,12 @@ function btdebug.moveToSquare()
 			cursor = 2
 		elseif (inkey == "E") then
 			cursor = 3
-		elseif (inkey == btkeys.BTKEY_DOWN) then
+		elseif (inkey == btkeys.DOWN) then
 			cursor = cursor + 1
 			if (cursor > 3) then
 				cursor = 2
 			end
-		elseif (inkey == btkeys.BTKEY_UP) then
+		elseif (inkey == btkeys.UP) then
 			cursor = cursor - 1
 			if (cursor < 1) then
 				cursor = 3

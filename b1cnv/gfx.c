@@ -220,12 +220,12 @@ static void outputIcons(uint8_t indent)
 
 void convertGFX(void)
 {
+#if 0
 	outputScreens(2);
 	outputIcons(2);
 	outputBigpic(2);
-#if 0
 	outputBitmapFont();
 	outputCitypics(2);
-	outputDunpics(2);
 #endif
+	outputDunpics(2);
 }

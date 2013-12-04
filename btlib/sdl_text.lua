@@ -156,11 +156,11 @@ function textBox:readString(inMaxLen)
 
 		inkey = getkey()
 
-		if (inkey == btkeys.BTKEY_RETURN) then
+		if (inkey == btkeys.RETURN) then
 			self.tb:eraseChar(128, x)
 			self.tb:putc(32)
 			break
-		elseif (inkey == btkeys.BTKEY_BACKSPACE) then
+		elseif (inkey == btkeys.BACKSPACE) then
 			if (nchars ~= 0) then
 				-- Get the last character
 				local c = outstring:sub(-1)
@@ -176,7 +176,7 @@ function textBox:readString(inMaxLen)
 
 				nchars = nchars - 1
 			end
-		elseif (inkey == btkeys.BTKEY_ESCAPE) then
+		elseif (inkey == btkeys.ESCAPE) then
 			if (nchars ~= 0) then
 				self:clearLine()
 				self.tb:SetCursor(240, y)
@@ -338,21 +338,21 @@ function textBox:select(inHighIndex, inNumItems)
 	while (true) do
 		inkey = getkey()
 
-		if (inkey == btkeys.BTKEY_DOWN) then
+		if (inkey == btkeys.DOWN) then
 			if (lineIndex < inNumItems) then
 				self.tb:UnHighlight(highIndex)
 				highIndex = highIndex + 1
 				lineIndex = lineIndex + 1
 				self.tb:Highlight(highIndex)
 			end
-		elseif (inkey == btkeys.BTKEY_UP) then
+		elseif (inkey == btkeys.UP) then
 			if (lineIndex > 1) then
 				self.tb:UnHighlight(highIndex)
 				highIndex = highIndex - 1
 				lineIndex = lineIndex - 1
 				self.tb:Highlight(highIndex)
 			end
-		elseif ((inkey == btkeys.BTKEY_RETURN) or
+		elseif ((inkey == btkeys.RETURN) or
 			(inkey == " ")) then
 			return lineIndex
 		elseif ((inkey > "0") and (inkey < tostring(numItems))) then

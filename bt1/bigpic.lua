@@ -73,21 +73,22 @@ function __bigpic:new()
 				facet.rect = gfxRect:New(
 					facet.x, facet.y, facet.w, facet.h)
 
-				if (facetname == "portal") then
+				if (facetname == "floor") then
 					facet.floor = {}
 					facet.floor[0] = gfxImage:new(
-						path.."/0-floor.png", "png")
+						path.."/0-portal.png", "png")
 					facet.floor[1] = gfxImage:new(
-						path.."/1-floor.png", "png")
+						path.."/1-portal.png", "png")
 					facet.floor[2] = gfxImage:new(
-						path.."/2-floor.png", "png")
+						path.."/2-portal.png", "png")
+				elseif (facetname == "ceiling") then
 					facet.ceiling = {}
 					facet.ceiling[0] = gfxImage:new(
-						path.."/0-ceiling.png", "png")
+						path.."/0-portal.png", "png")
 					facet.ceiling[1] = gfxImage:new(
-						path.."/1-ceiling.png", "png")
+						path.."/1-portal.png", "png")
 					facet.ceiling[2] = gfxImage:new(
-						path.."/2-ceiling.png", "png")
+						path.."/2-portal.png", "png")
 				else
 					facet.door = {}
 					facet.door[0] = gfxImage:new(
@@ -191,27 +192,30 @@ function bigpic:drawImage(inName)
 	self.activeBigpic = self.imgs[inName].img
 	if (self.imgs[inName].isTimeAware) then
 		if (globals.isNight) then
-			gfx.surface:Fill(self.gfxRect, globals.colors[1])
+			self.surface:Fill(nil, globals.colors[1])
 		else
-			gfx.surface:Fill(self.gfxRect, globals.colors[12])
+			self.surface:Fill(nil, globals.colors[12])
 		end
+		self.surface:Draw(self.gfxRect)
 	end
 
 	self.activeBigpic:Draw(self.gfxRect)
 end
 
-if false then
 ----------------------------------------
 -- cityBackground()
 ----------------------------------------
 function bigpic:cityBackground()
 	if (globals.isNight) then
-		self.surface:Draw(nil, self.city.nightbg)
+		self.surface:Blit(nil, self.city.nightbg)
 	else
-		self.surface:Draw(nil, self.city.daybg)
+		self.surface:Blit(nil, self.city.daybg)
 	end
 end
 
+----------------------------------------
+-- cityAdd()
+----------------------------------------
 function bigpic:cityAdd(inQuad, inFacet, inBuilding)
 	local q
 
@@ -222,43 +226,43 @@ function bigpic:cityAdd(inQuad, inFacet, inBuilding)
 	q = self.city[inQuad][inFacet]
 
 	if (q[inBuilding] == nil) then
-		self.surface:Draw(nil, self.imgs[inBuilding].img, nil)
+		self.surface:Blit(nil, self.imgs[inBuilding].img, nil)
 	else
-		self.surface:Draw(q.rect, q[inBuilding], nil)
+		self.surface:Blit(q.rect, q[inBuilding], nil)
 	end
 end
 
+----------------------------------------
+-- cityDisplay()
+----------------------------------------
 function bigpic:cityDisplay()
 	if (self.activeBigpic ~= nil) then
 		self.activeBigpic:Clear()
 		self.activeBigpic = nil
 	end
 
-	self.surface:Update()
-	if (globals.isNight) then
-		self.surface:SetColor(11, globals.colors[1])
-	end
-	m_window:Draw(self.gfxRect, self.surface, nil)
-	m_window:Update()
-
-	if (globals.isNight) then
-		self.surface:SetColor(11, globals.colors[12])
-	end
+	self.surface:Draw(self.gfxRect)
 end
 
+----------------------------------------
+-- dunBackground()
+----------------------------------------
 function bigpic:dunBackground(inTileSet)
 	if (not party.light.active) then
 		self.surface:Fill(self.dun.lightRect[0], globals.colors[1])
 		return
 	end
 
-	self.surface:Draw(nil, self.dun.bg[inTileSet], nil)
+	self.surface:Blit(nil, self.dun.bg[inTileSet], nil)
 	if (party.light.distance < 4) then
 		self.surface:Fill(self.dun.lightRect[party.light.distance],
 				globals.colors[1])
 	end
 end
 
+----------------------------------------
+-- dunAdd()
+----------------------------------------
 function bigpic:dunAdd(inQuad, inTileSet, inFacet, inSq)
 	local gfx
 	local q
@@ -267,13 +271,8 @@ function bigpic:dunAdd(inQuad, inTileSet, inFacet, inSq)
 		return	
 	end
 
-	if (inFacet == "portal") then
-		if (inSq.hasCeilPortal) then
-			gfx = "ceil"
-		end
-		if (inSq.hasFloorPortal) then
-			gfx = "floor"
-		end
+	if ((inFacet == "floor") or (inFacet == "ceiling")) then
+		gfx = inFacet
 	else
 		if ((inSq.secret) and (party.light.seeSecret)) then
 			gfx = "door"
@@ -291,21 +290,21 @@ function bigpic:dunAdd(inQuad, inTileSet, inFacet, inSq)
 	end
 
 	q = self.dun[inQuad][inFacet]
-	self.surface:Draw(q.rect, q[gfx][inTileSet], nil)
+	self.surface:Blit(q.rect, q[gfx][inTileSet], nil)
 end
 
+----------------------------------------
+-- dunDisplay()
+----------------------------------------
 function bigpic:dunDisplay()
 	if (self.activeBigpic ~= nil) then
 		self.activeBigpic:Clear()
 		self.activeBigpic = nil
 	end
 
-	self.surface:Update()
-	m_window:Draw(self.gfxRect, self.surface, nil)
-	m_window:Update(self.gfxRect)
+	self.surface:Draw(self.gfxRect)
 end
 
-end
 
 
 

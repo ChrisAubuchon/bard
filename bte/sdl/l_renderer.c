@@ -25,6 +25,7 @@ static int l_renderer_clear(lua_State *L);
 static int l_renderer_copy(lua_State *L);
 static int l_renderer_fill_rect(lua_State *L);
 static int l_renderer_present(lua_State *L);
+static int l_renderer_set_viewport(lua_State *L);
 static int l_renderer_get_color(lua_State *L);
 static int l_renderer_set_color(lua_State *L);
 
@@ -139,6 +140,24 @@ static int l_renderer_present(lua_State *L)
 
 	renderer = l_checkRenderer(L, 1);
 	SDL_RenderPresent(renderer);
+
+	return 0;
+}
+
+/*
+ * l_renderer_set_viewport()
+ */
+static int l_renderer_set_viewport(lua_State *L)
+{
+	/* args */
+	SDL_Renderer	*renderer;
+	SDL_Rect	*rect;
+
+	renderer = l_checkRenderer(L, 1);
+	rect = l_testRect(L, 2);
+
+	if (SDL_RenderSetViewport(renderer, rect))
+		sdl_error(L);
 
 	return 0;
 }
@@ -293,6 +312,7 @@ void l_sdl_renderer_open(lua_State *L)
 	mod_function(L, "Copy",		l_renderer_copy);
 	mod_function(L, "FillRect",	l_renderer_fill_rect);
 	mod_function(L, "Present",	l_renderer_present);
+	mod_function(L, "SetViewPort",	l_renderer_set_viewport);
 	mod_variable(L, "DrawColor",	l_renderer_get_color,
 					l_renderer_set_color);
 	class_end(L);

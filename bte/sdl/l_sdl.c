@@ -181,6 +181,7 @@ void l_sdl_open(lua_State *L)
 	l_sdl_surface_open(L);
 	l_sdl_font_open(L);
 	l_sdl_textbox_open(L);
+	l_sdl_timer_open(L);
 
 	mod_begin_table(L, "K");
 	mod_constant_n(L,	"BACKSPACE",	SDLK_BACKSPACE);

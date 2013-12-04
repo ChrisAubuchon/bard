@@ -113,13 +113,13 @@ function dunSquares:tarjanMouth()
 	bigpic:drawImage("PIC_MAGICMOUTH")
 	bigpic:setTitle("Mouth...")
 	text:clear()
-	text:splashMessage(
+	text:csplash(true, true, 
 		"A magic mouth on the wall speaks: Know this, that a man " ..
 		"called Tarjan, thought to many to be insane, had through " ..
 		"wizardly powers"
 		)
 	text:clear()
-	text:splashMessage(
+	text:csplash(true, true, 
 		"...proclaimed himself a god in Skara Brae a hundred " ..
 		"years ago. His image is locked in stone until made " ..
 		"whole again..."
@@ -135,7 +135,7 @@ function dunSquares:basharKavilor()
 	text:clear()
 	bigpic:drawImage("PIC_SMAGE")
 	bigpic:setTitle("Bashar Kavilor")
-	text:splashMessage(
+	text:csplash(true, true, 
 		"You have entered the living chambers of Bashar Kavilor, " ..
 		"the High Priest. He screams, \"Infidel! Face now the " ..
 		"wrath of a servant of the Mad One!\"\n\n"
@@ -152,7 +152,7 @@ function dunSquares:sphynx()
 	bigpic:drawImage("PIC_TREASURE")
 	bigpic:setTitle("")
 	text:clear()
-	text:splashMessage("This is the High Priest's treasure chamber. " ..
+	text:csplash(true, true, "This is the High Priest's treasure chamber. " ..
 		"His pet dragon, Sphynx, peers at you hungily. \"Sphynx " ..
 		"eat now,\" it growls."
 		)
@@ -166,7 +166,7 @@ function dunSquares:witchKing()
 	text:clear()
 	bigpic:drawImage("PIC_SPECTRE")
 	bigpic:setTitle("Witch King")
-	text:splashMessage("Before you lies the ancient burial chamber " ..
+	text:csplash(true, true, "Before you lies the ancient burial chamber " ..
 		"of King Aildrek, now a creature of darkness. \"Now, " ..
 		"mortal man, I will drink of your souls,\" he hisses."
 		)
@@ -232,7 +232,7 @@ function dunSquares:guardCaptain()
 	text:clear()
 	bigpic:drawImage("PIC_THIEF")
 	bigpic:setTitle("Guard Captain")
-	text:splashMessage(
+	text:csplash(true, true, 
 		"You see the Captain of the Guard standing before you.\n" ..
 		"\"Die, scum!\" he screams as he runs insanely toward you."
 		)
@@ -249,7 +249,7 @@ function dunSquares:robedMen()
 	text:clear()
 	bigpic:drawImage("PIC_NOMAD")
 	bigpic:setTitle("Robed Men")
-	text:splashMessage(
+	text:csplash(true, true, 
 		"Before you stand six warriors, dressed in bright green " ..
 		"robes. \"Intruders!\" They scream battle cries as they " ..
 		"run toward you with drawn swords."
@@ -298,11 +298,11 @@ function dunSquares:vampireOldMan()
 	bigpic:setTitle("Old Man")
 
 	local function printIntro()
-		text:splashMessage(
+		text:csplash(true, true, 
 			"A wizened man appears before you, saying, "..
 			"\"Answer this riddle to pass:"
 			)
-		text:splashMessage(
+		text:csplash(true, true, 
 			"\"Once man alive\nNow living death\nIt drinketh " ..
 			"blood\nN' stealeth breath.\""
 			)
@@ -375,7 +375,7 @@ function dunSquares:shieldsMouth()
 
 	bigpic:drawImage("PIC_MAGICMOUTH")
 	bigpic:setTitle("Mouth...")
-	text:splashMessage(
+	text:csplash(true, true, 
 		"A magic mouth on the wall speaks to you, saying this riddle:"
 		)
 	text:cdprint(true, false, 
@@ -411,7 +411,7 @@ function dunSquares:partyHasRobes()
 		if (not c:hasItem("Robes")) then
 			bigpic:drawImage("PIC_NOMAD")
 			bigpic:setTitle("Robed Men")
-			text:splashMessage(
+			text:csplash(true, true, 
 				"The legions of Baron Harkyn stand before " ..
 				"you, recognizing you as intruders, " ..
 				"\"Death to them!\" they scream."
@@ -487,7 +487,7 @@ function dunSquares:skullTavernQuestion()
 	bigpic:setBigpic("PIC_FRED", "An old man")
 
 	local function printIntro()
-		text:splashMessage(
+		text:csplash(true, true, 
 			"An old man stands before you saying, \"Answer " ..
 			"this question to pass:\n\nWhat tavern lies off " ..
 			"Night Archer street?\""
@@ -667,17 +667,17 @@ function dunSquares:onyxKey()
 	end
 
 	bigpic:setBigpic("PIC_KYLEARAN", "Kylearan")
-	text:splash(
+	text:csplash(false, true,
 		"Greetings! I am Kylearan, oh perseverent ones, the " ..
 		"good wizard of Skara Brae. Put away your weapons, for I " ..
 		"am your ally, not an enemy\n"
 		)
-	text:splashMessage(
+	text:csplash(true, true, 
 		"You have passed my tests, and can now continue on to " ..
 		"your true quest, the source of evil in skara Brae -- " ..
 		"Mangar the Dark, my nemesis\n"
 		)
-	text:splashMessage(
+	text:csplash(true, true, 
 		"Mangar's tower, at the opposite corner of Skara Brae, " ..
 		"is a five level deathtrap, which can only be entered " ..
 		"by use of an onyx key.\n"
@@ -703,7 +703,7 @@ end
 function dunSquares:mouthFour()
 	bigpic:setBigpic("PIC_MAGICMOUTH", "Mouth...")
 
-	text:splashMessage(
+	text:csplash(true, true, 
 		"A magic mouth on the wall speaks to you, saying this:\n\"" ..
 		"Perseverence in all things.\""
 		)
@@ -755,7 +755,7 @@ function dunSquares:masterKey()
 	end
 
 	bigpic:setBigpic("PIC_FRED", "Keymaster")
-	text:splashMessage(
+	text:csplash(true, true, 
 		"An old man is here, and says to you:\n\"I am the " ..
 		"Keymaster. I have something to sell you for the low " ..
 		"price of 50000 gold pieces.\""
@@ -809,7 +809,7 @@ function dunSquares:masterKey()
 			end
 			printIntro()
 		elseif (inkey == "F") then
-			text:splashMessage(
+			text:csplash(true, true, 
 				"The man speaks briefly and 6 friends " ..
 				"appear. \"Most unfriendly,\" he says. " ..
 				"His friends look very angry."
@@ -874,7 +874,7 @@ function dunSquares:largeCoffin()
 		inkey = getkey()
 
 		if (inkey == "O") then
-			text:splashMessage(
+			text:csplash(true, true, 
 				"A Vampire Lord rises from the coffin. " ..
 				"He seems rather disturbed."
 				)
@@ -891,7 +891,7 @@ end
 ----------------------------------------
 function dunSquares:sleepingDragons()
 	if (party.song.active) then
-		text:splashMessage(
+		text:csplash(true, true, 
 			"Your music caused two sleeping dragons to " ..
 			"continue slumbering."
 			)
@@ -899,7 +899,7 @@ function dunSquares:sleepingDragons()
 		return
 	end
 
-	text:splashMessage(
+	text:csplash(true, true, 
 		"Two sleeping dragons awaken at your passage. \"Hmm, " ..
 		"humans for dinner again, Gor,\" says the small one. " ..
 		"\"Why don't we get any pork up here?\""
@@ -1036,7 +1036,7 @@ end
 -- mangarTreasure()
 ----------------------------------------
 function dunSquares:mangarTreasure()
-	text:splashMessage(
+	text:csplash(true, true, 
 		"This is Mangar's treasure trove. Two dragons are here, " ..
 		"and they're very hungry. I think you're in some real trouble."
 		)
@@ -1103,12 +1103,12 @@ function dunSquares:mangar()
 	text:clear()
 	bigpic:setBigpic("PIC_MANGAR", "Mangar!")
 
-	text:splashMessage(
+	text:csplash(true, true, 
 		"You stand in the antechamber of Mangar the Dark, evil " ..
 		"Archmage of Skara Brae. Mangar glares at you with deep " ..
 		"hatred. \"Die, mortals!\" he screams."
 		)
-	text:splashMessage(
+	text:csplash(true, true, 
 		"With a wave of his hand a few of his close friends drop " ..
 		"by. They don't look like a fun group."
 		)
@@ -1127,16 +1127,16 @@ function dunSquares:mangar()
 
 	-- There seems to be a loop waiting for a key here. Not sure why.
 
-	text:splashMessage(
+	text:csplash(true, true, 
 		"Kylearan, the good Archmage, appears before you in a " ..
 		"flash of light. \"Well done!\" he cries, beaming. " ..
 		"\"Your quest in Skara Brae is now finished!\""
 		)
-	text:splashMessage(
+	text:csplash(true, true, 
 		"\"The evil one is now defeated, and his spell of winter " ..
 		"will soon end.\""
 		)
-	text:splashMessage(
+	text:csplash(true, true, 
 		"\"You will all, as a symbol of my gratitude, receive " ..
 		"a gold and experience bonus of 300,000 units. Fare well " ..
 		"and live long!\""

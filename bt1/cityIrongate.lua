@@ -27,7 +27,7 @@ function cityIrongate:enter()
 
 	self:resetBigpic(true)
 	text:clear()
-	text:splashMessage(
+	text:csplash(true, true, 
 		"\nYou stand before an iron gate, beyond which " ..
 		"stands %s tower.", 
 		self.castle

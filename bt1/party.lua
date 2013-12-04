@@ -3,6 +3,10 @@ require "btdebug"
 require "random"
 
 party = {
+	-- Graphics objects for party display
+	gfxRect			= gfxRect:New(32, 266, 580, 112),
+	gfxSurface		= gfxSurface:New(580, 112),
+
 	summon			= false,
 	size			= 0,
 
@@ -298,6 +302,8 @@ function party:display()
 		end
 		self:printStatusLine(charString, hpString, i)
 	end
+
+	self.gfxSurface:Draw(self.gfxRect)
 end
 
 ----------------------------------------
@@ -705,18 +711,15 @@ function party:printStatusLine(inCharString, inHpString, inSlot)
 	local fontP
 	local y
 
-	y = 266 + (16 * inSlot)
+	y = 16 * inSlot
 	fontP = globals.fonts.mono
-	m_window:Fill(gfxRect:New(32, y, 580, 16), globals.colors[8])
-
+	self.gfxSurface:Fill(gfxRect:New(0, y, 580, 16), globals.colors[8])
 	if (inCharString) then
 		renderedText = fontP:Render(inCharString, globals.colors[16])
-		m_window:Draw(gfxRect:New(32, y, 0, 0), renderedText, nil)
+		self.gfxSurface:Blit(gfxRect:New(0, y, 0, 0), renderedText, nil)
 		renderedText = fontP:Render(inHpString, globals.colors[1])
-		m_window:Draw(gfxRect:New(416, y, 0, 0), renderedText, nil)
+		self.gfxSurface:Blit(gfxRect:New(384, y, 0, 0), renderedText, nil)
 	end
-
-	m_window:Update()
 end
 
 ----------------------------------------
@@ -889,7 +892,7 @@ function party:died()
 	bigpic:drawImage("PIC_GAMEOVER")
 	bigpic:setTitle("Sorry, bud")
 	text:clear()
-	text:splashMessage("Alas, your party has expired, but has gone to adventurer heaven.")
+	text:csplash(true, true, "Alas, your party has expired, but has gone to adventurer heaven.")
 end
 
 

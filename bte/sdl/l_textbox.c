@@ -22,6 +22,7 @@
 /********************************/
 
 typedef struct {
+	lua_State	*errorState;
 	SDL_Renderer	*renderer;
 	SDL_Texture	*texture;
 	SDL_Surface	*screen;
@@ -49,7 +50,6 @@ static void		_textbox_newline(l_textbox *tb);
 static void		_textbox_scroll(l_textbox *tb);
 static void		_textbox_highlight(l_textbox *tb, uint8_t srci,
 				uint8_t desti, uint32_t lineno);
-static void		_update_parent(l_textbox *tb, SDL_Rect *r);
 static uint32_t		_textbox_wrap(l_textbox *tb, btstring_t *str,
 				uint32_t base);
 static void		_update_screen(l_textbox *tb);
@@ -91,7 +91,8 @@ static l_textbox *l_checkTextbox(lua_State *L, int index)
 
 static void set_color(l_textbox *tb, uint8_t index, SDL_Color *c)
 {
-	SDL_SetPaletteColors(tb->s->format->palette, c, index, 1);
+	if (SDL_SetPaletteColors(tb->s->format->palette, c, index, 1))
+		sdl_error(tb->errorState);
 }
 
 static void get_color(l_textbox *tb, uint8_t index, SDL_Color *c)
@@ -109,11 +110,13 @@ static void _textbox_scroll(l_textbox *tb)
 	r.y = font_height(tb->font) / 2;
 	r.w = tb->s->w;
 	r.h = tb->s->h - font_height(tb->font) / 2;
-	SDL_BlitSurface(tb->s, &r, tb->s, NULL);
+	if (SDL_BlitSurface(tb->s, &r, tb->s, NULL))
+		sdl_error(tb->errorState);
 
 	r.y = r.h;
 	r.h = font_height(tb->font) / 2;
-	SDL_FillRect(tb->s, &r, BG_INDEX);
+	if (SDL_FillRect(tb->s, &r, BG_INDEX))
+		sdl_error(tb->errorState);
 
 	_update_screen(tb);
 }
@@ -165,28 +168,22 @@ static void _textbox_highlight(l_textbox *tb, uint8_t srci, uint8_t desti, \
 	_update_screen(tb);
 }
 
+/*
+ * _update_screen()
+ */
 static void _update_screen(l_textbox *tb)
 {
-	SDL_BlitSurface_r(tb->s, NULL, tb->screen, tb->rect);
-	SDL_UpdateTexture(tb->texture, NULL,
-			tb->screen->pixels,  tb->screen->pitch);
-	SDL_RenderCopy(tb->renderer, tb->texture, NULL, NULL);
-	SDL_RenderPresent(tb->renderer);
-}
+	if (SDL_BlitSurface_r(tb->s, NULL, tb->screen, tb->rect))
+		sdl_error(tb->errorState);
+	if (SDL_UpdateTexture(
+			tb->texture, NULL,
+			tb->screen->pixels,  tb->screen->pitch
+			))
+		sdl_error(tb->errorState);
 
-static void _update_parent(l_textbox *tb, SDL_Rect *r)
-{
-	SDL_Rect pr;
+	if (SDL_RenderCopy(tb->renderer, tb->texture, NULL, NULL))
+		sdl_error(tb->errorState);
 
-	pr.x = r->x + tb->rect->x;
-	pr.y = r->y + tb->rect->y;
-	pr.w = r->w;
-	pr.h = r->h;
-	SDL_BlitSurface(tb->s, r, tb->screen, &pr);
-
-	SDL_UpdateTexture(tb->texture, NULL,
-			tb->screen->pixels,  tb->screen->pitch);
-	SDL_RenderCopy(tb->renderer, tb->texture, NULL, NULL);
 	SDL_RenderPresent(tb->renderer);
 }
 
@@ -255,6 +252,7 @@ static int l_textbox_new(lua_State *L)
 	luaL_getmetatable(L, "l_sdl_textbox");
 	lua_setmetatable(L, -2);
 
+	tb->errorState	= L;
 	tb->renderer	= l_checkRenderer(L, 1);
 	tb->texture	= l_checkTexture(L, 2);
 	tb->screen	= l_checkSurface(L, 3);
@@ -270,6 +268,8 @@ static int l_textbox_new(lua_State *L)
 	if (tb->rect) {
 		tb->s = SDL_CreateRGBSurface(0, tb->rect->w, tb->rect->h,
 					     8, 0, 0, 0, 0);
+		if (tb->s == NULL)
+			sdl_error(L);
 	} else {
 		luaL_error(L, "Rectangle not specified for textbox");
 	}
@@ -587,7 +587,8 @@ static int l_textbox_erasechar(lua_State *L)
 	srect.y = tb->y;
 	srect.w = w;
 	srect.h = h;
-	SDL_FillRect(tb->s, &srect, BG_INDEX);
+	if (SDL_FillRect(tb->s, &srect, BG_INDEX))
+		sdl_error(L);
 
 	_update_screen(tb);
 
@@ -611,7 +612,8 @@ static int l_textbox_clearline(lua_State *L)
 	srect.y = tb->y;
 	srect.w = tb->rect->w;
 	srect.h = font_height(tb->font);
-	SDL_FillRect(tb->s, &srect, BG_INDEX);
+	if (SDL_FillRect(tb->s, &srect, BG_INDEX))
+		sdl_error(L);
 
 	_update_screen(tb);
 

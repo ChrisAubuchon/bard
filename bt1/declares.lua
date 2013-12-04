@@ -1,11 +1,6 @@
 -- action.lua
 declare_global("btAction")
 
--- bttable.lua
-declare_global("btTable")
-declare_global("btArray")
-declare_global("btDefaultTable")
-
 -- battle.lua
 declare_global("battle")
 declare_global("doDamage")
@@ -30,10 +25,6 @@ declare_global("building")
 declare_global("dprint")
 declare_global("btdebug")
 
--- btio.lua
-declare_global("getkey")
-declare_global("btkeys")
-
 -- btlib.lua
 declare_global("key_in_num_range")
 declare_global("keyboardCommand")
@@ -56,11 +47,6 @@ declare_global("citylib")
 
 -- classes.lua
 declare_global("classes")
-
--- dataio.lua
-declare_global("read_table")
-declare_global("write_table")
-declare_global("false_table")
 
 -- dun.lua
 declare_global("dun")
@@ -85,7 +71,7 @@ declare_global("directions")
 declare_global("currentLevel")
 declare_global("currentBattle")
 declare_global("stringTables")
-declare_global("m_window")
+declare_global("text")
 
 -- guild.lua
 declare_global("guild")
@@ -102,10 +88,6 @@ declare_global("items")
 -- level.lua
 declare_global("level")
 
--- linkedList.lua
-declare_global("linkedList")
-declare_global("linkedListNode")
-
 -- monster.lua
 declare_global("monster")
 declare_global("monsterGroup")
@@ -114,17 +96,11 @@ declare_global("monsterParty")
 -- noncombat.lua
 declare_global("noncombat")
 
--- objectHash.lua
-declare_global("objectHash")
-
 -- party.lua
 declare_global("party")
 
 -- race.lua
 declare_global("race")
-
--- random.lua
-declare_global("random")
 
 -- review.lua
 declare_global("review")
@@ -134,18 +110,6 @@ declare_global("roscoes")
 
 -- roster.lua
 declare_global("roster")
-
--- sdl_video.lua
-declare_global("gfxScreen")
-declare_global("gfxWindow")
-declare_global("gfxImage")
-declare_global("gfxRectangle")
-declare_global("gfxColor")
-declare_global("gfxFont")
-
--- sdl_text.lua
-declare_global("text")
-declare_global("textBox")
 
 -- song.lua
 declare_global("song")
@@ -162,9 +126,6 @@ declare_global("tavern")
 
 -- temple.lua
 declare_global("temple")
-
--- timer.lua
-declare_global("timer")
 
 -- use.lua
 declare_global("use")

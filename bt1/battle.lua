@@ -549,10 +549,10 @@ end
 
 function battleData:getPlayerOption(c)
 	local action
-	local options = {}
+	local options
 	local inkey
 
-	false_table(options)
+	options = btDefaultTable:new(false)
 
 	action = btAction.new()
 	action.source = c

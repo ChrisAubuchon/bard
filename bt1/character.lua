@@ -749,7 +749,7 @@ function character.getCharacterName()
 			return false
 		end
 		if (roster:nameExists(name)) then
-			text:splashMessage("\n\nThere is a already a person by that name.\n")
+			text:csplash(true, true, "\n\nThere is a already a person by that name.\n")
 		else
 			return name
 		end

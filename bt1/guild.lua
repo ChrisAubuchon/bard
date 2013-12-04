@@ -13,7 +13,7 @@ local function add_member()
 	local member
 
 	if (not party:hasRoom()) then
-		text:splashMessage("\n\nNo room to add new members.");
+		text:csplash(true, true, "\n\nNo room to add new members.");
 
 		return
 	end
@@ -29,7 +29,7 @@ local function add_member()
 		party:addParty(roster:readParty(member))
 	else
 		if (party:findByName(member)) then
-			text:splashMessage(
+			text:csplash(true, true, 
 				"\n\nThat member is already in the party."
 			)
 			return
@@ -74,7 +74,7 @@ local function delete_member()
 	end
 
 	if (party:findByName(member)) then
-		text:splashMessage(
+		text:csplash(true, true, 
 			"You can't delete a member in your party from the disk."			)
 		return
 	end
@@ -116,7 +116,7 @@ local function remove_member()
 	local member
 
 	if (not party:getFirstCharacter()) then
-		text:splashMessage("\nWhat party!")
+		text:csplash(true, true, "\nWhat party!")
 
 		return
 	end
@@ -146,7 +146,7 @@ local function save_party()
 	local name
 
 	if (not party:getFirstCharacter()) then
-		text:splashMessage("\nWhat party!")
+		text:csplash(true, true, "\nWhat party!")
 
 		return
 	end

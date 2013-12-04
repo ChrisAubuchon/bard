@@ -16,16 +16,16 @@ local function bt1_16()
 	if (globals.doTimeEvents) then
 		if (globals.isNight) then
 			if (random:band(0x3f) == 2) then
-				return btkeys.BTKEY_RANDOMBATTLE
+				return btkeys.RANDOMBATTLE
 			end
 		else
 			if (random:band(0x7f) == 2) then
-				return btkeys.BTKEY_RANDOMBATTLE
+				return btkeys.RANDOMBATTLE
 			end
 		end
 
 		if (random:band(0xff) == 2) then
-			return btkeys.BTKEY_WANDERING
+			return btkeys.WANDERING
 		end
 	end
 end

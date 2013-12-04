@@ -201,13 +201,13 @@ function shoppe:identifyItem(inChar)
 
 	item = inChar.inventory[itemNumber]
 	if (item.isIdentified) then
-		text:splashMessage("\nThat item is known already.")
+		text:csplash(true, true, "\nThat item is known already.")
 		return
 	end
 
 	value = math.floor(item.value / 2)
 	if (value > inChar.gold) then
-		text:splashMessage("\nNot enough gold.")
+		text:csplash(true, true, "\nNot enough gold.")
 		return
 	end
 
