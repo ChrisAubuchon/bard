@@ -1,22 +1,22 @@
 local colors = {}
 globals = {}
 
-colors[1] = gfxColor:new(0,0,0)
-colors[2] = gfxColor:new(0,0,170)
-colors[3] = gfxColor:new(0,170,0)
-colors[4] = gfxColor:new(0,170,170)
-colors[5] = gfxColor:new(170,0,0)
-colors[6] = gfxColor:new(170,0,170)
-colors[7] = gfxColor:new(170,85,0)
-colors[8] = gfxColor:new(170,170,170)
-colors[9] = gfxColor:new(85,85,85)
-colors[10] = gfxColor:new(85,85,255)
-colors[11] = gfxColor:new(85,255,85)
-colors[12] = gfxColor:new(85,255,255)
-colors[13] = gfxColor:new(255,85,85)
-colors[14] = gfxColor:new(255,85,255)
-colors[15] = gfxColor:new(255,255,85)
-colors[16] = gfxColor:new(255,255,255)
+colors[1] = 	{   0,   0,   0	}
+colors[2] = 	{   0,   0, 170	}
+colors[3] = 	{   0, 170,   0	}
+colors[4] = 	{   0, 170, 170	}
+colors[5] = 	{ 170,   0,   0	}
+colors[6] = 	{ 170,   0, 170	}
+colors[7] = 	{ 170,  85,   0	}
+colors[8] = 	{ 170, 170, 170	}
+colors[9] = 	{  85,  85,  85	}
+colors[10] = 	{  85,  85, 255	}
+colors[11] = 	{  85, 255,  85	}
+colors[12] = 	{  85, 255, 255	}
+colors[13] = 	{ 255,  85,  85	}
+colors[14] = 	{ 255,  85, 255	}
+colors[15] = 	{ 255, 255,  85	}
+colors[16] = 	{ 255, 255, 255	}
 
 globals.doTimeEvents	= false
 globals.gameHour	= 7
@@ -29,11 +29,15 @@ globals.partyDied	= false
 globals.citySquare	= false
 globals.guildCity	= "Tangramayne"
 
-m_window		= gfxScreen:new()
+--m_window		= gfxScreen:new()
 globals.fonts		= {}
 globals.fonts.mono	= gfxFont:new("fonts/bt2font.btf", true)
 globals.fonts.var	= gfxFont:new("fonts/bt2font.btf", false)
-text			= textBox:new(m_window)
+text			= textBox:new(
+				gfxRect:New(340, 12, 276, 192),
+				23,
+				globals.fonts.var
+				)
 garths			= false
 
 currentLevel		= false

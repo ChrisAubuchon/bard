@@ -8,7 +8,13 @@
 
 #define DUN_FRONT	0x01
 #define DUN_SIDE	0x02
-#define DUN_PORTAL	0x04
+#define DUN_FLOOR	0x04
+#define DUN_CEILING	0x08
+
+#define TILE_DOOR	0
+#define TILE_WALL	1
+#define TILE_FLOOR	0
+#define TILE_CEILING	1
 
 /****************************************/
 /*					*/
@@ -21,7 +27,14 @@ static void dun_gfxInit();
 static btstring_t *getBackground(void);
 static void outputBackground(uint8_t tileset);
 static void getDunGfx(bt_view_t *view, uint8_t tileset);
-static void getDunFacet(bt_view_t *oview, uint8_t tilset, dunfacet_t *fxxx, uint8_t facet);
+static void getDunFacet(bt_view_t *oview, uint8_t tilset, dunfacet_t *fxxx, uint8_t facet, uint8_t tile);
+static void		createFacetDirectory(dunfacet_t *df, uint8_t facet);
+static btstring_t	*getFacetLabel(dunfacet_t *df, uint8_t facet);
+static btstring_t	*dunfacet_getQuad(dunfacet_t *df);
+static view_t		*getFacetView(dunfacet_t *df, bta_cell_t *img,
+					oldGfxXY_t *xy, uint8_t facet);
+static void		writeFacet(bt_view_t *outView, dunfacet_t *df,
+					view_t *view, uint8_t facet);
 
 /****************************************/
 /*					*/
@@ -148,6 +161,10 @@ static uint16_t dunPortFloorOffset[] = {
 	16, 16, 16, 8, 16, 16
 };
 
+static uint16_t dunCeilingYDelta[] = {
+	69, 43, 24, 68, 41, 24
+};
+
 static oldGfxXY_t dunSideXY[] = {
 	{  0,  0,  8, 87 },
 	{  9,  0, 28, 84 },
@@ -184,18 +201,18 @@ static uint16_t dunSideDoorOffset[] = {
 /*					*/
 /****************************************/
 
-static void getDunFacet(bt_view_t *outView, uint8_t tileset, dunfacet_t *fxxx, uint8_t facet)
+static void getDunFacet(bt_view_t *outView, uint8_t tileset, dunfacet_t *fxxx, uint8_t facet, uint8_t tile)
 {
 	uint16_t doorOffset = 0;
 	uint16_t x, y;
 	uint16_t offset;
-	uint8_t i;
 
 	btwoGfx_t *dun;
 	oldGfxSZ_t *sz;
 	oldGfxXY_t *xy;
 	btstring_t *data;
-	view_t view;
+	view_t		view;
+	view_t		*facetView;
 
 	bta_cell_t *img;
 
@@ -212,7 +229,8 @@ static void getDunFacet(bt_view_t *outView, uint8_t tileset, dunfacet_t *fxxx, u
 		xy = &dunSideXY[fxxx->faceMap];
 		doorOffset = dunSideDoorOffset[fxxx->faceMap];
 		break;
-	case DUN_PORTAL:
+	case DUN_FLOOR:
+	case DUN_CEILING:
 		dun = &dun_portalGfx[fxxx->faceMap];
 		sz = &dunPortSZ[fxxx->faceMap];
 		xy = &dunPortXY[fxxx->faceMap];
@@ -229,71 +247,142 @@ static void getDunFacet(bt_view_t *outView, uint8_t tileset, dunfacet_t *fxxx, u
 	view.bottom = sz->bottom;
 	view.width = dun->width;
 
-	for (i = 0; i < 2; i++) {
-		btstring_t *label;
-		btstring_t *l;
+	btstring_t *label;
+	btstring_t *l;
 
-		view.right = sz->right + ((i) ? doorOffset : 0);
-		view.left = sz->left + ((i) ? doorOffset : 0);
-		view.offset = dun->offset;
+	view.right = sz->right + ((tile) ? doorOffset : 0);
+	view.left = sz->left + ((tile) ? doorOffset : 0);
+	view.offset = dun->offset;
 
-		img = getImage(&view, dundata);
+	img = getImage(&view, dundata);
+	img = bta_cell_toRGBA(img, egapal);
 
-		switch (facet) {
-		case DUN_FRONT:
-			label = bts_strcpy("front");
-			break;
-		case DUN_SIDE:
-			label = bts_sprintf("%sside", fxxx->extra);
-			break;
-		case DUN_PORTAL:
-			label = bts_strcpy("portal");
-			break;
-		}
+	facetView = getFacetView(fxxx, img, xy, facet);
 
-		if (i == 0) {
-			btstring_t *q;
-			uint16_t imgx;
-
-			debug("label->buf = %s\n", label->buf);
-			xmkdir(mkImagePath("dpics/%d-%s", fxxx->depth,
-							fxxx->name));
-			xmkdir(mkImagePath("dpics/%d-%s/%s",
-						fxxx->depth,
-						fxxx->name,
-						label->buf));
-			q = bts_sprintf("%d-%s", fxxx->depth, 
-						fxxx->name
-					);
-
-			if (fxxx->rightFlag == 1)
-				imgx = 224 - (img->width) - (xy->x_lo << 1);
-			else
-				imgx = xy->x_lo << 1;
-
-			bt_view_new_facet(outView, q, label, imgx,
-						xy->y_lo << 1,
-						img->width, img->height);
-		}
-
-		if (i) {
-			if (facet == DUN_PORTAL) 
-				l = bts_strcpy("ceiling");
-			else
-				l = bts_strcpy("wall");
-		} else {
-			if (facet == DUN_PORTAL)
-				l = bts_strcpy("floor");
-			else
-				l = bts_strcpy("door");
-		}
-		bta_toPNG(img,
-			mkImagePath("dpics/%d-%s/%s/%d-%s.png",
-				fxxx->depth, fxxx->name,
-				label->buf, tileset, l->buf));
-		bts_free(l);
-		bta_cell_free(img);
+	switch (facet) {
+	case DUN_FLOOR:
+		writeFacet(outView, fxxx, facetView, facet);
+		break;
+	case DUN_CEILING:
+		writeFacet(outView, fxxx, facetView, facet);
+		break;
+	case DUN_FRONT:
+	case DUN_SIDE:
+		if (tile)
+			writeFacet(outView, fxxx, facetView, facet);
+		break;
 	}
+
+	free(facetView);
+
+	label = getFacetLabel(fxxx, facet);
+	switch (facet) {
+	case DUN_FLOOR:
+	case DUN_CEILING:
+		l = bts_strcpy("portal");
+		break;
+	case DUN_FRONT:
+	case DUN_SIDE:
+		if (tile)
+			l = bts_strcpy("wall");
+		else
+			l = bts_strcpy("door");
+		break;
+	}
+	debug("dpics/%d-%s/%s/%d-%s\n", fxxx->depth, fxxx->name, label->buf, tileset, l->buf);
+	bta_toPNG(img,
+		mkImagePath("dpics/%d-%s/%s/%d-%s.png",
+			fxxx->depth, fxxx->name,
+			label->buf, tileset, l->buf));
+	bts_free(l);
+	bts_free(label);
+	bta_cell_free(img);
+}
+
+/*
+ * writeFacet()
+ */
+static void writeFacet(bt_view_t *outView, dunfacet_t *df, view_t *view, uint8_t facet)
+{
+	btstring_t	*quad;
+	btstring_t	*label;
+
+	quad = dunfacet_getQuad(df);
+	label = getFacetLabel(df, facet);
+
+	bt_view_new_facet(outView, quad, label, view->x, view->y,
+			view->width, view->height);
+
+}
+
+/*
+ * getFacetView()
+ */
+static view_t *getFacetView(dunfacet_t *df, bta_cell_t *img, oldGfxXY_t *xy, uint8_t facet)
+{
+	view_t	*rval;
+
+	rval = (view_t *)xzalloc(sizeof(view_t));
+	rval->width = img->width;
+	rval->height = img->height;
+
+	if (df->rightFlag == 1)
+		rval->x = 224 - img->width - (xy->x_lo << 1);
+	else
+		rval->x = xy->x_lo << 1;
+
+	rval->y = xy->y_lo << 1;
+	if (facet == DUN_CEILING)
+		rval->y -= (dunCeilingYDelta[df->faceMap] << 1);
+
+	return rval;
+}
+
+/*
+ * createFacetDirectory()
+ */
+static void createFacetDirectory(dunfacet_t *df, uint8_t facet)
+{
+	btstring_t	*label;
+	btstring_t	*quad;
+
+	label = getFacetLabel(df, facet);
+	quad = dunfacet_getQuad(df);
+
+	xmkdir(mkImagePath("dpics/%s", quad->buf));
+	xmkdir(mkImagePath("dpics/%s/%s", quad->buf, label->buf));
+
+	bts_free(quad);
+	bts_free(label);
+}
+
+/*
+ * getFacetLabel()
+ */
+static btstring_t *getFacetLabel(dunfacet_t *df, uint8_t facet)
+{
+	switch (facet) {
+	case DUN_FRONT:
+		return bts_strcpy("front");
+	case DUN_SIDE:
+		return bts_sprintf("%sside", df->extra);
+	case DUN_FLOOR:
+		return bts_strcpy("floor");
+	case DUN_CEILING:
+		return bts_strcpy("ceiling");
+	}
+
+	printf("Returning NULL\n");
+
+	return NULL;
+}
+
+/*
+ * dunfacet_getQuad()
+ */
+static btstring_t *dunfacet_getQuad(dunfacet_t *df)
+{
+	return bts_sprintf("%d-%s", df->depth, df->name);
 }
 
 static void getDunGfx(bt_view_t *view, uint8_t tileset)
@@ -303,17 +392,29 @@ static void getDunGfx(bt_view_t *view, uint8_t tileset)
 
 	i = 0;
 	while (dunSide[i].depth) {
-		getDunFacet(view, tileset, &dunSide[i], DUN_SIDE);
+		debug("DUN_SIDE: %2d\n", i);
+		createFacetDirectory(&dunSide[i], DUN_SIDE);
+		getDunFacet(view, tileset, &dunSide[i], DUN_SIDE, TILE_WALL);
+		getDunFacet(view, tileset, &dunSide[i], DUN_SIDE, TILE_DOOR);
 		i++;
 	}
 	i = 0;
 	while (dunFront[i].depth) {
-		getDunFacet(view, tileset, &dunFront[i], DUN_FRONT);
+		debug("DUN_FRONT: %2d\n", i);
+		createFacetDirectory(&dunFront[i], DUN_FRONT);
+		getDunFacet(view, tileset, &dunFront[i], DUN_FRONT, TILE_WALL);
+		getDunFacet(view, tileset, &dunFront[i], DUN_FRONT, TILE_DOOR);
 		i++;
 	}
 	i = 0;
 	while (dunPortal[i].depth) {
-		getDunFacet(view, tileset, &dunPortal[i], DUN_PORTAL);
+		debug("DUN_PORTAL: %2d\n", i);
+		createFacetDirectory(&dunPortal[i], DUN_FLOOR);
+		createFacetDirectory(&dunPortal[i], DUN_CEILING);
+		getDunFacet(view, tileset, &dunPortal[i], DUN_FLOOR,
+				TILE_FLOOR);
+		getDunFacet(view, tileset, &dunPortal[i], DUN_CEILING,
+				TILE_CEILING);
 		i++;
 	}
 }
@@ -412,7 +513,7 @@ void outputDunpics(void)
 	xmkdir(mkImagePath("dpics"));
 
 	for (i = 0; i < 3; i++) {
-		fp = xfopen(mkBardTwoPath("DPICS%d", i), "rb");
+		fp = xfopen(mkBardTwoPath("dpics%d", i), "rb");
 		huf = dehuf_init(fp);
 		dundata = dehuf(huf, 0x7fff);
 		dehuf_free(huf);

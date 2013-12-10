@@ -32,7 +32,6 @@ static void outputScreens(void);
 static void outputIcons(void);
 static void outputMousePointers(void);
 
-static void icon_write_clear(btstring_t *data, int index);
 static void icon_write_bta(huffile_t *huf, int index);
 static void icon_write_compass(huffile_t *data, int index);
 static void icon_write_detect(huffile_t *huf, int index);
@@ -67,23 +66,9 @@ static void outputScreens(void)
 
 }
 
-static void icon_write_clear(btstring_t *data, int index)
-{
-	bta_cell_t	*img;
-	int		i, j;
-
-	img = bta_cell_new(0, 0, icons[index].width, icons[index].height, 0, NULL);
-	img->gfx = data;
-	for (i = 0; i < icons[index].height; i++) {
-		for (j = 2; j < icons[index].width; j++) {
-			img->gfx->buf[(i * icons[index].width) + j] = 0x77;
-		}
-	}
-	img = bta_cell_convert(img);
-	bta_toPNG(img, mkImagePath("%s_clear.png", icons[index].name));
-	bta_cell_free(img);
-}
-
+/*
+ * __icon_write_png()
+ */
 static void __icon_write_png(btstring_t *data, btstring_t *fname,
 				iconGfx_t *ip)
 {
@@ -96,6 +81,9 @@ static void __icon_write_png(btstring_t *data, btstring_t *fname,
 	bta_cell_free(img);
 }
 
+/*
+ * icon_write_bta()
+ */
 static void icon_write_bta(huffile_t *huf, int index)
 {
 	bta_t		*bta;
@@ -106,7 +94,7 @@ static void icon_write_bta(huffile_t *huf, int index)
 	btstring_t	*data;
 	int		i, j;
 
-	bta = bta_new(BTA_TYPE_SIMPLELOOP, 1);
+	bta = bta_new(1);
 
 	ip	= &icons[index];
 	offset	= 0;
@@ -145,6 +133,9 @@ static uint8_t *cdir[] = {
 	"north", "east", "south", "west", "clear"
 };
 
+/*
+ * icon_write_compass()
+ */
 static void icon_write_compass(huffile_t *huf, int index)
 {
 	bta_cell_t	*img;
@@ -171,7 +162,9 @@ static void icon_write_compass(huffile_t *huf, int index)
 	bts_free(data);
 }
 
-
+/*
+ * icon_write_detect()
+ */
 static void icon_write_detect(huffile_t *huf, int index)
 {
 	bta_t		*bta;
@@ -182,7 +175,7 @@ static void icon_write_detect(huffile_t *huf, int index)
 	iconGfx_t	*ip;
 	int		i, j;
 
-	bta = bta_new(BTA_TYPE_SIMPLELOOP, 1);
+	bta = bta_new(1);
 	l = bta_loop_new(bta, 0, 6);
 
 	ip	= &icons[index];
@@ -215,6 +208,9 @@ static void icon_write_detect(huffile_t *huf, int index)
 	bts_free(data);
 }
 
+/*
+ * icon_write_png()
+ */
 static void icon_write_png(huffile_t *huf, int index)
 {
 	bta_cell_t	*img;
@@ -240,6 +236,9 @@ static void icon_write_png(huffile_t *huf, int index)
 	bts_free(data);
 }
 
+/*
+ * outputIcons()
+ */
 static void outputIcons(void)
 {
 	FILE		*fp;
@@ -286,10 +285,10 @@ static void outputMousePointers(void)
 
 void convertGFX(void)
 {
-	outputBigpic();
 	outputScreens();
 	outputIcons();
 	outputBitmapFont();
+	outputBigpic();
 	outputDunpics();
 	outputCitypics();
 	outputWildpics();

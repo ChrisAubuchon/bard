@@ -128,8 +128,6 @@ function __bigpic:new()
 	readCityImages()
 	readDunImages()
 
-	--self.surface = gfxWindow:new(224, 176, 8)
-	--self.surface = gfxWindow:new(224, 176, 32)
 	self.surface		= gfxSurface:New(224, 176)
 	self.titleSurface	= gfxSurface:New(224, 16)
 

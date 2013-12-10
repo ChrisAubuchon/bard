@@ -3,6 +3,7 @@
 #include <gfx.h>
 #include <bt_gfx.h>
 #include <cnv_gfx.h>
+#include <cnv_bigpic.h>
 #include <dehuf.h>
 #include <fpio.h>
 
@@ -17,8 +18,9 @@
 
 static void		getAnimLoops(bta_t *bta, btstring_t *anim, 
 					b2anim_t *b2a);
-static void bigpic_setBG(btstring_t * in);
-static void extractPixel(uint16_t data, pixel_t *p);
+static void		bigpic_setBG(btstring_t *in);
+static void		extractPixel(uint16_t data, pixel_t *p);
+static bta_cell_t	*cellToRGBA(bta_cell_t *in, btstring_t *big);
 
 /****************************************/
 /*					*/
@@ -38,7 +40,6 @@ static uint8_t		anim_countCells(btstring_t * anim,
 static animbox_t	*getAnimBox(btstring_t *data, uint16_t off);
 static void		copyCell(btstring_t *anim, uint16_t offset, 
 					btstring_t *big, animbox_t *ab);
-
 
 /****************************************/
 /*					*/
@@ -61,6 +62,19 @@ static void bigpic_setBG(btstring_t * in)
 		in->buf[i] ^= in->buf[i - 0x38];
 }
 
+static void dumpBig(btstring_t *fname, btstring_t *big)
+{
+	bta_cell_t	*c;
+	btstring_t	*tmp;
+
+	tmp = bts_copy(big);
+
+	c = bta_cell_new(0, 0, 224, 176, 0, tmp);
+	c = bta_cell_toRGBA(c, egapal);
+	bta_toPNG(c, fname);
+	bta_cell_free(c);
+}
+
 static void getAnimLoops(bta_t *bta, btstring_t *anim, b2anim_t *b2a)
 {
 	bta_loop_t	*l;
@@ -70,6 +84,7 @@ static void getAnimLoops(bta_t *bta, btstring_t *anim, b2anim_t *b2a)
 	int16_t		cycleCount;
 	uint8_t		ncells;
 	animbox_t	*ab;
+	btstring_t	*buf;
 
 	for (i = 0; i < b2a->nloops; i++) {
 		debug("*************************************\n");
@@ -79,6 +94,8 @@ static void getAnimLoops(bta_t *bta, btstring_t *anim, b2anim_t *b2a)
 		offset = b2a->base[i].offset;
 		cycleCount = b2a->base[i].cycles;
 
+		buf = bts_copy(bta->base->gfx);
+
 		for (j = 0; j < ncells; j++) {	
 			debug("Cell: %d\n", j);
 			if (cycleCount == 0) {
@@ -86,7 +103,6 @@ static void getAnimLoops(bta_t *bta, btstring_t *anim, b2anim_t *b2a)
 			}
 
 			off = b2a->base[i].offset + str_read16le(&anim->buf[offset + 2]);
-			debug("off = %04x\n", off);
 			ab = getAnimBox(anim, off);
 
 			c = bta_cell_new(ab->x, ab->y, 
@@ -96,9 +112,9 @@ static void getAnimLoops(bta_t *bta, btstring_t *anim, b2anim_t *b2a)
 			c->gfx = bts_new(ab->height * ab->width);
 
 			copyCell(anim, off, c->gfx, ab);
-			c = bta_cell_convert(c);
-			
-			debug("c->x = %d, c->y = %d, c->w = %d, c->h = %d, c->delay = %d\n", c->x, c->y, c->width, c->height, cycleCount);
+			c = bta_cell_4bitTo8bit(c);
+			c = bta_cell_scale(c);
+			c = cellToRGBA(c, buf);
 
 			bta_cell_set(bta, i, j, c);
 
@@ -107,7 +123,53 @@ static void getAnimLoops(bta_t *bta, btstring_t *anim, b2anim_t *b2a)
 
 			free(ab);
 		}
+
+		bts_free(buf);
 	}
+}
+
+/*
+ * celltoRGBA()
+ */
+static bta_cell_t *cellToRGBA(bta_cell_t *in, btstring_t *big)
+{
+	bta_cell_t	*rval;
+	uint32_t	i, j;
+	uint8_t		*inp;
+	uint8_t		*rvalp;
+	uint32_t	index;
+
+	rval = bta_cell_new(
+		in->x, in->y,
+		in->width, in->height,
+		in->delay, NULL);
+	rval->gfx = bts_new(in->gfx->size * 4);
+
+	inp = in->gfx->buf;
+	rvalp = rval->gfx->buf;
+
+	for (i = 0; i < in->height; i++) {
+		for (j = 0; j < in->width; j++) {
+			if (*inp == 0) {
+				*rvalp++ = 0;
+				*rvalp++ = 0;
+				*rvalp++ = 0;
+				*rvalp++ = 0;
+				*inp++;
+			} else {
+				index = ((224 * in->y) + (in->x)) + ((i * 224) + j);
+				big->buf[index] ^= *inp++;
+				*rvalp++ = egapal[big->buf[index]].red;
+				*rvalp++ = egapal[big->buf[index]].green;
+				*rvalp++ = egapal[big->buf[index]].blue;
+				*rvalp++ = egapal[big->buf[index]].alpha;
+			}
+		}
+	}
+
+	bta_cell_free(in);
+
+	return rval;
 }
 
 /****************************************/
@@ -116,6 +178,9 @@ static void getAnimLoops(bta_t *bta, btstring_t *anim, b2anim_t *b2a)
 /*					*/
 /****************************************/
 
+/*
+ * anim_parse()
+ */
 static b2anim_t *anim_parse(btstring_t *data)
 {
 	uint16_t	offset		= 0;
@@ -177,7 +242,9 @@ static uint8_t anim_countCells(btstring_t *anim, uint16_t base_offset)
 	uint16_t	offset	= base_offset;
 	uint8_t		ncells	= 0;
 
+#if 0
 	debug("base_offset: 0x%04x\n", base_offset);
+#endif
 
 	do {
 		cell.cycles = str_read16le(&anim->buf[offset]);
@@ -187,9 +254,11 @@ static uint8_t anim_countCells(btstring_t *anim, uint16_t base_offset)
 		if (str_read16le(&anim->buf[cell.offset]) == 0xffff)
 			break;
 
+#if 0
 		debug("cell %d:\n", ncells);
 		debug("  cycleCount: %4d\n", cell.cycles);
 		debug("  cellOffset: 0x%04x\n", cell.offset);
+#endif
 
 		ncells++;
 	} while (cell.cycles != 0xffff);
@@ -282,7 +351,8 @@ void outputBigpic(void)
 	btstring_t	*big;
 	btstring_t	*anim = NULL;
 	uint16_t	npics;
-	bt_bigpicList_t	*bpl;
+	cnvList_t	*bpl;
+	bt_bigpic_t	*bp;
 
 	bta_t		*img;
 	bta_cell_t	*c;
@@ -294,7 +364,7 @@ void outputBigpic(void)
 	fp = xfopen(mkBardTwoPath("BIGPIC"), "rb");
 	npics = fp_read32le(fp) / sizeof(uint32_t);
 
-	bpl = bigpic_list_new(npics);
+	bpl = bigpicList_new();
 
 	for (i = 0; i < npics; i++) {
 		debug("Bigpic: %d\n", i);
@@ -313,25 +383,31 @@ void outputBigpic(void)
 			nloops = b2a->nloops;
 		}
 
+		bp = bigpic_new();
+		bp->name = getPicMacro(i);
+#if 0
+		bp->isTimeAware = isTimeAware[i];
+#endif
+
 		if (nloops) {
-			img = bta_new(BTA_TYPE_XORLOOP, b2a->nloops);
+			img = bta_new(b2a->nloops);
 
 			bigpic_setBG(big);
 			c = bta_cell_new(0, 0, 56, 88, 0, big);
-			c = bta_cell_convert(c);
+			c = bta_cell_4bitTo8bit(c);
+			c = bta_cell_scale(c);
 			img->base = c;
 
 			getAnimLoops(img, anim, b2a);
+
+			img->base = bta_cell_toRGBA(img->base, egapal);
 
 			bts_free(anim);
 
 			bta_write_bta(mkImagePath("bigpic_%d.bta", i), img);
 
-			bigpic_list_set(bpl,
-				getPicMacro(i),
-				mkImagePathRel("bigpic_%d.bta", i),
-				BTA_TYPE_XORLOOP
-				);
+			bp->type = IMAGE_BTA;
+			bp->path = mkImagePathRel("bigpic_%d.bta", i);
 
 			bta_free(img);
 			free(b2a);
@@ -341,21 +417,19 @@ void outputBigpic(void)
 			c = bta_cell_convert(c);
 			bta_toPNG(c, mkImagePath("bigpic_%d.png", i));
 
-			bigpic_list_set(bpl,
-				getPicMacro(i),
-				mkImagePathRel("bigpic_%d.png", i),
-				BTA_PNG
-				);
+			bp->type = IMAGE_PNG;
+			bp->path = mkImagePathRel("bigpic_%d.png", i);
 
 			bta_cell_free(c);
 		}
 
+		cnvList_add(bpl, bp);
 		anim = NULL;
 		dehuf_free(huf);
 	}
 
-	bigpic_list_to_json(bpl, mkJsonPath("bigpic.json"));
-	bigpic_list_free(bpl);
+	bigpicList_toJson(bpl, mkJsonPath("bigpic.json"));
+	cnvList_free(bpl);
 
 	fclose(fp);
 }

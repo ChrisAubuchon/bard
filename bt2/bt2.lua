@@ -34,21 +34,14 @@ setmetatable(_G, {
 	})
 
 require "declares"
-require "btlib_declares"
-require "diskio"
-require "sdl_video"
-require "sdl_timer"
-require "sdl_text"
+require "btlib"
+
+gfx:Init("Bard's Tale II")
 require "globals"
 require "btdebug"
 
-m_window:Draw(nil, gfxImage:new("images/title.png", "png"), nil)
-m_window:Update()
-
-getkey()
-
-m_window:Draw(nil, gfxImage:new("images/screen.png", "png"), nil)
-m_window:Update()
+local title = gfxImage:new("images/title.png", "png")
+title:Draw(nil)
 
 require "icons"
 require "bigpic"
@@ -85,6 +78,11 @@ require "dunSquares"
 require "dun"
 require "battle"
 require "songs"
+
+getkey()
+
+title = gfxImage:new("images/screen.png", "png")
+title:Draw(nil)
 
 repeat
 	if (globals.gameState == globals.STATE_GUILD) then	

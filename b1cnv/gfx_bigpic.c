@@ -134,12 +134,9 @@ void getAnimLoops(bta_t *bta, btstring_t *anim, anim_t *ba)
 			c->gfx = bts_new(ab->height * ab->width);
 
 			offset = copyCell(anim, offset, c->gfx, ab);
-			dump_btstring(bts_strcpy("cell0-pre8.dat"), c->gfx, 0);
 			c = bta_cell_4bitTo8bit(c);
 			c = bta_cell_scale(c);
 			c = cellToRGBA(c, buf);
-
-			bta_toPNG(c, mkImagePath("loop_%d_cell_%d.png", i, j));
 
 			bta_cell_set(bta, i, j, c);
 

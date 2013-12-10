@@ -20,6 +20,8 @@ end
 
 -- Set the data path
 --
+package.path = package.path .. ";" .. sys.dataPath .. "/../btlib/?.lua"
+sys.sharedPath = sys.dataPath .. "/share"
 sys.dataPath = sys.dataPath .. "/bt1"
 
 setmetatable(_G, {
@@ -33,31 +35,26 @@ setmetatable(_G, {
 
 
 require "declares"
-require "sdl_video"
-require "sdl_timer"
-require "sdl_text"
+require "btlib"
+
+gfx:Init("Bard's Tale")
 require "globals"
 require "btdebug"
 
-m_window:Draw(nil, gfxImage:new("images/title.png", "png"), nil)
-m_window:Update()
+local title = gfxImage:new("images/title.png", "png")
+title:Draw(nil)
 
-require "bttable"
-require "linkedList"
-require "entity"
-require "btapi"
 require "btdebug"
-require "dataio"
+require "b1lib"
+require "bigpic"
 require "battleBonus"
 require "battle"
 require "action"
-require "random"
 require "spells"
 require "icons"
 require "durationSpell"
 require "race"
 require "classes"
-require "level"
 require "building"
 require "cityBuildings"
 require "cityGuardian"
@@ -87,8 +84,8 @@ require "summon"
 
 getkey()
 
-m_window:Draw(nil, gfxImage:new("images/screen.png", "png"), nil)
-m_window:Update()
+title = gfxImage:new("images/screen.png", "png")
+title:Draw(nil)
 
 repeat
 	if (globals.gameState == globals.STATE_GUILD) then

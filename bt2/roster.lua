@@ -13,26 +13,6 @@ function roster:new(inVersion)
 end
 
 ----------------------------------------
--- toArray()
-----------------------------------------
-function roster:toArray()
-	local t = {}
-	local k
-
-	for k,_ in pairs(self.characters) do
-		table.insert(t,k)
-	end
-
-	for k,_ in pairs(self.parties) do
-		table.insert(t,k)
-	end
-
-	table.sort(t)
-
-	return t
-end
-
-----------------------------------------
 -- printMember()
 --
 -- Print the member line in list format
@@ -47,20 +27,6 @@ function roster:printMember(inName)
 	else
 		text:print("*" .. inName)
 	end
-end
-
-----------------------------------------
--- nameExists()
---
---
-----------------------------------------
-function roster:nameExists(inName)
-	if ((self.characters[inName] ~= nil) or
-	    (self.parties[inName] ~= nil)) then
-		return true
-	end
-
-	return false
 end
 
 ----------------------------------------
@@ -100,30 +66,6 @@ function roster:readParty(inName)
 	assert(self.parties[inName] ~= nil)
 
 	return self.parties[inName]
-end
-
-----------------------------------------
--- isParty()
-----------------------------------------
-function roster:isParty(inName)
-	if (self.parties[inName] ~= nil) then
-		return true
-	end
-
-	return false
-end
-
-----------------------------------------
--- remove()
-----------------------------------------
-function roster:remove(inName)
-	dprint(self.characters[inName])
-	if (self.characters[inName] ~= nil) then
-		self.characters[inName] = nil
-	else
-		self.parties[inName] = nil
-	end
-	self:write()
 end
 
 ----------------------------------------

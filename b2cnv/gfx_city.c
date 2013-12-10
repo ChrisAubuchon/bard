@@ -31,12 +31,33 @@ static void outputBldgFronts(bt_view_t *view);
 static btstring_t *piczero;
 static btstring_t *picone;
 
+
+bta_color_t cityPalette[16] = {
+	{   0,   0,   0, 255 }, /*0*/
+	{   0,   0, 170, 255 }, /*1*/
+	{   0, 170,   0, 255 }, /*2*/
+	{   0, 170, 170, 255 }, /*3*/
+	{ 170,   0,   0, 255 }, /*4*/
+	{ 170,   0, 170, 255 }, /*5*/
+	{ 170,  85,   0, 255 }, /*6*/
+	{ 170, 170, 170, 255 }, /*7*/
+	{  85,  85,  85, 255 }, /*8*/
+	{  85,  85, 255, 255 }, /*9*/
+	{  85, 255,  85, 255 }, /*a*/
+	{  85, 255, 255, 0   }, /*b*/
+	{ 255,  85,  85, 255 }, /*c*/
+	{ 255,  85, 255, 255 }, /*d*/
+	{ 255, 255,  85, 255 }, /*e*/
+	{ 255, 255, 255, 255 }  /*f*/
+};
+
 /****************************************/
 /*					*/
 /* Static variables			*/
 /*					*/
 /****************************************/
 
+#if 0
 static uint8_t quadmap[] = { 
 	QUAD_4L,
 	QUAD_3L, QUAD_3L, QUAD_3L, QUAD_3L,
@@ -50,6 +71,7 @@ static uint8_t quadmap[] = {
 	QUAD_3M, QUAD_3M, QUAD_3M, QUAD_3M,
 	QUAD_2M
 };
+#endif
 
 static uint8_t qanimmap[] = { 
 	3,
@@ -314,6 +336,7 @@ static void outputCityFacet(bt_view_t *oview, uint8_t facet, uint8_t quad)
 		view.offset = city->offset;
 
 		img = getImage(&view, data);
+		img = bta_cell_toRGBA(img, cityPalette);
 
 		if (i == 0) {
 			btstring_t	*q;
@@ -394,7 +417,8 @@ static void outputBldgFronts(bt_view_t *view)
 	for (i = 0; i < 4; i++) {
 		b = bta_cell_new(0, 0, 56, 88, 0, 
 			dehufFile(mkBardTwoPath("B%d.HUF", i), 0x1340));
-		b = bta_cell_convert(b);
+		b = bta_cell_scale(bta_cell_4bitTo8bit(b));
+		b = bta_cell_toRGBA(b, cityPalette);
 		bta_toPNG(b, 
 			mkImagePath("citypics/base-1/face/%s.png",
 				bldgFace[i+1]));
@@ -476,7 +500,20 @@ static void outputBackground(void)
 	bg = bta_cell_new(0, 0, 56, 88, 0, b);
 	bg = bta_cell_convert(bg);
 
-	bta_toPNG(bg, mkImagePath("citypics/citybg.png"));
+	bta_toPNG(bg, mkImagePath("citypics/citybg-day.png"));
+
+	bta_cell_free(bg);
+
+	b = bts_new(0x1340);
+	for (i = 0; i < 2576; i++)
+		b->buf[i] = 0x0;
+	for (; i < 4928; i++)
+		b->buf[i] = 0xcc;
+
+	bg = bta_cell_new(0, 0, 56, 88, 0, b);
+	bg = bta_cell_convert(bg);
+
+	bta_toPNG(bg, mkImagePath("citypics/citybg-night.png"));
 
 	bta_cell_free(bg);
 }

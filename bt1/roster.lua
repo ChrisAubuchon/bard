@@ -1,68 +1,14 @@
-require "character"
+require "bICharacter"
 
-local __roster = {}
-function __roster:new(inFileName)
-	local self = diskio:readTable(inFileName, true)
-	self.fileName = inFileName
+roster = btroster:new("roster", "bt1")
 
-	if (not self.characters) then
-		self.characters = {}
-		self.parties = {}
-		diskio:writeTable(inFileName)
-	end
+function roster:new(inVersion)
+	local self = btroster:new("roster", inVersion)
 
-	btTable.addParent(self, __roster)
+	btTable.addParent(self, roster)
 	btTable.setClassMetatable(self)
 
 	return self
-end
-
-function __roster:write()
-	local t = {}
-	t.characters = self.characters
-	t.parties = self.parties
-	diskio:writeTable(t, self.fileName)
-end
-
-----------------------------------------
--- toArray()
---
--- Return an array with a sorted list
--- of the parties and characters
-----------------------------------------
-function __roster:toArray()
-	local t = {}
-	local k
-
-	dprint("roster.toArray()")
-
-	for k,_ in pairs(self.characters) do
-		table.insert(t, k)
-	end
-
-	for k,_ in pairs(self.parties) do
-		table.insert(t, k)
-	end
-
-	table.sort(t)
-
-	return t
-end
-
-roster = __roster:new("roster")
-
-----------------------------------------
--- nameExists()
---
---
-----------------------------------------
-function roster:nameExists(inName)
-	if ((self.characters[inName] ~= nil) or
-	    (self.parties[inName] ~= nil)) then
-		return true
-	end
-
-	return false
 end
 
 ----------------------------------------
@@ -105,17 +51,6 @@ function roster:readParty(inName)
 end
 
 ----------------------------------------
--- isParty()
-----------------------------------------
-function roster:isParty(inName)
-	if (self.parties[inName] ~= nil) then
-		return true
-	end
-
-	return false
-end
-
-----------------------------------------
 -- printMember()
 --
 -- Print the member line in list format
@@ -132,16 +67,6 @@ function roster:printMember(inName)
 	end
 end
 
-----------------------------------------
--- remove()
-----------------------------------------
-function roster:remove(inName)
-	if (self.characters[inName] ~= nil) then
-		self.characters[inName] = nil
-	else
-		self.parties[inName] = nil
-	end
-end
 
 
 

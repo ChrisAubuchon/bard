@@ -21,6 +21,25 @@
 #define WILD_CORNER		0x30
 #define WILD_EDGE		0x40
 
+bta_color_t wildPalette[16] = {
+	{   0,   0,   0,   0 }, /*0*/
+	{   0,   0, 170, 255 }, /*1*/
+	{   0, 170,   0, 255 }, /*2*/
+	{   0, 170, 170, 255 }, /*3*/
+	{ 170,   0,   0, 255 }, /*4*/
+	{ 170,   0, 170, 255 }, /*5*/
+	{ 170,  85,   0, 255 }, /*6*/
+	{ 170, 170, 170, 255 }, /*7*/
+	{  85,  85,  85, 255 }, /*8*/
+	{  85,  85, 255, 255 }, /*9*/
+	{  85, 255,  85, 255 }, /*a*/
+	{  85, 255, 255, 255 }, /*b*/
+	{ 255,  85,  85, 255 }, /*c*/
+	{ 255,  85, 255, 255 }, /*d*/
+	{ 255, 255,  85, 255 }, /*e*/
+	{ 255, 255, 255, 255 }  /*f*/
+};
+
 /****************************************/
 /*					*/
 /* Local function prototypes		*/
@@ -500,7 +519,8 @@ static void outputWildFacet(bt_view_t *oview, dunfacet_t *df, uint8_t facet)
 
 	xmkdir(mkImagePath("wpics/%d-%s", df->depth, df->name));	
 
-	bta_transparent_toPNG(img,
+	img = bta_cell_toRGBA(img, wildPalette);
+	bta_toPNG(img,
 		mkImagePath("wpics/%d-%s/%s%s.png",
 				df->depth,
 				df->name,
@@ -529,7 +549,20 @@ static void outputBackground(void)
 	bg = bta_cell_new(0, 0, 56, 88, 0, b);
 	bg = bta_cell_convert(bg);
 
-	bta_toPNG(bg, mkImagePath("wpics/wpic.png"));
+	bta_toPNG(bg, mkImagePath("wpics/wpic-day.png"));
+
+	bta_cell_free(bg);
+
+	b = bts_new(0x1340);
+	for (i = 0; i < 2576; i++)
+		b->buf[i] = 0;
+	for (; i < 4928; i++)
+		b->buf[i] = 0x22;
+
+	bg = bta_cell_new(0, 0, 56, 88, 0, b);
+	bg = bta_cell_convert(bg);
+
+	bta_toPNG(bg, mkImagePath("wpics/wpic-night.png"));
 
 	bta_cell_free(bg);
 }
@@ -562,3 +595,4 @@ void outputWildpics(uint8_t indent)
 
 	bts_free(wpic);
 }
+

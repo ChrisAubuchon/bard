@@ -2,6 +2,7 @@ local __bigpic = {}
 function __bigpic:new()
 	local self = {
 		titleRect	= false,
+		titleSurface	= false,
 		gfxRect		= false,
 		activeBigpic	= nil,
 		surface		= false,
@@ -18,19 +19,20 @@ function __bigpic:new()
 	self.city	= diskio:readTable("cityview")
 	self.wild	= diskio:readTable("wildview")
 	self.dun	= diskio:readTable("dunview")
-	self.titleRect	= gfxRectangle:new(32, 212, 224, 16)
-	self.gfxRect	= gfxRectangle:new(32, 30, 224, 176)
+	self.titleRect	= gfxRect:New(32, 212, 224, 16)
+	self.gfxRect	= gfxRect:New(32, 30, 224, 176)
 	self.dun.lightRect = {}
-	self.dun.lightRect[0] = gfxRectangle:new(0, 0, 224, 176)
-	self.dun.lightRect[1] = gfxRectangle:new(0, 10, 224, 156)
-	self.dun.lightRect[2] = gfxRectangle:new(0, 26, 224, 108)
-	self.dun.lightRect[3] = gfxRectangle:new(0, 48, 224, 66)
+	self.dun.lightRect[0] = gfxRect:New(0, 0, 224, 176)
+	self.dun.lightRect[1] = gfxRect:New(0, 10, 224, 156)
+	self.dun.lightRect[2] = gfxRect:New(0, 26, 224, 108)
+	self.dun.lightRect[3] = gfxRect:New(0, 48, 224, 66)
 	self.dun.bg = {}
 	self.dun.bg[0] = gfxImage:new("images/dpics/0-bg.png", "png")
 	self.dun.bg[1] = gfxImage:new("images/dpics/1-bg.png", "png")
 	self.dun.bg[2] = gfxImage:new("images/dpics/2-bg.png", "png")
 
-	self.surface = gfxWindow:new(224, 176, 8)
+	self.surface		= gfxSurface:New(224, 176)
+	self.titleSurface	= gfxSurface:New(224, 16)
 
 	return self
 end
@@ -75,7 +77,7 @@ function bigpic:setTitle(format, ...)
 	x = ((224 - w) / 2) + 36
 
 	m_window:Fill(self.titleRect, globals.colors[1])
-	m_window:Draw(gfxRectangle:new(x,212,0,0), surface, nil)
+	m_window:Draw(gfxRect:New(x,212,0,0), surface, nil)
 	m_window:Update(self.titleRect)
 end
 
@@ -107,7 +109,7 @@ function bigpic:drawImage(inName, inIsTimeAware)
 		m_window:Update(self.gfxRect)
 		self.surface:SetColor(11, globals.colors[12])
 	else
-		self.activeBigpic:Draw(m_window, self.gfxRect)
+		self.activeBigpic:Draw(self.gfxRect)
 	end
 end
 
@@ -124,7 +126,7 @@ function bigpic:readCityImage(inQuadName, inFacetName, inFacet, inBuilding)
 		return
 	end
 
-	inFacet.rect = gfxRectangle:new(inFacet.x, inFacet.y,
+	inFacet.rect = gfxRect:New(inFacet.x, inFacet.y,
 					inFacet.w, inFacet.h)
 	path = string.format(format, inQuadName, inFacetName, inBuilding)
 	inFacet[inBuilding] = gfxImage:new(path, "png")
@@ -203,7 +205,7 @@ function bigpic:readWildImage(inFacetName, inFacet, inBuilding)
 	local format	= "images/wpics/%s/%s.png"
 	local path
 
-	inFacet.rect = gfxRectangle:new(inFacet.x, inFacet.y, 
+	inFacet.rect = gfxRect:New(inFacet.x, inFacet.y, 
 					inFacet.w, inFacet.h)
 	path = string.format(format, inFacetName, inBuilding)
 	inFacet.gfx = gfxImage:new(path, "png")
@@ -291,7 +293,7 @@ function bigpic:dunAdd(inQuad, inTileSet, inFacet, inSq)
 
 	q = self.dun[inQuad][inFacet]
 	if (not q.rect) then
-		q.rect = gfxRectangle:new(q.x, q.y, q.w, q.h)
+		q.rect = gfxRect:New(q.x, q.y, q.w, q.h)
 	end
 
 	if (not q[gfx]) then

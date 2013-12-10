@@ -48,6 +48,9 @@ static void icon_write_clear(btstring_t *data, int index);
 /*					*/
 /****************************************/
 
+/*
+ * outputScreens()
+ */
 static void outputScreens(uint8_t indent)
 {
 	uint8_t i;
@@ -65,6 +68,9 @@ static void outputScreens(uint8_t indent)
 	}
 }
 
+/*
+ * icon_write_detect()
+ */
 static void icon_write_detect(huffile_t *huf, int index)
 {
 	bta_t *bta;
@@ -83,9 +89,13 @@ static void icon_write_detect(huffile_t *huf, int index)
 
 	for (i = 0; i < 6; i++) {
 		if (i == 0)
-			img = bta_cell_new(0, 0, icons[index].width, icons[index].height, 25, NULL);
+			img = bta_cell_new(0, 0, 
+				icons[index].width, icons[index].height, 
+				25, NULL);
 		else
-			img = bta_cell_new(0, 0, icons[index].width, icons[index].height, icons[index].delay, NULL);
+			img = bta_cell_new(0, 0, 
+				icons[index].width, icons[index].height, 
+				icons[index].delay, NULL);
 
 		img->gfx = bts_ncopy(data, size, size * ((i > 3) ? 6 - i : i));
 		img = bta_cell_convert(img);
@@ -100,6 +110,9 @@ static void icon_write_detect(huffile_t *huf, int index)
 	bts_free(data);
 }
 
+/*
+ * icon_write_bta()
+ */
 static void icon_write_bta(huffile_t *huf, int index)
 {
 	bta_t *bta;
@@ -119,7 +132,9 @@ static void icon_write_bta(huffile_t *huf, int index)
 	l = bta_loop_new(bta, 0, ncells);
 
 	for (i = 0; i < ncells; i++) {
-		img = bta_cell_new(0, 0, icons[index].width, icons[index].height, icons[index].delay, NULL);
+		img = bta_cell_new(0, 0, 
+			icons[index].width, icons[index].height,
+			icons[index].delay, NULL);
 
 		img->gfx = bts_ncopy(data, size, offset);
 		img = bta_cell_convert(img);
@@ -136,12 +151,18 @@ static void icon_write_bta(huffile_t *huf, int index)
 	bts_free(data);
 }
 
+/*
+ * icon_write_clear()
+ */
 static void icon_write_clear(btstring_t *data, int index)
 {
 	bta_cell_t *img;
 	int i, j;
 
-	img = bta_cell_new(0, 0, icons[index].width, icons[index].height, 0, NULL);
+	img = bta_cell_new(0, 0, 
+		icons[index].width, icons[index].height, 
+		0, NULL);
+
 	img->gfx = data;
 	for (i = 0; i < icons[index].height; i++) {
 		for (j = 2; j < icons[index].width; j++) {
@@ -153,6 +174,9 @@ static void icon_write_clear(btstring_t *data, int index)
 	bta_cell_free(img);
 }
 
+/*
+ * icon_write_png()
+ */
 static void icon_write_png(huffile_t *huf, int index)
 {
 	bta_cell_t *img;
@@ -160,7 +184,10 @@ static void icon_write_png(huffile_t *huf, int index)
 
 	data = dehuf(huf, icons[index].size);
 
-	img = bta_cell_new(0, 0, icons[index].width, icons[index].height, 0, NULL);
+	img = bta_cell_new(0, 0,
+		icons[index].width, icons[index].height,
+		0, NULL);
+
 	img->gfx = bts_copy(data);
 	img = bta_cell_convert(img);
 	bta_toPNG(img, mkImagePath("%s.png", icons[index].name));
@@ -175,6 +202,9 @@ static uint8_t *cdir[] = {
 	"north", "east", "south", "west"
 };
 
+/*
+ * icon_write_compass()
+ */
 static void icon_write_compass(huffile_t *huf, int index)
 {
 	bta_cell_t *img;
@@ -187,9 +217,12 @@ static void icon_write_compass(huffile_t *huf, int index)
 	data = dehuf(huf, icons[index].size);
 
 	for (i = 0; i < icons[index].size / size; i++) {
-		img = bta_cell_new(0, 0, icons[index].width, icons[index].height, 0, bts_ncopy(data, size, offset));
+		img = bta_cell_new(0, 0,
+			icons[index].width, icons[index].height,
+			0, bts_ncopy(data, size, offset));
 		img = bta_cell_convert(img);
-		bta_toPNG(img, mkImagePath("%s_%s.png", icons[index].name, cdir[i]));
+		bta_toPNG(img, mkImagePath("%s_%s.png",
+				icons[index].name, cdir[i]));
 		bta_cell_free(img);
 
 		offset += size;
@@ -198,6 +231,9 @@ static void icon_write_compass(huffile_t *huf, int index)
 	icon_write_clear(bts_ncopy(data, size, 0), index);
 }
 
+/*
+ * outputIcons()
+ */
 static void outputIcons(uint8_t indent)
 {
 	FILE *fp;

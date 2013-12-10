@@ -62,3 +62,60 @@ function btroster:write()
 end
 
 
+----------------------------------------
+-- toArray()
+----------------------------------------
+function btroster:toArray()
+	local	t = {}
+	local	k
+
+	for k,_ in pairs(self.characters) do
+		table.insert(t, k)
+	end
+
+	for k,_ in pairs(self.parties) do
+		table.insert(t, k)
+	end
+
+	table.sort(t)
+
+	return t
+end
+
+----------------------------------------
+-- nameExists()
+----------------------------------------
+function btroster:nameExists(inName)
+	if ((self.characters[inName] ~= nil) or 
+	    (self.parties[inName] ~= nil)) then
+		return true
+	end
+
+	return false
+end
+
+----------------------------------------
+-- isParty()
+----------------------------------------
+function btroster:isParty(inName)
+	if (self.parties[inName] ~= nil) then
+		return true
+	end
+
+	return false
+end
+
+----------------------------------------
+-- remove()
+----------------------------------------
+function btroster:remove(inName)
+	if (self.characters[inName] ~= nil) then
+		self.characters[inName] = nil
+	elseif (self.parties[inName] ~= nil) then
+		self.parties[inName] = nil
+	else
+		return
+	end
+
+	self:write()
+end

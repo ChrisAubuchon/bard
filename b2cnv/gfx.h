@@ -63,6 +63,7 @@ typedef struct {
 	uint8_t		rflag;
 	uint16_t	offset;
 	uint16_t	width;
+	uint16_t	height;
 } view_t;
 
 typedef struct {
