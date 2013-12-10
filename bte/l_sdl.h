@@ -60,7 +60,11 @@ int		SDL_BlitSurface_r(SDL_Surface *src, SDL_Rect *srcrect, \
 #include <btlib.h>
 #include <bt_bta.h>
 #include <bt_btf.h>
+<<<<<<< HEAD
 #include <SDL/SDL.h>
+=======
+#include <SDL2/SDL.h>
+>>>>>>> 18c3a63c7e03ebf53e3f3d4d212b248963194f17
 #include <sdl.h>
 
 #define IMG_SURFACE	0
@@ -99,9 +103,6 @@ SDL_Color *sdl_color_arg(lua_State *L, int *index);
 int l_img_load_png(lua_State *L);
 int l_img_load_bta(lua_State *L);
 
-/* l_rect.c */
-SDL_Rect *sdl_rect_arg(lua_State *L, int *index);
-void l_sdl_rect_open(lua_State *L);
 
 
 /* l_ttf.c */
@@ -114,6 +115,25 @@ void l_sdl_textbox_open(lua_State *L);
 void l_sdl_font_open(lua_State *L);
 font_t *l_checkFont(lua_State *L, int index);
 SDL_Surface *sdl_font_render(font_t *font, const char *text, SDL_Color *c);
+
+/* l_rect.c */
+void		l_sdl_rect_open(lua_State *L);
+SDL_Rect	*l_testRect(lua_State *L, int index);
+SDL_Rect	*l_checkRect(lua_State *L, int index);
+
+/* l_renderer.c */
+void		l_sdl_renderer_open(lua_State *L);
+int		l_renderer_new(lua_State *L);
+SDL_Renderer	*l_testRenderer(lua_State *L, int index);
+SDL_Renderer	*l_checkRenderer(lua_State *L, int index);
+SDL_Renderer	**l_checkRendererP(lua_State *L, int index);
+
+/* l_window.c */
+void		l_sdl_window_open(lua_State *L);
+int		l_window_new(lua_State *L);
+SDL_Window	*l_testWindow(lua_State *L, int index);
+SDL_Window	*l_checkWindow(lua_State *L, int index);
+SDL_Window	**l_checkWindowP(lua_State *L, int index);
 
 #endif
 

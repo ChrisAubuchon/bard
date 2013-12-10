@@ -3,7 +3,7 @@
 
 #include <btlib.h>
 #include <bt_btf.h>
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 #define	FONT_BTF	1
 #define FONT_TTF	2

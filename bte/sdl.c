@@ -9,7 +9,7 @@ int SDL_FillRect_RC(SDL_Surface *dst, Sint32 x, Sint32 y, Sint32 w, Sint32 h, Ui
 	r.w = w;
 	r.h = h;
 
-	return SDL_FillRect(dst, &r, color);
+/*	return SDL_FillRect(dst, &r, color);*/
 }
 
 /********************************/
@@ -20,10 +20,12 @@ int SDL_FillRect_RC(SDL_Surface *dst, Sint32 x, Sint32 y, Sint32 w, Sint32 h, Ui
 
 void SDL_UpdateRect_RP(SDL_Surface *screen, SDL_Rect *r)
 {
+#if 0
 	if (r != NULL)
 		SDL_UpdateRect(screen, r->x, r->y, r->w, r->h);
 	else
 		SDL_UpdateRect(screen, 0, 0, 0, 0);
+#endif
 }
 
 /*

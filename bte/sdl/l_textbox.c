@@ -91,8 +91,12 @@ static l_textbox *l_checkTextbox(lua_State *L, int index)
 
 static void set_color(l_textbox *tb, uint8_t index, SDL_Color *c)
 {
+<<<<<<< HEAD
 	if (SDL_SetPaletteColors(tb->s->format->palette, c, index, 1))
 		sdl_error(tb->errorState);
+=======
+/*	SDL_SetColors(tb->s, c, index, 1);*/
+>>>>>>> 18c3a63c7e03ebf53e3f3d4d212b248963194f17
 }
 
 static void get_color(l_textbox *tb, uint8_t index, SDL_Color *c)
@@ -165,7 +169,17 @@ static void _textbox_highlight(l_textbox *tb, uint8_t srci, uint8_t desti, \
 	if (SDL_MUSTLOCK(tb->s))
 		SDL_UnlockSurface(tb->s);
 
+<<<<<<< HEAD
 	_update_screen(tb);
+=======
+	SDL_BlitSurface_RP(tb->s, NULL, tb->parent, tb->r);
+
+#if 0
+	SDL_UpdateRect_RC(tb->parent, tb->r->x, \
+			  tb->r->y + (lineno * font_height(tb->font)), \
+			  tb->r->w, font_height(tb->font));
+#endif
+>>>>>>> 18c3a63c7e03ebf53e3f3d4d212b248963194f17
 }
 
 /*
@@ -246,18 +260,28 @@ static uint32_t _textbox_wrap(l_textbox *tb, btstring_t *str, uint32_t base)
  */
 static int l_textbox_new(lua_State *L)
 {
+<<<<<<< HEAD
 	l_textbox	*tb;
+=======
+	l_textbox *tb;
+>>>>>>> 18c3a63c7e03ebf53e3f3d4d212b248963194f17
 
 	tb = lua_newuserdata(L, sizeof(l_textbox));
 	luaL_getmetatable(L, "l_sdl_textbox");
 	lua_setmetatable(L, -2);
 
+<<<<<<< HEAD
 	tb->errorState	= L;
 	tb->renderer	= l_checkRenderer(L, 1);
 	tb->texture	= l_checkTexture(L, 2);
 	tb->screen	= l_checkSurface(L, 3);
 	tb->rect	= l_checkRect(L, 4);
 	tb->maxChar	= (uint32_t)luaL_checkinteger(L, 5);
+=======
+	tb->parent = l_checkSurface(L, 1);
+	tb->maxChar = (uint32_t)luaL_checkinteger(L, 2);
+	tb->r = l_checkRect(L, 3);
+>>>>>>> 18c3a63c7e03ebf53e3f3d4d212b248963194f17
 	tb->font = NULL;
 
 	tb->x = 0;
@@ -390,7 +414,11 @@ static int l_textbox_draw(lua_State *L)
 {
 	l_textbox *tb = l_checkTextbox(L, 1);
 
+<<<<<<< HEAD
 	_update_screen(tb);
+=======
+/*	SDL_UpdateRect(tb->parent, tb->r->x, tb->r->y, tb->r->w, tb->r->h);*/
+>>>>>>> 18c3a63c7e03ebf53e3f3d4d212b248963194f17
 
 	return 0;
 }

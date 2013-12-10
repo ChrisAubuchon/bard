@@ -186,7 +186,7 @@ static void icon_write_detect(huffile_t *huf, int index)
 	for (i = 0; i < 6; i++) {
 		if (i == 0) {
 			img = bta_cell_new(0, 0, ip->width, ip->height, 
-						25, NULL);
+						35, NULL);
 		} else {
 			img = bta_cell_new(0, 0, ip->width, ip->height,
 						ip->delay, NULL);

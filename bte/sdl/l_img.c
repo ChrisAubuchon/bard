@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 #include <bte.h>
 #include <SDL2/SDL_image.h>
+=======
+#include <btlib.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <l_int.h>
+>>>>>>> 18c3a63c7e03ebf53e3f3d4d212b248963194f17
 #include <l_sdl.h>
 
 /*#define DEBUG 1*/
