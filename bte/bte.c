@@ -1,14 +1,4 @@
-<<<<<<< HEAD
 #include <bte.h>
-=======
-#ifndef NOSDL
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_main.h>
-#endif
-#include <stdio.h>
-
-#include <bt_lua.h>
->>>>>>> 18c3a63c7e03ebf53e3f3d4d212b248963194f17
 
 char *program_name = "BTE";
 

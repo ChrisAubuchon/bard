@@ -34,7 +34,6 @@ SDL_Surface *BTF_RenderText(btf_t *btf, const char *text, SDL_Color color)
 	debug("rval->format = %s\n", SDL_GetPixelFormatName(rval->format->format));
 	palette = rval->format->palette;
 	palette->colors[0].r = 255 - color.r;
-<<<<<<< HEAD
 	palette->colors[0].g = 255 - color.g;
 	palette->colors[0].b = 255 - color.b;
 	palette->colors[0].a = 0;
@@ -54,17 +53,6 @@ SDL_Surface *BTF_RenderText(btf_t *btf, const char *text, SDL_Color color)
 		rval->format->palette->colors[1].g,
 		rval->format->palette->colors[1].b
 	);
-=======
-   	palette->colors[0].g = 255 - color.g;
-   	palette->colors[0].b = 255 - color.b;
-   	palette->colors[1].r = color.r;
-   	palette->colors[1].g = color.g;
-   	palette->colors[1].b = color.b;
-#if 0
-   	SDL_SetColorKey(rval, SDL_SRCCOLORKEY, 0 );
-#endif
-
->>>>>>> 18c3a63c7e03ebf53e3f3d4d212b248963194f17
 
 	if (SDL_MUSTLOCK(rval))
 		SDL_LockSurface(rval);

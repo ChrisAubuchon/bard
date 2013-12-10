@@ -1,11 +1,4 @@
-<<<<<<< HEAD
 #include <bte.h>
-=======
-#include <btlib.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <l_int.h>
->>>>>>> 18c3a63c7e03ebf53e3f3d4d212b248963194f17
 #include <l_sdl.h>
 
 /*#define DEBUG 1*/
@@ -108,44 +101,6 @@ static int l_surface_get_pitch(lua_State *L)
 	return 1;
 }
 
-<<<<<<< HEAD
-=======
-static int l_surface_update_rect(lua_State *L)
-{
-	SDL_Surface *sur;
-	SDL_Rect *r;
-
-	sur = l_checkSurface(L, 1);
-	r = l_checkRect(L, 2);
-
-/*	SDL_UpdateRect(sur, r->x, r->y, r->w, r->h);*/
-
-	free(r);
-
-	return 0;
-}
-
-static int l_surface_set_color(lua_State *L)
-{
-	SDL_Surface *sur;
-	SDL_Color *c;
-	int index = 3;
-	int color;
-	int rval;
-	
-
-	sur = l_checkSurface(L, 1);
-	color = luaL_checkint(L, 2);
-	c = sdl_color_arg(L, &index);
-
-#if 0
-	rval = SDL_SetPalette(sur, SDL_LOGPAL | SDL_PHYSPAL, c, color, 1);
-#endif
-
-	return 0;
-}
-
->>>>>>> 18c3a63c7e03ebf53e3f3d4d212b248963194f17
 static int l_surface_set_color_key(lua_State *L)
 {
 	SDL_Surface	*sur;
@@ -155,13 +110,7 @@ static int l_surface_set_color_key(lua_State *L)
 	sur = l_checkSurface(L, 1);
 	key = luaL_checkint(L, 2);
 
-<<<<<<< HEAD
 	rval = SDL_SetColorKey(sur, SDL_TRUE, key);
-=======
-#if 0
-	rval = SDL_SetColorKey(sur, SDL_SRCCOLORKEY, key);
-#endif
->>>>>>> 18c3a63c7e03ebf53e3f3d4d212b248963194f17
 
 	return 0;
 }
@@ -181,7 +130,6 @@ static int l_surface_clear_color_key(lua_State *L)
 
 static int l_surface_fill_rect(lua_State *L)
 {
-<<<<<<< HEAD
 	SDL_Surface	*sur;
 	SDL_Rect	*rect;
 	SDL_Color	c;
@@ -189,21 +137,6 @@ static int l_surface_fill_rect(lua_State *L)
 	sur = l_checkSurface(L, 1);
 	rect = l_testRect(L, 2);
 	l_checkColor(L, 3, &c);
-=======
-	SDL_Surface *sur;
-	SDL_Rect *r;
-	SDL_Color *c;
-	int index = 3;
-	uint32_t color;
-
-	sur = l_checkSurface(L, 1);
-	r = l_checkRect(L, 2);
-	c = sdl_color_arg(L, &index);
-
-	color = SDL_MapRGB(sur->format, c->r, c->g, c->b);
-
-/*	SDL_FillRect(sur, r, color);*/
->>>>>>> 18c3a63c7e03ebf53e3f3d4d212b248963194f17
 
 	SDL_FillRect(sur, rect, SDL_MapRGBA(sur->format, c.r, c.g, c.b, c.a));
 
@@ -212,7 +145,6 @@ static int l_surface_fill_rect(lua_State *L)
 
 static int l_surface_blit(lua_State *L)
 {
-<<<<<<< HEAD
 	SDL_Surface	*src;
 	SDL_Surface	*dest;
 	SDL_Rect	*sr;
@@ -222,39 +154,11 @@ static int l_surface_blit(lua_State *L)
 	dr = l_testRect(L, 2);
 	src = l_checkSurface(L, 3);
 	sr = l_testRect(L, 4);
-=======
-	SDL_Surface *src;
-	SDL_Surface *dest;
-	SDL_Rect *sr;
-	SDL_Rect *dr;
-
-	dest = l_checkSurface(L, 1);
-	dr = l_checkRect(L, 2);
-	src = l_checkSurface(L, 3);
-	sr = l_checkRect(L, 4);
->>>>>>> 18c3a63c7e03ebf53e3f3d4d212b248963194f17
 
 	if (SDL_BlitSurface(src, sr, dest, dr)) {
 		sdl_error(L);
 	}
 
-<<<<<<< HEAD
-=======
-	free(sr);
-	free(dr);
-
-	return 0;
-}
-
-static int l_surface_flip(lua_State *L)
-{
-	SDL_Surface *sur;
-
-	sur = l_checkSurface(L, 1);
-
-/*	SDL_Flip(sur);*/
-
->>>>>>> 18c3a63c7e03ebf53e3f3d4d212b248963194f17
 	return 0;
 }
 
@@ -294,12 +198,7 @@ static int l_surface_create_rgb(lua_State *L)
 	s = l_checkSurfaceP(L, -1);
 
 	*s = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, depth, \
-<<<<<<< HEAD
 				rmask, gmask, bmask, amask);
-=======
-					0,0,0,0);
-/*	SDL_SetColors(*s, egapal, 0, 16);*/
->>>>>>> 18c3a63c7e03ebf53e3f3d4d212b248963194f17
 
 	if (*s == NULL)
 		sdl_error(L);
