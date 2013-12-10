@@ -688,11 +688,11 @@ function party:printStatusLine(inStrings, inSlot)
 
 	if (inStrings) then
 		renderedText = fontP:Render(inStrings.name, globals.colors[16])
-		self.gfxSurface:Blit(gfxRect:New(24, y, 0, 0), renderedText, nil)
+		self.gfxSurface:Blit(gfxRect:New(0, y, 0, 0), renderedText, nil)
 		renderedText = fontP:Render(inStrings.hp, globals.colors[1])
-		self.gfxSurface:Blit(gfxRect:New(400, y, 0, 0), renderedText, nil)
+		self.gfxSurface:Blit(gfxRect:New(376, y, 0, 0), renderedText, nil)
 		renderedText = fontP:Render(inStrings.sppt, globals.colors[1])
-		self.gfxSurface:Blit(gfxRect:New(536, y, 0, 0), renderedText, nil)
+		self.gfxSurface:Blit(gfxRect:New(512, y, 0, 0), renderedText, nil)
 	end
 end
 
