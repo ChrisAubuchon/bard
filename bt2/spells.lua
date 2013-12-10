@@ -164,13 +164,13 @@ spells.teleport = function()
 		teleportHelper(deltas[4], 4)
 	
 		inkey = getkey()
-		if ((inkey == "-") or (inkey == btkeys.BTKEY_LEFT)) then
+		if ((inkey == "-") or (inkey == btkeys.LEFT)) then
 			deltas[cursorPosition] = deltas[cursorPosition] - 1
 			if (deltas[cursorPosition] < -21) then
 				deltas[cursorPosition] = -21
 			end
 		elseif ((inkey == "+") or (inkey == "=") or
-			 (inkey == btkeys.BTKEY_RIGHT)) then
+			 (inkey == btkeys.RIGHT)) then
 			deltas[cursorPosition] = deltas[cursorPosition] + 1
 			if (deltas[cursorPosition] > 21) then
 				deltas[cursorPosition] = 21
@@ -181,12 +181,12 @@ spells.teleport = function()
 			cursorPosition = 3
 		elseif (inkey == "U") then	
 			cursorPosition = 4
-		elseif (inkey == btkeys.BTKEY_DOWN) then
+		elseif (inkey == btkeys.DOWN) then
 			cursorPosition = cursorPosition + 1
 			if (cursorPosition > 4) then
 				cursorPosition = 2
 			end
-		elseif (inkey == btkeys.BTKEY_UP) then
+		elseif (inkey == btkeys.UP) then
 			cursorPosition = cursorPosition - 1
 			if (cursorPosition < 2) then
 				cursorPosition = 4

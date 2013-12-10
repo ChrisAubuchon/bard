@@ -3,6 +3,10 @@ require "btdebug"
 require "random"
 
 party = {
+	-- Graphics objects for party display
+	gfxRect			= gfxRect:New(24, 288, 604, 112),
+	gfxSurface		= gfxSurface:New(604, 112),
+
 	size			= 0,
 
 	-- Passive effects
@@ -172,9 +176,6 @@ local iteratorConditionals = {
 
 ----------------------------------------
 -- iterator()
---
--- Special iterator function to include
--- the "summon" slot
 ----------------------------------------
 function party:iterator(inCondition)
 	local condition	= inCondition or "default"
@@ -281,6 +282,8 @@ function party:display()
 		end
 		self:printStatusLine(strings, i)
 	end
+
+	self.gfxSurface:Draw(self.gfxRect)
 end
 
 ----------------------------------------
@@ -405,10 +408,6 @@ end
 ----------------------------------------
 function party:isHostile()
 	local c
-
-	if ((self.summon) and (self.summon.isHostile)) then
-		return true
-	end
 
 	for c in self:characterIterator("isHostile") do
 		return true
@@ -594,9 +593,6 @@ function party:randomCharacter(inSummonFlag)
 	local denominator	= 2
 	local comparator
 
-	-- This is only used by the addDoppleganger()
-	-- function so we can skip the summon slot
-	--
 	for c in self:characterIterator("isAttackable") do
 		if (not randomCharacter) then
 			randomCharacter = c
@@ -623,9 +619,7 @@ end
 -- Summon a monster to the summon slot
 ----------------------------------------
 function party:doSummon(inSummon)
-	if (self.summon) then
-		self:removeSummon()
-	end
+	local xxx_fix_doSummon
 
 	self:insertHead(summon:new(inSummon.type))
 	self.summon = self:getFirst()
@@ -688,20 +682,18 @@ function party:printStatusLine(inStrings, inSlot)
 	local fontP
 	local y
 
-	y = 288 + (16 * inSlot)
+	y = 16 * inSlot
 	fontP = globals.fonts.mono
-	m_window:Fill(gfxRectangle:new(24, y, 604, 16), globals.colors[8])
+	self.gfxSurface:Fill(gfxRect:New(0, y, 604, 16), globals.colors[8])
 
 	if (inStrings) then
 		renderedText = fontP:Render(inStrings.name, globals.colors[16])
-		m_window:Draw(gfxRectangle:new(24, y, 0, 0), renderedText, nil)
+		self.gfxSurface:Blit(gfxRect:New(24, y, 0, 0), renderedText, nil)
 		renderedText = fontP:Render(inStrings.hp, globals.colors[1])
-		m_window:Draw(gfxRectangle:new(400, y, 0, 0), renderedText, nil)
+		self.gfxSurface:Blit(gfxRect:New(400, y, 0, 0), renderedText, nil)
 		renderedText = fontP:Render(inStrings.sppt, globals.colors[1])
-		m_window:Draw(gfxRectangle:new(536, y, 0, 0), renderedText, nil)
+		self.gfxSurface:Blit(gfxRect:New(536, y, 0, 0), renderedText, nil)
 	end
-
-	m_window:Update()
 end
 
 ----------------------------------------

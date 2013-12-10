@@ -12,6 +12,31 @@
 
 /****************************************/
 /*					*/
+/* Local variables			*/
+/*					*/
+/****************************************/
+
+static uint8_t isTimeAware[] = {
+/*   0*/ 0, 0, 0, 0,
+/*   4*/ 0, 0, 0, 0,
+/*   8*/ 0, 0, 0, 0,
+/*  12*/ 0, 0, 0, 1,
+/*  16*/ 1, 1, 1, 0,
+/*  20*/ 0, 1, 0, 0,
+/*  24*/ 0, 0, 0, 0,
+/*  28*/ 0, 0, 0, 0,
+/*  32*/ 0, 0, 0, 0,
+/*  36*/ 0, 0, 0, 0,
+/*  40*/ 0, 0, 0, 0,
+/*  44*/ 1, 0, 0, 0,
+/*  48*/ 0, 0, 0, 0,
+/*  52*/ 0, 0, 0, 0,
+/*  56*/ 0, 0, 0, 0,
+/*  60*/ 0, 0, 0, 0
+};
+
+/****************************************/
+/*					*/
 /* Local function prototypes		*/
 /*					*/
 /****************************************/
@@ -414,7 +439,13 @@ void outputBigpic(void)
 		} else {
 			bigpic_setBG(big);
 			c = bta_cell_new(0, 0, 56, 88, 0, big);
-			c = bta_cell_convert(c);
+			if (isTimeAware[i]) {
+				c = bta_cell_4bitTo8bit(c);
+				c = bta_cell_scale(c);
+				c = bta_cell_toRGBA(c, cityPalette);
+			} else {
+				c = bta_cell_convert(c);
+			}
 			bta_toPNG(c, mkImagePath("bigpic_%d.png", i));
 
 			bp->type = IMAGE_PNG;

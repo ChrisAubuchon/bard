@@ -648,7 +648,7 @@ function dun:main()
 				end
 				self:doPortal(1, -1)
 			end
-		elseif (inkey == btkeys.BTKEY_WANDERING) then
+		elseif (inkey == btkeys.WANDERING) then
 			self:wanderingMonster()
 			self:resetBigpic()
 		elseif (inkey == "Z") then

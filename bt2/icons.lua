@@ -95,7 +95,7 @@ function icons:new(inType)
 	end
 
 	self.clear = gfxImage:new(data.clear, data.clearType)
-	self.rectangle = gfxRectangle:new(data.x, data.y, data.w, data.h)
+	self.rectangle = gfxRect:New(data.x, data.y, data.w, data.h)
 
 	btTable.addParent(self, icons)
 	btTable.setClassMetatable(self)
@@ -105,7 +105,7 @@ end
 
 function icons:activate()
 	self.active = true
-	self.gfx:Draw(m_window, self.rectangle)
+	self.gfx:Draw(self.rectangle)
 end
 
 function icons:deactivate()
@@ -114,13 +114,12 @@ function icons:deactivate()
 		self.gfx:Clear()
 	end
 
-	self.clear:Draw(m_window, self.rectangle)
+	self.clear:Draw(self.rectangle)
 end
 
 function icons:update(inDirection)
 	if (self.type == icons.ICON_COMPASS) then
-		self.gfx[inDirection]:Draw(m_window, self.rectangle)
-		m_window:Update(self.rectangle)
+		self.gfx[inDirection]:Draw(self.rectangle)
 	end
 end
 

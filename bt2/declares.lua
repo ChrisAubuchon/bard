@@ -35,7 +35,6 @@ declare_global("dwhere")
 declare_global("btdebug")
 
 -- btio.lua
-declare_global("getkey")
 declare_global("btkeys")
 
 -- btlib.lua

@@ -71,15 +71,15 @@ function keyboardCommand(inkey)
 		party:useItem()
 		text:clear()
 		return true
-	elseif (inkey == btkeys.BTKEY_LEFT) then
+	elseif (inkey == btkeys.LEFT) then
 		currentLevel:turnParty("left")
-	elseif (inkey == btkeys.BTKEY_RIGHT) then
+	elseif (inkey == btkeys.RIGHT) then
 		currentLevel:turnParty("right")
-	elseif (inkey == btkeys.BTKEY_DOWN) then
+	elseif (inkey == btkeys.DOWN) then
 		currentLevel:turnParty("back")
-	elseif (inkey == btkeys.BTKEY_UP) then
+	elseif (inkey == btkeys.UP) then
 		currentLevel:moveForward()
-	elseif (inkey == btkeys.BTKEY_RANDOMBATTLE) then
+	elseif (inkey == btkeys.RANDOMBATTLE) then
 		battle:random()
 		return true
 	elseif (inkey == "Q") then

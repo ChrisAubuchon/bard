@@ -74,19 +74,17 @@ function bigpic:setTitle(format, ...)
 	end
 
 	surface = fontP:Render(title, globals.colors[16])
-	x = ((224 - w) / 2) + 36
+	x = (224 - w) / 2
 
-	m_window:Fill(self.titleRect, globals.colors[1])
-	m_window:Draw(gfxRect:New(x,212,0,0), surface, nil)
-	m_window:Update(self.titleRect)
+	self.titleSurface:Fill(nil, globals.colors[1]);
+	self.titleSurface:Blit(gfxRect:New(x,0,0,0), surface, nil)
+	self.titleSurface:Draw(self.titleRect)
 end
 
 ----------------------------------------
 -- drawImage()
 ----------------------------------------
-function bigpic:drawImage(inName, inIsTimeAware)
-	local isTimeAware = inIsTimeAware or false
-
+function bigpic:drawImage(inName)
 	-- Dynamically create the graphics image if it
 	-- has not already been created
 	--
@@ -101,16 +99,15 @@ function bigpic:drawImage(inName, inIsTimeAware)
 	end
 
 	self.activeBigpic = self.imgs[inName].img
-	if (globals.isNight and isTimeAware) then
-		self.surface:Draw(nil, self.activeBigpic, nil)
-		self.surface:Update()
-		self.surface:SetColor(11, globals.colors[1])
-		m_window:Draw(self.gfxRect, self.surface, nil)
-		m_window:Update(self.gfxRect)
-		self.surface:SetColor(11, globals.colors[12])
-	else
-		self.activeBigpic:Draw(self.gfxRect)
+	if (self.imgs[inName].isTimeAware) then
+		if (globals.isNight) then
+			self.surface:Fill(nil, globals.colors[1])
+		else
+			self.surface:Fill(nil, globals.colors[12])
+		end
+		self.surface:Draw(self.gfxRect)
 	end
+	self.activeBigpic:Draw(self.gfxRect)
 end
 
 ----------------------------------------
@@ -136,10 +133,19 @@ end
 -- cityBackground()
 ----------------------------------------
 function bigpic:cityBackground()
-	if (not self.city.bg) then
-		self.city.bg = gfxImage:new("images/citypics/citybg.png", "png")
+	if (globals.isNight) then
+		if (not self.city.nightbg) then
+			self.city.nightbg = gfxImage:new(
+				"images/citypics/citybg-night.png", "png")
+		end
+		self.surface:Blit(nil, self.city.nightbg)
+	else
+		if (not self.city.daybg) then
+			self.city.daybg = gfxImage:new(
+				"images/citypics/citybg-day.png", "png")
+		end
+		self.surface:Blit(nil, self.city.daybg)
 	end
-	self.surface:Draw(nil, self.city.bg, nil)
 end
 
 ----------------------------------------
@@ -161,9 +167,9 @@ function bigpic:cityAdd(inCycle, inDepth, inFacet, inBuilding)
 	end
 
 	if (q[inBuilding] == nil) then
-		self.surface:Draw(nil, self.imgs[inBuilding].img, nil)
+		self.surface:Blit(nil, self.imgs[inBuilding].img, nil)
 	else
-		self.surface:Draw(q.rect, q[inBuilding], nil)
+		self.surface:Blit(q.rect, q[inBuilding], nil)
 	end
 end
 
@@ -176,26 +182,26 @@ function bigpic:cityDisplay()
 		self.activeBigpic = nil
 	end
 
-	self.surface:Update()
-	if (globals.isNight) then
-		self.surface:SetColor(11, globals.colors[1])
-	end
-	m_window:Draw(self.gfxRect, self.surface, nil)
-	m_window:Update()
-
-	if (globals.isNight) then
-		self.surface:SetColor(11, globals.colors[12])
-	end
+	self.surface:Draw(self.gfxRect)
 end
 
 ----------------------------------------
 -- wildBackground()
 ----------------------------------------
 function bigpic:wildBackground()
-	if (not self.wild.bg) then
-		self.wild.bg = gfxImage:new("images/wpics/wpic.png", "png")
+	if (globals.isNight) then	
+		if (not self.wild.nightbg) then
+			self.wild.nightbg = gfxImage:new(
+				"images/wpics/wpic-night.png", "png")
+		end
+		self.surface:Blit(nil, self.wild.nightbg)
+	else
+		if (not self.wild.daybg) then
+			self.wild.daybg = gfxImage:new(
+				"images/wpics/wpic-day.png", "png")
+		end
+		self.surface:Blit(nil, self.wild.daybg)
 	end
-	self.surface:Draw(nil, self.wild.bg, nil)
 end
 
 ----------------------------------------
@@ -228,7 +234,7 @@ function bigpic:wildAdd(inDepth, inFacet, inBuilding)
 	if (not q.gfx) then
 		self:readWildImage(facet, q, inBuilding)
 	end
-	self.surface:Draw(q.rect, q.gfx, nil)
+	self.surface:Blit(q.rect, q.gfx, nil)
 end
 
 ----------------------------------------
@@ -247,7 +253,7 @@ function bigpic:dunBackground(inTileSet)
 		return
 	end
 
-	self.surface:Draw(nil, self.dun.bg[inTileSet], nil)
+	self.surface:Blit(nil, self.dun.bg[inTileSet], nil)
 	if (party.light.distance < 4) then
 		self.surface:Fill(self.dun.lightRect[party.light.distance],
 				globals.colors[1])
@@ -276,13 +282,8 @@ function bigpic:dunAdd(inQuad, inTileSet, inFacet, inSq)
 		return	
 	end
 
-	if (inFacet == "portal") then
-		if (inSq.hasCeilPortal) then
-			gfx = "ceil"
-		end
-		if (inSq.hasFloorPortal) then
-			gfx = "floor"
-		end
+	if ((inFacet == "floor") or (inFacet == "ceiling")) then
+		gfx = inFacet
 	else
 		if ((inSq.secret) and (party.light.seeSecret)) then
 			gfx = "door"
@@ -305,7 +306,7 @@ function bigpic:dunAdd(inQuad, inTileSet, inFacet, inSq)
 						      gfx, inTileSet)
 	end
 	
-	self.surface:Draw(q.rect, q[gfx][inTileSet], nil)
+	self.surface:Blit(q.rect, q[gfx][inTileSet], nil)
 end
 
 function bigpic:dunDisplay()
@@ -314,9 +315,7 @@ function bigpic:dunDisplay()
 		self.activeBigpic = nil
 	end
 
-	self.surface:Update()
-	m_window:Draw(self.gfxRect, self.surface, nil)
-	m_window:Update(self.gfxRect)
+	self.surface:Draw(self.gfxRect)
 end
 
 

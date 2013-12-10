@@ -135,24 +135,3 @@ stringTables.isEffects = {
 	steam	= "steamed"
 }
 
-btkeys = {
-	BTKEY_RETURN = ":A:",
-	BTKEY_ESCAPE = ":B:",
-	BTKEY_BACKSPACE = ":C:",
-	BTKEY_UP = ":D:",
-	BTKEY_DOWN = ":E:",
-	BTKEY_LEFT = ":F:",
-	BTKEY_RIGHT = ":G:",
-	BTKEY_PAGEUP = ":H:",
-	BTKEY_PAGEDOWN = ":I:",
-	BTKEY_F1 = ":J:",
-	BTKEY_F2 = ":K:",
-	BTKEY_F3 = ":L:",
-	BTKEY_F4 = ":M:",
-	BTKEY_F5 = ":N:",
-	BTKEY_F6 = ":O:",
-	BTKEY_F7 = ":P:",
-	BTKEY_RANDOMBATTLE	= ":Q:",
-	BTKEY_WANDERING		= ":R:"
-}
-
