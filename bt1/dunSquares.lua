@@ -14,7 +14,7 @@ function dunSquares:battle(...)
 		self.currentSquare = self.previousSquare
 		return false
 	else
-		self.currentSquare.clearCode()
+		self.currentSquare:clearCode()
 		return true
 	end
 end
@@ -125,7 +125,7 @@ function dunSquares:tarjanMouth()
 		"whole again..."
 		)
 	text:clear()
-	self.currentSquare.clearCode()
+	self.currentSquare:clearCode()
 end
 
 ----------------------------------------
@@ -221,7 +221,7 @@ function dunSquares:baronsThrone()
 			)
 		self.currentSquare.north.gfx = false
 		self.currentSquare.north.isWall = false
-		self.currentSquare.clearCode()
+		self.currentSquare:clearCode()
 	end
 end
 
@@ -265,7 +265,7 @@ function dunSquares:robedMen()
 			text:cdprint(true, true, "You found some robes.")
 			text:clear()
 		end
-		self.currentSquare.clearCode()
+		self.currentSquare:clearCode()
 	end
 end
 
@@ -285,7 +285,7 @@ function dunSquares:crystalSword()
 			text:clear()
 		end
 	end
-	self.currentSquare.clearCode()
+	self.currentSquare:clearCode()
 end
 
 ----------------------------------------
@@ -334,7 +334,7 @@ function dunSquares:vampireOldMan()
 		inkey = getkey()
 		if (inkey == "A") then
 			if (checkAnswer()) then
-				self.currentSquare.clearCode()
+				self.currentSquare:clearCode()
 				return
 			end
 			printIntro()
@@ -363,7 +363,7 @@ function dunSquares:silverSquare()
 				)
 			text:clear()
 		end
-		self.currentSquare.clearCode()
+		self.currentSquare:clearCode()
 	end
 end
 
@@ -396,7 +396,7 @@ function dunSquares:shieldsMouth()
 			text:cdprint(true, true, "%s found a shield.", c.name)
 		end
 	end
-	self.currentSquare.clearCode()
+	self.currentSquare:clearCode()
 end
 
 ----------------------------------------
@@ -518,7 +518,7 @@ function dunSquares:skullTavernQuestion()
 
 		if (inkey == "A") then
 			if (checkAnswer()) then
-				self.currentSquare.clearCode()
+				self.currentSquare:clearCode()
 				text:cdprint(true, true, 
 					"\"Pass, oh learned ones,\" he says."
 					)
@@ -585,7 +585,7 @@ function dunSquares:sinisterMouth()
 		sq.south.isWall = false
 		sq.south.isDoor = true
 		sq.south.gfx = "door"
-		self.currentSquare.clearCode()
+		self.currentSquare:clearCode()
 	else
 		text:cdprint(false, true, "\n\"Wrong!\"")
 		self.currentSquare = self.previousSquare
@@ -608,7 +608,7 @@ function dunSquares:silverTriangle()
 				)
 			text:clear()
 		end
-		self.currentSquare.clearCode()
+		self.currentSquare:clearCode()
 	end
 end
 
@@ -635,7 +635,7 @@ function dunSquares:crystalStatue()
 		if (inkey == "F") then
 			if (battle:new("M_CRYSTAL_GOLEM", 1)) then
 				if (party:isItemEquipped("Crystal Sword")) then
-					self.currentSquare.clearCode()
+					self.currentSquare:clearCode()
 					return
 				end
 				text:cdprint(false, true, 
@@ -691,7 +691,7 @@ function dunSquares:onyxKey()
 		text:cdprint(true, true, "%s got a key.\n\n", c.name)
 	end
 	text:cdprint(false, true, "Kylearan vanishes.")
-	self.currentSquare.clearCode()
+	self.currentSquare:clearCode()
 end
 
 ----------------------------------------
@@ -741,7 +741,7 @@ function dunSquares:silverCircle()
 	if (c) then
 		text:cdprint(true,true, "%s has found a silver circle.", c.name)
 	end
-	self.currentSquare.clearCode()
+	self.currentSquare:clearCode()
 end
 
 ----------------------------------------
@@ -760,7 +760,7 @@ function dunSquares:masterKey()
 		"Keymaster. I have something to sell you for the low " ..
 		"price of 50000 gold pieces.\""
 		)
-	self.currentSquare.clearCode()
+	self.currentSquare:clearCode()
 
 	----------------------------------------
 	-- printIntro() helper function
@@ -839,7 +839,7 @@ function dunSquares:sevenAnswers()
 		"Speak the seven of the One God, in Sequence, and seek " ..
 		"the lost stairs:\""
 		)
-	self.currentSquare.clearCode()
+	self.currentSquare:clearCode()
 
 	for i = 1,7 do
 		text:print("\n")
@@ -895,7 +895,7 @@ function dunSquares:sleepingDragons()
 			"Your music caused two sleeping dragons to " ..
 			"continue slumbering."
 			)
-		self.currentSquare.clearCode()
+		self.currentSquare:clearCode()
 		return
 	end
 
@@ -931,7 +931,7 @@ function dunSquares:thorFigurine()
 			text:clear()
 		end
 	end
-	self.currentSquare.clearCode()
+	self.currentSquare:clearCode()
 end
 
 ----------------------------------------
@@ -939,7 +939,7 @@ end
 ----------------------------------------
 function dunSquares:swapDoors()
 	globals.swapWallsAndDoors = true
-	self.currentSquare.clearCode()
+	self.currentSquare:clearCode()
 end
 
 ----------------------------------------
@@ -950,7 +950,7 @@ function dunSquares:silverDest()
 		"On the wall to the north are etched 3 geometric shapes: " ..
 		"a square, a circle, and a triangle."
 		)
-	self.currentSquare.clearCode()
+	self.currentSquare:clearCode()
 
 	if (party:hasItem("Silvr Square") and party:hasItem("Silvr Circle") and
 	    party:hasItem("Silvr Triang")) then
@@ -969,7 +969,7 @@ function dunSquares:spectreSnare()
 	local answer
 	local c
 
-	self.currentSquare.clearCode()
+	self.currentSquare:clearCode()
 
 	if (party:hasItem("Spectre Snare")) then
 		return
@@ -1064,7 +1064,7 @@ function dunSquares:mouthOne()
 			return
 		end
 	end
-	self.currentSquare.clearCode()
+	self.currentSquare:clearCode()
 	party:display()
 end
 
@@ -1093,7 +1093,7 @@ function dunSquares:possessCharacter()
 	if (globals.partyDied) then
 		return
 	end
-	self.currentSquare.clearCode()
+	self.currentSquare:clearCode()
 end
 
 ----------------------------------------

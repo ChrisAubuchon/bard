@@ -36,6 +36,21 @@ function table.copy(inSource, inDestination)
 	return t
 end
 
+function table.print(inTable)
+	local k
+	local v
+
+	for k,v in pairs(inTable) do
+		if (type(v) == "table") then
+			print(string.format("%s: {", k))
+			table.print(v)
+			print("}")
+		else
+			print(string.format("%s: %s", k, v))
+		end
+	end
+end
+
 
 function btTable.addParent(inSelf, ...)
 	local i

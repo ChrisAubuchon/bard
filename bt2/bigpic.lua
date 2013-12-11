@@ -285,7 +285,7 @@ function bigpic:dunAdd(inQuad, inTileSet, inFacet, inSq)
 	if ((inFacet == "floor") or (inFacet == "ceiling")) then
 		gfx = inFacet
 	else
-		if ((inSq.secret) and (party.light.seeSecret)) then
+		if ((inSq.isSecret) and (party.light.seeSecret)) then
 			gfx = "door"
 		else
 			gfx = inSq.gfx

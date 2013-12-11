@@ -589,6 +589,7 @@ function cityBuildings:enter(inBuilding, ...)
 	self[inBuilding]:enter(...)
 
 	if (buildingRval.turnParty) then
+		dprint("Turning party")
 		currentLevel:turnParty("back")
 	end
 

@@ -15,7 +15,6 @@
 
 struct dunGraph_t {
 	gl_list_t	squares;
-	gl_list_t	edges;
 };
 
 /********************************/
@@ -26,14 +25,11 @@ struct dunGraph_t {
 
 static bool dunVertex_equals(const void *vv1, const void *vv2);
 static size_t dunVertex_hash(const void *vv);
-static bool dunEdge_equals(const void *ve1, const void *ve2);
-static size_t dunEdge_hash(const void *ve);
-static size_t dunEdge_hash(const void *ve);
-static void dunEdge_free(const void *ve);
 
-static json_t *edges_to_json(dunLevel_t *dl);
 static json_t *vertices_to_json(dunLevel_t *dl);
 static void dunLevel_to_json(dunLevel_t *dl, btstring_t *fname);
+
+static json_t		*dunPath_toJson(dunPath_t *dp);
 
 static void		dunList_toLevels(const void *vd);
 
@@ -72,47 +68,21 @@ static void dunVertex_free(const void *vv)
 	dunVertex_t *v = (dunVertex_t *)vv;
 
 	bts_free(v->label);
-	bts_free(v->northEdge);
-	bts_free(v->southEdge);
-	bts_free(v->eastEdge);
-	bts_free(v->westEdge);
 	bts_free(v->isTeleport);
 	bts_free(v->isStairs);
 	bts_free(v->isMessage);
 	bts_free(v->isForcedBattle);
 	bts_free(v->code);
+	bts_free(v->north.dstSquare);
+	bts_free(v->north.gfx);
+	bts_free(v->south.dstSquare);
+	bts_free(v->south.gfx);
+	bts_free(v->east.dstSquare);
+	bts_free(v->east.gfx);
+	bts_free(v->west.dstSquare);
+	bts_free(v->west.gfx);
 
 	free(v);
-}
-
-static bool dunEdge_equals(const void *ve1, const void *ve2)
-{
-	dunEdge_t *e1 = (dunEdge_t *)ve1;
-	dunEdge_t *e2 = (dunEdge_t *)ve2;
-
-	return (e1->value == e2->value);
-}
-
-static size_t dunEdge_hash(const void *ve)
-{
-	dunEdge_t *edge = (dunEdge_t *)ve;
-
-	return edge->value;
-}
-
-static void dunEdge_free(const void *ve)
-{
-	dunEdge_t *edge = (dunEdge_t *)ve;
-
-	if (edge == NULL) {
-		return;
-	}
-
-	bts_free(edge->sq1);
-	bts_free(edge->gfx1);
-	bts_free(edge->sq2);
-	bts_free(edge->gfx2);
-	free(edge);
 }
 
 static void dunLevel_free(const void *vdl)
@@ -123,7 +93,6 @@ static void dunLevel_free(const void *vdl)
 		return;
 	if (dl->graph != NULL) {
 		gl_list_free(dl->graph->squares);
-		gl_list_free(dl->graph->edges);
 		free(dl->graph);
 	}
 	cnvList_free(dl->items);
@@ -152,7 +121,6 @@ static void dunLevel_toJson(const void *vdl)
 	JSON_NUMBER(root,	"poisonDamage",	dl->poisonDmg);
 	JSON_BOOL(root,		"canTeleportFrom",dl->canTeleportFrom);
 	JSON_STRING(root,	"dungeonDirection", dl->dungeonDirection == DIR_DOWNWARD ? "below" : "above");
-	json_object_set_new(root,"edges",	edges_to_json(dl));
 	json_object_set_new(root,"squares",	vertices_to_json(dl));
 
 	json_object_set_new(root,"items", cnvList_toJsonArray(dl->items));
@@ -185,77 +153,46 @@ static btstring_t *dunLevel_toName(const void *vdl)
 	return dl->name;
 }
 
-static json_t *edges_to_json(dunLevel_t *dl)
+static json_t *dunPath_toJson(dunPath_t *dp)
 {
-	json_t *edges;
-	json_t *edgeNode;
-	json_t *sqNode;
-	gl_list_iterator_t iter;
-	gl_list_node_t node;
-	dunEdge_t *edge;
+	json_t		*node;
 
-	edges = json_object();
-	iter = gl_list_iterator(dl->graph->edges);
-	while (gl_list_iterator_next(&iter, (const void **)&edge, &node)) {
-
-		edgeNode = json_object();
-
-		sqNode = json_object();
-		if (edge->gfx1 == NULL) {
-			json_object_set_new(sqNode, "gfx", json_false());
-		} else {
-			JSON_STRING(sqNode, "gfx", edge->gfx1->buf);
-		}
-		JSON_BTSTRING(sqNode,	"path",		edge->sq2);
-		JSON_TRUE_IF(sqNode,	"secret",	edge->secret1);
-		JSON_TRUE_IF(sqNode,	"isWall",	edge->isWall1);
-		JSON_TRUE_IF(sqNode,	"isDoor",	edge->isDoor1);
-		JSON_TRUE_IF(sqNode,	"canPhase",	edge->canPhase1);
-		if (edge->sq1) {
-			json_object_set_new(edgeNode,	edge->sq1->buf, sqNode);
-		} else {
-			fprintf(stderr, "Edge: %s has no sq1\n", edge->label->buf);
-		}
-
-		sqNode = json_object();
-		if (edge->gfx2 == NULL) {
-			json_object_set_new(sqNode, "gfx", json_false());
-		} else {
-			JSON_STRING(sqNode, "gfx", edge->gfx2->buf);
-		}
-		JSON_BTSTRING(sqNode,	"path",		edge->sq1);
-		JSON_TRUE_IF(sqNode,	"secret",	edge->secret2);
-		JSON_TRUE_IF(sqNode,	"isWall",	edge->isWall2);
-		JSON_TRUE_IF(sqNode,	"isDoor",	edge->isDoor2);
-		JSON_TRUE_IF(sqNode,	"canPhase",	edge->canPhase2);
-		if (edge->sq2) {
-			json_object_set_new(edgeNode,	edge->sq2->buf, sqNode);
-		} else {
-			fprintf(stderr, "Edge: %s has no sq2\n", edge->label->buf);
-		}
-
-		json_object_set_new(edges, edge->label->buf, edgeNode);
+	node = json_object();
+	JSON_BTSTRING(node, "path", dp->dstSquare);
+	if (dp->gfx == NULL) {
+		JSON_FALSE(node, "gfx");
+	} else {
+		JSON_BTSTRING(node, "gfx", dp->gfx);
 	}
+	JSON_TRUE_IF(node, "isSecret", dp->isSecret);
+	JSON_TRUE_IF(node, "canPhase", dp->canPhase);
+	JSON_TRUE_IF(node, "isWall", dp->isWall);
+	JSON_TRUE_IF(node, "isDoor", dp->isDoor);
 
-	return edges;
+	return node;
 }
 
 static json_t *vertices_to_json(dunLevel_t *dl)
 {
-	json_t *vertices;
-	json_t *vertexNode;
-	gl_list_iterator_t iter;
-	gl_list_node_t node;
-	dunVertex_t *vertex;
+	json_t			*vertices;
+	json_t			*vertexNode;
+	gl_list_iterator_t	iter;
+	gl_list_node_t		node;
+	dunVertex_t		*vertex;
 
 	vertices = json_object();
 	iter = gl_list_iterator(dl->graph->squares);
 	while (gl_list_iterator_next(&iter, (const void **)&vertex, &node)) {
 		vertexNode = json_object();
-		JSON_STRING(vertexNode,	"north",	vertex->northEdge->buf);
-		JSON_STRING(vertexNode,	"south",	vertex->southEdge->buf);
-		JSON_STRING(vertexNode,	"east",		vertex->eastEdge->buf);
-		JSON_STRING(vertexNode,	"west",		vertex->westEdge->buf);
+		json_object_set_new(vertexNode, "north", 
+				dunPath_toJson(&vertex->north));
+		json_object_set_new(vertexNode, "south", 
+				dunPath_toJson(&vertex->south));
+		json_object_set_new(vertexNode, "east", 
+				dunPath_toJson(&vertex->east));
+		json_object_set_new(vertexNode, "west", 
+				dunPath_toJson(&vertex->west));
+		
 		JSON_TRUE_IF(vertexNode,"isSpinner",	vertex->isSpinner);
 		JSON_TRUE_IF(vertexNode,"isSmoke",	vertex->isSmoke);
 		JSON_TRUE_IF(vertexNode,"isNoSpptRegen",vertex->isNoSpptRegen);
@@ -360,31 +297,6 @@ dunVertex_t *dunVertex_get(dunLevel_t *dl, uint32_t value)
 	}
 }
 
-dunEdge_t *dunEdge_new(dunLevel_t *dl, uint32_t value)
-{
-	dunEdge_t *tmp;
-	gl_list_node_t node;
-
-	tmp = (dunEdge_t *)xzalloc(sizeof(dunEdge_t));
-	tmp->value	= value;
-
-	node = gl_list_search(dl->graph->edges, (void *)tmp);
-	if (node == NULL) {
-		tmp->label	= bts_sprintf("x%08x", value);
-		tmp->secret1	= 0;
-		tmp->canPhase1	= 0;
-		tmp->isWall1	= 0;
-		tmp->secret2	= 0;
-		tmp->canPhase2	= 0;
-		tmp->isWall2	= 0;
-
-		node = gl_list_add_last(dl->graph->edges, (void *)tmp);
-	} else {
-		free(tmp);
-	}
-	return (dunEdge_t *)gl_list_node_value(dl->graph->edges, node);
-}
-
 dunVertex_t *dunVertex_new(dunLevel_t *dl, uint32_t value)
 {
 	dunVertex_t *rval;
@@ -407,8 +319,6 @@ dunLevel_t *dunLevel_new(void)
 	rval->graph = (dunGraph_t *)xzalloc(sizeof(dunGraph_t));
 	rval->graph->squares = gl_list_create_empty(GL_ARRAY_LIST,
 		dunVertex_equals, dunVertex_hash, dunVertex_free, 0);
-	rval->graph->edges = gl_list_create_empty(GL_LINKEDHASH_LIST,
-		dunEdge_equals, dunEdge_hash, dunEdge_free, 0);
 
 	rval->items = cnvList_btstring();
 	rval->monsters = cnvList_btstring();

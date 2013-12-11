@@ -19,6 +19,9 @@ local function __false_mt(t, key)
 	return val
 end
 
+----------------------------------------
+-- __addPortal()
+----------------------------------------
 local function __addPortal(sq, quad, tileSet)
 	if (sq.hasCeilPortal) then
 		bigpic:dunAdd(quad, tileSet, "ceiling", sq)
@@ -61,6 +64,9 @@ local dunViewMiddle = {
 	[5]	= "5-M"
 }
 
+----------------------------------------
+-- __buildSide()
+----------------------------------------
 local function __buildSide(sq, tileSet, pathDir, wallDir, depth, 
 				sideDepth, face)
 	local quad = tostring(depth) .. "-" .. sideNames[face][sideDepth]
@@ -112,74 +118,40 @@ local function __buildView(sq, dir, tileSet, maxDepth, depth)
 end
 
 ----------------------------------------
--- Local class for dungeon edges
+-- Local class for dungeon squares
 ----------------------------------------
-local dunEdge	= {}
-dunEdge.new = function (inSquare, inEdge, inSquareList)
-	local self = {
-		path	= false
-		}
+local dunSq	= {}
+dunSq.new = function(inLabel, inSquare)
+	local self
 
-	local function __init()
-		local attr
-		local value
+	self = table.copy(inSquare)
+	self.label = inLabel
 
-		self.path = inSquareList[inEdge[inSquare].path]
-		for attr, value in pairs(inEdge[inSquare]) do
-			if (attr ~= "path") then
-				self[attr] = value
-			end
-		end
-		setmetatable(self, { __index = __false_mt })
-	end
-
-	__init()
+	btTable.addParent(self, dunSq)
+	btTable.setClassMetatable(self)
 
 	return self
 end
 
 ----------------------------------------
--- Local class for dungeon squares
+-- dunSq:toCoordinates()
 ----------------------------------------
-local dunSq	= {}
-dunSq.new = function(inLabel, inSquare)
-	local self = {
-		label		= inLabel,
-		north		= false,
-		south		= false,
-		east		= false,
-		west		= false,
-	}
+function dunSq:toCoordinates()
+	local	x
+	local	y
 
-	local function __init()
-		local attr
-		local value
+	x = tonumber(string.sub(self.label, 2, 3), 16)
+	y = tonumber(string.sub(self.label, 4, 5), 16)
 
-		for attr, value in pairs(inSquare) do
-			self[attr] = value
-		end
+	return x,y 
+end
 
-		setmetatable(self, { __index = __false_mt })
-	end
-
-	function self.toCoordinates()
-		local x
-		local y
-
-		x = tonumber(string.sub(self.label, 2, 3), 16)
-		y = tonumber(string.sub(self.label, 4, 5), 16)
-
-		return x,y
-	end
-
-	function self.clearCode()
-		self.isSpecial = false
-		self.code = false
-	end
-
-	__init()
-
-	return self
+----------------------------------------
+-- dunSq:clearCode()
+----------------------------------------
+function dunSq:clearCode()
+	self.isSpecial	= false
+	self.code	= false
 end
 
 dun = {}
@@ -189,7 +161,6 @@ function dun:new(inName, inLevel, inX, inY, inDirection)
 		isPhasedFlag	= false,
 		squareFlags	= btDefaultTable:new(false),
 		squares		= {},
-		edges		= {}
 	}
 
 	btTable.addParent(self, dun, level, dunSquares)
@@ -198,58 +169,64 @@ function dun:new(inName, inLevel, inX, inY, inDirection)
 	self.name		= inName
 	self.direction		= inDirection
 
+	-- Read the level data from the disk if necessary
+	--
 	if (type(dunData[inName][inLevel].level) == "string") then
 		dunData[inName][inLevel].level = diskio:readTable(
 				dunData[inName][inLevel].level, false
 				)
 	end
 
-	local dunLevel = dunData[inName][inLevel].level
-
-	local function __initSquares()
-		local label
-		local object
-
-		for label, object in pairs(dunLevel.squares) do
-			self.squares[label] = dunSq.new(label, object)
-		end
-	end
-
-	local function __initEdges()
-		local label
-		local object
-
-		for label, object in pairs(self.squares) do
-			object.north = dunEdge.new(label,
-				dunLevel.edges[object.north], self.squares)
-			object.south = dunEdge.new(label,
-				dunLevel.edges[object.south], self.squares)
-			object.east = dunEdge.new(label,
-				dunLevel.edges[object.east], self.squares)
-			object.west = dunEdge.new(label,
-				dunLevel.edges[object.west], self.squares)
-		end
-	end
-
-	local function __initVars()
-		local label
-		local object
-
-		for label, object in pairs(dunLevel) do
-			if ((label ~= "squares") and (label ~= "edges")) then
-				self[label] = object
-			end
-		end
-	end
-
-	__initSquares()
-	__initEdges()
-	__initVars()
+	self:fromTable(dunData[inName][inLevel].level)
 
 	self.currentSquare = string.format("x%02x%02x", inX, inY)
 	self.currentSquare = self.squares[self.currentSquare]
 
 	return self
+end
+
+
+----------------------------------------
+-- fromTable()
+----------------------------------------
+function dun:fromTable(inTable)
+	local label, object
+
+	assert(inTable.squares ~= nil, "Invalid table for dun:fromTable()")
+
+	-- Create dungeon square objects
+	for label, object in pairs(inTable.squares) do
+		self.squares[label] = dunSq.new(label, object)
+	end
+
+	-- Link the object.{direction}.path variables to the actual
+	-- square.
+	--
+	for label, object in pairs(self.squares) do
+		object.north.path = self.squares[object.north.path]
+		object.south.path = self.squares[object.south.path]
+		object.east.path = self.squares[object.east.path]
+		object.west.path = self.squares[object.west.path]
+	end
+
+	-- Copy in the rest of the table data
+	--
+	for label, object in pairs(inTable) do
+		if (label ~= "squares") then
+			if (type(object) == "table") then	
+				self[label] = table.copy(object)
+			else
+				self[label] = object
+			end
+		end
+	end
+end
+
+----------------------------------------
+-- dun:toTable()
+----------------------------------------
+function dun:toTable()
+	return true
 end
 
 function dun:isDungeon()
@@ -277,7 +254,7 @@ function dun:setTitle()
 end
 
 function dun:getCoordinates()
-	return self.currentSquare.toCoordinates()
+	return self.currentSquare:toCoordinates()
 end
 
 function dun:getNumLevels()
@@ -406,9 +383,12 @@ function dun:turnParty(inRelDirection)
 	self:buildView()
 end
 
+----------------------------------------
+-- dun:moveForward()
+----------------------------------------
 function dun:moveForward()
 	local curSq = self.currentSquare
-	local edge = curSq[self.direction]
+	local path = curSq[self.direction]
 
 	text:clear()
 	self.squareFlags = btDefaultTable:new(false)
@@ -417,12 +397,12 @@ function dun:moveForward()
 	end
 
 	if (globals.swapWallsAndDoors) then
-		if (edge.isDoor and not curSq.isPhased) then
+		if (path.isDoor and not curSq.isPhased) then
 			text:print("\n\nOuch!!")
 			return
 		end
 	else
-		if ((edge.isWall) and not (curSq.isPhased)) then
+		if ((path.isWall) and not (curSq.isPhased)) then
 			text:print("\n\nOuch!!")
 			return
 		end
@@ -431,7 +411,7 @@ function dun:moveForward()
 	self.currentSquare.isPhased = nil
 
 	self.previousSquare = self.currentSquare
-	self.currentSquare = edge.path
+	self.currentSquare = path.path
 	self:runSquareCode()
 	self:doSpinnerCheck()
 end

@@ -369,8 +369,10 @@ function city:main()
 		globals.doTimeEvents = false
 
 		if (keyboardCommand(inkey)) then
-			self:resetBigpic()
-			text:cdprint(true, false, self.currentSquare.label)
+			if (not self.exit) then
+				self:resetBigpic()
+				text:cdprint(true, false, self.currentSquare.label)
+			end
 		elseif (inkey == "?") then
 			self:printLocation()
 		elseif (inkey == "D") then

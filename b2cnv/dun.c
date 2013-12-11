@@ -46,17 +46,12 @@ static btstring_t	*unmaskString(uint8_t *inString, uint8_t inSize);
 static btstring_t	*getNodeLabel(uint32_t x, uint32_t y);
 static FILE		*openLevelFile(void);
 static void		convertDunLevel(b2level_t *level);
-static uint32_t		getEdge(int32_t x, int32_t y, uint32_t dir);
 static uint32_t		getVertex(int32_t x, int32_t y);
 
-static void		setEdges(b2level_t *level, int32_t x, int32_t y, 
-				uint8_t walls);
 static void		setVertex(b2level_t *level, int32_t x, int32_t y, 
 				uint32_t index);
-static void		setEdgeWall(b2level_t *level, dunEdge_t *edge,
-				int32_t x, int32_t y, uint8_t square,
-				uint8_t dir);
-static uint8_t		wrapNumber(int8_t inN);
+static void		getPath(dungeonLevel_t *, uint8_t, int32_t, int32_t,
+				uint8_t, dunPath_t *);
 static void		convertStairs(b2level_t *level, uint32_t index,
 				dunVertex_t *v);
 static void		addSpecialSquares(b2level_t *level);
@@ -117,123 +112,66 @@ static FILE *openLevelFile(void)
 /*				*/
 /********************************/
 
-#define doLabel(side,srcX,srcY,dstX,dstY) \
-	(((side) << 21) | (((srcX)&0x1f) << 15) | (((srcY)&0x1f) << 10) | \
-	(((dstX)&0x1f) << 5) | ((dstY)&0x1f))
-
-static uint32_t getEdge(int32_t x, int32_t y, uint32_t dir)
+/*
+ * getPath()
+ */
+static void getPath(
+	dungeonLevel_t	*level,
+	uint8_t		square,
+	int32_t		x,
+	int32_t		y,
+	uint8_t		direction,
+	dunPath_t	*path
+	)
 {
-	uint32_t	rval = 0;
-	switch (dir) {
+	uint8_t		wallMask, doorMask, squareMask;
+	int32_t		deltaX = 0;
+	int32_t		deltaY = 0;
+
+	switch (direction) {
 	case DIR_NORTH:
-		rval = doLabel(1, x, y, x, wrapNumber(y+1));
+		wallMask = WALL_NORTH;
+		doorMask = DOOR_NORTH;
+		squareMask = NORTH_MASK;
+		deltaY = 1;
 		break;
 	case DIR_SOUTH:
-		rval = doLabel(1, x, wrapNumber(y-1), x, y);
-		break;
-	case DIR_WEST:
-		rval = doLabel(2, wrapNumber(x-1), y, x, y);
+		wallMask = WALL_SOUTH;
+		doorMask = DOOR_SOUTH;
+		squareMask = SOUTH_MASK;
+		deltaY = -1;
 		break;
 	case DIR_EAST:
-		rval = doLabel(2, x, y, wrapNumber(x+1), y);
+		wallMask = WALL_EAST;
+		doorMask = DOOR_EAST;
+		squareMask = EAST_MASK;
+		deltaX = 1;
+		break;
+	case DIR_WEST:
+		wallMask = WALL_WEST;
+		doorMask = DOOR_WEST;
+		squareMask = WEST_MASK;
+		deltaX = -1;
 		break;
 	}
 
-	return rval;
-}
-#undef doLabel
-
-static void setEdgeWall(b2level_t *level, dunEdge_t *edge, int32_t x, 
-				int32_t y, uint8_t square, uint8_t dir)
-{
-	switch (dir) {
-	case DIR_NORTH:
-		edge->sq1 = getNodeLabel(x, y);
-		if (square & NORTH_MASK) {
-			edge->canPhase1 = level->src->phaseFlag;
-			if (square & WALL_NORTH) {
-				edge->gfx1 = bts_strcpy("wall");
-				if (square & DOOR_NORTH) {
-					edge->isDoor1 = 1;
-					edge->secret1 = 1;
-				} else {
-					edge->isWall1 = 1;
-				}
+	path->dstSquare = getNodeLabel(	wrapNumber(x + deltaX),
+					wrapNumber(y + deltaY));
+	if (square & squareMask) {
+		path->canPhase = level->phaseFlag;
+		if (square & wallMask) {
+			path->gfx = bts_strcpy("wall");
+			if (square & doorMask) {
+				path->isDoor = 1;
+				path->isSecret = 1;
 			} else {
-				edge->isDoor1 = 1;
-				edge->gfx1 = bts_strcpy("door");
+				path->isWall = 1;
 			}
+		} else {
+			path->gfx = bts_strcpy("door");
+			path->isDoor = 1;
 		}
-		break;
-	case DIR_SOUTH:
-		edge->sq2 = getNodeLabel(x, y);
-		if (square & SOUTH_MASK) {
-			edge->canPhase2 = level->src->phaseFlag;
-			if (square & WALL_SOUTH) {
-				edge->gfx2 = bts_strcpy("wall");
-				if (square & DOOR_SOUTH) {
-					edge->isDoor2 = 1;
-					edge->secret2 = 1;
-				} else {
-					edge->isWall2 = 1;
-				}
-			} else {
-				edge->isDoor2 = 1;
-				edge->gfx2 = bts_strcpy("door");
-			}
-		}
-		break;
-	case DIR_WEST:
-		edge->sq1 = getNodeLabel(x, y);
-		if (square & WEST_MASK) {
-			edge->canPhase1 = level->src->phaseFlag;
-			if (square & WALL_WEST) {
-				edge->gfx1 = bts_strcpy("wall");
-				if (square & DOOR_WEST) {
-					edge->isDoor1 = 1;
-					edge->secret1 = 1;
-				} else {
-					edge->isWall1 = 1;
-				}
-			} else {
-				edge->isDoor1 = 1;
-				edge->gfx1 = bts_strcpy("door");
-			}
-		}
-		break;
-	case DIR_EAST:
-		edge->sq2 = getNodeLabel(x, y);
-		if (square & EAST_MASK) {
-			edge->canPhase2 = level->src->phaseFlag;
-			if (square & WALL_EAST) {
-				edge->gfx2 = bts_strcpy("wall");
-				if (square & DOOR_EAST) {
-					edge->isDoor2 = 1;
-					edge->secret2 = 1;
-				} else {
-					edge->isWall2 = 1;
-				}
-			} else {
-				edge->isDoor2 = 1;
-				edge->gfx2 = bts_strcpy("door");
-			}
-		}
-		break;
 	}
-}
-
-static void setEdges(b2level_t *level, int32_t x, int32_t y, uint8_t walls)
-{
-	dunEdge_t	*edge;
-
-	edge	= dunEdge_new(level->dst, getEdge(x, y, DIR_NORTH));
-	setEdgeWall(level, edge, x, y, walls, DIR_NORTH);
-	edge	= dunEdge_new(level->dst, getEdge(x, y, DIR_SOUTH));
-	setEdgeWall(level, edge, x, y, walls, DIR_SOUTH);
-	edge	= dunEdge_new(level->dst, getEdge(x, y, DIR_EAST));
-	setEdgeWall(level, edge, x, y, walls, DIR_EAST);
-	edge	= dunEdge_new(level->dst, getEdge(x, y, DIR_WEST));
-	setEdgeWall(level, edge, x, y, walls, DIR_WEST);
 }
 
 /********************************/
@@ -281,10 +219,15 @@ static void setVertex(b2level_t *level, int32_t x, int32_t y, uint32_t index)
 	dunVertex_t	*vertex;
 
 	vertex = dunVertex_new(level->dst, getVertex(x, y));
-	vertex->northEdge = bts_sprintf("x%08x", getEdge(x,y,DIR_NORTH));
-	vertex->southEdge = bts_sprintf("x%08x", getEdge(x,y,DIR_SOUTH));
-	vertex->eastEdge = bts_sprintf("x%08x", getEdge(x,y,DIR_EAST));
-	vertex->westEdge = bts_sprintf("x%08x", getEdge(x,y,DIR_WEST));
+
+	getPath(level->src, level->src->wallData[index], x, y, DIR_NORTH,
+		&vertex->north);
+	getPath(level->src, level->src->wallData[index], x, y, DIR_SOUTH,
+		&vertex->south);
+	getPath(level->src, level->src->wallData[index], x, y, DIR_EAST,
+		&vertex->east);
+	getPath(level->src, level->src->wallData[index], x, y, DIR_WEST,
+		&vertex->west);
 
 	if (level->src->loFlags[index] & DUN_SPECIAL) {
 		vertex->isSpecial = 1;
@@ -565,7 +508,6 @@ static void convertDunLevel(b2level_t *level)
 	index = 0;
 	for (y = 0; y < 22; y++) {
 		for (x = 0; x < 22; x++) {
-			setEdges(level, x, y, l->wallData[index]);
 			setVertex(level, x, y, index);
 			index++;
 		}

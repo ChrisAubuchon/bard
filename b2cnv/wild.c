@@ -96,7 +96,6 @@ static btstring_t *getEvent(uint32_t x, uint32_t y, uint8_t sq)
 		return bts_strcpy("cityBuildings:enter(\"fanskar\")");
 	case 0xf1:
 	{
-		debug("y = %d\n", y);
 		if (y == 19) {
 			return bts_strcpy("cityBuildings:enter(\"kazdek\")");
 		} else if (y == 2) {

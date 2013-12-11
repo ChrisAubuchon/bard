@@ -73,11 +73,9 @@ static uint8_t levelNumber[] = {
 
 static int8_t		wrapNumber(int8_t in);
 static btstring_t	*getNodeLabel(uint16_t x, uint16_t y);
-static uint32_t		getEdge(int32_t x, int32_t y, uint32_t dir);
+static void		getPath(dungeonLevel_t *, uint8_t, int32_t, int32_t,
+				uint8_t, dunPath_t *);
 static uint32_t		getVertex(int32_t x, int32_t y);
-static void 		setEdgeWall(dungeonLevel_t *l, dunEdge_t *edge, 
-				int32_t x, int32_t y, uint8_t square, 
-				uint8_t dir);
 static dunLevel_t	*convertDunLevel(btstring_t *data, uint32_t index);
 static void 		convertStairs(dungeonLevel_t *l, uint32_t index, 
 					dunVertex_t *v, uint32_t dunIndex);
@@ -95,36 +93,6 @@ static void 		addTraps(dunLevel_t *dl);
 static btstring_t *getNodeLabel(uint16_t x, uint16_t y)
 {
 	return bts_sprintf("x%02x%02x", x, y);
-}
-
-static uint32_t getEdge(int32_t inX, int32_t inY, uint32_t dir)
-{
-	uint32_t rval = 0;
-	uint8_t x, y;
-
-	x = inX & 0x1f;
-	y = inY & 0x1f;
-
-	switch (dir) {
-	case DIR_NORTH:
-		rval = (1 << 21) | (x << 15) | (y << 10) | (x << 5) | 
-			(wrapNumber(inY+1) & 0x1f);
-		break;
-	case DIR_SOUTH:
-		rval = (1 << 21) | (x << 15) | ((wrapNumber(inY-1)&0x1f) << 10)
-			| (x << 5) | y;
-		break;
-	case DIR_WEST:
-		rval = (2 << 21) | ((wrapNumber(inX-1)&0x1f) << 15) | (y << 10)
-			| (x << 5) | y;
-		break;
-	case DIR_EAST:
-		rval = (2 << 21) | (x << 15) | (y << 10) | 
-			((wrapNumber(inX+1) & 0x1f) << 5) | y;
-		break;
-	}
-
-	return rval;
 }
 
 static uint32_t getVertex(int32_t x, int32_t y)
@@ -145,90 +113,62 @@ static int8_t wrapNumber(int8_t in)
 		return in;
 }
 
-static void setEdgeWall(dungeonLevel_t *l, dunEdge_t *edge, 
-			int32_t x, int32_t y, uint8_t square, uint8_t dir)
+static void getPath(
+	dungeonLevel_t	*level,
+	uint8_t		square,
+	int32_t		x,
+	int32_t		y,
+	uint8_t		direction,
+	dunPath_t	*path
+	)
 {
-	switch (dir) {
+	uint8_t		wallMask, doorMask, squareMask;
+	int32_t		deltaX = 0;
+	int32_t		deltaY = 0;
+
+	switch (direction){
 	case DIR_NORTH:
-		edge->sq1 = getNodeLabel(x,y);
-		if (square & NORTH_MASK) {
-			edge->canPhase1 = !l->dun_phaseFlag;
-			if (square & WALL_NORTH) {
-				edge->gfx1 = bts_strcpy("wall");
-				if (square & DOOR_NORTH) {
-					edge->isDoor1 = 1;
-					edge->secret1 = 1;
-				} else {
-					edge->isWall1 = 1;
-				}
-			} else {
-				edge->isDoor1 = 1;
-				edge->gfx1 = bts_strcpy("door");
-			}
-		} else {
-			edge->gfx1 = NULL;
-		}
+		wallMask = WALL_NORTH;
+		doorMask = DOOR_NORTH;
+		squareMask = NORTH_MASK;
+		deltaY = 1;
 		break;
 	case DIR_SOUTH:
-		edge->sq2 = getNodeLabel(x,y);
-		if (square & SOUTH_MASK) {
-			edge->canPhase2 = !l->dun_phaseFlag;
-			if (square & WALL_SOUTH) {
-				edge->gfx2 = bts_strcpy("wall");
-				if (square & DOOR_SOUTH) {
-					edge->isDoor2 = 1;
-					edge->secret2 = 1;
-				} else {
-					edge->isWall2 = 1;
-				}
-			} else {
-				edge->isDoor2 = 1;
-				edge->gfx2 = bts_strcpy("door");
-			}
-		} else {
-			edge->gfx2 = NULL;
-		}
-		break;
-	case DIR_WEST:
-		edge->sq1 = getNodeLabel(x,y);
-		if (square & WEST_MASK) {
-			edge->canPhase1 = !l->dun_phaseFlag;
-			if (square & WALL_WEST) {
-				edge->gfx1 = bts_strcpy("wall");
-				if (square & DOOR_WEST) {
-					edge->isDoor1 = 1;
-					edge->secret1 = 1;
-				} else {
-					edge->isWall1 = 1;
-				}
-			} else {
-				edge->isDoor1 = 1;
-				edge->gfx1 = bts_strcpy("door");
-			}
-		} else {
-			edge->gfx1 = NULL;
-		}
+		wallMask = WALL_SOUTH;
+		doorMask = DOOR_SOUTH;
+		squareMask = SOUTH_MASK;
+		deltaY = -1;
 		break;
 	case DIR_EAST:
-		edge->sq2 = getNodeLabel(x,y);
-		if (square & EAST_MASK) {
-			edge->canPhase2 = !l->dun_phaseFlag;
-			if (square & WALL_EAST) {
-				edge->gfx2 = bts_strcpy("wall");
-				if (square & DOOR_EAST) {
-					edge->isDoor2 = 1;
-					edge->secret2 = 1;
-				} else {
-					edge->isWall2 = 1;
-				}
+		wallMask = WALL_EAST;
+		doorMask = DOOR_EAST;
+		squareMask = EAST_MASK;
+		deltaX = 1;
+		break;
+	case DIR_WEST:
+		wallMask = WALL_WEST;
+		doorMask = DOOR_WEST;
+		squareMask = WEST_MASK;
+		deltaX = -1;
+		break;
+	}
+	path->dstSquare = getNodeLabel(	wrapNumber(x + deltaX), 
+					wrapNumber(y + deltaY));
+
+	if (square & squareMask) {
+		path->canPhase = !level->dun_phaseFlag;
+		if (square & wallMask) {
+			path->gfx = bts_strcpy("wall");
+			if (square & doorMask) {
+				path->isDoor = 1;
+				path->isSecret = 1;
 			} else {
-				edge->isDoor2 = 1;
-				edge->gfx2 = bts_strcpy("door");
+				path->isWall = 1;
 			}
 		} else {
-			edge->gfx2 = NULL;
+			path->gfx = bts_strcpy("door");
+			path->isDoor = 1;
 		}
-		break;
 	}
 }
 
@@ -275,13 +215,11 @@ static void convertStairs(dungeonLevel_t *l, uint32_t index, dunVertex_t *v,
 
 static dunLevel_t *convertDunLevel(btstring_t *data, uint32_t dunIndex)
 {
-	dunLevel_t *dl;
-	dungeonLevel_t *l;
-	uint32_t i;
-	int32_t x, y;
-	uint32_t index;
-	dunEdge_t *edge;
-	dunVertex_t *vertex;
+	dunLevel_t	*dl;
+	dungeonLevel_t	*l;
+	dunVertex_t	*vertex;
+	uint32_t	i, index;
+	int32_t		x, y;
 
 	dl = dunLevel_new();
 	l = (dungeonLevel_t *)data->buf;
@@ -305,19 +243,15 @@ static dunLevel_t *convertDunLevel(btstring_t *data, uint32_t dunIndex)
 	index = 0;
 	for (y = 0; y < 22; y++) {
 		for (x = 0; x < 22; x++) {
-			edge = dunEdge_new(dl, getEdge(x, y, DIR_NORTH));
-			setEdgeWall(l, edge,x,y,l->wallData[index], DIR_NORTH);
-			edge = dunEdge_new(dl, getEdge(x, y, DIR_SOUTH));
-			setEdgeWall(l, edge,x,y, l->wallData[index], DIR_SOUTH);
-			edge = dunEdge_new(dl, getEdge(x, y, DIR_EAST));
-			setEdgeWall(l, edge,x,y, l->wallData[index], DIR_EAST);
-			edge = dunEdge_new(dl, getEdge(x, y, DIR_WEST));
-			setEdgeWall(l, edge,x,y, l->wallData[index], DIR_WEST);
 			vertex = dunVertex_new(dl, getVertex(x,y));
-			vertex->northEdge = bts_sprintf("x%08x", getEdge(x,y,DIR_NORTH));
-			vertex->southEdge = bts_sprintf("x%08x", getEdge(x,y,DIR_SOUTH));
-			vertex->eastEdge = bts_sprintf("x%08x", getEdge(x,y,DIR_EAST));
-			vertex->westEdge = bts_sprintf("x%08x", getEdge(x,y,DIR_WEST));
+			getPath(l, l->wallData[index], x, y, DIR_NORTH, 
+				&vertex->north);
+			getPath(l, l->wallData[index], x, y, DIR_SOUTH, 
+				&vertex->south);
+			getPath(l, l->wallData[index], x, y, DIR_EAST, 
+				&vertex->east);
+			getPath(l, l->wallData[index], x, y, DIR_WEST, 
+				&vertex->west);
 			if (l->dun_flags[index] & DUN_SPECIAL) {
 				vertex->isSpecial = 1;
 			}
@@ -521,12 +455,12 @@ static void addTraps(dunLevel_t *dl)
 
 void convertDungeons(void)
 {
-	uint32_t dunno, levno;
-	uint32_t nlevs;
-	huffile_t *huf;
-	btstring_t *data;
+	uint32_t	dunno, levno;
+	uint32_t	nlevs;
+	huffile_t	*huf;
+	btstring_t	*data;
 	cnvList_t	*dungeons;
-	dunLevel_t *level;
+	dunLevel_t	*level;
 
 	FILE *fp;
 

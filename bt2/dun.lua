@@ -112,75 +112,43 @@ local function __buildView(sq, dir, tileSet, maxDepth, depth)
 end
 
 ----------------------------------------
--- Local class for dungeon edges
-----------------------------------------
-local dunEdge	= {}
-dunEdge.new = function (inSquare, inEdge, inSquareList)
-	local self = {
-		path	= false
-		}
-
-	local function __init()
-		local attr
-		local value
-
-		self.path = inSquareList[inEdge[inSquare].path]
-		for attr, value in pairs(inEdge[inSquare]) do
-			if (attr ~= "path") then
-				self[attr] = value
-			end
-		end
-		setmetatable(self, { __index = __false_mt })
-	end
-
-	__init()
-
-	return self
-end
-
-----------------------------------------
 -- Local class for dungeon squares
 ----------------------------------------
 local dunSq	= {}
 dunSq.new = function(inLabel, inSquare)
-	local self = {
-		label		= inLabel,
-		north		= false,
-		south		= false,
-		east		= false,
-		west		= false,
-	}
+	local self
 
-	local function __init()
-		local attr
-		local value
+	self = table.copy(inSquare)
+	self.label = inLabel
 
-		for attr, value in pairs(inSquare) do
-			self[attr] = value
-		end
-
-		setmetatable(self, { __index = __false_mt })
-	end
-
-	function self.toCoordinates()
-		local x
-		local y
-
-		x = tonumber(string.sub(self.label, 2, 3), 16)
-		y = tonumber(string.sub(self.label, 4, 5), 16)
-
-		return x,y
-	end
-
-	function self.clearCode()
-		self.isSpecial = false
-		self.code = false
-	end
-
-	__init()
+	btTable.addParent(self, dunSq)
+	btTable.setClassMetatable(self)
 
 	return self
 end
+
+----------------------------------------
+-- dunSq:toCoordinates()
+----------------------------------------
+function dunSq:toCoordinates()
+	local x
+	local y
+
+	x = tonumber(string.sub(self.label, 2, 3), 16)
+	y = tonumber(string.sub(self.label, 4, 5), 16)
+
+	return x,y
+end
+
+----------------------------------------
+-- dunSq:clearCode()
+----------------------------------------
+function dunSq:clearCode()
+	self.isSpecial = false
+	self.code = false
+end
+
+
 
 dun = {}
 function dun:new(inName, inLevel, inX, inY, inDirection)
@@ -189,7 +157,6 @@ function dun:new(inName, inLevel, inX, inY, inDirection)
 		isPhasedFlag	= false,
 		squareFlags	= btDefaultTable:new(false),
 		squares		= {},
-		edges		= {}
 	}
 
 	btTable.addParent(self, dun, level, dunSquares)
@@ -204,52 +171,40 @@ function dun:new(inName, inLevel, inX, inY, inDirection)
 				)
 	end
 
-	local dunLevel = dunData[inName][inLevel].level
-
-	local function __initSquares()
-		local label
-		local object
-
-		for label, object in pairs(dunLevel.squares) do
-			self.squares[label] = dunSq.new(label, object)
-		end
-	end
-
-	local function __initEdges()
-		local label
-		local object
-
-		for label, object in pairs(self.squares) do
-			object.north = dunEdge.new(label,
-				dunLevel.edges[object.north], self.squares)
-			object.south = dunEdge.new(label,
-				dunLevel.edges[object.south], self.squares)
-			object.east = dunEdge.new(label,
-				dunLevel.edges[object.east], self.squares)
-			object.west = dunEdge.new(label,
-				dunLevel.edges[object.west], self.squares)
-		end
-	end
-
-	local function __initVars()
-		local label
-		local object
-
-		for label, object in pairs(dunLevel) do
-			if ((label ~= "squares") and (label ~= "edges")) then
-				self[label] = object
-			end
-		end
-	end
-
-	__initSquares()
-	__initEdges()
-	__initVars()
+	self:fromTable(dunData[inName][inLevel].level)
 
 	self.currentSquare = string.format("x%02x%02x", inX, inY)
 	self.currentSquare = self.squares[self.currentSquare]
 
 	return self
+end
+
+----------------------------------------
+-- dun:fromTable()
+----------------------------------------
+function dun:fromTable(inTable)
+	local label, object
+
+	for label, object in pairs(inTable.squares) do
+		self.squares[label] = dunSq.new(label, object)
+	end
+
+	for label, object in pairs(self.squares) do
+		object.north.path = self.squares[object.north.path]
+		object.south.path = self.squares[object.south.path]
+		object.east.path = self.squares[object.east.path]
+		object.west.path = self.squares[object.west.path]
+	end
+
+	for label, object in pairs(inTable) do
+		if (label ~= "squares") then
+			if (type(object) == "table") then
+				self[label] = table.copy(object)
+			else
+				self[label] = object
+			end
+		end
+	end
 end
 
 function dun:isDungeon()
@@ -277,7 +232,7 @@ function dun:setTitle()
 end
 
 function dun:getCoordinates()
-	return self.currentSquare.toCoordinates()
+	return self.currentSquare:toCoordinates()
 end
 
 function dun:getNumLevels()
