@@ -533,6 +533,7 @@ static json_t *bteSummon_toJson(const void *vbs)
 	inData = json_object();
 
 	JSON_TRUE_IF(inData, "isIllusion", bs->isIllusion);
+	JSON_TRUE_IF(inData, "fillParty", bs->fillParty);
 	json_object_set_new(inData, "summons", 
 				cnvList_toJsonArray(bs->monsters));
 

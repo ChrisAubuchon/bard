@@ -618,13 +618,25 @@ end
 --
 -- Summon a monster to the summon slot
 ----------------------------------------
-function party:doSummon(inSummon)
-	local xxx_fix_doSummon
+function party:doSummon(inData)
+	if (not self:hasRoom()) then
+		text:print(" but there was no room for a summoning!\n\n")
+		self:display()
+		timer:delay()
+		return
+	end
 
-	self:insertHead(summon:new(inSummon.type))
-	self.summon = self:getFirst()
-	self.summon.isIllusion = inSummon.isIllusion or false
+	repeat
+		if (not self:hasRoom()) then
+			break
+		end
+
+		dprint(summon)
+		self:addCharacter(summon:new(inData.summons[1], inData.isIllusion))
+	until (not inData.fillParty)
+
 	self:display()
+	text:printEllipsis()
 end
 
 ----------------------------------------

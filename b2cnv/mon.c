@@ -255,7 +255,7 @@ static void unmaskString(uint8_t *str, uint32_t size)
 
 btstring_t *getSummonMacro(uint32_t index)
 {
-	return bts_sprintf("SUM_%s", sumMons[index].name);
+	return bts_sprintf("%s_%d", sumMons[index].name, M_SUMMON);
 }
 
 #if 0

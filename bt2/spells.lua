@@ -249,21 +249,23 @@ spells.teleport = function()
 
 end
 
+----------------------------------------
+-- spells.summon()
+----------------------------------------
 function spells.summon(inAction)
 	local inData	= inAction.inData
-	local summon	= {}
-
-	summon.isIllusion = inData.isIllusion
-	summon.type = inData.summons[random:xdy(1,#inData.summons)]
 
 	if (inAction.source:isCharacter()) then
-		party:doSummon(summon)
-		text:printEllipsis()
+		party:doSummon(inData)
 	elseif (inAction.source:isSummon()) then
+		local xxx_add_party_monster_summon_spell = true
+
 		text:printEllipsis()
 		return
 	else
-		currentBattle.monParty:doSummon(summon)
+		local xxx_fix_monParty_doSummon = true
+
+		currentBattle.monParty:doSummon(inData)
 	end
 end
 

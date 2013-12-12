@@ -369,6 +369,11 @@ static btAction_t *spf_summon(uint32_t index)
 	rval	= btAction_new(FUNC_SUMMON, EFFECT_SUMMON);
 	bs	= btEffect_summon(rval->effect);
 
+	if (index == 77)
+		bs->fillParty = 1;
+	else
+		bs->fillParty = 0;
+
 	bs->isIllusion = IFBIT(spellDuration[index], 0x80, 1, 0);
 
 	debug("spellDuration[%d] = %2d\n", index, spellDuration[index]);
