@@ -6,17 +6,19 @@
 ----------------------------------------
 building = {}
 function building:new(inTitle, inBigpic)
-	local self = {
-		title	= inTitle,
-		bigpic	= inBigpic
-	}
+	local self = object:new()
 
-	btTable.addParent(self, building)
-	btTable.setClassMetatable(self)
+	self.title	= inTitle
+	self.bigpic	= inBigpic
+
+	self:addParent(building)
 
 	return self
 end
 
+----------------------------------------
+-- building:resetBigpic()
+----------------------------------------
 function building:resetBigpic(inNightAware)
 	bigpic:drawImage(self.bigpic, inNightAware)
 	bigpic:setTitle(self.title)

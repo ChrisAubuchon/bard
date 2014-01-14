@@ -162,16 +162,15 @@ end
 
 city = {}
 function city:new(inName)
-	local self = {
-		sqs	= {},
-		bldgs	= {},
-		day	= false,
-		night	= false,
-	}
+	local self = object:new()
 
+	self:addParent(city)
+	self:addParent(level)
 
-	btTable.addParent(self, city, level)
-	btTable.setClassMetatable(self)
+	self.sqs	= {}
+	self.bldgs	= {}
+	self.day	= false
+	self.night	= false
 
 	self.name	= inName
 	if (type(cities[inName]) == "string") then
@@ -304,20 +303,20 @@ function city:moveForward()
 	local front_sq = self.currentSquare[self.direction]
 	local rval
 
-	if (not front_sq.isBuilding()) then
-		self:animateMove()
-	end
-
-	if (not front_sq.onEnter()) then
+	if (front_sq.isBuilding()) then
+		front_sq.onEnter()
 		if (self.exit) then
 			return true
 		end
+		self:resetBigpic()
+	else
+		self:animateMove()
+		self.previousSquare = self.currentSquare
 		self.currentSquare = front_sq
+		if (self.currentSquare.onEnter()) then
+			self.currentSquare = self.previousSquare
+		end
 		self:buildView()
-	end
-
-	if (globals.partyDied) then
-		return
 	end
 	text:clear()
 end

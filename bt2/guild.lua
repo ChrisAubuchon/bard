@@ -1,13 +1,6 @@
 guild = {}
 
 ----------------------------------------
--- resetBigpic()
-----------------------------------------
-function guild:resetBigpic()
-	bigpic:setBigpic("PIC_GUILDINT", "The Guild")
-end
-
-----------------------------------------
 -- addMember()
 ----------------------------------------
 function guild:addMember()
@@ -286,7 +279,7 @@ function guild:doEnter()
 				globals.gameState = globals.STATE_INGAME
 				currentLevel = city:new(globals.guildCity)
 				currentLevel:enter()
-				party.light.effect:__activate(-1)
+				party.light:__activate(-1)
 				party.light.distance = 5
 				party.light.seeSecret = true
 				party.light.active = true
@@ -309,9 +302,10 @@ end
 -- guild:enter()
 ----------------------------------------
 function guild:enter()
-	local self = {}
+	local self = object:new()
 
-	btTable.addParent(self, guild)
-	btTable.setClassMetatable(self)
+	self:addParent(guild)
+	self:addParent(building:new("The Guild", "PIC_GUILDINT"))
+
 	self:doEnter()
 end

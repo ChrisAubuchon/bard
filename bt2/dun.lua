@@ -116,13 +116,11 @@ end
 ----------------------------------------
 local dunSq	= {}
 dunSq.new = function(inLabel, inSquare)
-	local self
+	local self = object:new()
 
-	self = table.copy(inSquare)
-	self.label = inLabel
+	self:addParent(dunSq)
 
-	btTable.addParent(self, dunSq)
-	btTable.setClassMetatable(self)
+	table.copy(inSquare, self)
 
 	return self
 end
@@ -152,15 +150,16 @@ end
 
 dun = {}
 function dun:new(inName, inLevel, inX, inY, inDirection)
-	local self = {
-		currentLevel	= inLevel,
-		isPhasedFlag	= false,
-		squareFlags	= btDefaultTable:new(false),
-		squares		= {},
-	}
+	local self = object:new()
 
-	btTable.addParent(self, dun, level, dunSquares)
-	btTable.setClassMetatable(self)
+	self:addParent(dun)
+	self:addParent(level)
+	self:addParent(dunSquares)
+
+	self.currentLevel	= inLevel
+	self.isPhasedFlag	= false
+	self.squareFlags	= btDefaultTable:new(false)
+	self.squares		= {}
 
 	self.name		= inName
 	self.direction		= inDirection

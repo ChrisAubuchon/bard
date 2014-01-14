@@ -2,18 +2,17 @@ require "bttable"
 
 btAction = {}
 function btAction:new()
-	local self = {
-		next		= false,
-		prev		= false,
-		source		= false,
-		target		= false,
-		func		= false,
-		inData		= {},
-		outData		= {}
-	}
+	local self = object:new()
 
-	btTable.addParent(self, btAction)
-	btTable.setClassMetatable(self)
+	self:addParent(btAction)
+
+	self.next		= false
+	self.prev		= false
+	self.source		= false
+	self.target		= false
+	self.func		= false
+	self.inData		= {}
+	self.outData		= {}
 
 	return self
 end

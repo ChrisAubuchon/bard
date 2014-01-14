@@ -45,8 +45,12 @@ function roster:readCharacter(inName)
 
 	assert(self.characters[inName] ~= nil)
 
-	char = character:new()
-	char:fromTable(self.characters[inName])
+	if (self.characters[inName].class == "Il") or
+	   (self.characters[inName].class == "mn") then
+		char = summon:fromTable(self.characters[inName])
+	else
+		char = character:fromTable(self.characters[inName])
+	end
 
 	return char
 end
@@ -167,8 +171,7 @@ function roster:convert(inTable, inVersion)
 
 	local newchar
 
-	newchar = character:new()
-	newchar:fromTable(c)
+	newchar = character:fromTable(c)
 	newchar.xp = newchar:getXpForLevel(newchar.cur_level)
 
 	return newchar

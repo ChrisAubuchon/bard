@@ -1,4 +1,3 @@
-require "btTable"
 require "inventory"
 require "entity"
 require "battleParty"
@@ -13,23 +12,19 @@ character = {}
 -- Character class
 ----------------------------------------
 function character:new()
-	local self = {
-		isHiding	= false
-	}
+	local self = object:new()
 
-	btTable.addParent(self, bIICharacter, 
-			character, 
-			classes,
-			entity, 
-			objectHash:new(self), 
-			battleParty,
-			battlePlayer, 
-			battleBonus,
-			linkedListNode
-			)
-	btTable.setClassMetatable(self)
+	self.isHiding	= false
 
-	self.__index = self
+	self:addParent(bIICharacter)
+	self:addParent(character)
+	self:addParent(classes)
+	self:addParent(entity)
+	self:addParent(objectHash:new(self))
+	self:addParent(battleParty)
+	self:addParent(battlePlayer)
+	self:addParent(battleBonus)
+	self:addParent(linkedListNode)
 
 	return self
 end
@@ -51,7 +46,7 @@ function character:getHpString()
 	elseif (self.isPossessed) then
 		return "POSS"
 	else
-		return sprintf("%4d", self.max_hp)
+		return sprintf("%4d", self.maxHp)
 	end
 end
 
@@ -91,7 +86,7 @@ function character:getStatusLine()
 		string.sub(self.class,1,2)
 		)
 
-	rval.hp = sprintf("%4d", self.cur_hp)
+	rval.hp = sprintf("%4d", self.currentHp)
 	rval.sppt = sprintf("%3d", self.cur_sppt)
 
 	return rval
@@ -108,28 +103,33 @@ end
 -- fromTable()
 ----------------------------------------
 function character:fromTable(t)
+	local rval
 	local k
 	local v
+
+	rval = character:new()
 
 	for k,v in pairs(t) do
 		if (k ~= "inventory") then
 			if (type(v) == "table") then
-				self[k] = table.copy(v)
+				rval[k] = table.copy(v)
 			else
-				self[k] = v
+				rval[k] = v
 			end
 		else
-			self.inventory = inventory:new()
-			self.inventory:fromTable(v)
+			rval.inventory = inventory:new()
+			rval.inventory:fromTable(v)
 		end
 	end
 
-	if (not self.inventory) then
+	if (not rval.inventory) then
 		dprint("Creating empty inventory")
-		self.inventory = inventory:new()
+		rval.inventory = inventory:new()
 	end
 
-	self:setClass(self.class)
+	rval:setClass(rval.class)
+
+	return rval
 end
 			
 ----------------------------------------
@@ -140,16 +140,29 @@ function character:toTable()
 	local k
 	local v
 
-	for k,v in pairs(bIICharacter) do
-		if (k == "inventory") then
-			t["inventory"] = self.inventory:toTable()
-		elseif (type(v) == "function") then
-			dprint("Doing nothing for key: " .. tostring(k))
-			local doNothing = 1
-		else
-			t[k] = self[k]
+	local function toTable(inSelf, inDest, inHeader)
+		local k
+		local v
+
+		for k,_ in pairs(inHeader) do
+			v = inSelf[k]
+
+			if (type(v) == "function") then
+				local doNothing = 1
+			elseif (type(v) == "table") then
+				if (v.toTable) then
+					inDest[k] = v:toTable()
+				else
+					inDest[k] = table.copy(v)
+				end
+			else
+				inDest[k] = inSelf[k]
+			end
 		end
 	end
+
+	toTable(self, t, bIICharacter)
+	toTable(self, t, entity)
 
 	return t
 end
@@ -165,20 +178,24 @@ function character:clone()
 	local k
 	local v
 
-	for k,v in pairs(bIICharacter) do
-		if (type(v) == "table") then
-			rawset(rval, k, table.copy(self.v))
-		else
-			rawset(rval, k, self[k])
+	local function doClone(inSelf, inDest, inHeader)
+		local k
+		local v
+
+		for k,_ in pairs(inHeader) do
+			v = inSelf[k]
+
+			if (type(v) == "table") then
+				rawset(inDest, k, table.copy(v))
+			else
+				rawset(inDest, k, v)
+			end
 		end
 	end
-	for k,v in pairs(battleBonus) do
-		if (type(v) == "table") then
-			rawset(rval, k, table.copy(self.v))
-		else
-			rawset(rval, k, self[k])
-		end
-	end
+
+	doClone(self, rval, bIICharacter)
+	doClone(self, rval, battleBonus)
+	doClone(self, rval, entity)
 
 	rval:setClass(rval.class)
 
@@ -418,8 +435,8 @@ function character.createCharacter()
 	----------------------------------------
 	-- Set hit points
 	----------------------------------------
-	newchar.max_hp = random:xdy_z(2, 16, 1) + 14
-	newchar.cur_hp = newchar.max_hp
+	newchar.maxHp = random:xdy_z(2, 16, 1) + 14
+	newchar.currentHp = newchar.maxHp
 
 	text:clear()
 	character.printAttributes(newchar)
@@ -504,7 +521,29 @@ end
 function character:printAttributes()
 	text:print("St: %2d  IQ: %2d", self.st, self.iq)
 	text:print("\nDx: %2d  Cn: %2d", self.dx, self.cn)
-	text:print("\nLk: %2d  HP: %d", self.lk, self.max_hp)
+	text:print("\nLk: %2d  HP: %d", self.lk, self.maxHp)
+end
+
+----------------------------------------
+-- character:setBigpic()
+----------------------------------------
+function character:setBigpic()
+	bigpic:setBigpic(self.pic, self.class)
+end
+
+----------------------------------------
+-- character:printAttributeScreen()
+----------------------------------------
+function character:printAttributeScreen()
+	text:clear()
+	text:print(self.name)
+	text:print("\nRace:  " .. self.race)
+	text:print("\nClass: " .. self.class)
+	text:print("\n")
+	self:printAttributes()
+	text:print("\nLvl:%2d", self.cur_level)
+	text:print(" SpPt:%3d", self.max_sppt)
+	text:print("\nExper:%9d", self.xp)
 end
 
 ----------------------------------------
@@ -516,21 +555,13 @@ function character:printCharacter()
 	local inkey
 	local inv
 
-	bigpic:drawImage(self.pic)
-	bigpic:setTitle(self.class)
+	self:setBigpic()
 
 	repeat
-		text:clear()
-		text:print(self.name)
-		text:print("\nRace:  " .. self.race)
-		text:print("\nClass: " .. self.class)
-		text:print("\n")
-		self:printAttributes()
-		text:print("\nLvl:%2d", self.cur_level)
-		text:print(" SpPt:%3d", self.max_sppt)
-		text:print("\nExper:%9d\n", self.xp)
+		self:printAttributeScreen()
 
-		text:print("Gold:%10d", self.gold)
+		text:setCursor(0, 7)
+		text:print("\nGold:%10d", self.gold)
 		text:print("\n   (POOL GOLD)\n   (TRADE GOLD)")
 		text:printContinue()
 

@@ -2,39 +2,37 @@ require "bttable"
 require "btdebug"
 require "random"
 
-party = {
-	-- Graphics objects for party display
-	gfxRect			= gfxRect:New(24, 288, 604, 112),
-	gfxSurface		= gfxSurface:New(604, 112),
+party = object:new()
+party:addParent(battleBonus)
+party:addParent(linkedList)
 
-	size			= 0,
+-- Graphics objects for party display
+party.gfxRect		= gfxRect:New(24, 288, 604, 112)
+party.gfxSurface	= gfxSurface:New(604, 112)
 
-	-- Passive effects
-	--
-	detect		= detectEffect:new(),
-	shield		= shieldEffect:new(),
-	light		= lightEffect:new(),
-	compass		= compassEffect:new(),
-	levitate	= levitateEffect:new(),
+party.size		= 0
 
-	song		= {
-		active		= false,
-		timer		= 0,
-		acBonus		= 0,
-		lightSong	= false,
-		trapProtect	= false,
-		singer		= false
-	},
-	battle	= {
-		acBonus		= 0,
-		antiMagic	= 0,
-		songHpRegen	= 0
-	}
+-- Passive effects
+--
+party.detect	= detectEffect:new()
+party.shield	= shieldEffect:new()
+party.light	= lightEffect:new()
+party.compass	= compassEffect:new()
+party.levitate	= levitateEffect:new()
+
+party.song		= {
+	active		= false,
+	timer		= 0,
+	acBonus		= 0,
+	lightSong	= false,
+	trapProtect	= false,
+	singer		= false
 }
-
-btTable.addParent(party, battleBonus, linkedList)
-btTable.setClassMetatable(party)
-party.__index = party
+party.battle	= {
+	acBonus		= 0,
+	antiMagic	= 0,
+	songHpRegen	= 0
+}
 
 ----------------------------------------
 -- getFirstCharacter()

@@ -1,7 +1,6 @@
-roscoes = {}
+roscoes = object:new()
 
-btTable.addParent(roscoes, building:new("Roscoe's", "PIC_ROSCOEINT"))
-btTable.setClassMetatable(roscoes)
+roscoes:addParent(building:new("Roscoe's", "PIC_ROSCOEINT"))
 
 function roscoes:enter()
 	self:resetBigpic()

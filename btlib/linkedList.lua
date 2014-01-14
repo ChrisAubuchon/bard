@@ -1,7 +1,3 @@
-linkedList = {
-	head	= false,
-	tail	= false
-}
 
 ----------------------------------------
 -- linkedListNode class
@@ -31,8 +27,25 @@ end
 ----------------------------------------
 -- linkedList class
 --
---
+-- This class can be used as a parent
+-- via addParent(linkedList) or as a
+-- new object bia linkedList:new()
 ----------------------------------------
+linkedList = {
+	head	= false,
+	tail	= false
+}
+
+function linkedList:new()
+	local self = object:new()
+
+	self:addParent(linkedList)
+
+	self.head = false
+	self.tail = false
+
+	return self
+end
 
 ----------------------------------------
 -- getFirst()

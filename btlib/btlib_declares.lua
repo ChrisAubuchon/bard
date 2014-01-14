@@ -9,6 +9,9 @@ declare_global("btroster")
 declare_global("bICharacter")
 declare_global("bIICharacter")
 
+-- array.lua
+declare_global("array")
+
 -- bttable.lua
 declare_global("btTable")
 declare_global("btArray")
@@ -17,12 +20,18 @@ declare_global("btDefaultTable")
 -- diskio.lua
 declare_global("diskio")
 
+-- entity.lua
+declare_global("entity")
+
 -- level.lua
 declare_global("level")
 
 -- linkedList.lua
 declare_global("linkedList")
 declare_global("linkedListNode")
+
+-- object.lua
+declare_global("object")
 
 -- objectHash.lua
 declare_global("objectHash")

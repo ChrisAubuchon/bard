@@ -154,16 +154,14 @@ end
 
 wild = {}
 function wild:new()
-	local self = {
-		sqs	= {},
-		day	= false,
-		night	= false,
-	}
+	local self = object:new()
 
+	self:addParent(wild)
+	self:addParent(level)
 
-	btTable.addParent(self, wild, level)
-	btTable.setClassMetatable(self)
-
+	self.sqs	= {}
+	self.day	= false
+	self.night	= false
 	self.name	= "wild"
 	self.title	= wildData.title
 	self.day	= wildData.day

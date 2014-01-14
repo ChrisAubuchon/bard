@@ -1,7 +1,6 @@
-review = {}
+review = object:new()
 
-btTable.addParent(review, building:new("Review board", "PIC_REVINT"))
-btTable.setClassMetatable(review)
+review:addParent(building:new("Review board", "PIC_REVINT"))
 
 function review:nightCheck()
 	if (globals.isNight) then

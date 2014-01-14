@@ -3,20 +3,17 @@ require "bttable"
 
 textBox = {}
 function textBox:new(inRect, inChars, inFont)
-	local self = {
-		rect	= inRect,
-		tb	= false
-	}
+	local self = object:new()
 
+	self:addParent(textBox)
+
+	self.rect	= inRect
 	self.tb = SDL.NewTextbox(gfx.renderer, gfx.texture, gfx.surface, 
 				self.rect, inChars)
 	self.tb.bg_color = { 255, 255, 255, 255 }
 	self.tb.fg_color = {   0,   0,   0, 255 }
 	self.tb.hg_color = { 255, 255,   0, 255 }
 	self.tb:SetFont(inFont.font)
-
-	btTable.addParent(self, textBox)
-	btTable.setClassMetatable(self)
 
 	return self
 end

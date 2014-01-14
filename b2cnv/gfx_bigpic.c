@@ -392,6 +392,9 @@ void outputBigpic(void)
 	bpl = bigpicList_new();
 
 	for (i = 0; i < npics; i++) {
+		if (i == 52) 
+			continue;
+
 		debug("Bigpic: %d\n", i);
 		fp_moveToIndex32(fp, i, 0);
 

@@ -5,12 +5,11 @@ local objects = {}
 
 objectHash = {}
 function objectHash:new(inObject)
-	local self = {
-		key = false
-	}
+	local self = object:new()
 
-	btTable.addParent(self, objectHash)
-	btTable.setClassMetatable(self)
+	self:addParent(objectHash)
+
+	self.key = false
 
 	while true do
 		self.key = random:hash()

@@ -167,11 +167,10 @@ function tavern:enter()
 end
 
 function tavern:new(inTitle)
-	local self = {
-	}
+	local self = object:new()
 
-	btTable.addParent(self, tavern, building:new(inTitle, "PIC_BARINT"))
-	btTable.setClassMetatable(self)
+	self:addParent(tavern)
+	self:addParent(building:new(inTitle, "PIC_BARINT"))
 
 	self:enter()
 end

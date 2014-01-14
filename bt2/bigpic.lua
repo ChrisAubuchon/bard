@@ -1,43 +1,25 @@
-local __bigpic = {}
-function __bigpic:new()
-	local self = {
-		titleRect	= false,
-		titleSurface	= false,
-		gfxRect		= false,
-		activeBigpic	= nil,
-		surface		= false,
-		imgs		= false,
-		city		= {},
-		dun		= {},
-		wild		= {}
-	}
+bigpic = object:new()
 
-	btTable.addParent(self, __bigpic)
-	btTable.setClassMetatable(self)
+bigpic.activeBigpic	= nil
 
-	self.imgs	= diskio:readTable("bigpic")
-	self.city	= diskio:readTable("cityview")
-	self.wild	= diskio:readTable("wildview")
-	self.dun	= diskio:readTable("dunview")
-	self.titleRect	= gfxRect:New(32, 212, 224, 16)
-	self.gfxRect	= gfxRect:New(32, 30, 224, 176)
-	self.dun.lightRect = {}
-	self.dun.lightRect[0] = gfxRect:New(0, 0, 224, 176)
-	self.dun.lightRect[1] = gfxRect:New(0, 10, 224, 156)
-	self.dun.lightRect[2] = gfxRect:New(0, 26, 224, 108)
-	self.dun.lightRect[3] = gfxRect:New(0, 48, 224, 66)
-	self.dun.bg = {}
-	self.dun.bg[0] = gfxImage:new("images/dpics/0-bg.png", "png")
-	self.dun.bg[1] = gfxImage:new("images/dpics/1-bg.png", "png")
-	self.dun.bg[2] = gfxImage:new("images/dpics/2-bg.png", "png")
+bigpic.imgs	= diskio:readTable("bigpic")
+bigpic.city	= diskio:readTable("cityview")
+bigpic.wild	= diskio:readTable("wildview")
+bigpic.dun	= diskio:readTable("dunview")
+bigpic.titleRect	= gfxRect:New(32, 212, 224, 16)
+bigpic.gfxRect	= gfxRect:New(32, 30, 224, 176)
+bigpic.dun.lightRect = {}
+bigpic.dun.lightRect[0] = gfxRect:New(0, 0, 224, 176)
+bigpic.dun.lightRect[1] = gfxRect:New(0, 10, 224, 156)
+bigpic.dun.lightRect[2] = gfxRect:New(0, 26, 224, 108)
+bigpic.dun.lightRect[3] = gfxRect:New(0, 48, 224, 66)
+bigpic.dun.bg = {}
+bigpic.dun.bg[0] = gfxImage:new("images/dpics/0-bg.png", "png")
+bigpic.dun.bg[1] = gfxImage:new("images/dpics/1-bg.png", "png")
+bigpic.dun.bg[2] = gfxImage:new("images/dpics/2-bg.png", "png")
 
-	self.surface		= gfxSurface:New(224, 176)
-	self.titleSurface	= gfxSurface:New(224, 16)
-
-	return self
-end
-
-bigpic = __bigpic:new()
+bigpic.surface		= gfxSurface:New(224, 176)
+bigpic.titleSurface	= gfxSurface:New(224, 16)
 
 ----------------------------------------
 -- setBigpic()

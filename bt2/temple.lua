@@ -1,22 +1,11 @@
 temple = {}
 function temple:new(inName)
-	local self = {
-		name	= inName
-	}
+	local self = object:new()
 
-	dprint(self.name)
-	btTable.addParent(self, temple)
-	btTable.setClassMetatable(self)
+	self:addParent(temple)
+	self:addParent(building:new(inName, "PIC_TEMPLEINT"))
 
 	self:enter()
-end
-
-----------------------------------------
--- setBigpic()
-----------------------------------------
-function temple:setBigpic()
-	bigpic:drawImage("PIC_TEMPLEINT")
-	bigpic:setTitle(self.name)
 end
 
 ----------------------------------------
@@ -25,8 +14,7 @@ end
 function temple:enter()
 	local inkey
 
-	dprint(self.name)
-	self:setBigpic()
+	self:resetBigpic()
 
 	repeat
 		text:cdprint(true, false, 
@@ -42,6 +30,9 @@ function temple:enter()
 			end
 		end
 	until (inkey == "E")
+
+	text:clear()
+	currentLevel:turnParty("back")
 end
 
 ----------------------------------------

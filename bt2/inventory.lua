@@ -1,18 +1,17 @@
-require "bttable"
 require "items"
 
+----------------------------------------
+-- inventorySlot class
+----------------------------------------
 local inventorySlot = {}
 function inventorySlot:new(inName)
-	local self = {
-		isEquipped	= false,
-		isIdentified	= false,
-		count		= false
-	}
+	local self = items:new(inName)
 
-	btTable.addParent(self, inventorySlot, items:new(inName))
-	btTable.setClassMetatable(self)
+	self:addParent(inventorySlot)
 
-	self.__index = self
+	self.isEquipped		= false
+	self.isIdentified	= false
+	self.count		= false
 
 	return self
 end
@@ -45,16 +44,16 @@ function inventorySlot:toInventoryLine(inCharacter)
 	return rval
 end
 
+----------------------------------------
+-- inventory class
+----------------------------------------
 inventory = {}
 function inventory:new()
-	local self = {
-		maxSize		= 8
-	}
+	local self = array:new()
 
-	btTable.addParent(self, btArray, inventory)
-	btTable.setClassMetatable(self)
+	self:addParent(inventory)
 
-	self.__index = self
+	self.maxSize = 8
 
 	return self
 end
@@ -88,12 +87,12 @@ function inventory:dropItem(inSlot)
 
 		for i = 1,self.size do
 			if (self[i].name == inSlot) then
-				self:__remove(i)
+				self:remove(i)
 				return
 			end
 		end
 	elseif (type(inSlot == "number")) then
-		self:__remove(inSlot)
+		self:remove(inSlot)
 	end
 end
 
@@ -131,7 +130,7 @@ function inventory:addItem(inName, isIdentified, inCount)
 	i = inventorySlot:new(inName)
 	i.isIdentified = isIdentified
 	i.count = inCount or 1
-	self:__add(i)
+	self:add(i)
 
 	return true
 end
@@ -145,7 +144,7 @@ function inventory:fromTable(inTable)
 			local newSlot = inventorySlot:new(inTable[i].name)
 			newSlot.isEquipped = inTable[i].isEquipped
 			newSlot.isIdentified = inTable[i].isIdentified
-			self:__add(newSlot)
+			self:add(newSlot)
 		end
 	end
 end

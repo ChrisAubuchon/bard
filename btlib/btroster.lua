@@ -5,13 +5,15 @@ btroster = {}
 -- btroster class
 ----------------------------------------
 function btroster:new(inFileName, inVersion)
-	local self = {
-		fileName	= inFileName,
-		version		= inVersion,
-		diskTable	= {},
-		characters	= {},
-		parties		= {}
-	}
+	local self = object:new()
+
+	self:addParent(btroster)
+
+	self.fileName	= inFileName
+	self.version	= inVersion
+	self.diskTable	= {}
+	self.characters	= {}
+	self.parties	= {}
 
 	local function init()
 		local k
@@ -38,10 +40,6 @@ function btroster:new(inFileName, inVersion)
 			self.parties[k] = v
 		end
 	end
-
-
-	btTable.addParent(self, btroster)
-	btTable.setClassMetatable(self)
 
 	init()
 

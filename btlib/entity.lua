@@ -1,10 +1,25 @@
 ----------------------------------------
 -- entity class
--- Base class for a monster or character
 ----------------------------------------
 
 entity = {
-	className	= "entity"
+	name		= "",
+	class		= false,
+	currentHp	= 0,
+	maxHp		= 0,
+	ac		= 10,
+
+	gold		= 0,
+
+	isDead		= false,
+	isOld		= false,
+	isPoisoned	= false,
+	isStoned	= false,
+	isParalyzed	= false,
+	isPossessed	= false,
+	isNuts		= false,
+
+	numAttacks	= 1
 }
 
 function entity:isCharacter()

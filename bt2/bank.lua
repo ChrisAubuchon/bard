@@ -1,9 +1,8 @@
-bank = {
-	accounts = diskio:readTable("accounts", true)
-}
+bank = object:new()
 
-btTable.addParent(bank, building:new("The bank", "PIC_BANKINT"))
-btTable.setClassMetatable(bank)
+bank:addParent(building:new("The bank", "PIC_BANKINT"))
+
+bank.accounts = diskio:readTable("accounts", true)
 
 ----------------------------------------
 -- saveAccounts()

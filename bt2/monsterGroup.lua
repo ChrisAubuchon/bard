@@ -2,24 +2,22 @@
 monsterGroup = {}
 
 function monsterGroup:new(inName, inSize)
-	local self = {
-		size		= 0,
-		range		= false,
-		name		= inName,
-		isIllusion	= false
-	}
+	local self = object:new()
 
-	btTable.addParent(self, monsterGroup)
-	btTable.addParent(self, monster) 
-	btTable.addParent(self, linkedList)
-	btTable.addParent(self, linkedListNode)
-	btTable.addParent(self, monster.base(inName)) 
-	btTable.addParent(self, objectHash:new(self))
-	btTable.addParent(self, battleMonster)
-	btTable.addParent(self, entity)
-	btTable.addParent(self, battleBonus)
-	btTable.setClassMetatable(self)
-	self.range = self.distance
+	self:addParent(monsterGroup)
+	self:addParent(monster) 
+	self:addParent(linkedList)
+	self:addParent(linkedListNode)
+	self:addParent(monster.base(inName)) 
+	self:addParent(objectHash:new(self))
+	self:addParent(battleMonster)
+	self:addParent(entity)
+	self:addParent(battleBonus)
+
+	self.size	= 0
+	self.range	= self.distance
+	self.name	= inName
+	self.isIllusion	= false
 
 	local m
 
@@ -44,7 +42,7 @@ function monsterGroup:addMonster()
 	local m 	= monster:new(self.name)
 
 	m.parentGroup = self
-	btTable.addParent(m, battleMonster)
+	m:addParent(battleMonster)
 
 	self:insertTail(m)
 	self.size = self.size + 1

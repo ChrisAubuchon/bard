@@ -41,14 +41,16 @@ end
 ----------------------------------------
 gfxImage = {}
 function gfxImage:new(inName, inType)
-	local self = {
-		surface	= false,
-		isAnim	= false
-	}
-
 	if (inName == nil) then
 		error("nil image name")
 	end
+
+	local self = object:new()
+
+	self:addParent(gfxImage)
+
+	self.surface	= false
+	self.isAnim	= false
 
 	if (inType == "png") then
 		self.surface = SDL.LoadPNG(inName)
@@ -56,9 +58,6 @@ function gfxImage:new(inName, inType)
 		self.surface = SDL.LoadBTA(inName)
 		self.isAnim = true
 	end
-
-	btTable.addParent(self, gfxImage)
-	btTable.setClassMetatable(self)
 
 	return self
 end
@@ -105,9 +104,9 @@ end
 ----------------------------------------
 gfxFont = {}
 function gfxFont:new(inName, inMonoFlag)
-	local self = {
-		font	= false
-	}
+	local self = object:new()
+
+	self:addParent(self, gfxFont)
 
 	if (inMonoFlag) then
 		self.font = SDL.font.Open(inName,
@@ -118,9 +117,6 @@ function gfxFont:new(inName, inMonoFlag)
 				SDL.font.FONT_BTF,
 				SDL.font.BTF_VARWIDTH)
 	end
-
-	btTable.addParent(self, gfxFont)
-	btTable.setClassMetatable(self)
 
 	return self
 end
@@ -154,16 +150,15 @@ end
 ----------------------------------------
 gfxSurface = {}
 function gfxSurface:New(inWidth, inHeight)
-	local self = {
-		surface = false
-	}
+	local self = object:new()
+
+	self:addParent(gfxSurface)
+
+	self.surface = false
 
 	if ((inWidth) and (inHeight)) then
 		self.surface = SDL.CreateRGBSurface(inWidth, inHeight, 32)
 	end
-
-	btTable.addParent(self, gfxSurface)
-	btTable.setClassMetatable(self)
 
 	return self
 end

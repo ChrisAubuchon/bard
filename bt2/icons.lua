@@ -75,13 +75,12 @@ icons.ICON_COMPASS	= 5
 -- new()
 ----------------------------------------
 function icons:new(inType)
-	local self = {
-		type		= inType,
-		gfx		= false,
-		clear		= false,
-		rectangle	= false,
-		active		= false
-	}
+	local self = object:new()
+
+	self:addParent(icons)
+
+	self.type	= inType
+	self.active	= false
 
 	local data = iconData[inType]
 	if (inType == icons.ICON_COMPASS) then
@@ -96,9 +95,6 @@ function icons:new(inType)
 
 	self.clear = gfxImage:new(data.clear, data.clearType)
 	self.rectangle = gfxRect:New(data.x, data.y, data.w, data.h)
-
-	btTable.addParent(self, icons)
-	btTable.setClassMetatable(self)
 
 	return self
 end

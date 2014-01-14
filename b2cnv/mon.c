@@ -77,6 +77,8 @@ static monster_t *convertMonster(b2mon_t *inMonster)
 	m->toHitHi	= inMonster->baseac2hit + 3;
 	m->pronoun	= (inMonster->flags & 1) ? 0 : 1;
 
+	m->numAttacks	= inMonster->numattacks + 1;
+
 #define CAP(x,y)  ((x) > (y)) ? (y) : (x)
 	m->priorityLo	= CAP(((inMonster->basemelee << 2) | 1), 0xff);
 	m->priorityLo	= CAP((((inMonster->basemelee << 2) | 1) + 31), 0xff);

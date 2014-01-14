@@ -4,13 +4,10 @@ local _items = diskio:readTable("items")
 
 items = {}
 function items:new(inName)
-	local self = {
-	}
-
-	btTable.addParent(self, _items[inName], items)
-	btTable.setClassMetatable(self)
-
-	self.__index = self
+	local self = object:new()
+	
+	self:addParent(_items[inName])
+	self:addParent(items)
 
 	return self
 end

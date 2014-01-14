@@ -1,13 +1,12 @@
 monsterParty = {}
 function monsterParty:new()
-	local self = {
-		size		= 0
-	}
+	local self = object:new()
 
-	btTable.addParent(self, monsterParty, battleBonus, linkedList)
-	btTable.setClassMetatable(self)
+	self:addParent(monsterParty)
+	self:addParent(battleBonus)
+	self:addParent(linkedList)
 
-	self.__index = self
+	self.size = 0
 
 	return self
 end

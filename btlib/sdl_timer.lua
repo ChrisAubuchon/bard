@@ -4,14 +4,11 @@ timer = {}
 -- new()
 ----------------------------------------
 function timer:new(inFunction, inInterval)
-	local self = {
-		timer	= false
-	}
+	local self = object:new()
+
+	self:addParent(timer)
 
 	self.timer = SDL.AddTimer(inFunction, inInterval)
-
-	btTable.addParent(self, timer)
-	btTable.setClassMetatable(self)
 
 	return self
 end

@@ -1,13 +1,13 @@
 local shoppe = {}
 function shoppe:new(inTitle, inPic, inGreeting, inFileName)
-	local self = {
-		greeting	= inGreeting,
-		fileName	= inFileName,
-		inventory	= diskio:readTable(inFileName)
-	}
+	local self = object:new()
 
-	btTable.addParent(self, shoppe, building:new(inTitle, inPic))
-	btTable.setClassMetatable(self)
+	self.greeting	= inGreeting
+	self.fileName	= inFileName
+	self.inventory	= diskio:readTable(inFileName)
+
+	self:addParent(shoppe)
+	self:addParent(building:new(inTitle, inPic))
 
 	return self
 end
