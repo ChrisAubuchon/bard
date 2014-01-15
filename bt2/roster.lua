@@ -119,7 +119,7 @@ function roster:convert(inTable, inVersion)
 		"name", "race", "class", 
 		"st", "iq", "dx", "lk", "cn",
 		"save_st", "save_iq", "save_dx", "save_lk", "save_cn",
-		"ac", "cur_hp", "max_hp", "cur_sppt", "max_sppt",
+		"ac", "currentHp", "maxHp", "currentSppt", "maxSppt",
 		"xp", "gold", "cur_level", "max_level", "rogu_level",
 		"hunt_level", "songs", "isDoppelganger", "isDead",
 		"isOld", "isPoisoned", "isStoned", "isParalyzed",

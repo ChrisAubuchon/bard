@@ -273,7 +273,7 @@ local function __doHeal(inAction, inTarget)
 	local inData	= inAction.inData
 
 	if (inData.fullHeal) then
-		inTarget.cur_hp = inTarget.max_hp
+		inTarget.currentHp = inTarget.maxHp
 	else
 		local hpHealed = 0
 
@@ -282,9 +282,9 @@ local function __doHeal(inAction, inTarget)
 			hpHealed = random:xdy(inData.ndice, inData.dieval)
 		end
 
-		inTarget.cur_hp = inTarget.cur_hp + hpHealed
-		if (inTarget.cur_hp > inTarget.max_hp) then
-			inTarget.cur_hp = inTarget.max_hp
+		inTarget.currentHp = inTarget.currentHp + hpHealed
+		if (inTarget.currentHp > inTarget.maxHp) then
+			inTarget.currentHp = inTarget.maxHp
 		end
 	end
 
@@ -305,7 +305,7 @@ local function __doHeal(inAction, inTarget)
 			end
 		end
 
-		inTarget.cur_hp = 1
+		inTarget.currentHp = 1
 		inTarget.possessed = false
 
 		if (currentBattle) then

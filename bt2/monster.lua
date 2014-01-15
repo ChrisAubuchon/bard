@@ -1,36 +1,17 @@
 monster = {}
 
-local _monsters
-_monsters = diskio:readTable("monsters")
-
-local m
-local a
-
-for _,m in pairs(_monsters) do
-	for _,a in ipairs(m.attacks) do
-		compileAction(a.action)
-	end
-end
-
 function monster:new(inName)
-	local self = {
-		beenAttacked	= false,
-		maxHP		= 0,
-		curHP		= 0,
-		ac		= 10,
-		parentGroup	= false,
-	}
+	local self = object:new()
 
-	btTable.addParent(self, monster, 
-			_monsters[inName], 
-			entity,
-			objectHash:new(self),
-			linkedListNode
-			)
-	btTable.setClassMetatable(self)
+	self:addParent(monster)
+	self:addParent(monsterData[inName])
+	self:addParent(entity)
+	self:addParent(linkedListNode)
 
-	self.maxHP = self.hpBase + random:xdy(self.hpRndNDice, self.hpRndDie)
-	self.curHP = self.maxHP
+	self.beenAttacked	= false
+	self.parentGroup	= false
+
+	self:generateHp()
 	self.ac		= self.baseAC
 
 	self.__index = self
@@ -60,6 +41,14 @@ function monster:advanceGroup()
 	for m in parent:iterator() do
 		currentBattle:removePriority(m)
 	end
+end
+
+----------------------------------------
+-- monster:generateHp()
+----------------------------------------
+function monster:generateHp()
+	self.maxHp = self.hpBase + random:xdy(self.hpRndNDice, self.hpRndDie)
+	self.currentHp = self.maxHp
 end
 
 function monster:getMultiString()
@@ -121,29 +110,3 @@ function monster:getTargetString()
 	return string.format("a %s", self.singular)
 end
 
-function monster.getXPReward(inType)
-	assert(_monsters[inType])
-
-	return _monsters[inType].reward
-end
-
-function monster.typeTable()
-	local t = {}
-
-	function t:toArray() 
-		local r = {}
-
-		for i,_ in pairs(_monsters) do
-			table.insert(r, i)
-		end
-
-		table.sort(r)
-		return r
-	end
-
-	return t
-end
-
-function monster.base(inType)
-	return _monsters[inType]
-end

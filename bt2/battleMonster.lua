@@ -171,8 +171,8 @@ function battleMonster:doDamage(inAction)
 	if ((outData.specialAttack ~= "stone") and
 	    (outData.specialAttack ~= "critical")) then
 		outData.specialAttack = false
-		if (outData.damage < target.curHP) then
-			target.curHP = target.curHP - outData.damage
+		if (outData.damage < target.currentHp) then
+			target.currentHp = target.currentHp - outData.damage
 			target.beenAttacked = true
 			return false
 		else

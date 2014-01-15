@@ -1,3 +1,10 @@
+require "random"
+
+----------------------------------------
+-- Table to hold all objects
+----------------------------------------
+local objectData = {}
+
 ----------------------------------------
 -- object class
 --
@@ -6,14 +13,23 @@
 ----------------------------------------
 
 object = {}
-function object:new()
-	local self = {
-		__parents =	{}
-	}
+function object:new(inTable)
+	local self = inTable or {}
 
+	self.__parents	= {}
 	table.insert(self.__parents, object)
+
+	while true do
+		self.key = random:hash()
+		if (not objectData[self.key]) then
+			objectData[self.key] = true
+			break
+		end
+	end
+
 	setmetatable(self, {
-		__index = object.index
+		__index = object.index,
+		__gc	= object.gc
 		}
 	)
 
@@ -81,6 +97,13 @@ function object:index(inKey)
 		self[inKey] = v
 		return v
 	end
+end
+
+----------------------------------------
+-- object:gc()
+----------------------------------------
+function object:gc()
+	objectData[self.key] = nil
 end
 
 ----------------------------------------

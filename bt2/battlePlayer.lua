@@ -183,7 +183,7 @@ function battlePlayer:getCombatSpell(inAction)
 		return false
 	end
 
-	if (self.cur_sppt < s.sppt) then
+	if (self.currentSppt < s.sppt) then
 		text:cdprint(false, true, "\nNot enough spell points.")
 		return false
 	end

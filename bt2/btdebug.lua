@@ -463,7 +463,7 @@ function btdebug.doBattle()
 	end
 
 	for i = 1,ngroups do
-		g = text:scrollingSelect(monster.typeTable(), printItem)
+		g = text:scrollingSelect(monsterData, printItem)
 		if (not g) then return end
 
 		text:cdprint(true, false, "Enter group size:")

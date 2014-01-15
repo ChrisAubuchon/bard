@@ -69,12 +69,12 @@ function review:doAdvancement()
 	char.cur_level = char.cur_level + 1
 	char.max_level = char.cur_level
 
-	char.cur_hp = char.cur_hp + (random:rnd() % char.hpDice)
+	char.currentHp = char.currentHp + (random:rnd() % char.hpDice)
 	if (char.cn > 14) then
-		char.cur_hp = char.cur_hp + (char.cn - 14)
+		char.currentHp = char.currentHp + (char.cn - 14)
 	end
-	char.cur_hp = char.cur_hp + 1
-	char.max_hp = char.cur_hp
+	char.currentHp = char.currentHp + 1
+	char.maxHp = char.currentHp
 
 	if (char.class == "Rogue") then
 		char.rogu_level = char.rogu_level + (random:rnd() % 7)
@@ -101,12 +101,12 @@ function review:doAdvancement()
 			char.num_attacks = 8
 		end
 	elseif (char:getSpellLevel()) then
-		char.cur_sppt = char.cur_sppt + (random:rnd() % 3)
+		char.currentSppt = char.currentSppt + (random:rnd() % 3)
 		if (char.iq > 14) then
-			char.cur_sppt = char.cur_sppt + (char.iq - 14)
+			char.currentSppt = char.currentSppt + (char.iq - 14)
 		end
-		char.cur_sppt = char.cur_sppt + 1
-		char.max_sppt = char.cur_sppt
+		char.currentSppt = char.currentSppt + 1
+		char.maxSppt = char.currentSppt
 	end
 	self:advanceRandomStat(char)
 	party:display()

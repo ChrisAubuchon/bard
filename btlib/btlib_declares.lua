@@ -33,9 +33,6 @@ declare_global("linkedListNode")
 -- object.lua
 declare_global("object")
 
--- objectHash.lua
-declare_global("objectHash")
-
 -- random.lua
 declare_global("random")
 

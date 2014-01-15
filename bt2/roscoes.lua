@@ -16,12 +16,12 @@ function roscoes:doReenergize(inChar)
 	local rechargeCost
 
 	text:cdprint(true, false, inChar.name)
-	if (inChar.cur_sppt >= inChar.max_sppt) then
+	if (inChar.currentSppt >= inChar.maxSppt) then
 		text:cdprint(false, true, " does not require restoration")
 		return
 	end
 
-	rechargeCost = (inChar.max_sppt - inChar.cur_sppt) * 15
+	rechargeCost = (inChar.maxSppt - inChar.currentSppt) * 15
 	text:print(
 		" has some definite spell point problems. It will cost " ..
 		"%d in gold. Who will pay?", 
@@ -40,7 +40,7 @@ function roscoes:doReenergize(inChar)
 	end
 
 	payer.gold = payer.gold - rechargeCost
-	inChar.cur_sppt = inChar.max_sppt
+	inChar.currentSppt = inChar.maxSppt
 	text:cdprint(true, true, "\n\nRoscoe re-energizes him.")
 	party:display()
 end

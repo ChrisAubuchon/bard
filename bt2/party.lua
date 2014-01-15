@@ -447,10 +447,10 @@ function party:doPoison()
 		if (c.isPoisoned) then
 			doResort = true
 
-			c.cur_hp = c.cur_hp - currentLevel:getPoisonDamage()
+			c.currentHp = c.currentHp - currentLevel:getPoisonDamage()
 
-			if (c.cur_hp <= 0) then
-				c.cur_hp = 0
+			if (c.currentHp <= 0) then
+				c.currentHp = 0
 				c.isDead = true
 			end
 		end
@@ -469,8 +469,8 @@ function party:regenSpellPoints()
 	local update = false
 
 	for c in self:characterIterator() do
-		if (c.cur_sppt < c.max_sppt) then
-			c.cur_sppt = c.cur_sppt + 1
+		if (c.currentSppt < c.maxSppt) then
+			c.currentSppt = c.currentSppt + 1
 			update = true
 		end
 	end
@@ -492,16 +492,16 @@ function party:doEquippedEffects()
 
 	for c in self:characterIterator() do
 		if (c:isEffectEquipped("hasSpptRegen")) then
-			if (c.cur_sppt < c.max_sppt) then
-				c.cur_sppt = c.cur_sppt + 1
+			if (c.currentSppt < c.maxSppt) then
+				c.currentSppt = c.currentSppt + 1
 				update = true
 			end
 		end
 
 		if (self.song.regenHp or c:isEffectEquipped("hasRegenHP")) then
 			if (not c:isDisabled()) then
-				if (c.cur_hp < c.max_hp) then
-					c.cur_hp = c.cur_hp + 1
+				if (c.currentHp < c.maxHp) then
+					c.currentHp = c.currentHp + 1
 					update = true
 				end
 			end
@@ -775,7 +775,7 @@ function party:castSpell()
 		return
 	end
 
-	if (s.sppt > char.cur_sppt) then
+	if (s.sppt > char.currentSppt) then
 		text:cdcprint(false, true, true, 
 			"\nNot enough spells points.")
 		return
@@ -936,8 +936,8 @@ function party:meleeMarch()
 	local c
 
 	for c in self:characterIterator() do
-		if ((c.cur_hp + 3) <= c.max_hp) then
-			c.cur_hp = c.cur_hp + 3
+		if ((c.currentHp + 3) <= c.maxHp) then
+			c.currentHp = c.currentHp + 3
 		end
 	end
 

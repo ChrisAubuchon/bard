@@ -8,8 +8,7 @@ function monsterGroup:new(inName, inSize)
 	self:addParent(monster) 
 	self:addParent(linkedList)
 	self:addParent(linkedListNode)
-	self:addParent(monster.base(inName)) 
-	self:addParent(objectHash:new(self))
+	self:addParent(monsterData[inName]) 
 	self:addParent(battleMonster)
 	self:addParent(entity)
 	self:addParent(battleBonus)
@@ -50,7 +49,6 @@ end
 
 function monsterGroup:removeMonster(inMonster)
 	self:remove(inMonster)
-	inMonster:deleteKey()
 	self.size = self.size - 1
 end
 

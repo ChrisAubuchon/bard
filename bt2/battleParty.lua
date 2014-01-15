@@ -105,10 +105,10 @@ function battleParty:doDamage(inAction)
 	end
 
 	if (outData.damage > 0) then
-		if (self.cur_hp > outData.damage) then
-			self.cur_hp = self.cur_hp - outData.damage
+		if (self.currentHp > outData.damage) then
+			self.currentHp = self.currentHp - outData.damage
 		else
-			self.cur_hp = 0
+			self.currentHp = 0
 			self.possessed = false
 			self.isDead = true
 
@@ -186,7 +186,7 @@ function battleParty:inflictStatus(inAction)
 		if (self.isDestinyKnight) then
 			return true
 		end
-		self.cur_hp = 100
+		self.currentHp = 100
 		self.isPossessed	= true
 		self.isDead		= false
 		self.isPoisoned		= false
@@ -198,15 +198,15 @@ function battleParty:inflictStatus(inAction)
 		if (self.isDestinyKnight) then
 			return true
 		end
-		self.cur_hp		= 0
+		self.currentHp		= 0
 		self.isStoned		= true
 		self:songTimeout()
 	elseif ((inData.specialAttack == "critical") or 
 		(inData.specialAttack == "kill")) then
 		if (self.isDestinyKnight) then
-			self.cur_hp = self.max_hp
+			self.currentHp = self.maxHp
 		else
-			self.cur_hp		= 0
+			self.currentHp		= 0
 			self.possessed		= false
 			self.isDead		= true
 		end

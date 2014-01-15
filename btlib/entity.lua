@@ -7,6 +7,10 @@ entity = {
 	class		= false,
 	currentHp	= 0,
 	maxHp		= 0,
+
+	currentSppt	= 0,
+	maxSppt		= 0,
+
 	ac		= 10,
 
 	gold		= 0,
@@ -19,7 +23,15 @@ entity = {
 	isPossessed	= false,
 	isNuts		= false,
 
-	numAttacks	= 1
+	numAttacks	= 1,
+
+	spellLevel = {
+		Magician	= 0,
+		Conjurer	= 0,
+		Sorcerer	= 0,
+		Wizard		= 0,
+		Archmage	= 0
+	}
 }
 
 function entity:isCharacter()

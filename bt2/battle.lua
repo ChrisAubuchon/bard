@@ -1,4 +1,3 @@
-require "objectHash"
 require "character"
 require "monster"
 require "btdebug"
@@ -102,6 +101,8 @@ function battleData:new()
 		actionTail		= false,
 		battleDataBySource	= {},
 		killCount		= btTable.new(true),
+		songToHitBonus		= 0,
+		sontDamageBonus		= 0,
 
 		--
 		-- The songToHitPenalty isn't used in the DOS version
@@ -126,7 +127,6 @@ end
 -- battleData:addAction()
 ----------------------------------------
 function battleData:addAction(inSource, inAction)
-	dprint(inSource.key)
 	dprint(inSource.singular)
 	dprint(inAction)
 	self.battleDataBySource[inSource.key] = inAction
@@ -415,8 +415,8 @@ function battleData:endRound()
 		local char
 
 		for char in party:iterator("skipDisabled") do
-			if (char.max_hp > char.cur_hp) then
-				char.cur_hp = char.cur_hp + 1
+			if (char.maxHp > char.currentHp) then
+				char.currentHp = char.currentHp + 1
 			end
 		end
 	end
@@ -432,7 +432,7 @@ function battleData:postRoundCleanup()
 	local c
 
 	c = party.summon
-	if ((c) and ((c.cur_hp == 0) or (c.isStoned) or (c.isParalyzed) or
+	if ((c) and ((c.currentHp == 0) or (c.isStoned) or (c.isParalyzed) or
 		     (c.isDead))) then
 		dprint("Removing summon")
 		party:removeSummon()
@@ -636,7 +636,7 @@ function battleData:getPlayerOption(c)
 		text:print("Defend\n")
 		options["D"] = true
 
-		if (c.cur_sppt > 0) then
+		if (c.currentSppt > 0) then
 			text:print("Cast a spell\n")
 			options["C"] = true
 		end
@@ -778,7 +778,7 @@ function battleData:doReward()
 
 	for mgroup,nmonsters in pairs(self.killCount) do
 		for i = 1,nmonsters do
-			xp = xp + monster.getXPReward(mgroup)
+			xp = xp + monsterData:getXPReward(mgroup)
 			if (random:band(7) == 0) then
 				itemsToGive = itemsToGive + 1
 			end
@@ -862,6 +862,9 @@ function battleData:doReward()
 end
 
 
+----------------------------------------
+-- battleData:convertPreBattleSong
+----------------------------------------
 function battleData:convertPreBattleSong()
 	if (party.song.active) then
 		local singer = party.song.singer

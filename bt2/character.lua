@@ -3,7 +3,6 @@ require "entity"
 require "battleParty"
 require "battlePlayer"
 require "race"
-require "objectHash"
 require "classes"
 
 character = {}
@@ -20,7 +19,6 @@ function character:new()
 	self:addParent(character)
 	self:addParent(classes)
 	self:addParent(entity)
-	self:addParent(objectHash:new(self))
 	self:addParent(battleParty)
 	self:addParent(battlePlayer)
 	self:addParent(battleBonus)
@@ -82,12 +80,12 @@ function character:getStatusLine()
 		self.name, 
 		self:getAcString(),
 		self:getHpString(),
-		self.cur_sppt,
+		self.currentSppt,
 		string.sub(self.class,1,2)
 		)
 
 	rval.hp = sprintf("%4d", self.currentHp)
-	rval.sppt = sprintf("%3d", self.cur_sppt)
+	rval.sppt = sprintf("%3d", self.currentSppt)
 
 	return rval
 end
@@ -481,13 +479,13 @@ function character.createCharacter()
 		newchar.spellLevel[newchar.class] = 1
 
 		if (newchar.iq > 15) then
-			newchar.max_sppt = 10 + (18 - newchar.iq)
+			newchar.maxSppt = 10 + (18 - newchar.iq)
 		else
-			newchar.max_sppt = 10
+			newchar.maxSppt = 10
 		end
 
-		newchar.max_sppt = newchar.max_sppt + (random:rnd() % 8)
-		newchar.cur_sppt = newchar.max_sppt
+		newchar.maxSppt = newchar.maxSppt + (random:rnd() % 8)
+		newchar.currentSppt = newchar.maxSppt
 	end
 
 	newchar.inventory = inventory:new()
@@ -542,7 +540,7 @@ function character:printAttributeScreen()
 	text:print("\n")
 	self:printAttributes()
 	text:print("\nLvl:%2d", self.cur_level)
-	text:print(" SpPt:%3d", self.max_sppt)
+	text:print(" SpPt:%3d", self.maxSppt)
 	text:print("\nExper:%9d", self.xp)
 end
 
@@ -926,11 +924,11 @@ function character:consumeSpellPoints(inAction)
 		req = bits32.arshift(req, 1)
 	end
 
-	if (req > self.cur_sppt) then
+	if (req > self.currentSppt) then
 		return true
 	end
 
-	self.cur_sppt = self.cur_sppt - req
+	self.currentSppt = self.currentSppt - req
 
 	return false
 end

@@ -2,13 +2,22 @@
 ----------------------------------------
 -- linkedListNode class
 ----------------------------------------
-
-
 linkedListNode = {
 	prev	= false,
 	next	= false
 }
 
+function linkedListNode:new()
+	local self = object:new()
+
+	self:addParent(linkedListNode)
+
+	return self
+end
+
+----------------------------------------
+-- linkedListNode:compare()
+----------------------------------------
 function linkedListNode:compare(inValue)
 	return false
 end

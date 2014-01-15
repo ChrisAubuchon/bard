@@ -53,7 +53,6 @@ end
 ----------------------------------------
 function monsterParty:removeMonsterGroup(inGroup)
 	self.size = self.size - 1
-	inGroup:deleteKey()
 	self:remove(inGroup)
 end
 

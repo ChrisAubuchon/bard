@@ -3,36 +3,32 @@ summon = {}
 ----------------------------------------
 -- summon:new()
 ----------------------------------------
-function summon:new(inName, inIsIllusion)
-	local self = {
-		isIllusion	= inIsIllusion,
-		monsterType	= inName
-	}
+function summon:new(inType, inIsIllusion)
+	local self = linkedListNode:new()
 
+	self:addParent(summon)
+	self:addParent(monsterData[inType])
+	self:addParent(battleParty)
+	self:addParent(battleSummon)
+	self:addParent(character)
+	self:addParent(battleBonus)
+	self:addParent(monster)
+	self:addParent(entity)
 
-	btTable.addParent(self, summon)
-	btTable.addParent(self, battleParty)
-	btTable.addParent(self,	monster:new(inName))
-	btTable.addParent(self,	character)
-	btTable.addParent(self,	bIICharacter)
-	btTable.addParent(self,	battleBonus)
-	btTable.addParent(self,	linkedListNode)
-	btTable.addParent(self, entity)
-	btTable.setClassMetatable(self)
+	self.isIllusion		= inIsIllusion
+	self.monsterType	= inType
+
+	self:generateHp()
 
 	self.baseAC	= self.ac
 	self.name	= self.singular
 	self.inventory	= inventory:new()
-	self.currentHp	= self.curHP
-	self.maxHp	= self.maxHP
 
 	if (self.isIllusion) then
 		self.class = "Il"
 	else
 		self.class = "Mn"
 	end
-
-	self.__index = self
 
 	return self
 end

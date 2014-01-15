@@ -49,7 +49,7 @@ function temple:doHealing(inChar)
 		if (not self:restoreLife(inChar)) then
 			return
 		end
-	elseif (inChar.cur_hp < inChar.max_hp) then
+	elseif (inChar.currentHp < inChar.maxHp) then
 		if (not self:healHp(inChar)) then
 			return	
 		end
@@ -108,8 +108,8 @@ function temple:healAffliction(inChar)
 		inChar.lk = inChar.save_lk
 	end
 
-	if (inChar.cur_hp == 0) then
-		inChar.cur_hp = 1
+	if (inChar.currentHp == 0) then
+		inChar.currentHp = 1
 	end
 
 	inChar.isDead = false
@@ -184,14 +184,14 @@ end
 function temple:healHp(inChar)
 	local cost
 
-	cost = 10 * (inChar.max_hp - inChar.cur_hp)
+	cost = 10 * (inChar.maxHp - inChar.currentHp)
 	text:print(" has wounds which need tending. It will cost ")
 
 	if (not self:getPayer(cost)) then
 		return false
 	end
 
-	inChar.cur_hp = inChar.max_hp
+	inChar.currentHp = inChar.maxHp
 
 	return true
 end

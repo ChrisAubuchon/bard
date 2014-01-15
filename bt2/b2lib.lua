@@ -1,4 +1,3 @@
-
 ----------------------------------------
 -- Check if a string is a number 
 -- >= low and <= high
@@ -46,6 +45,8 @@ function keyboardCommand(inkey)
 		party:castSpell()
 		text:clear()
 		return true
+	elseif (inkey == "G") then
+		collectgarbage()
 	elseif (inkey == "N") then
 		party:reorder()
 		text:clear()

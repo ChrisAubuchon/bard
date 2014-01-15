@@ -71,9 +71,6 @@ declare_global("shieldEffect")
 declare_global("levitateEffect")
 declare_global("detectEffect")
 
--- entity.lua
-declare_global("entity")
-
 -- garths.lua
 declare_global("garths")
 
@@ -105,15 +102,10 @@ declare_global("linkedList")
 declare_global("linkedListNode")
 
 -- monster.lua
+declare_global("monsterData")
 declare_global("monster")
 declare_global("monsterGroup")
 declare_global("monsterParty")
-
--- noncombat.lua
-declare_global("noncombat")
-
--- objectHash.lua
-declare_global("objectHash")
 
 -- party.lua
 declare_global("party")
