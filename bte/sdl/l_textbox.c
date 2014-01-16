@@ -34,7 +34,6 @@ typedef struct {
 	uint32_t	y;		/* Cursor y coordinate		*/
 	uint32_t	ws;
 	uint32_t	nchars;	
-	uint32_t	max;
 } l_textbox;
 
 /********************************/
@@ -132,7 +131,6 @@ static void _textbox_newline(l_textbox *tb)
 
 	/* Clear the whitespace and number of chars counters */
 	tb->ws = 0;
-	tb->max = tb->maxChar;
 	tb->nchars = 0;
 
 	/* Scroll the text */
@@ -206,30 +204,44 @@ static void _update_screen(l_textbox *tb)
 /*#define MAX_CHAR	20*/
 static uint32_t _textbox_wrap(l_textbox *tb, btstring_t *str, uint32_t base)
 {
+	uint32_t	max;
 	uint32_t nchars = 0;
 	uint32_t ncaps = 0;
 	uint8_t *textp;
 
+	max = tb->maxChar - tb->nchars;
+
 	textp = &str->buf[base];
 
+	debug("textp = '%s'\n", textp);
+	debug("max = %d\n", max);
+
 	while ((*textp != '\0') && (*textp != '\n')) {
-		if ((tb->nchars + nchars) > tb->maxChar) 
+		if ((tb->nchars + nchars) >= tb->maxChar) 
 			break;
 
 		if ((*textp == 'm') || ((*textp != ' ') && (!islower(*textp)))){
 			ncaps++;
 
-			tb->max = tb->max - (((ncaps * 2) + tb->ws + 4) / 6);
+			max = tb->maxChar - tb->nchars - (((ncaps * 2)+4) / 6);
 		}
 		nchars++;
 		textp++;
 	}
 
-	if ((tb->nchars + nchars) < tb->max)
-		return nchars;
+	debug("nchars = %d\n", nchars);
+	debug("max = %d\n", max);
 
-	while ((*--textp != ' ') && (nchars))
+/*	if ((tb->nchars + nchars) < tb->maxChar) {*/
+	if (nchars < max) {
+		debug("Returning nchars\n");
+		return nchars;
+	}
+
+	while ((*--textp != ' ') && (nchars)) {
+		debug("Stripping back\n");
 		nchars--;
+	}
 
 	return nchars;
 }
@@ -257,7 +269,6 @@ static int l_textbox_new(lua_State *L)
 	tb->screen	= l_checkSurface(L, 3);
 	tb->rect	= l_checkRect(L, 4);
 	tb->maxChar	= (uint32_t)luaL_checkinteger(L, 5);
-	tb->max		= tb->maxChar;
 	tb->font = NULL;
 
 	tb->x = 0;
@@ -409,7 +420,6 @@ static int l_textbox_clear(lua_State *L)
 	tb->y = 0;
 	tb->ws = 0;
 	tb->nchars = 0;
-	tb->max = tb->maxChar;
 }
 
 static int l_textbox_free(lua_State *L)
@@ -489,7 +499,7 @@ static int l_textbox_print(lua_State *L)
 #endif
 		nchars = _textbox_wrap(tb, text, index);
 
-		while ((tb->x == 0) && (text->buf[index] == ' '))
+		while ((tb->x == 0) && (index != 0) && (text->buf[index] == ' '))
 			index++;
 
 		if (nchars) {
