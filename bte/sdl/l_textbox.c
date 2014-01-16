@@ -34,6 +34,7 @@ typedef struct {
 	uint32_t	y;		/* Cursor y coordinate		*/
 	uint32_t	ws;
 	uint32_t	nchars;	
+	uint32_t	max;
 } l_textbox;
 
 /********************************/
@@ -131,6 +132,7 @@ static void _textbox_newline(l_textbox *tb)
 
 	/* Clear the whitespace and number of chars counters */
 	tb->ws = 0;
+	tb->max = tb->maxChar;
 	tb->nchars = 0;
 
 	/* Scroll the text */
@@ -204,29 +206,26 @@ static void _update_screen(l_textbox *tb)
 /*#define MAX_CHAR	20*/
 static uint32_t _textbox_wrap(l_textbox *tb, btstring_t *str, uint32_t base)
 {
-	uint32_t max;
 	uint32_t nchars = 0;
 	uint32_t ncaps = 0;
 	uint8_t *textp;
 
-	max = tb->maxChar - ((tb->ws + 4) / 6);
-
 	textp = &str->buf[base];
 
-	while ((*textp != '\0') && (*textp != '\n') && (nchars < max)) {
-		if ((tb->nchars + nchars) >= tb->maxChar)
+	while ((*textp != '\0') && (*textp != '\n')) {
+		if ((tb->nchars + nchars) > tb->maxChar) 
 			break;
 
 		if ((*textp == 'm') || ((*textp != ' ') && (!islower(*textp)))){
 			ncaps++;
 
-			max = tb->maxChar - (((ncaps * 2) + tb->ws + 4) / 6);
+			tb->max = tb->max - (((ncaps * 2) + tb->ws + 4) / 6);
 		}
 		nchars++;
 		textp++;
 	}
 
-	if ((tb->nchars + nchars) < max)
+	if ((tb->nchars + nchars) < tb->max)
 		return nchars;
 
 	while ((*--textp != ' ') && (nchars))
@@ -258,6 +257,7 @@ static int l_textbox_new(lua_State *L)
 	tb->screen	= l_checkSurface(L, 3);
 	tb->rect	= l_checkRect(L, 4);
 	tb->maxChar	= (uint32_t)luaL_checkinteger(L, 5);
+	tb->max		= tb->maxChar;
 	tb->font = NULL;
 
 	tb->x = 0;
@@ -409,6 +409,7 @@ static int l_textbox_clear(lua_State *L)
 	tb->y = 0;
 	tb->ws = 0;
 	tb->nchars = 0;
+	tb->max = tb->maxChar;
 }
 
 static int l_textbox_free(lua_State *L)
@@ -475,6 +476,7 @@ static int l_textbox_print(lua_State *L)
 
 	get_color(tb, FG_INDEX, &fg);
 
+	debug("text: '%s'\n", text->buf);
 	while (index < text->size - 1) {
 		btstring_t *tmp;
 #if 0
@@ -487,8 +489,12 @@ static int l_textbox_print(lua_State *L)
 #endif
 		nchars = _textbox_wrap(tb, text, index);
 
+		while ((tb->x == 0) && (text->buf[index] == ' '))
+			index++;
+
 		if (nchars) {
 			tmp = bts_strncpy(&text->buf[index], nchars);
+			debug("tmp = '%s'\n", tmp->buf);
 
 			s = font_render(tb->font, tmp->buf, &fg);
 			if (!s)
