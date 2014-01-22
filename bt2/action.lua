@@ -2,12 +2,10 @@ require "bttable"
 
 btAction = {}
 function btAction:new()
-	local self = object:new()
+	local self = linkedListNode:new()
 
 	self:addParent(btAction)
 
-	self.next		= false
-	self.prev		= false
 	self.source		= false
 	self.target		= false
 	self.func		= false
@@ -20,20 +18,20 @@ end
 function btAction:dump()
 	local k
 	local v
-	dprint("===========================")
-	dprint("Source: %s", self.source:getSingularName())
-	dprint("Target: %s", self.target:getSingularName())
-	dprint("inData: {")
+	log:print(log.LOG_DEBUG, "===========================")
+	log:print(log.LOG_DEBUG, "Source: %s", self.source:getSingularName())
+	log:print(log.LOG_DEBUG, "Target: %s", self.target:getSingularName())
+	log:print(log.LOG_DEBUG, "inData: {")
 	for k,v in pairs(self.inData) do
-		dprint("  %s: %s", k, v)
+		log:print(log.LOG_DEBUG, "  %s: %s", k, v)
 	end
-	dprint("}")
-	dprint("outData: {")
+	log:print(log.LOG_DEBUG, "}")
+	log:print(log.LOG_DEBUG, "outData: {")
 	for k,v in pairs(self.outData) do
-		dprint("  %s: %s", k, v)
+		log:print(log.LOG_DEBUG, "  %s: %s", k, v)
 	end
-	dprint("}")
-	dprint("===========================")
+	log:print(log.LOG_DEBUG, "}")
+	log:print(log.LOG_DEBUG, "===========================")
 end
 
 ----------------------------------------
@@ -47,12 +45,12 @@ function btAction:validateTarget()
 	end
 
 	if (self.target:isCharacter() and self.target:isDisabled()) then
-		dprint("Character target is disabled")
+		log:print(log.LOG_DEBUG, "Character target is disabled")
 		return false
 	end
 
 	if (self.target:isMonster() and self.target.size == 0) then
-		dprint("Monster group is gone")
+		log:print(log.LOG_DEBUG, "Monster group is gone")
 		return false
 	end
 
@@ -78,9 +76,9 @@ function btAction:savingThrow()
 	local targetValue
 
 	sourceValue = self.source:calculateSavingThrow()
-	dprint("sourceValue: %d", sourceValue)
+	log:print(log.LOG_DEBUG, "sourceValue: %d", sourceValue)
 	targetValue = self.target:calculateSavingThrow()
-	dprint("targetValue: %d", targetValue)
+	log:print(log.LOG_DEBUG, "targetValue: %d", targetValue)
 
 	if (sourceValue >= targetValue) then
 		return false, false
@@ -140,7 +138,7 @@ function btAction:singleTargetSpell()
 	local save
 	local half
 
-	dprint("btAction:singleTargetSpell()")
+	log:print(log.LOG_DEBUG, "btAction:singleTargetSpell()")
 
 	if (target:isSummon() and source:isCharacter()) then
 		party.summon.isHostile = true

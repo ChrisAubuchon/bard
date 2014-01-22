@@ -30,6 +30,9 @@ declare_global("level")
 declare_global("linkedList")
 declare_global("linkedListNode")
 
+-- log.lua
+declare_global("log")
+
 -- object.lua
 declare_global("object")
 

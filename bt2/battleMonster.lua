@@ -69,7 +69,7 @@ function battleMonster:meleeAttack(inAction)
 	local inData	= inAction.inData
 	local outData	= inAction.outData
 
-	dprint("battleMonster:meleeAttack() inData: " .. tostring(inData))
+	log:print(log.LOG_DEBUG, "battleMonster:meleeAttack() inData: " .. tostring(inData))
 	if (not inAction:validateTarget()) then
 		return
 	end
@@ -203,7 +203,7 @@ function battleMonster:battleBonus(inAction)
 	local inTarget		= inAction.target
 	local updateParty	= false
 
-	dprint("battleMonster:battleBonus()")
+	log:print(log.LOG_DEBUG, "battleMonster:battleBonus()")
 
 	if (inData.acBonus) then
 		if (inData.group) then
@@ -280,7 +280,7 @@ function battleMonster:attackSpell(inAction)
 	local outData		= inAction.outData
 	local source		= inAction.source
 
-	dprint("battleMonster:attackSpell()")
+	log:print(log.LOG_DEBUG, "battleMonster:attackSpell()")
 	if (inData.group or inData.allFoes) then
 		inAction:multiTargetSpell()
 	else
@@ -306,15 +306,15 @@ function battleMonster:doDoppleganger(inAction)
 	end
 
 	randomCharacter = party:randomCharacter()
-	dprint("cloneCharacter = %s", randomCharacter.name)
+	log:print(log.LOG_DEBUG, "cloneCharacter = %s", randomCharacter.name)
 	doppleganger = randomCharacter:clone()
 	party:addCharacter(doppleganger)
 	if (random:band(1) == 1) then
-		dprint("randomCharacter is the doppleganger")
+		log:print(log.LOG_DEBUG, "randomCharacter is the doppleganger")
 		randomCharacter.isDoppleganger = true
 		randomCharacter.possessed = true
 	else
-		dprint("doppleganger is the doppleganger")
+		log:print(log.LOG_DEBUG, "doppleganger is the doppleganger")
 		doppleganger.isDoppleganger = true
 		doppleganger.possessed = true
 	end

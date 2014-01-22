@@ -141,11 +141,11 @@ function review:doClassChange()
 		return
 	end
 
-	dprint(char.spellLevel.Conjurer)
-	dprint(char.spellLevel.Magician)
-	dprint(char.spellLevel.Sorcerer)
-	dprint(char.spellLevel.Wizard)
-	dprint(char.spellLevel.Archmage)
+	log:print(log.LOG_DEBUG, char.spellLevel.Conjurer)
+	log:print(log.LOG_DEBUG, char.spellLevel.Magician)
+	log:print(log.LOG_DEBUG, char.spellLevel.Sorcerer)
+	log:print(log.LOG_DEBUG, char.spellLevel.Wizard)
+	log:print(log.LOG_DEBUG, char.spellLevel.Archmage)
 	text:cdprint(true, false, char.name .. "\n\n")
 	if (char.spellLevel.Conjurer == 0) then 
 		text:print("\nConjurer")

@@ -1,10 +1,5 @@
 btdebug = {}
 
-local __debug = true
-local __debugLog = "output.log"
---local __debugFile = io.open(__debugLog, "w+")
-local __debugFile = io.stdout
-
 ----------------------------------------
 -- specialSquare class
 ----------------------------------------
@@ -26,41 +21,6 @@ end
 
 function specialSquare:printName(inSquare)
 	text:print(inSquare.name)
-end
-
-function dwhere(inDepth)
-	local dstring
-	local dinfo
-
-	dinfo = debug.getinfo(inDepth, "Sl")
-	dstring = string.format("%s:%s", 
-			string.match(dinfo.short_src, "[^/]*$"),
-			dinfo.currentline
-			)
-	__debugFile:write(dstring .. "\n")
-	__debugFile:flush()
-end
-		
-
-----------------------------------------
--- dprint()
-----------------------------------------
-function dprint(format, ...)
-	if (__debug) then
-		local dstring
-		local dinfo
-
-		dinfo = debug.getinfo(2, "Sl")
-		dstring = "DEBUG: " .. string.match(dinfo.short_src, "[^/]*$")
-			.. ":" .. tostring(dinfo.currentline) .. " "
-
-		if (select("#", ...) == 0) then
-			__debugFile:write(dstring .. tostring(format).."\n")
-		else
-			__debugFile:write(dstring .. string.format(format,...).."\n")
-		end
-		__debugFile:flush()
-	end
 end
 
 function btdebug.enterDungeon()

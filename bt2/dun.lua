@@ -25,7 +25,7 @@ local function __addPortal(sq, quad, tileSet)
 	end
 
 	if (sq.hasFloorPortal) then
-		dprint(quad)
+		log:print(log.LOG_DEBUG, quad)
 		bigpic:dunAdd(quad, tileSet, "portal", sq, "floor")
 	end
 end

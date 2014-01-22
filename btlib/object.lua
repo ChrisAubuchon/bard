@@ -27,6 +27,11 @@ function object:new(inTable)
 		end
 	end
 
+	log:print(log.LOG_INFO, "object(%s) created from %s",
+			self.key,
+			log:getLocation(3)
+		)
+
 	setmetatable(self, {
 		__index = object.index,
 		__gc	= object.gc
@@ -103,6 +108,7 @@ end
 -- object:gc()
 ----------------------------------------
 function object:gc()
+	log:print(log.LOG_INFO, "object(%s) cleared", self.key)
 	objectData[self.key] = nil
 end
 
@@ -131,4 +137,23 @@ function table.copy(inSource, inDestination)
 	end
 
 	return t
+end
+
+----------------------------------------
+-- table.setDefault()
+----------------------------------------
+function table.setDefault(inTable, inValue)
+	setmetatable(inTable, {
+		__index = function(t, k)
+			local val
+
+			val = rawget(t, k)
+			if (val == nil) then
+				return inValue
+			end
+
+			return val
+		end
+		}
+	)
 end

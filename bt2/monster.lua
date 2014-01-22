@@ -71,6 +71,9 @@ function monster:getSingularName()
 	return self.singular
 end
 
+----------------------------------------
+-- monster:getBattlePriority()
+----------------------------------------
 function monster:getBattlePriority()
 	return random:betweenInclusive(self.priorityLo, self.priorityHi)
 end
@@ -80,7 +83,7 @@ function monster:getPronoun()
 end
 
 function monster:inMeleeRange()
-	dprint(self.parentGroup.range)
+	log:print(log.LOG_DEBUG, self.parentGroup.range)
 	return (self.parentGroup.range == 10)
 end
 

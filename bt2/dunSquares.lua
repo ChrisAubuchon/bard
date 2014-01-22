@@ -449,7 +449,7 @@ function dunSquares:eyeStatue()
 			local c
 
 			c = party:hasItem("Eye")
-			dprint(c)
+			log:print(log.LOG_DEBUG, c)
 			if (c) then
 				text:cdprint(true, true, 
 					"An Eye levitates from %s and goes " ..

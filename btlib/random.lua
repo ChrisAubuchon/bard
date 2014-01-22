@@ -104,3 +104,13 @@ end
 function random:hash()
 	return string.format("0x%08X", self.mt())
 end
+
+----------------------------------------
+-- random:randomMember()
+--
+-- Convenience function to select a 
+-- random member of an array
+----------------------------------------
+function random:randomMember(inArray)
+	return inArray[self:xdy(1, #inArray)]
+end

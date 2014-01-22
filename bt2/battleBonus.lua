@@ -7,10 +7,19 @@ battleBonus = {
 	damageRandom	= 0,
 	damageBonus	= 0,
 	damagePenalty	= 0,
+	hpRegen		= 0,
 	missTurn	= false,
 	disbelieve	= false,
 	extraAttacks	= false
 }
+
+function battleBonus:new()
+	local self = object:new()
+
+	self:addParent(battleBonus)
+
+	return self
+end
 
 function battleBonus:resetBattleBonus()
 	self.antiMagic		= 0
@@ -26,6 +35,7 @@ function battleBonus:resetBattleBonus()
 end
 
 function battleBonus:addBattleBonus(inStat, inAmount, inStack)
+	log:print(log.LOG_DEBUG, "inStat: %s\tinAmount: %d\t inStack: %s", inStat, inAmount, inStack)
 	if ((self[inStat] == 0) or (not inStack)) then
 		self[inStat] = inAmount
 	else
@@ -34,12 +44,12 @@ function battleBonus:addBattleBonus(inStat, inAmount, inStack)
 end
 
 function battleBonus:dumpBattleBonus()
-	dprint("antiMagic: %d", self.antiMagic)
-	dprint("acBonus: %d", self.acBonus)
-	dprint("acPenalty: %d", self.acPenalty)
-	dprint("toHitBonus: %d", self.toHitBonus)
-	dprint("toHitPenalty: %d", self.toHitPenalty)
-	dprint("damageRandom: %d", self.damageRandom)
-	dprint("damageBonus: %d", self.damageBonus)
-	dprint("damagePenalty: %d", self.damagePenalty)
+	log:print(log.LOG_DEBUG, "antiMagic: %d", self.antiMagic)
+	log:print(log.LOG_DEBUG, "acBonus: %d", self.acBonus)
+	log:print(log.LOG_DEBUG, "acPenalty: %d", self.acPenalty)
+	log:print(log.LOG_DEBUG, "toHitBonus: %d", self.toHitBonus)
+	log:print(log.LOG_DEBUG, "toHitPenalty: %d", self.toHitPenalty)
+	log:print(log.LOG_DEBUG, "damageRandom: %d", self.damageRandom)
+	log:print(log.LOG_DEBUG, "damageBonus: %d", self.damageBonus)
+	log:print(log.LOG_DEBUG, "damagePenalty: %d", self.damagePenalty)
 end

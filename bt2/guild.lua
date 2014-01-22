@@ -16,7 +16,7 @@ function guild:addMember()
 		return
 	end
 
-	dprint(member)
+	log:print(log.LOG_DEBUG, member)
 
 	text:clear()
 

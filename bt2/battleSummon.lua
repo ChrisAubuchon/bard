@@ -12,16 +12,16 @@ battleSummon	= {}
 function battleSummon:doAction(inAction)
 	local attack
 
-	dprint("battleSummon:doAction() called")
+	log:print(log.LOG_DEBUG, "battleSummon:doAction() called")
 
 	if (self:isDisabled()) then
 		return
 	end
 
 	if (self.isIllusion and (not currentBattle.isPartyAttack)) then
-		dprint(currentBattle.monParty.disbelieve)
+		log:print(log.LOG_DEBUG, currentBattle.monParty.disbelieve)
 		if (currentBattle.monParty.disbelieve) then
-			dprint("Skipping summon turn: disbelieve")
+			log:print(log.LOG_DEBUG, "Skipping summon turn: disbelieve")
 			return
 		end
 	end
@@ -142,7 +142,12 @@ function battleSummon:attackSpell(inAction)
 	end
 end
 
-
+----------------------------------------
+-- battleSummon:getBattlePriority()
+----------------------------------------
+function battleSummon:getBattlePriority()
+	return random:betweenInclusive(self.priorityLo, self.priorityHi)
+end
 
 
 

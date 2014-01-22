@@ -50,19 +50,19 @@ function battlePlayer:doAction(inAction)
 
 
 	if (inAction.action == "melee") then
-		dprint("Performing melee attack")
+		log:print(log.LOG_DEBUG, "Performing melee attack")
 		self:doMeleeAttack(inAction)
 	elseif (inAction.action == "cast") then
-		dprint("Performing cast a spell")
+		log:print(log.LOG_DEBUG, "Performing cast a spell")
 		self:doCombatSpell(inAction)
 	elseif (inAction.action == "defend") then
-		dprint("Source: " .. tostring(inAction.source.name) .. " defends")
+		log:print(log.LOG_DEBUG, "Source: " .. tostring(inAction.source.name) .. " defends")
 		return
 	elseif (inAction.action == "use") then
-		dprint("Using an item")
+		log:print(log.LOG_DEBUG, "Using an item")
 		self:useItem(inAction)
 	elseif (inAction.action == "sing") then
-		dprint("Singing a bard song")
+		log:print(log.LOG_DEBUG, "Singing a bard song")
 		self:doBardSong(inAction)
 	elseif (inAction.action == "possessedAttack") then
 		local attackParty	= false
@@ -308,7 +308,7 @@ function battlePlayer:attackSpell(inAction)
 	local source		= inAction.source
 	local target		= inAction.target
 
-	dprint("battlePlayer:attackSpell()")
+	log:print(log.LOG_DEBUG, "battlePlayer:attackSpell()")
 	-- printEllipsis if a group or allFoes spell was cast
 	-- and all of the monster groups are dead.
 	--
@@ -383,8 +383,42 @@ function battlePlayer:hideInShadows()
 	self.isHiding = false
 end
 
+----------------------------------------
+-- battlePlayer:getBattlePriority()
+----------------------------------------
+function battlePlayer:getBattlePriority()
+	local priority
+	local levelBonus
 
+	priority = bit32.rshift(self.battlesWon, 9)
+	if (self.dx > 14) then
+		priority = priority + bit32.lshift(self.dx - 14, 3)
+	end
+	priority = priority + (random:rnd() % 32)
 
+	levelBonus = bit32.rshift(self.cur_level, 1)
+	if ((self.class == "Conjurer") or
+	    (self.class == "Magician") or
+	    (self.class == "Sorcerer") or
+	    (self.class == "Wizard") or
+	    (self.class == "Archmage")) then
+		levelBonus = bit32.rshift(levelBonus, 2)
+	elseif ((self.class == "Rogue") or
+		(self.class == "Bard")) then
+		levelBonus = bit32.rshift(levelBonus, 1)
+	elseif (self.class == "Monk") then
+		levelBonus = bit32.lshift(levelBonus, 1)
+	end
+
+	priority = priority + levelBonus
+	if (priority <= 0) then
+		return 1
+	elseif (priority > 255) then
+		return 255
+	else
+		return priority
+	end
+end
 
 
 

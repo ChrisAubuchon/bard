@@ -18,11 +18,11 @@ function character:new()
 	self:addParent(bIICharacter)
 	self:addParent(character)
 	self:addParent(classes)
-	self:addParent(entity)
 	self:addParent(battleParty)
 	self:addParent(battlePlayer)
 	self:addParent(battleBonus)
 	self:addParent(linkedListNode)
+	self:addParent(entity)
 
 	return self
 end
@@ -121,7 +121,7 @@ function character:fromTable(t)
 	end
 
 	if (not rval.inventory) then
-		dprint("Creating empty inventory")
+		log:print(log.LOG_DEBUG, "Creating empty inventory")
 		rval.inventory = inventory:new()
 	end
 
@@ -260,7 +260,7 @@ end
 -- a special status
 ----------------------------------------
 function character:isAfflicted()
-	dprint("isAfflicted() called")
+	log:print(log.LOG_DEBUG, "isAfflicted() called")
 	return (self.isDead or self.isOld or self.isPoisoned 
 		or self.isStoned or self.isParalyzed
 		or self.isPossessed or self.isNuts)
@@ -273,7 +273,7 @@ end
 -- current class
 ----------------------------------------
 function character:getSpellLevel()
-	dprint(self.class)
+	log:print(log.LOG_DEBUG, self.class)
 	if (self.class == "Magician") then return self.spellLevel.Magician end
 	if (self.class == "Conjurer") then return self.spellLevel.Conjurer end
 	if (self.class == "Sorcerer") then return self.spellLevel.Sorcerer end
@@ -302,7 +302,7 @@ end
 function character:isEffectEquipped(effect)
 	local i
 
-	dprint("character:isEffectEquipped(): " .. self.name)
+	log:print(log.LOG_DEBUG, "character:isEffectEquipped(): " .. self.name)
 	if (self.name == nil) then
 		error("nil name", 2)
 	end
@@ -362,42 +362,6 @@ function character:hasItem(inName)
 	end
 
 	return false
-end
-
-----------------------------------------
--- getBattlePriority()
-----------------------------------------
-function character:getBattlePriority()
-	local priority
-	local levelBonus
-
-	priority = bit32.rshift(self.battlesWon, 9)
-	if (self.dx > 14) then
-		priority = priority + bit32.lshift(self.dx - 14, 3)
-	end
-	priority = priority + (random:rnd() % 32)
-
-	levelBonus = bit32.rshift(self.cur_level, 1)
-	if ((self.class == "Conjurer") or
-	    (self.class == "Magician") or
-	    (self.class == "Sorcerer") or
-	    (self.class == "Wizard")) then
-		levelBonus = bit32.rshift(levelBonus, 2)
-	elseif ((self.class == "Rogue") or
-		(self.class == "Bard")) then
-		levelBonus = bit32.rshift(levelBonus, 1)
-	elseif (self.class == "Monk") then
-		levelBonus = bit32.lshift(levelBonus, 1)
-	end
-
-	priority = priority + levelBonus
-	if (priority <= 0) then
-		return 1
-	elseif (priority > 255) then
-		return 255
-	else
-		return priority
-	end
 end
 
 ----------------------------------------
@@ -918,7 +882,7 @@ end
 function character:consumeSpellPoints(inAction)
 	local req	= inAction.inData.sppt
 
-	dprint("consumeSpellPoints() called")
+	log:print(log.LOG_DEBUG, "consumeSpellPoints() called")
 
 	if (self:isEffectEquipped("hasHalfSppt")) then
 		req = bits32.arshift(req, 1)
@@ -942,7 +906,7 @@ function character:getSpell(mouseFlag)
 	local spellAbbr
 	local s
 
-	dprint("getSpell() called")
+	log:print(log.LOG_DEBUG, "getSpell() called")
 
 	if (mouseFlag) then
 		local xxx_do_mouse_menu = true
@@ -974,7 +938,7 @@ end
 function character:castSpell(inAction)
 	local fizzle = false
 
-	dprint("castSpell() called")
+	log:print(log.LOG_DEBUG, "castSpell() called")
 
 	text:print(" casts a spell")
 

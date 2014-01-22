@@ -2,11 +2,17 @@
 
 uint8_t *song_combatStrings[] = {
 	"local missile_damage_bonus_penalty = true",
-	"party.battle.antiMagic = party.battle.antiMagic + 2",
+	"currentBattle.song:addBattleBonus(\"antiMagic\", 2, true)", 
 	"party.acBonus = party.acBonus + inAction.inData.data",
-	"party.toHitBonus = party.toHitBonus + inAction.inData.data; party.damageBonus = party.damageBonus + inAction.inData.data",
-	"party.battle.songHpRegen = party.battle.songHpRegen + inAction.inData.data",
-	"party.extraAttacks = party.extraAttacks + 1",
+	"currentBattle.song:addBattleBonus(\"toHitBonus\",\
+				inAction.inData.data,\
+				true);\
+	 currentBattle.song:addBattleBonus(\"damageBonus\", \
+				inAction.inData.data,\
+				true);",
+	"currentBattle.song:addBattleBonus(\"hpRegen\", inAction.inData.data, \
+				true)",
+	"currentBattle.song:addBattleBonus(\"extraAttacks\", 1, false)",
 	""
 };
 

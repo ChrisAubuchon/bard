@@ -1,5 +1,6 @@
 require	"btlib_declares"
 
+require "log"
 require "object"
 require "array"
 

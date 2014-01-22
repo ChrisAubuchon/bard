@@ -31,7 +31,7 @@ party.song		= {
 party.battle	= {
 	acBonus		= 0,
 	antiMagic	= 0,
-	songHpRegen	= 0
+	songHpRegen	= false
 }
 
 ----------------------------------------
@@ -81,7 +81,7 @@ function party:updateIndices()
 	local node
 
 	for node in self:iterator() do
-		if (index < 4) then
+		if (index < 5) then
 			node.inMeleeRange = true
 		else
 			node.inMeleeRange = false
@@ -158,6 +158,21 @@ local iteratorConditionals = {
 	isHostile	= function (c)
 				return (c.isPossessed or c.isDoppleganger)
 			  end,
+	cantRun		= function (c)
+		if (c:isDisabled()) then
+			return false
+		end
+
+		if (c.isDoppleganger) then
+			return true
+		end
+
+		if (c:isSummon() and not c.isDocile) then
+			return true
+		end
+
+		return false
+	end,
 	isAttackable	= function (c)
 				if (c:isSummon() and c.isIllusion) then
 					if (currentBattle and 
@@ -291,7 +306,7 @@ end
 -- members to the bottom of the party
 ----------------------------------------
 function party:sort()
-	dprint("party:sort() called")
+	log:print(log.LOG_DEBUG, "party:sort() called")
 	local function __sort(inAttr)
 		local tail
 		local current
@@ -415,6 +430,22 @@ function party:isHostile()
 end
 
 ----------------------------------------
+-- canRun()
+--
+-- Returns true if the party is capable
+-- of choosing Fight, Run, Advance
+----------------------------------------
+function party:canRun()
+	local c
+
+	for c in self:characterIterator("cantRun") do
+		return false
+	end
+
+	return true
+end
+
+----------------------------------------
 -- isLive()
 --
 -- Return true if there is at least one
@@ -423,7 +454,7 @@ end
 function party:isLive()
 	local c
 
-	dprint("isLive() called")
+	log:print(log.LOG_DEBUG, "isLive() called")
 	for c in self:characterIterator("isLive") do
 		return true
 	end
@@ -449,7 +480,9 @@ function party:doPoison()
 
 			c.currentHp = c.currentHp - currentLevel:getPoisonDamage()
 
-			if (c.currentHp <= 0) then
+			if (c.isDestinyKnight) then
+				c.currentHp = c.maxHp
+			elseif (c.currentHp <= 0) then
 				c.currentHp = 0
 				c.isDead = true
 			end
@@ -490,12 +523,16 @@ function party:doEquippedEffects()
 	local c
 	local update = false
 
-	for c in self:characterIterator() do
+	for c in self:Iterator("skipDisabled") do
 		if (c:isEffectEquipped("hasSpptRegen")) then
 			if (c.currentSppt < c.maxSppt) then
 				c.currentSppt = c.currentSppt + 1
 				update = true
 			end
+		end
+
+		if (party.song.spptRegen) then
+			c.currentSppt = c.currentSppt + 1
 		end
 
 		if (self.song.regenHp or c:isEffectEquipped("hasRegenHP")) then
@@ -629,7 +666,7 @@ function party:doSummon(inData)
 			break
 		end
 
-		dprint(summon)
+		log:print(log.LOG_DEBUG, summon)
 		self:addCharacter(summon:new(inData.summons[1], inData.isIllusion))
 	until (not inData.fillParty)
 
@@ -643,7 +680,7 @@ end
 -- Remove the summoned monster
 ----------------------------------------
 function party:removeSummon()
-	dprint(self.summon)
+	log:print(log.LOG_DEBUG, self.summon)
 	if (not self.summon) then return end
 
 	self:remove(self.summon)
@@ -850,12 +887,11 @@ function party:singSong()
 		party.song.singer:songTimeout()
 	end
 
-	dprint(tune.activate)
 	if (tune.activate) then
 		action.func = tune.activate.func
 		action.inData = tune.nonCombatData[currentLevel.level].inData
 
-		dprint(action.func)
+		log:print(log.LOG_DEBUG, action.func)
 		if (action.func) then
 			action.func(action)
 		end
@@ -889,6 +925,10 @@ function party:doDisbelieve()
 	local mgroup
 
 	if (not currentBattle.monParty) then
+		return
+	end
+
+	if (not self.disbelieve) then
 		return
 	end
 

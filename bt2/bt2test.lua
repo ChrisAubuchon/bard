@@ -59,7 +59,6 @@ require "battleBonus"
 require "battleMonster"
 require "battlePlayer"
 require "battleParty"
-require "battleSummon"
 require "character"
 require	"monsterData"
 require "monster"
@@ -86,12 +85,24 @@ require "dunSquares"
 require "dun"
 require "battle"
 require "songs"
-require "timers"
 
 getkey()
 
 title = gfxImage:new("images/screen.png", "png")
 title:Draw(nil)
+
+text:print("A Forest Giant slams MAGICY, and hits for 5 points of damage.")
+getkey()
+
+text:print("A Forest Giant slams MAGICY")
+text:print(", and hits for 5 points of damage.")
+getkey()
+
+text:clear()
+text:print("Thou art in the Guild of Adventurers.")
+getkey()
+
+os.exit()
 
 repeat
 	if (globals.gameState == globals.STATE_GUILD) then	

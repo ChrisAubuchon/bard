@@ -35,7 +35,7 @@ globals.fonts.mono	= gfxFont:new("fonts/bt2font.btf", true)
 globals.fonts.var	= gfxFont:new("fonts/bt2font.btf", false)
 text			= textBox:new(
 				gfxRect:New(340, 12, 276, 192),
-				23,
+				22,
 				globals.fonts.var
 				)
 garths			= false

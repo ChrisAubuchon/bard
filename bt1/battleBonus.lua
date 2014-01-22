@@ -7,6 +7,8 @@ battleBonus = {
 	damageRandom	= 0,
 	damageBonus	= 0,
 	damagePenalty	= 0,
+	extraAttacks	= 0,
+	hpRegen		= 0,
 	missTurn	= false,
 	disbelieve	= false
 }

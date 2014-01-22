@@ -1,3 +1,5 @@
+require "battleSummon"
+
 summon = {}
 
 ----------------------------------------
@@ -16,6 +18,7 @@ function summon:new(inType, inIsIllusion)
 	self:addParent(entity)
 
 	self.isIllusion		= inIsIllusion
+	self.isDocile		= true
 	self.monsterType	= inType
 
 	self:generateHp()
@@ -61,8 +64,9 @@ function summon:toTable()
 	end
 
 	toTable(self, t, entity)
-	t.isIllusion = self.isIllusion
-	t.monsterType = self.monsterType
+	t.isIllusion	= self.isIllusion
+	t.monsterType	= self.monsterType
+	t.isDocile	= self.isDocile
 
 	return t
 end

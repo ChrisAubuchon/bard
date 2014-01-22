@@ -1,10 +1,9 @@
 monsterParty = {}
 function monsterParty:new()
-	local self = object:new()
+	local self = linkedList:new()
 
 	self:addParent(monsterParty)
 	self:addParent(battleBonus)
-	self:addParent(linkedList)
 
 	self.size = 0
 
@@ -42,10 +41,10 @@ end
 ----------------------------------------
 function monsterParty:addMonsterGroup(inGroup)
 	self.size = self.size + 1
-	dprint(inGroup)
+	log:print(log.LOG_DEBUG, inGroup)
 	self:insertTail(inGroup)
-	dprint(self.head)
-	dprint(self.tail)
+	log:print(log.LOG_DEBUG, self.head)
+	log:print(log.LOG_DEBUG, self.tail)
 end
 
 ----------------------------------------
@@ -65,30 +64,13 @@ end
 function monsterParty:isInMeleeRange()
 	local mgroup
 
-	for mgroup in self:iterator() do
-		if (mgroup.range == 10) then
-			return true
-		end
+	local function inRangeFunction(m) return (m.range == 10) end
+
+	for mgroup in self:conditionalIterator(inRangeFunction) do
+		return true
 	end
 
 	return false
-end
-
-----------------------------------------
--- adjustMeleeGroups()
-----------------------------------------
-function monsterParty:adjustMeleeGroups()
-	local i		= 1
-	local mgroup
-
-	for mgroup in self:iterator() do
-		if (i < 3) then
-			mgroup.inMeleeRange = true
-		else
-			mgroup.inMeleeRange = false
-		end
-		i = i + 1
-	end
 end
 
 ----------------------------------------

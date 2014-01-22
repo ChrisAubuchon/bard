@@ -138,7 +138,7 @@ end
 function inventory:fromTable(inTable)
 	local i
 
-	dprint("#inTable: %d", #inTable)
+	log:print(log.LOG_DEBUG, "#inTable: %d", #inTable)
 	for i = 1,#inTable do
 		if (inTable[i].name ~= "") then
 			local newSlot = inventorySlot:new(inTable[i].name)

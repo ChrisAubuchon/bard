@@ -368,7 +368,7 @@ function spells.spellBind(inAction)
 end
 
 function spells.mageStar(inAction)
-	dprint("spells.mageStar")
+	log:print(log.LOG_DEBUG, "spells.mageStar")
 
 	if (inAction:groupSavingThrow()) then
 		text:ctdprint(false, true, " but it had no effect!\n\n")
@@ -381,7 +381,7 @@ end
 
 
 function spells.attack(inAction)
-	dprint("spells.attack()")
+	log:print(log.LOG_DEBUG, "spells.attack()")
 	inAction.source:attackSpell(inAction)
 end
 

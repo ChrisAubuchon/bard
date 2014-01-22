@@ -2,13 +2,50 @@ require "character"
 require "monster"
 require "btdebug"
 
-local battleData = {}
-
-battleSummon	= {}
-
 -- Public battle interface
 --
 battle = {}
+
+----------------------------------------
+-- battle:init()
+--
+-- Initialize battle data structure
+----------------------------------------
+function battle:init()
+	local self = object:new()
+
+	self:addParent(battle)
+
+	self.isPartyAttack	= false
+	self.skipParty		= false
+	self.monDisbelieve	= false
+	self.numGroups		= 0
+	self.monParty		= nil
+	self.priorityQueue	= {}
+	self.actionBySource	= {}
+	self.actionList		= linkedList:new()
+	self.killCount		= {}
+	table.setDefault(self.killCount, 0)
+	self.songToHitBonus	= 0
+	self.songDamageBonus	= 0
+	self.songToHitPenalty	= 0
+	self.preBattleSong	= false
+
+	self.currentBigpic	= false
+
+	self.song = battleBonus:new()
+
+	party.battle.antiMagic	= 0
+	party.battle.acBonus	= 0
+
+	return self
+end
+
+----------------------------------------
+--
+-- Battle Entry points
+--
+----------------------------------------
 
 ----------------------------------------
 -- random()
@@ -19,13 +56,12 @@ function battle:random()
 	local mgroups
 	local mgroup
 
-	currentBattle = battleData:new()
+	currentBattle = battle:init()
 
 	currentBattle.isPartyAttack = false
 	currentBattle.monParty = monsterParty.new()
 	mgroups = currentLevel:getBattleOpponents()
 	for _,mgroup in ipairs(mgroups) do
-		dprint(mgroup)
 		currentBattle.monParty:addMonsterGroup(monsterGroup:new(mgroup, false))
 	end
 
@@ -36,7 +72,7 @@ end
 -- partyAttack()
 ----------------------------------------
 function battle:partyAttack()
-	currentBattle = battleData:new()
+	currentBattle = battle:init()
 
 	currentBattle.isPartyAttack = true
 	currentBattle.battleGroup	= false
@@ -56,12 +92,15 @@ function battle:new(...)
 	local count
 	local i
 
-	currentBattle = battleData:new()
+	currentBattle = battle:init()
 	currentBattle.isPartyAttack = false
 	currentBattle.monParty = monsterParty:new()
 
+	log:print(log.LOG_DEBUG, select('#', ...))
 	for i = 1,select('#', ...),2 do
 		name,count = select(i, ...)
+
+		log:print(log.LOG_DEBUG, "name: %s, count: %d", name, count)
 
 		if (type(name) ~= "string") then
 			error("Invalid monster type: "..tostring(type(name)),2)
@@ -84,12 +123,13 @@ end
 ----------------------------------------
 
 ----------------------------------------
--- battleData class
+-- battle class
 --
 -- This class holds all of the data
 -- for a battle
 ----------------------------------------
-function battleData:new()
+if false then
+function battle:new()
 	local self = {
 		isPartyAttack		= false,
 		isPartyBigpicDone	= false,
@@ -99,7 +139,7 @@ function battleData:new()
 		monParty		= false,
 		actionHead		= false,
 		actionTail		= false,
-		battleDataBySource	= {},
+		actionBySource	= {},
 		killCount		= btTable.new(true),
 		songToHitBonus		= 0,
 		sontDamageBonus		= 0,
@@ -113,7 +153,7 @@ function battleData:new()
 		preBattleSong		= false
 	}
 
-	btTable.addParent(self, battleData)
+	btTable.addParent(self, battle)
 	btTable.setClassMetatable(self)
 
 	party.battle.antiMagic = 0
@@ -122,35 +162,36 @@ function battleData:new()
 
 	return self
 end
-
-----------------------------------------
--- battleData:addAction()
-----------------------------------------
-function battleData:addAction(inSource, inAction)
-	dprint(inSource.singular)
-	dprint(inAction)
-	self.battleDataBySource[inSource.key] = inAction
-	dprint(self.battleDataBySource[inSource.key])
-end
-
-function battleData:removeAction(inSource)
-	self.battleDataBySource[inSource.key] = nil
-end
-
-function battleData:resetPriority()
-	self.battleDatabySource	= {}
 end
 
 ----------------------------------------
--- battleData:addPriority()
+-- battle:addAction()
 ----------------------------------------
-function battleData:addPriority(inSource, inPriority)
-	local action = self.battleDataBySource[inSource.key]
+function battle:addAction(inSource, inAction)
+	self.actionBySource[inSource.key] = inAction
+end
+
+function battle:removeAction(inSource)
+	self.actionBySource[inSource.key] = nil
+end
+
+function battle:resetPriority()
+	self.actionBySource	= {}
+	self.priorityQueue	= {}
+end
+
+----------------------------------------
+-- battle:addPriority()
+----------------------------------------
+function battle:addPriority(inSource, inPriority)
+	local action = self.actionBySource[inSource.key]
 
 	action.priority = inPriority
 
-	self.battleDataBySource[inSource.key] = action
+	self.actionBySource[inSource.key] = action
+	table.insert(self.priorityQueue, action)
 
+if false then
 	if (not self.actionHead) then
 		self.actionHead = action
 		self.actionTail = action
@@ -182,18 +223,19 @@ function battleData:addPriority(inSource, inPriority)
 	action.prev = current.prev
 	current.prev = action
 end
+end
 
 ----------------------------------------
--- battleData:removePriority()
+-- battle:removePriority()
 ----------------------------------------
-function battleData:removePriority(inSource)
-	local action = self.battleDataBySource[inSource.key]
+function battle:removePriority(inSource)
+	local action = self.actionBySource[inSource.key]
 
 	if (not action) then
 		return
 	end
 
-	self.battleDataBySource[inSource.key] = nil
+	self.actionBySource[inSource.key] = nil
 	if (action.next) then
 		action.next.prev = action.prev
 	end
@@ -202,27 +244,40 @@ function battleData:removePriority(inSource)
 	end
 end
 
-function battleData:dumpPriorities()
-	local a
+----------------------------------------
+-- battle:sortPriorities()
+----------------------------------------
+function battle:sortPriorities()
+	local action
 
-	a = self.actionHead
-	while (a) do
-		print("Source: " .. a.source:getSingularName())
-		print("Priority: " .. tostring(a.priority))
+	local function priorityCompare(a,b)
+		return a.priority > b.priority
+	end
+
+	table.sort(self.priorityQueue, priorityCompare)
+
+	-- Link up the priority queue nodes
+	for _,action in ipairs(self.priorityQueue) do
+		self.actionList:insertTail(action)
+	end
+end
+
+function battle:dumpPriorities()
+	local action
+
+	for action in self.actionList:iterator() do
+		print("Source: " .. action.source:getSingularName())
+		print("Priority: " .. tostring(action.priority))
 		print("---")
-		a = a.next
 	end
 end
 
 ----------------------------------------
--- battleData class
+-- battle:start()
 --
--- This class holds all of the functions
--- used during battle. This is to
--- separate data from functions
+-- 
 ----------------------------------------
-
-function battleData:start()
+function battle:start()
 	local mgroup
 	local continue = true
 	local partyRan = false
@@ -244,11 +299,6 @@ function battleData:start()
 			break
 		end
 
-if false then
-		if (self.monParty) then
-			self.monParty:adjustMeleeGroups()
-		end
-end
 		self:getMonsterActions()
 		self:getPriorities()
 
@@ -268,7 +318,7 @@ end
 			end
 		elseif (self.monParty:isAlive()) then
 			text:cdprint(true, false, "\nYou still face ")
-			self:printMonsterGroups()
+			self:printOpponents()
 
 			self.monParty:advance()
 		else
@@ -289,23 +339,29 @@ end
 	return not partyRan
 end
 
-function battleData:stop()
+function battle:stop()
 	text:clear()
 	party:display()
 end
 
 ----------------------------------------
--- battleData:updateBigpic()
+-- battle:updateBigpic()
 ----------------------------------------
-function battleData:updateBigpic()
+function battle:updateBigpic()
 	if (self.isPartyAttack) then
-		if (not self.isPartyBigpicDone) then
-			bigpic:setTitle("PARTY")
-			bigpic:drawImage("PIC_WARRIOR")
-			self.isPartyBigpicDone = true
+		if (self.currentBigpic ~= "PIC_WARRIOR") then
+			bigpic:setBigpic("PIC_WARRIOR", "PARTY")
+			self.currentBigpic = "PIC_WARRIOR"
 		end
 	else
 		local leadGroup = self.monParty:getNearestGroup()
+
+		if (leadGroup.picture == self.currentBigpic) then
+			return
+		end
+
+		self.currentBigpic = leadGroup.picture
+
 		if (leadGroup.size == 1) then
 			bigpic:setTitle(leadGroup.singular)
 		else
@@ -322,18 +378,24 @@ local encounterStringList = {
 	"\nSnarls of defiance are heard from "
 }
 
-function battleData:printEncounter()
+----------------------------------------
+-- battle:printEncounter()
+----------------------------------------
+function battle:printEncounter()
 	text:clear()
 
 	if (self.isPartyAttack) then
-		text:print("\nThere is dissention in your ranks...\n\n")
+		text:print("\nDissention in your ranks...\n\n")
 	else
-		text:print(encounterStringList[random:xdy(1,#encounterStringList)])
-		self:printMonsterGroups()
+		text:print(random:randomMember(encounterStringList))
+		self:printOpponents()
 	end
 end
 
-function battleData:printMonsterGroups()
+----------------------------------------
+-- battle:printOpponents()
+----------------------------------------
+function battle:printOpponents()
 	if (self.isPartyAttack) then
 		text:print("\nhostile party members!\n\n")
 		return
@@ -343,13 +405,10 @@ function battleData:printMonsterGroups()
 end
 
 ----------------------------------------
---
--- Battle Round section
---
+-- battle:doRound()
 ----------------------------------------
-
-function battleData:doRound()
-	local currentAction
+function battle:doRound()
+	local action
 
 	text:setCursor(0, 11)
 	if (party.advance) then
@@ -363,27 +422,22 @@ function battleData:doRound()
 		party.advance = false
 	end
 
-	currentAction = self.actionHead
-	while (currentAction) do
-		currentAction.source:doAction(currentAction)
-
+	for action in self.actionList:iterator() do
+		action.source:doAction(action)
 		if (globals.partyDied) then
 			return
 		end
-
-		currentAction = currentAction.next
-	end
-	if (self.monParty) then
-		self.monParty:adjustMeleeGroups()
+		self.actionList:remove(action)
 	end
 end
 
-function battleData:endRound()
+----------------------------------------
+-- battle.endRound()
+----------------------------------------
+function battle:endRound()
 	local mgroup
 
-	self.actionHead = false
-	self.actionTail = false
-	self.battleDataBySource = {}
+	self:resetPriority()
 
 	if (self.monParty) then
 		for mgroup in self.monParty:iterator() do
@@ -411,12 +465,15 @@ function battleData:endRound()
 	party:doPoison()
 	party:doEquippedEffects()
 
-	if (party.battle.songHpRegen) then
+	if (self.song.hpRegen > 0) then
 		local char
 
 		for char in party:iterator("skipDisabled") do
 			if (char.maxHp > char.currentHp) then
-				char.currentHp = char.currentHp + 1
+				char.currentHp = char.currentHp + self.song.hpRegen
+				if (char.currentHp > char.maxHp) then
+					char.currentHp = char.maxHp
+				end
 			end
 		end
 	end
@@ -427,14 +484,14 @@ function battleData:endRound()
 	end
 end
 
-function battleData:postRoundCleanup()
+function battle:postRoundCleanup()
 	local i
 	local c
 
 	c = party.summon
 	if ((c) and ((c.currentHp == 0) or (c.isStoned) or (c.isParalyzed) or
 		     (c.isDead))) then
-		dprint("Removing summon")
+		log:print(log.LOG_DEBUG, "Removing summon")
 		party:removeSummon()
 	end
 
@@ -452,23 +509,19 @@ function battleData:postRoundCleanup()
 	party:sort()
 end
 
-function battleData:getPriorities()
+----------------------------------------
+-- battle:getPriorities()
+----------------------------------------
+function battle:getPriorities()
 	local p
 	local c
 
 	if ((not party.missTurn) and (not party.advance)) then
 		for c in party:characterIterator("skipDisabled") do
-			p = c:getBattlePriority()
-			self:addPriority(c, p)
+			self:addPriority(c, c:getBattlePriority())
 		end
 	end
-
-if false then
-	if (party.summon) then
-		p = party.summon:getBattlePriority()
-		self:addPriority(party.summon, p)
-	end
-end
+	party.missTurn = false
 
 	if (self.isPartyAttack) then
 		return
@@ -480,6 +533,9 @@ end
 			c.beenAttacked = false
 		end
 	end
+
+	self:sortPriorities()
+	self:dumpPriorities()
 end
 
 
@@ -488,7 +544,7 @@ end
 -- Player battle option section
 --
 ----------------------------------------
-function battleData:getPlayerOptions()
+function battle:getPlayerOptions()
 	local c
 	local done = false
 	local action
@@ -501,18 +557,8 @@ function battleData:getPlayerOptions()
 		return true
 	end
 
-if false then
-	if (party.summon) then
-		dprint("Adding a summon option")
-		local a = btAction:new()
-		a.source = party.summon
-		a.action = battle.doSummonAttack
-		self:addAction(a.source, a)
-	end
-end
-
 	repeat
-		for c in party:characterIterator("skipDisabled") do
+		for c in party:iterator("skipDisabled") do
 			action = self:getPlayerOption(c)
 			if (c.isDoppleganger) then
 				action.action = "possessedAttack"
@@ -535,17 +581,13 @@ end
 end
 
 ----------------------------------------
--- battleData:getRunFightOption()
+-- battle:getRunFightOption()
 ----------------------------------------
-function battleData:getRunFightOption()
+function battle:getRunFightOption()
 	local inkey
 
-	if (self.isPartyAttack) then
+	if (self.isPartyAttack or (not party:canRun())) then
 		timer:delay(3)
-		return false
-	end
-
-	if (party:isHostile()) then
 		return false
 	end
 
@@ -581,6 +623,7 @@ function battleData:getRunFightOption()
 
 			return false
 		elseif (inkey == "D") then
+			log:print(log.LOG_DEBUG, "songHpRegen: %s", party.battle.songHpRegen)
 			self:dumpBattleBonus()
 		end
 	until (inkey == "F")
@@ -589,30 +632,20 @@ function battleData:getRunFightOption()
 end
 
 ----------------------------------------
--- battleData:getPlayerOption
+-- battle:getPlayerOption
 ----------------------------------------
-function battleData:getPlayerOption(c)
+function battle:getPlayerOption(c)
 	local action
 	local options = {}
 	local inkey
 
-	setmetatable(options, { __index = function (t,key)
-		local val
+	table.setDefault(options, false)
 
-		val = rawget(t, key)
-		if (val == nil) then
-			return false
-		end
-
-		return val
-	end
-	})
-
-	action = btAction.new()
+	action = btAction:new()
 	action.source = c
 
 	if (c:isSummon()) then
-		aaction.action = battle.doSummonAttack
+		action.action = battle.doSummonAttack
 		return action
 	end
 
@@ -671,13 +704,13 @@ function battleData:getPlayerOption(c)
 					continue = false
 				elseif (inkey == "B") then
 					action.action = "sing"
-					if (action.source:getTune(action, true)) then
+					if (c:getBattleTune(action, true)) then
 						return action
 					end
 					continue = false
 				elseif (inkey == "C") then
 					action.action = "cast"
-					if (action.source:getCombatSpell(action)) then
+					if (c:getCombatSpell(action)) then
 						return action
 					end
 					continue = false
@@ -707,9 +740,9 @@ function battleData:getPlayerOption(c)
 end
 
 ----------------------------------------
--- battleData:meleeTarget()
+-- battle:meleeTarget()
 ----------------------------------------
-function battleData:meleeTarget(inAction)
+function battle:meleeTarget(inAction)
 	if (self.isPartyAttack or inAction.action == "partyAttack") then
 		inAction.action = "melee"
 		text:cdprint(true, false, "Attack:")
@@ -734,14 +767,14 @@ function battleData:meleeTarget(inAction)
 end
 
 ----------------------------------------
--- battleData:getMonsterActions()
+-- battle:getMonsterActions()
 ----------------------------------------
-function battleData:getMonsterActions()
+function battle:getMonsterActions()
 	local action
 	local mgroup
 	local m
 
-	dprint("getMonsterActions()")
+	log:print(log.LOG_DEBUG, "getMonsterActions()")
 	if (self.isPartyAttack) then
 		return
 	end
@@ -756,9 +789,9 @@ function battleData:getMonsterActions()
 end
 
 ----------------------------------------
--- battleData:doReward()
+-- battle:doReward()
 ----------------------------------------
-function battleData:doReward()
+function battle:doReward()
 	local mgroup
 	local nmonsters
 	local i
@@ -863,17 +896,18 @@ end
 
 
 ----------------------------------------
--- battleData:convertPreBattleSong
+-- battle:convertPreBattleSong
 ----------------------------------------
-function battleData:convertPreBattleSong()
+function battle:convertPreBattleSong()
 	if (party.song.active) then
 		local singer = party.song.singer
 
 		self.preBattleSong = singer.song
 
-		if ((singer.song.name == "Falkens Fury") or
-		    (singer.song.name == "Lucklaran")) then
-			dprint("Running combatFunction")
+		if (singer.song.name ~= "Sanctuary Score") then
+			-- Stop the song
+			singer:songTimeout()
+			log:print(log.LOG_DEBUG, "Running combatFunction")
 			local action = btAction.new()
 			action.inData = singer.song.combatData[currentLevel.level].inData
 			singer.song.combatFunction.func(action)
@@ -881,7 +915,7 @@ function battleData:convertPreBattleSong()
 	end
 end
 
-function battleData:postCleanup()
+function battle:postCleanup()
 	local c
 
 	party:resetBattleBonus()
@@ -891,24 +925,28 @@ function battleData:postCleanup()
 	end
 end
 
-function battleData:dumpBattleBonus()
+function battle:dumpBattleBonus()
 	local c
-	dprint("Party battle bonus:")
+	log:print(log.LOG_DEBUG, "Party battle bonus:")
 	party:dumpBattleBonus()
-	dprint("----------------------------")
-	dprint("Character battle bonus")
-	dprint("----------------------------")
+	log:print(log.LOG_DEBUG, "----------------------------")
+	log:print(log.LOG_DEBUG, "Character battle bonus")
+	log:print(log.LOG_DEBUG, "----------------------------")
 	for c in party:iterator() do
-		dprint("%s Bonus", c.name)
+		log:print(log.LOG_DEBUG, "%s Bonus", c.name)
 		c:dumpBattleBonus()
 	end
-	dprint("----------------------------")
+	log:print(log.LOG_DEBUG, "----------------------------")
+	log:print(log.LOG_DEBUG, "Song battle bonus")
+	log:print(log.LOG_DEBUG, "----------------------------")
+	self.song:dumpBattleBonus()
+	log:print(log.LOG_DEBUG, "----------------------------")
 	if (self.monParty) then
-		dprint("Monster Party battle bonus")
+		log:print(log.LOG_DEBUG, "Monster Party battle bonus")
 		self.monParty:dumpBattleBonus()
-		dprint("----------------------------")
+		log:print(log.LOG_DEBUG, "----------------------------")
 		for c in self.monParty:iterator() do
-			dprint("%s Bonus", c.singular)
+			log:print(log.LOG_DEBUG, "%s Bonus", c.singular)
 			c:dumpBattleBonus()
 		end
 	end
