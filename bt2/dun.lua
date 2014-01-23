@@ -121,6 +121,7 @@ dunSq.new = function(inLabel, inSquare)
 	self:addParent(dunSq)
 
 	table.copy(inSquare, self)
+	self.label = inLabel
 
 	return self
 end

@@ -78,6 +78,23 @@ spells.scrySite = function()
 	elseif (currentLevel:isCity()) then
 		text:csplash(false, true, " and are in %s.", 
 			currentLevel.title)
+	else
+		local x
+		local y
+
+		x,y = currentLevel:getCoordinates()
+
+		text:csplash(false, true,
+			", and are %d level%s %s,\n%d square%s north\n" ..
+			"%d square%s east of the entry stairs",
+			currentLevel.dungeonLevel,
+			string.pluralize(currentLevel.dungeonLevel, "", "s"),
+			currentLevel.dungeonDirection,
+			y,
+			string.pluralize(y, "", "s"),
+			x,
+			string.pluralize(x, "", "s")
+			)
 	end
 			
 if false then

@@ -502,7 +502,7 @@ static void convertDunLevel(b2level_t *level)
 	dl->level	= l->songLevel;
 	dl->poisonDmg	= poisonDamageList[l->songLevel];
 
-	dl->dungeonLevel	= level->levno;
+	dl->dungeonLevel	= level->levno + 1;
 	dl->dungeonDirection	= l->direction ? DIR_UPWARD : DIR_DOWNWARD;
 
 	index = 0;
