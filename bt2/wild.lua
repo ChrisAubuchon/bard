@@ -65,6 +65,19 @@ square.new = function(inLabel, inSquare)
 		self.enterFunction = nil
 	end
 
+	function self.toCoordinates()
+		local x
+		local y
+
+		x = tonumber(string.sub(self.label, 2, 3), 10)
+		y = tonumber(string.sub(self.label, 5, 6), 10)
+
+		log:print(log.LOG_DEBUG, "x: %d", x)
+		log:print(log.LOG_DEBUG, "y: %d", y)
+
+		return x,y
+	end
+
 	return self
 end
 
@@ -166,13 +179,6 @@ function wild:new()
 	self.title	= wildData.title
 	self.day	= wildData.day
 	self.night	= wildData.night
-if false then
-	if (globals.isNight) then
-		self.level	= 2
-	else
-		self.level	= 1
-	end
-end
 
 	local function __initSquares()
 		local label

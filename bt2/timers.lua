@@ -149,6 +149,5 @@ local xxx_look_in_to_making_timers_global = true
 -- Save off the timer somewhere so that they can be cleanly stopped
 
 timer:new(bt2_32,	1760)
---timer:new(bt2_512,	28160)
-timer:new(bt2_512,	1760)
+timer:new(bt2_512,	28160)
 timer:new(bt2_2048,	112640)

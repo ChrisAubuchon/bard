@@ -6,52 +6,35 @@ local spellList = {}
 spells = {}
 spells.passive = {}
 
-local function getPassiveDuration(inData)
-	local duration
 
-	if (inData.duration > 0) then
-		return inData.duration + random:xdy(1,16)
-	else
-		return -1
-	end
-end
-
+----------------------------------------
+-- Constant effect spells
+----------------------------------------
 spells.passive.light = function(inAction)
-	local inData	= inAction.inData
-	local duration	= getPassiveDuration(inAction.inData)
-
-	party.light:activate(duration, inData.distance, inData.detectSecret)
+	party.light:activate(inAction.inData)
 end
 
 spells.passive.levitate = function(inAction)
-	local duration	= getPassiveDuration(inAction.inData)
-	party.levitate:activate(duration)
+	party.levitate:activate(inAction.inData)
 end
 
 spells.passive.detect = function(inAction)
-	local inData	= inAction.inData
-	local duration	= getPassiveDuration(inAction.inData)
-
-	party.detect:activate(duration, inData.detectStairs,
-			inData.detectTraps,
-			inData.detectSpecial)
+	party.detect:activate(inAction.inData)
 end
 
 spells.passive.shield = function(inAction)
-	local inData	= inAction.inData
-	local duration	= getPassiveDuration(inAction.inData)
-
-	party.shield:activate(duration, inData.acBonus)
+	party.shield:activate(inAction.inData)
 end
 
 spells.passive.compass = function(inAction)
-	local duration	= getPassiveDuration(inAction.inData)
-
-	party.compass:activate(duration)
+	party.compass:activate(inAction.inData)
 	party.compass:update(currentLevel.direction)
 	text:printEllipsis()
 end
 
+----------------------------------------
+-- spells.trapZap()
+----------------------------------------
 spells.trapZap = function()
 	if (globals.gameState == globals.STATE_CITY) then
 		text:printEllipsis()
@@ -71,9 +54,33 @@ spells.trapZap = function()
 		
 end
 
+----------------------------------------
+-- spells.scrySite()
+----------------------------------------
 spells.scrySite = function()
 	local outString = "You face "
 
+	text:cdprint(true, false, "You face %s", currentLevel.direction)
+
+	if (currentLevel.name == "wild") then
+		local x
+		local y
+
+		x,y = currentLevel.currentSquare.toCoordinates()
+		text:csplash(false, true, 
+			", %d square%s north\n %d square%s east of the sages hut.",
+			y,
+			string.pluralize(y, "", "s"),
+			x,
+			string.pluralize(x, "", "s")
+			)
+			
+	elseif (currentLevel:isCity()) then
+		text:csplash(false, true, " and are in %s.", 
+			currentLevel.title)
+	end
+			
+if false then
 	if (currentLevel:isCity()) then
 		text:splashMessage(outString .. currentLevel.direction .. " and are in Skara Brae.")
 	else
@@ -107,6 +114,7 @@ spells.scrySite = function()
 		text:csplash(false, true, outString)
 		text:clear()
 	end
+end
 
 	text:clear()
 end

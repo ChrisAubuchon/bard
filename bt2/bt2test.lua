@@ -62,6 +62,7 @@ require "battleParty"
 require "character"
 require	"monsterData"
 require "monster"
+require "songs"
 require "monsterParty"
 require "monsterGroup"
 require "summon"
@@ -84,7 +85,6 @@ require "city"
 require "dunSquares"
 require "dun"
 require "battle"
-require "songs"
 
 getkey()
 
@@ -101,6 +101,11 @@ getkey()
 text:clear()
 text:print("Thou art in the Guild of Adventurers.")
 getkey()
+
+text:cdprint(true, false, "You face west")
+text:csplash(false, true, ", 23 squares north\n 2 squares east of the sages hut.")
+
+text:csplash(true, true, "You face west, 23 squares north\n 2 squares east of the sages hut.")
 
 os.exit()
 

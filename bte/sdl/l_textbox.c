@@ -497,10 +497,10 @@ static int l_textbox_print(lua_State *L)
 		nchars = font_wrap(tb->font, text->buf, index, \
 					(tb->rect->w - tb->x));
 #endif
-		nchars = _textbox_wrap(tb, text, index);
 
 		while ((tb->x == 0) && (index != 0) && (text->buf[index] == ' '))
 			index++;
+		nchars = _textbox_wrap(tb, text, index);
 
 		if (nchars) {
 			tmp = bts_strncpy(&text->buf[index], nchars);

@@ -20,6 +20,9 @@ end
 -- durationSpell:__activate()
 ----------------------------------------
 function durationSpell:__activate(inDuration)
+	if (not inDuration) then
+		error("nil inDuration", 2)
+	end
 	if (inDuration > 0) then
 		self.duration = inDuration + random:xdy(1,16)
 	else
@@ -54,12 +57,12 @@ end
 ----------------------------------------
 -- lightEffect:activate()
 ----------------------------------------
-function lightEffect:activate(inDuration, inDistance, inSeeSecret)
+function lightEffect:activate(inData)
 	self.active	= true
-	self.distance	= inDistance
-	self.seeSecret	= inSeeSecret
+	self.distance	= inData.distance
+	self.seeSecret	= inData.detectSecret
 
-	self:__activate(inDuration)
+	self:__activate(inData.duration)
 
 	if (party.song.lightSong) then
 		party.song:deactivate()
@@ -102,10 +105,12 @@ end
 ----------------------------------------
 -- shieldEffect:activate()
 ----------------------------------------
-function shieldEffect:activate(inDuration, inBonus)
+function shieldEffect:activate(inData)
 	self.active	= true
-	self.bonus	= inBonus
-	self:__activate(inDuration)
+	self.bonus	= inData.acBonus
+
+	log:print(log.LOG_DEBUG, "inAction.duration: %d", inData.duration)
+	self:__activate(inData.duration)
 	party:display()
 	text:printEllipsis()
 end
@@ -139,12 +144,12 @@ end
 ----------------------------------------
 -- detectEffect:activate()
 ----------------------------------------
-function detectEffect:activate(inDuration, inStairs, inTraps, inSpecial)
+function detectEffect:activate(inData)
 	self.active	= true
-	self.stairs	= inStairs
-	self.traps	= inTraps
-	self.special	= inSpecial
-	self:__activate(inDuration)
+	self.stairs	= inData.detectStairs
+	self.traps	= inData.detectTraps
+	self.special	= inData.detectSpecial
+	self:__activate(inAction.duration)
 	text:printEllipsis()
 end
 
@@ -174,9 +179,9 @@ end
 ----------------------------------------
 -- levitateEffect:activate()
 ----------------------------------------
-function levitateEffect:activate(inDuration)
+function levitateEffect:activate(inData)
 	self.active	= true
-	self:__activate(inDuration)
+	self:__activate(inData.duration)
 	text:printEllipsis()
 end
 
@@ -203,14 +208,13 @@ end
 ----------------------------------------
 -- compassEffect:activate()
 ----------------------------------------
-function compassEffect:activate(inDuration)
+function compassEffect:activate(inData)
 	self.active	= true
-	if (inDuration > 0) then
-		self.duration = inDuration + random:xdy(1,16)
+	if (inData.duration > 0) then
+		self.duration = inData.duration + random:xdy(1,16)
 	else
-		self.duration = inDuration
+		self.duration = inData.uration
 	end
-	text:printEllipsis()
 end
 
 ----------------------------------------
