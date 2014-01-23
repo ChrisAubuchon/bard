@@ -20,14 +20,7 @@ party.light	= lightEffect:new()
 party.compass	= compassEffect:new()
 party.levitate	= levitateEffect:new()
 
-party.song		= {
-	active		= false,
-	timer		= 0,
-	acBonus		= 0,
-	lightSong	= false,
-	trapProtect	= false,
-	singer		= false
-}
+party.song = song:new()
 party.battle	= {
 	acBonus		= 0,
 	antiMagic	= 0,
@@ -198,6 +191,13 @@ function party:iterator(inCondition)
 	end
 
 	return self:conditionalIterator(iteratorConditionals[condition])
+end
+
+----------------------------------------
+-- party:targetIterator()
+----------------------------------------
+function party:targetIterator()
+	return self:iterator()
 end
 
 local xxx_no_need_for_special_characterIterator_in_bt2 = true
@@ -523,7 +523,7 @@ function party:doEquippedEffects()
 	local c
 	local update = false
 
-	for c in self:Iterator("skipDisabled") do
+	for c in self:iterator("skipDisabled") do
 		if (c:isEffectEquipped("hasSpptRegen")) then
 			if (c.currentSppt < c.maxSppt) then
 				c.currentSppt = c.currentSppt + 1
@@ -533,14 +533,13 @@ function party:doEquippedEffects()
 
 		if (party.song.spptRegen) then
 			c.currentSppt = c.currentSppt + 1
+			update = true
 		end
 
-		if (self.song.regenHp or c:isEffectEquipped("hasRegenHP")) then
-			if (not c:isDisabled()) then
-				if (c.currentHp < c.maxHp) then
-					c.currentHp = c.currentHp + 1
-					update = true
-				end
+		if (c:isEffectEquipped("hasRegenHP")) then
+			if (c.currentHp < c.maxHp) then
+				c.currentHp = c.currentHp + 1
+				update = true
 			end
 		end
 	end
@@ -870,7 +869,7 @@ function party:singSong()
 	action = btAction.new()
 	action.source = char
 
-	tune = char:getTune()
+	tune = song:getTune()
 	if (not tune) then
 		text:clear()
 		return
@@ -884,24 +883,10 @@ function party:singSong()
 	text:print(" plays a tune")
 
 	if (party.song.active) then
-		party.song.singer:songTimeout()
+		party.song:deactivate()()
 	end
 
-	if (tune.activate) then
-		action.func = tune.activate.func
-		action.inData = tune.nonCombatData[currentLevel.level].inData
-
-		log:print(log.LOG_DEBUG, action.func)
-		if (action.func) then
-			action.func(action)
-		end
-	end
-
-	party.song.singer	= char
-	party.song.active	= true
-	party.song.timer	= 12
-	char.isSinging		= true
-	char.song		= tune
+	party.song:activate(char, tune)
 end
 
 ----------------------------------------

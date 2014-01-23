@@ -36,6 +36,8 @@ end
 -- Interval: ~30s
 ----------------------------------------
 local function bt2_512()
+	log:print(log.LOG_DEBUG, "bt2_512() run")
+
 	if ((not globals.isPaused) and (globals.doTimeEvents)) then
 		party:doPoison()
 
@@ -46,10 +48,10 @@ local function bt2_512()
 	end
 
 	if (not globals.isPaused) then
-		if ((party.song.active) and (party.song.timer > 0)) then
-			party.song.timer = party.song.timer - 1
-			if (party.song.timer == 0) then
-				party.singer:songTimeout()
+		if (party.song.duration > 0) then
+			party.song.duration = party.song.duration - 1
+			if (party.song.duration == 0) then
+				party.song:deactivate()
 			end
 		end
 
@@ -88,7 +90,8 @@ local function bt2_512()
 
 		if (globals.doTimeEvents) then
 			if ((currentLevel.currentSquare.isSpptRegen) or
-			    (currentLevel:isCity() and not globals.isNight))
+			    (currentLevel:isCity() and not globals.isNight) or
+			    (party.song.spptRegen))
 			    then
 				party:regenSpellPoints()
 			end
@@ -106,12 +109,11 @@ local function bt2_512()
 end
 
 ----------------------------------------
--- bt1_2048()
+-- bt2_2048()
 --
 -- Interval: ~2m
 ----------------------------------------
-local function bt1_2048()
-	dprint("bt1_2048()")
+local function bt2_2048()
 	if (not globals.isPaused) then
 		if (globals.gameHour == 23) then
 			globals.gameHour = 0
@@ -120,23 +122,21 @@ local function bt1_2048()
 		end
 
 		if ((globals.gameHour < 6) or (globals.gameHour > 18)) then
-			if ((not globals.isNight) and (not globals.inDungeon)) then
+			if (not globals.isNight) then
 				globals.isNight = true
-				currentLevel.level = 2
 
 				if (globals.doTimeEvents) then
-					if (currentLevel:isCity()) then
+					if (currentLevel:isOutdoors()) then
 						currentLevel:buildView()
 					end
 				end
 			end
 		else
-			if ((globals.isNight) and (not globals.inDungeon)) then
+			if (globals.isNight) then
 				globals.isNight = false
 
-				currentLevel.level = 1
 				if (globals.doTimeEvents) then
-					if (currentLevel:isCity()) then
+					if (currentLevel:isOutdoors()) then
 						currentLevel:buildView()
 					end
 				end
@@ -145,10 +145,10 @@ local function bt1_2048()
 	end
 end
 
-local function __init()
-	timer:new(bt2_32,	1760)
---	timer:new(bt2_512,	28160)
---	timer:new(bt1_2048,	112640)
-end
+local xxx_look_in_to_making_timers_global = true
+-- Save off the timer somewhere so that they can be cleanly stopped
 
-__init()
+timer:new(bt2_32,	1760)
+--timer:new(bt2_512,	28160)
+timer:new(bt2_512,	1760)
+timer:new(bt2_2048,	112640)

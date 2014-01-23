@@ -80,7 +80,7 @@ function character:getStatusLine()
 		self.name, 
 		self:getAcString(),
 		self:getHpString(),
-		self.currentSppt,
+		self.maxSppt,
 		string.sub(self.class,1,2)
 		)
 
@@ -960,31 +960,6 @@ function character:castSpell(inAction)
 end
 
 ----------------------------------------
--- getTune()
-----------------------------------------
-function character:getTune()
-	local i
-	local inkey
-
-	text:cdprint(true, false, "Play tune #\n\n")
-	for i = 1,#songs do
-		text:print("%d)%s\n", i, songs[i].name)
-	end
-
-	inkey = getkey()
-	if ((inkey > "0") and (inkey < tostring(#songs + 1))) then
-		local tune
-
-		inkey = tonumber(inkey)
-
-		return songs[inkey]
-	end
-
-	return false
-end
-
-
-----------------------------------------
 -- doVoiceCheck()
 ----------------------------------------
 function character:doVoiceCheck()
@@ -1002,25 +977,20 @@ end
 
 ----------------------------------------
 -- songTimeout()
+--
+-- Deactivate the currently playing song
+-- if this character is singing. Since
+-- there can only be only song playing
+-- at a time, if this character is 
+-- singing we can safely deactivate the
+-- party's song
 ----------------------------------------
 function character:songTimeout()
 	if (not self.isSinging) then
 		return	
 	end
 
-	if (not self.song) then
-		return
-	end
-
-	if (self.song.deactivate) then
-		self.song.deactivate.func()
-	end
-
-	party.song.singer = false
-	party.song.active = false
-	party.song.timer = 0
-	self.isSinging = false
-	self.song = false
+	party.song:deactivate()
 end
 
 ----------------------------------------

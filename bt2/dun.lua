@@ -206,6 +206,13 @@ function dun:fromTable(inTable)
 	end
 end
 
+----------------------------------------
+-- dun:isOutdoors()
+----------------------------------------
+function dun:isOutdoors()
+	return false
+end
+
 function dun:isDungeon()
 	return true
 end

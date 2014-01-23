@@ -309,7 +309,7 @@ function battle:start()
 		end
 
 		if (self.isPartyAttack) then
-			if (not party:isHostile()) then
+			if (not party:canRun()) then
 				text:cdprint(true, false, 
 					"Do you wish to continue?")
 				if (not text:getYesNo()) then
@@ -326,11 +326,11 @@ function battle:start()
 		end
 	until (continue == false)
 
-	self:postCleanup()
-
 	if ((not partyRan) and (not self.isPartyAttack)) then
 		self:doReward()
 	end
+
+	self:postCleanup()
 
 	self:stop()
 
@@ -339,6 +339,9 @@ function battle:start()
 	return not partyRan
 end
 
+----------------------------------------
+-- battle:stop()
+----------------------------------------
 function battle:stop()
 	text:clear()
 	party:display()
@@ -413,10 +416,10 @@ function battle:doRound()
 	text:setCursor(0, 11)
 	if (party.advance) then
 		text:print("\nThe party advances!!\n\n")
-		local m
-		for m in self.monParty:iterator() do
-			if (m.range > 10) then
-				m.range = m.range - 10
+		local mgroup
+		for mgroup in self.monParty:iterator() do
+			if (mgroup.range > 10) then
+				mgroup.range = mgroup.range - 10
 			end
 		end
 		party.advance = false
@@ -484,16 +487,12 @@ function battle:endRound()
 	end
 end
 
+----------------------------------------
+-- battle:postRoundCleanup()
+----------------------------------------
 function battle:postRoundCleanup()
 	local i
 	local c
-
-	c = party.summon
-	if ((c) and ((c.currentHp == 0) or (c.isStoned) or (c.isParalyzed) or
-		     (c.isDead))) then
-		log:print(log.LOG_DEBUG, "Removing summon")
-		party:removeSummon()
-	end
 
 	for c in party:iterator() do
 		if (c.isDoppleganger) then
@@ -507,6 +506,18 @@ function battle:postRoundCleanup()
 	end
 
 	party:sort()
+
+	-- Something very weird in the DOS version. What it looks like
+	-- is that if the reset of the part is disabled, then the first
+	-- character is stripped of being possessed.
+	--
+	c = party:isOccupied(2)
+	if (c) then
+		if (c:isDisabled()) then
+			party.head.isPossessed = false
+			party:display()
+		end
+	end
 end
 
 ----------------------------------------
@@ -801,7 +812,7 @@ function battle:doReward()
 	local giveGold		= true
 	local partySize		= 0
 
-	timer:delay()
+	--timer:delay()
 
 	if (globals.gameState == globals.STATE_DUNGEON) then
 		giveGold = currentLevel:doTreasureChest()
@@ -848,6 +859,7 @@ function battle:doReward()
 
 		if (not inTarget:isSummon()) then
 			if (inTarget:giveItem(inItem, isIdentified)) then
+				timer:delay(6)
 				text:print("%s found a ", inTarget.name)
 				if (isIdentified) then
 					text:print(item.name)
@@ -862,9 +874,15 @@ function battle:doReward()
 		return false
 	end
 
+	log:print(log.LOG_DEBUG, "itemsToGive: %d", itemsToGive)
 	if (giveGold) then
 		if ((itemsToGive == 0) and (currentLevel.level > 4)) then
 			itemsToGive = 1
+		end
+
+		if (itemsToGive == 0) then
+			timer:delay(10)
+			return
 		end
 
 		if (currentLevel.level < 5) then
@@ -888,7 +906,7 @@ function battle:doReward()
 			end
 		end
 
-		timer:delay(8)
+		timer:delay(10)
 	else
 		timer:delay(10)
 	end
@@ -899,22 +917,12 @@ end
 -- battle:convertPreBattleSong
 ----------------------------------------
 function battle:convertPreBattleSong()
-	if (party.song.active) then
-		local singer = party.song.singer
-
-		self.preBattleSong = singer.song
-
-		if (singer.song.name ~= "Sanctuary Score") then
-			-- Stop the song
-			singer:songTimeout()
-			log:print(log.LOG_DEBUG, "Running combatFunction")
-			local action = btAction.new()
-			action.inData = singer.song.combatData[currentLevel.level].inData
-			singer.song.combatFunction.func(action)
-		end
-	end
+	party.song:convertToCombat()
 end
 
+----------------------------------------
+-- battle:postCleanup()
+----------------------------------------
 function battle:postCleanup()
 	local c
 

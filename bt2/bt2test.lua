@@ -107,8 +107,8 @@ os.exit()
 repeat
 	if (globals.gameState == globals.STATE_GUILD) then	
 		globals.partyDied = false
-		if (party.song.singer) then
-			party.song.singer:songTimeout()
+		if (party.song.active) then
+			party.song:deactivate()
 		end
 
 		party.detect:deactivate()

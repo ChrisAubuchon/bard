@@ -180,6 +180,7 @@ function battleMonster:doDamage(inAction)
 		end
 	end
 
+	log:print(log.LOG_DEBUG, "Removing monster: %s", target.key)
 	self:removeMonster(target)
 	currentBattle:removePriority(target)
 	currentBattle.killCount[self.name] = currentBattle.killCount[self.name] + 1

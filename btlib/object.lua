@@ -99,6 +99,9 @@ function object:index(inKey)
 		rawset(self, inKey, table.copy(v))
 		return rawget(self, inKey)
 	else
+		if (inKey == nil) then
+			error("table index is nil", 2)
+		end
 		self[inKey] = v
 		return v
 	end

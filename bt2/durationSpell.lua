@@ -62,7 +62,7 @@ function lightEffect:activate(inDuration, inDistance, inSeeSecret)
 	self:__activate(inDuration)
 
 	if (party.song.lightSong) then
-		party.song.singer:songTimeout()
+		party.song:deactivate()
 	end
 
 	if (currentLevel:isDungeon()) then

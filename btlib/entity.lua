@@ -14,6 +14,8 @@ entity = {
 	ac		= 10,
 
 	gold		= 0,
+	xp		= 0,
+	battlesWon	= 0,
 
 	isDead		= false,
 	isOld		= false,

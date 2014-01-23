@@ -67,6 +67,7 @@ require "monsterParty"
 require "monsterGroup"
 require "summon"
 require "durationSpell"
+require "songs"
 require "party"
 require "action"
 require "guild"
@@ -85,7 +86,6 @@ require "city"
 require "dunSquares"
 require "dun"
 require "battle"
-require "songs"
 require "timers"
 
 getkey()
@@ -96,8 +96,8 @@ title:Draw(nil)
 repeat
 	if (globals.gameState == globals.STATE_GUILD) then	
 		globals.partyDied = false
-		if (party.song.singer) then
-			party.song.singer:songTimeout()
+		if (party.song.active) then
+			party.song:deactivate()
 		end
 
 		party.detect:deactivate()

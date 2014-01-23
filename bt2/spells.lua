@@ -385,7 +385,10 @@ function spells.attack(inAction)
 	inAction.source:attackSpell(inAction)
 end
 
-function spells.battleBonus(inAction)
+----------------------------------------
+-- spells:battleBonus()
+----------------------------------------
+function spells:battleBonus(inAction)
 	if (inAction.source:battleBonus(inAction)) then
 		text:printEllipsis()
 	end

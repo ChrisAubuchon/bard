@@ -139,7 +139,6 @@ declare_global("textBox")
 
 -- song.lua
 declare_global("song")
-declare_global("songs")
 
 -- spells.lua
 declare_global("spells")

@@ -240,11 +240,17 @@ function battleParty:battleBonus(inAction)
 	-- antiMagic battle bonus
 	----------------------------------------
 	if (inData.antiMagic) then
+		party:addBattleBonus("antiMagic", 2, true, 6)
+	end
+
+if false then
+	if (inData.antiMagic) then
 		party.antiMagic = party.antiMagic + 2
 		if (party.antiMagic > 6) then
 			party.antiMagic = 6
 		end
 	end
+end
 
 	----------------------------------------
 	-- AC Bonus

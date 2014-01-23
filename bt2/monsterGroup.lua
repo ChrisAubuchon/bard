@@ -2,11 +2,10 @@
 monsterGroup = {}
 
 function monsterGroup:new(inName, inSize)
-	local self = object:new()
+	local self = linkedList:new()
 
 	self:addParent(monsterGroup)
 	self:addParent(monster) 
-	self:addParent(linkedList)
 	self:addParent(linkedListNode)
 	self:addParent(monsterData[inName]) 
 	self:addParent(battleMonster)
@@ -53,14 +52,31 @@ function monsterGroup:removeMonster(inMonster)
 end
 
 ----------------------------------------
--- truncate()
+-- monsterGroup:targetIterator()
 --
--- Remove all members except for the
--- first
+-- Since spell targetting picks a 
+-- random member of the group, it is 
+-- possible for a multi-target spell
+-- to not hit every monster. This
+-- function returns the head of the list
+-- self.size times to make sure that the
+-- spell is executed the correct number
+-- of times.
 ----------------------------------------
-function monsterGroup:truncate()
-	assert(self.head, "trucate()ng an empty monster group")
+function monsterGroup:targetIterator()
+	local n		= 0
+	local fullSize	= self.size
+	local function f(_)
+		if (self == nil) then
+			error("Bad self reference", 2)
+		end
+		while (n < fullSize) do
+			n = n + 1
+			return self.head
+		end
+		return
+	end
 
-	self.head.next = false
-	self.tail = self.head
+	return f, nil, n
 end
+

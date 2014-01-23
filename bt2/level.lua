@@ -27,6 +27,7 @@ function level:doLifeDrain()	return true			end
 
 function level:isDungeon()	return false	end
 function level:isCity()		return false	end
+function level:isOutdoors()	return true	end
 function level:setTitle()
 	bigpic:setTitle(self.title)
 end

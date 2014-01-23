@@ -15,6 +15,7 @@ typedef struct {
 	btFunction_t	*activate;
 	btFunction_t	*deactivate;
 	btFunction_t	*combatFunction;
+	btFunction_t	*toCombat;
 	cnvList_t	*combatData;
 	cnvList_t	*nonCombatData;
 } btSong_t;

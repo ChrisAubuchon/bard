@@ -18,7 +18,7 @@ uint8_t *song_combatStrings[] = {
 
 uint8_t *song_activateStrings[] = {
 	"",
-	"party.battle.antiMagic = party.battle.antiMagic + 3",
+	"party:addBattleBonus(\"antiMagic\", 3, true)",
 	"party.song.acBonus = party.song.acBonus + inAction.inData.data; party:display()",
 	"party:meleeMarch()",
 	"party.song.trapProtect = true", 
@@ -28,13 +28,31 @@ uint8_t *song_activateStrings[] = {
 
 uint8_t *song_deactivateStrings[] = {
 	"",
-	"party.battle.antiMagic = 0",
+	"party.antiMagic = 0",
 	"party.song.acBonus = 0; party:display()",
 	"",
 	"party.song.trapProtect = false",
 	"party.song.spptRegen = false",
 	"party.light:deactivate(); party.song.lightSong = false"
 };
+
+uint8_t *song_toCombatStrings[] = {
+	"",
+	"currentBattle.song:addBattleBonus(\"antiMagic\", \
+				inAction.inData.data, false)",
+	"",
+	"currentBattle.song:addBattleBonus(\"toHitBonus\",\
+				inAction.inData.data,\
+				false);\
+	 currentBattle.song:addBattleBonus(\"damageBonus\", \
+				inAction.inData.data,\
+				false);",
+	"currentBattle.song:addBattleBonus(\"hpRegen\", inAction.inData.data, \
+				false)",
+	"currentBattle.song:addBattleBonus(\"extraAttacks\", 1, false)",
+	""
+};
+
 
 uint8_t *songName[] = {
 	"Archer's Tune",

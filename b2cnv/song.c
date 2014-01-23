@@ -91,19 +91,19 @@ void convertSongs(void)
 		b = btSong_new();
 		b->name = bts_strcpy(songName[i]);
 
+		b->toCombat = btFunction_new(FUNC_STRING,
+				bts_strcpy(song_toCombatStrings[i]));
+		b->combatFunction = btFunction_new(FUNC_STRING,
+				bts_strcpy(song_combatStrings[i]));
 		switch (i) {
 		case 6:
 			song_lightSpell(b, i);
-			b->combatFunction = btFunction_new(FUNC_STRING,
-					bts_strcpy(song_combatStrings[i]));
 			break;
 		default:
 			b->activate = btFunction_new(FUNC_STRING,
 					bts_strcpy(song_activateStrings[i]));
 			b->deactivate = btFunction_new(FUNC_STRING,
 					bts_strcpy(song_deactivateStrings[i]));
-			b->combatFunction = btFunction_new(FUNC_STRING,
-					bts_strcpy(song_combatStrings[i]));
 			song_generic(b->combatData, i);
 			song_generic(b->nonCombatData, i);
 			break;

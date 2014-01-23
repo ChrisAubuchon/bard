@@ -209,7 +209,6 @@ function btAction:multiTargetSpell()
 	local target		= self.target
 	local inData		= self.inData
 	local outData		= self.outData
-	local iter
 	local t
 	local lastDamage	= 0
 
@@ -222,10 +221,9 @@ function btAction:multiTargetSpell()
 			string.pluralize(target.size, target.singular, 
 						      target.plural)
 			)
-		iter = target
 	end
 
-	for t in target:iterator(true) do
+	for t in target:targetIterator() do
 		local save
 		local half
 

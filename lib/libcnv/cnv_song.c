@@ -49,6 +49,8 @@ static json_t *btSong_toJson(const void *vbs)
 					btFunction_toJson(bs->deactivate));
 	json_object_set_new(root, "combatFunction", 
 				btFunction_toJson(bs->combatFunction));
+	json_object_set_new(root, "toCombat",
+				btFunction_toJson(bs->toCombat));
 	json_object_set_new(root, "combatData",
 				cnvList_toJsonArray(bs->combatData));
 	json_object_set_new(root, "nonCombatData",

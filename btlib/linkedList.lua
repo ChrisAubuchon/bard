@@ -1,3 +1,5 @@
+require "object"
+require "random"
 
 ----------------------------------------
 -- linkedListNode class
@@ -362,4 +364,17 @@ function linkedList:randomMember()
 	end
 
 	return rval
+end
+
+----------------------------------------
+-- linkedList:truncate()
+--
+-- Remove all elements after inNode
+----------------------------------------
+function linkedList:truncate(inNode)
+	local node 	= inNode or self.head
+
+	while (node.next) do
+		self:remove(node.next)
+	end
 end
