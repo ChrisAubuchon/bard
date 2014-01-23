@@ -228,19 +228,18 @@ end
 function battlePlayer:getBattleTune(inAction)
 	local tune
 
-	tune = self:getTune()
+	tune = song:getTune()
 	if (not tune) then
 		return false
 	end
 
-	inAction.func = tune.combatFunction.func
-	inAction.inData = tune.combatData[currentLevel.level].inData
+	inAction.func = tune
 
 	return true
 end
 
 ----------------------------------------
--- doBardSong()
+-- battlePlayer:doBardSong()
 ----------------------------------------
 function battlePlayer:doBardSong(inAction)
 	text:print(self.name)
@@ -256,11 +255,8 @@ function battlePlayer:doBardSong(inAction)
 
 	text:print(" plays a tune...\n\n")
 
-	if (inAction.func) then
-		inAction.func(inAction)
-		party:display()
-		timer:delay()
-	end
+	song:activateCombatSong(inAction)
+	party:display()
 end
 
 local paladinSavingBonus = {

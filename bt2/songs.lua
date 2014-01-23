@@ -42,6 +42,21 @@ function song:new()
 end
 
 ----------------------------------------
+-- song:__tuneNumberCheck()
+--
+-- Validate that a function argument
+-- is a tune number
+----------------------------------------
+function song:__tuneNumberCheck(inTune)
+	if (type(inTune) ~= "number") then
+		error("song:activate() inTune not a number", 3)
+	end
+
+	if ((inTune < 1) or (inTune > #songList)) then
+		error("Invalid tune number: " .. tostring(inTune), 3)
+	end
+end
+----------------------------------------
 -- song:getTune()
 ----------------------------------------
 function song:getTune()
@@ -72,13 +87,7 @@ function song:activate(inSinger, inTune)
 	local tune
 	local action
 
-	if (type(inTune) ~= "number") then
-		error("song:activate() inTune not a number", 2)
-	end
-
-	if ((inTune < 1) or (inTune > #songList)) then
-		error("Invalid tune number: " .. tostring(inTune), 2)
-	end
+	self:__tuneNumberCheck(inTune)
 
 	tune = songList[inTune]
 	if (tune.activate) then
@@ -158,4 +167,27 @@ function song:convertToCombat()
 
 		tune.toCombat.func(action)
 	end
+end
+
+----------------------------------------
+-- song:combatSong()
+----------------------------------------
+function song:activateCombatSong(inAction)
+	local tune
+	local action
+
+	self:__tuneNumberCheck(inAction.func)
+
+	tune = songList[inAction.func]
+
+	-- Special handling for Watchwood Melody
+	if (tune.name == "Watchwood Melody") then
+		text:print(" but was unable to play it.")
+		return
+	end
+
+	inAction.func = tune.combatFunction.func
+	inAction.inData = tune.combatData[currentLevel.level].inData
+	inAction.func()
+	timer:delay()
 end

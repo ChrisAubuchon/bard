@@ -845,7 +845,6 @@ end
 ----------------------------------------
 function party:singSong()
 	local char
-	local action
 	local tune
 
 	text:cdprint(true, false, "Who will play?")
@@ -865,9 +864,6 @@ function party:singSong()
 			"\n\nHe has no instrument to play.")
 		return
 	end
-
-	action = btAction.new()
-	action.source = char
 
 	tune = song:getTune()
 	if (not tune) then
