@@ -439,6 +439,7 @@ function party:canRun()
 	local c
 
 	for c in self:characterIterator("cantRun") do
+		log:print(log.LOG_DEBUG, "%s can't run", c.name)
 		return false
 	end
 
@@ -758,14 +759,11 @@ function party:useItem()
 		return
 	end
 
-	action = btAction.new()
-	action.source = char
-
-	if (not char:getUseItem(action)) then
-		return
+	if (not char:getUseItem()) then
+		return	
 	end
 
-	char:useItem(action)
+	char:useItem()
 end
 
 ----------------------------------------
@@ -817,24 +815,22 @@ function party:castSpell()
 		return
 	end
 
-	action = btAction.new()
-	action.source	= char
-	action.func	= s.action.func
-	action.inData	= s.action.inData
-	action.inData.sppt	= s.sppt
+	char.action.func	= s.action.func
+	char.action.inData	= s.action.inData
+	char.action.inData.sppt = s.sppt
 
 	if (s.targetted) then
 		text:cdprint(true, false, "Use on:")
 
-		action.target = char:getActionTarget(s.targetted)
-		if (not action.target) then
+		char.action.target = char:getActionTarget(s.targetted)
+		if (not char.action.target) then
 			text:clear()
 			return
 		end
 	end
 
 	text:cdprint(true, false, char.name)
-	char:castSpell(action)
+	char:castSpell()
 	party:sort()
 end
 

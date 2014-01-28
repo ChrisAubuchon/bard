@@ -258,7 +258,14 @@ function btAction:multiTargetSpell()
 	end
 end
 
-
+----------------------------------------
+-- btAction:perform()
+----------------------------------------
+function btAction:perform(inSource)
+	if (self.func) then
+		self:func(inSource)
+	end
+end
 
 
 

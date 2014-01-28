@@ -277,12 +277,12 @@ end
 ----------------------------------------
 -- spells.summon()
 ----------------------------------------
-function spells.summon(inAction)
+function spells.summon(inAction, inSource)
 	local inData	= inAction.inData
 
-	if (inAction.source:isCharacter()) then
+	if (inSource:isCharacter()) then
 		party:doSummon(inData)
-	elseif (inAction.source:isSummon()) then
+	elseif (inSource:isSummon()) then
 		local xxx_add_party_monster_summon_spell = true
 
 		text:printEllipsis()
@@ -294,6 +294,9 @@ function spells.summon(inAction)
 	end
 end
 
+----------------------------------------
+-- __doHeal()
+----------------------------------------
 local function __doHeal(inAction, inTarget)
 	local inData	= inAction.inData
 
@@ -305,6 +308,8 @@ local function __doHeal(inAction, inTarget)
 		if (inData.randomHeal) then
 			assert(inData.ndice ~= 0)
 			hpHealed = random:xdy(inData.ndice, inData.dieval)
+		else
+			hpHealed = inData.ndice
 		end
 
 		inTarget.currentHp = inTarget.currentHp + hpHealed
@@ -345,6 +350,9 @@ local function __doHeal(inAction, inTarget)
 	if (inData.stoned) then inTarget.isStoned = false end
 end
 
+----------------------------------------
+-- spells.heal
+----------------------------------------
 function spells.heal(inAction)
 	local inData = inAction.inData
 
@@ -392,7 +400,7 @@ function spells.spellBind(inAction)
 	text:printEllipsis()
 end
 
-function spells.mageStar(inAction)
+function spells.mageStar(inAction, inSource)
 	log:print(log.LOG_DEBUG, "spells.mageStar")
 
 	if (inAction:groupSavingThrow()) then
@@ -400,29 +408,32 @@ function spells.mageStar(inAction)
 		party:display()
 		return
 	end
-	inAction.source:mageStar(inAction)
+	inSource:mageStar(inAction)
 	text:printEllipsis()
 end
 
 
-function spells.attack(inAction)
+----------------------------------------
+-- spells.attack()
+----------------------------------------
+function spells.attack(inAction, inSource)
 	log:print(log.LOG_DEBUG, "spells.attack()")
-	inAction.source:attackSpell(inAction)
+	inSource:attackSpell(inAction)
 end
 
 ----------------------------------------
 -- spells:battleBonus()
 ----------------------------------------
-function spells:battleBonus(inAction)
-	if (inAction.source:battleBonus(inAction)) then
+function spells:battleBonus(inAction, inSource)
+	if (inSource:battleBonus(inAction)) then
 		text:printEllipsis()
 	end
 end
 
-function spells.disbelieve(inAction)
+function spells.disbelieve(inAction, inSource)
 	-- disbelieve is kind of broken in the DOS version of BT1
 	--
-	if (inAction.source:isMonster()) then
+	if (inSource:isMonster()) then
 		assert(currentBattle.monParty.disbelieve)
 		currentBattle.monParty.disbelieve = true
 	else

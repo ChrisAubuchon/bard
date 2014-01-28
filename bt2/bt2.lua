@@ -24,7 +24,6 @@ package.path = package.path .. ";" .. sys.dataPath .. "/../btlib/?.lua"
 sys.sharedPath = sys.dataPath .. "/share"
 sys.dataPath = sys.dataPath .. "/bt2"
 
-if false then
 setmetatable(_G, {
 	__newindex = function(_, n)
 		error("Attempt to write to undeclared global " .. n, 2)
@@ -33,12 +32,11 @@ setmetatable(_G, {
 		error("Attempt to read from undeclared global " .. n, 2)
 	end,
 	})
-end
 
 require "declares"
 require "btlib"
 
-log.level = log.LOG_DEBUG
+log.level = log.LOG_MEMORY
 
 gfx:Init("Bard's Tale II")
 require "globals"

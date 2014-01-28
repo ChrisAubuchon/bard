@@ -349,6 +349,7 @@ static btAction_t *spf_wordofhealing(uint32_t index)
 		bh->paralysis	= 1;
 		bh->insanity	= 1;
 	}
+	bh->dieval = 4;
 
 	return rval;
 }

@@ -10,6 +10,10 @@ random = {
 function random:xdy(x, y)
 	local value = 0
 
+	if ((not x) or (not y)) then
+		error("random:xdy() invalid parameter", 2)
+	end
+
 	for i = 1,x do
 		value = value + ((self.mt() % y) + 1)
 	end

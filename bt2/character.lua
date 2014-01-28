@@ -13,7 +13,9 @@ character = {}
 function character:new()
 	local self = object:new()
 
-	self.isHiding	= false
+	self.isHiding		= false
+	self.action		= btAction:new()
+	self.action.source	= self
 
 	self:addParent(bIICharacter)
 	self:addParent(character)
@@ -585,11 +587,6 @@ function character:printCharacter()
 
 				if (inkey == "C") then
 					continue = false
-				elseif (inkey == "X") then
-					local a = btAction.new()
-					a.source = self
-					use.consumeItem(a, inv)
-					continue = false
 				elseif (inkey == "D") then
 					self:unequipItem(slot)
 					self.inventory:dropItem(slot)
@@ -793,7 +790,7 @@ end
 --
 -- Get an item to use from the character
 ----------------------------------------
-function character:getUseItem(inAction)
+function character:getUseItem()
 	local target	= false
 	local item
 
@@ -827,18 +824,31 @@ function character:getUseItem(inAction)
 		return false
 	end
 
+	self.action.inData = item.action.inData
+	self.action.inData.item = item
+	self.action.func = item.action.func
+
+if false then
 	inAction.inData = item.action.inData
 	inAction.inData.item = item
 	inAction.func = item.action.func
+end
 
 	if (item.targetted) then
 		text:cdprint(true, false, "Use on:")
 
+		self.action.target = self:getActionTarget(item.targetted)
+		if (not self.action.target) then
+			text:clear()
+			return false
+		end
+if false then
 		inAction.target = self:getActionTarget(item.targetted)
 		if (not inAction.target) then
 			text:clear()
 			return false
 		end
+end
 	end
 
 	return true
@@ -850,14 +860,14 @@ end
 --
 -- Perform the function of a used item
 ----------------------------------------
-function character:useItem(inAction)
-	self:consumeItem(inAction)
+function character:useItem()
+	self:consumeItem()
 
 	text:cdprint(true, false, "%s%s", self.name,
-				inAction.inData.item.useString)
+				self.action.inData.item.useString)
 
-	if (inAction.func) then
-		inAction.func(inAction)
+	if (self.action.func) then
+		self.action.func(self.action)
 	end
 end
 
@@ -867,8 +877,8 @@ end
 -- Consume an item based on the number
 -- of charges of the item
 ----------------------------------------
-function character:consumeItem(inAction)
-	local inItem	= inAction.inData.item
+function character:consumeItem()
+	local inItem	= self.action.inData.item
 
 	if ((inItem.max_charges == 1) or
 	    ((inItem.max_charges == 0) and (random:band(63) == 1))) then
@@ -879,8 +889,8 @@ end
 ----------------------------------------
 -- consumeSpellPoints
 ----------------------------------------
-function character:consumeSpellPoints(inAction)
-	local req	= inAction.inData.sppt
+function character:consumeSpellPoints()
+	local req	= self.action.inData.sppt
 
 	log:print(log.LOG_DEBUG, "consumeSpellPoints() called")
 
@@ -935,14 +945,14 @@ end
 --
 -- Do the actual casting of a spell
 ----------------------------------------
-function character:castSpell(inAction)
+function character:castSpell()
 	local fizzle = false
 
 	log:print(log.LOG_DEBUG, "castSpell() called")
 
 	text:print(" casts a spell")
 
-	fizzle = self:consumeSpellPoints(inAction)
+	fizzle = self:consumeSpellPoints()
 
 	if (currentLevel.currentSquare.isAntiMagic) then
 		fizzle = true
@@ -954,9 +964,7 @@ function character:castSpell(inAction)
 		return
 	end
 
-	if (inAction.func) then
-		inAction.func(inAction)
-	end
+	self:doAction()
 end
 
 ----------------------------------------
@@ -1061,7 +1069,12 @@ function character:getActionTarget(inTargetOptions)
 end
 
 
-
+----------------------------------------
+-- character:doAction()
+----------------------------------------
+function character:doAction()
+	self.action:perform(self)
+end
 
 
 

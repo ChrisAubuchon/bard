@@ -91,6 +91,11 @@ getkey()
 title = gfxImage:new("images/screen.png", "png")
 title:Draw(nil)
 
+text:print("\n   (POOL GOLD)\n   (TRADE GOLD)")
+getkey()
+
+text:clear()
+
 text:print("A Forest Giant slams MAGICY, and hits for 5 points of damage.")
 getkey()
 

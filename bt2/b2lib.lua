@@ -46,8 +46,8 @@ function keyboardCommand(inkey)
 		text:clear()
 		return true
 	elseif (inkey == "G") then
-		party:dumpBattleBonus()
-		log:print(log.LOG_DEBUG, "party.song.trapProtect: %s", party.song.trapProtect)
+		collectgarbage()
+		object.dumpAll()
 	elseif (inkey == "N") then
 		party:reorder()
 		text:clear()

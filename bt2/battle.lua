@@ -22,7 +22,6 @@ function battle:init()
 	self.numGroups		= 0
 	self.monParty		= nil
 	self.priorityQueue	= {}
-	self.actionBySource	= {}
 	self.actionList		= linkedList:new()
 	self.killCount		= {}
 	table.setDefault(self.killCount, 0)
@@ -183,52 +182,23 @@ end
 ----------------------------------------
 -- battle:addPriority()
 ----------------------------------------
-function battle:addPriority(inSource, inPriority)
-	local action = self.actionBySource[inSource.key]
+function battle:addPriority(inSource)
+	inSource.action.priority = inSource:getBattlePriority()
 
-	action.priority = inPriority
-
-	self.actionBySource[inSource.key] = action
-	table.insert(self.priorityQueue, action)
-
-if false then
-	if (not self.actionHead) then
-		self.actionHead = action
-		self.actionTail = action
-		return
-	end
-
-	local current = self.actionHead
-	while (current.priority > action.priority) do
-		current = current.next
-		if (not current) then break end
-	end
-
-	-- New tail
-	if (not current) then
-		action.prev = self.actionTail
-		self.actionTail.next = action
-		self.actionTail = action
-		return
-	end
-
-	if (current == self.actionHead) then
-		self.actionHead = action
-	end
-
-	action.next = current
-	if (current.prev) then
-		current.prev.next = action
-	end
-	action.prev = current.prev
-	current.prev = action
-end
+	table.insert(self.priorityQueue, inSource)
 end
 
 ----------------------------------------
 -- battle:removePriority()
 ----------------------------------------
 function battle:removePriority(inSource)
+	if (not inSource.action) then
+		return
+	end
+
+	-- Remove the action from the list
+	self.actionList:remove(inSource)
+if false then
 	local action = self.actionBySource[inSource.key]
 
 	if (not action) then
@@ -243,6 +213,7 @@ function battle:removePriority(inSource)
 		action.prev.next = action.next
 	end
 end
+end
 
 ----------------------------------------
 -- battle:sortPriorities()
@@ -251,14 +222,14 @@ function battle:sortPriorities()
 	local action
 
 	local function priorityCompare(a,b)
-		return a.priority > b.priority
+		return a.action.priority > b.action.priority
 	end
 
 	table.sort(self.priorityQueue, priorityCompare)
 
 	-- Link up the priority queue nodes
 	for _,action in ipairs(self.priorityQueue) do
-		self.actionList:insertTail(action)
+		self.actionList:insertTail(action.action)
 	end
 end
 
@@ -303,13 +274,14 @@ function battle:start()
 		self:getPriorities()
 
 		self:doRound()
+		log:print(log.LOG_DEBUG, "doRound() over")
 		self:endRound()
 		if (globals.partyDied) then
 			return false
 		end
 
 		if (self.isPartyAttack) then
-			if (not party:canRun()) then
+			if (party:canRun()) then
 				text:cdprint(true, false, 
 					"Do you wish to continue?")
 				if (not text:getYesNo()) then
@@ -389,6 +361,7 @@ function battle:printEncounter()
 
 	if (self.isPartyAttack) then
 		text:print("\nDissention in your ranks...\n\n")
+		timer:delay(3)
 	else
 		text:print(random:randomMember(encounterStringList))
 		self:printOpponents()
@@ -426,7 +399,8 @@ function battle:doRound()
 	end
 
 	for action in self.actionList:iterator() do
-		action.source:doAction(action)
+		--log:print(log.LOG_DEBUG, "source: %s", action.name)
+		action.source:doAction()
 		if (globals.partyDied) then
 			return
 		end
@@ -529,19 +503,17 @@ function battle:getPriorities()
 
 	if ((not party.missTurn) and (not party.advance)) then
 		for c in party:characterIterator("skipDisabled") do
-			self:addPriority(c, c:getBattlePriority())
+			self:addPriority(c)
 		end
 	end
 	party.missTurn = false
 
-	if (self.isPartyAttack) then
-		return
-	end
-
-	for p in self.monParty:iterator() do
-		for c in p:iterator() do
-			self:addPriority(c, c:getBattlePriority())
-			c.beenAttacked = false
+	if (not self.isPartyAttack) then
+		for p in self.monParty:iterator() do
+			for c in p:iterator() do
+				self:addPriority(c, c:getBattlePriority())
+				c.beenAttacked = false
+			end
 		end
 	end
 
@@ -570,11 +542,10 @@ function battle:getPlayerOptions()
 
 	repeat
 		for c in party:iterator("skipDisabled") do
-			action = self:getPlayerOption(c)
+			self:getPlayerOption(c)
 			if (c.isDoppleganger) then
-				action.action = "possessedAttack"
+				c.action.action = "possessedAttack"
 			end
-			self:addAction(c, action)
 		end 
 
 		text:cdprint(true, false, "Use these attack commands?")
@@ -597,7 +568,11 @@ end
 function battle:getRunFightOption()
 	local inkey
 
-	if (self.isPartyAttack or (not party:canRun())) then
+	if (self.isPartyAttack) then
+		return false
+	end
+
+	if (not party:canRun()) then
 		timer:delay(3)
 		return false
 	end
@@ -646,23 +621,19 @@ end
 -- battle:getPlayerOption
 ----------------------------------------
 function battle:getPlayerOption(c)
-	local action
 	local options = {}
 	local inkey
 
 	table.setDefault(options, false)
 
-	action = btAction:new()
-	action.source = c
-
 	if (c:isSummon()) then
-		action.action = battle.doSummonAttack
-		return action
+		c.action.action = battle.doSummonAttack
+		return
 	end
 
 	if ((c.isPossessed) or (c.isNuts)) then
-		action.action = "possessedAttack"
-		return action
+		c.action.action = "possessedAttack"
+		return
 	end
 
 	while true do
@@ -708,40 +679,40 @@ function battle:getPlayerOption(c)
 
 			if (options[inkey]) then
 				if (inkey == "A") then
-					action.action = "melee"
-					if (self:meleeTarget(action)) then
-						return action
+					c.action.action = "melee"
+					if (self:meleeTarget(c.action)) then
+						return
 					end
 					continue = false
 				elseif (inkey == "B") then
-					action.action = "sing"
-					if (c:getBattleTune(action, true)) then
-						return action
+					c.action.action = "sing"
+					if (c:getBattleTune(c.action, true)) then
+						return
 					end
 					continue = false
 				elseif (inkey == "C") then
-					action.action = "cast"
-					if (c:getCombatSpell(action)) then
-						return action
+					c.action.action = "cast"
+					if (c:getCombatSpell(c.action)) then
+						return
 					end
 					continue = false
 				elseif (inkey == "D") then
-					action.action = "defend"
-					return action
+					c.action.action = "defend"
+					return
 				elseif (inkey == "H") then
-					action.source:hideInShadows()
-					action.action = "hide"
-					return action
+					c:hideInShadows()
+					c.action.action = "hide"
+					return
 				elseif (inkey == "P") then
-					action.action = "partyAttack"
-					if (self:meleeTarget(action)) then
-						return action
+					c.action.action = "partyAttack"
+					if (self:meleeTarget(c.action)) then
+						return
 					end
 					continue = false
 				elseif (inkey == "U") then
-					action.action = "use"
-					if (c:getUseItem(action)) then
-						return action
+					c.action.action = "use"
+					if (c:getUseItem(c.action)) then
+						return
 					end
 					continue = false
 				end

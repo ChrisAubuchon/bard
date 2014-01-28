@@ -294,6 +294,12 @@ function guild:doEnter()
 			self:removeMember()
 		elseif (inkey == "Q") then
 			self:quitGame()
+		elseif (inkey == "G") then
+			collectgarbage()
+		elseif (inkey == "H") then
+			log:print(log.LOG_INFO, "=========================")
+			object.dumpAll()
+			log:print(log.LOG_INFO, "=========================")
 		end
 	until (inkey == "E")
 end
