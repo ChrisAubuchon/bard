@@ -13,6 +13,7 @@ log = {
 	LOG_NOTICE	= 6,
 	LOG_INFO	= 7,
 	LOG_DEBUG	= 8,
+	LOG_MEMORY	= 9,
 
 	level	= 0,
 	file	= io.stdout
@@ -26,9 +27,13 @@ local message = {
 	"WARNING",
 	"NOTICE",
 	"INFO",
-	"DEBUG"
+	"DEBUG",
+	"MEMORY"
 }
 
+----------------------------------------
+-- log:getLocation()
+----------------------------------------
 function log:getLocation(inDepth)
 	local dinfo
 
@@ -39,6 +44,9 @@ function log:getLocation(inDepth)
 		)
 end
 
+----------------------------------------
+-- log:print()
+----------------------------------------
 function log:print(level, format, ...)
 	if (level == self.level) then
 		local location

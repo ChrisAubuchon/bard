@@ -1,9 +1,16 @@
 require "random"
 
+local memoryTrace = true
+
 ----------------------------------------
 -- Table to hold all objects
+--
+-- Mark the values as weak to not
+-- interfere with garbage collection.
 ----------------------------------------
 local objectData = {}
+local objectDataMetaTable = { __mode = "v" }
+setmetatable(objectData, objectDataMetaTable)
 
 ----------------------------------------
 -- object class
@@ -22,15 +29,14 @@ function object:new(inTable)
 	while true do
 		self.key = random:hash()
 		if (not objectData[self.key]) then
-			objectData[self.key] = true
+			objectData[self.key] = self
 			break
 		end
 	end
 
-	log:print(log.LOG_INFO, "object(%s) created from %s",
-			self.key,
-			log:getLocation(3)
-		)
+	if (memoryTrace) then
+		self.__location = log:getLocation(3)
+	end
 
 	setmetatable(self, {
 		__index = object.index,
@@ -111,8 +117,30 @@ end
 -- object:gc()
 ----------------------------------------
 function object:gc()
-	log:print(log.LOG_INFO, "object(%s) cleared", self.key)
+	if (memoryTrace) then
+		log:print(log.LOG_MEMORY, 
+			"object(%s) from \"%s\" garbage collected", 
+			self.key,
+			self.__location
+		)
+	end
+
 	objectData[self.key] = nil
+end
+
+----------------------------------------
+-- object:dumpAll()
+----------------------------------------
+function object:dumpAll()
+	local key
+	local value
+
+	for key,value in pairs(objectData) do
+		log:print(log.LOG_INFO, "Key: %s from %s",
+			key,
+			value.__location
+			)
+	end
 end
 
 ----------------------------------------
