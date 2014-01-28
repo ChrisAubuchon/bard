@@ -28,7 +28,7 @@ end
 -- linkedListNode:isLast()
 ----------------------------------------
 function linkedListNode:isLast()
-	if (self.next) then
+	if (self[self.next]) then
 		return false
 	else
 		return true
@@ -47,13 +47,16 @@ linkedList = {
 	tail	= false
 }
 
-function linkedList:new()
+function linkedList:new(inNext, inPrev, inCompare)
 	local self = object:new()
 
 	self:addParent(linkedList)
 
-	self.head = false
-	self.tail = false
+	self.head	= false
+	self.tail	= false
+	self.next	= inNext or "next"
+	self.prev	= inPrev or "prev"
+	self.compare	= inCompare or nil
 
 	return self
 end
@@ -82,10 +85,10 @@ function linkedList:insertTail(inNode)
 		return
 	end
 
-	self.tail.next = inNode
-	inNode.prev = self.tail
-	inNode.next = false
-	self.tail = inNode
+	self.tail[self.next]	= inNode
+	inNode[self.prev]	= self.tail
+	inNode[self.next]	= false
+	self.tail		= inNode
 end
 
 ----------------------------------------
@@ -98,10 +101,10 @@ function linkedList:insertHead(inNode)
 		return
 	end
 
-	inNode.prev = false
-	inNode.next = self.head
-	self.head.prev = inNode
-	self.head = inNode
+	inNode[self.prev]	= false
+	inNode[self.next]	= self.head
+	self.head[self.prev]	= inNode
+	self.head		= inNode
 end
 
 ----------------------------------------
@@ -123,10 +126,10 @@ function linkedList:insertBefore(inNode, inLocation)
 	-- The assumption now is that inLocation has a 
 	-- prev entry.
 	--
-	inNode.next = inLocation
-	inNode.prev = inLocation.prev
-	inLocation.prev.next = inNode
-	inLocation.prev = inNode
+	inNode[self.next]			= inLocation
+	inNode[self.prev]			= inLocation[self.prev]
+	inLocation[self.prev][self.next]	= inNode
+	inLocation[self.prev]			= inNode
 end
 
 ----------------------------------------
@@ -143,10 +146,10 @@ function linkedList:insertAfter(inNode, inLocation)
 		return
 	end
 
-	inNode.prev = inLocation
-	inNode.next = inLocation.next
-	inLocation.next.prev = inNode
-	inLocation.next = inNode
+	inNode[self.prev]			= inLocation
+	inNode[self.next]			= inLocation[self.next]
+	inLocation[self.next][self.prev]	= inNode
+	inLocation[self.next]			= inNode
 end
 
 ----------------------------------------
@@ -154,19 +157,19 @@ end
 ----------------------------------------
 function linkedList:remove(inNode)
 	if (inNode == self.head) then
-		self.head = inNode.next
+		self.head = inNode[self.next]
 	end
 
 	if (inNode == self.tail) then
-		self.tail = inNode.prev
+		self.tail = inNode[self.prev]
 	end
 
-	if (inNode.next) then
-		inNode.next.prev = inNode.prev
+	if (inNode[self.next]) then
+		inNode[self.next][self.prev] = inNode[self.prev]
 	end
 
-	if (inNode.prev) then
-		inNode.prev.next = inNode.next
+	if (inNode[self.prev]) then
+		inNode[self.prev][self.next] = inNode[self.next]
 	end
 end
 
@@ -174,8 +177,8 @@ end
 -- removeHead()
 ----------------------------------------
 function linkedList:removeHead()
-	self.head = self.head.next
-	self.head.prev = false
+	self.head = self.head[self.next]
+	self.head[self.prev] = false
 end
 
 ----------------------------------------
@@ -183,8 +186,8 @@ end
 ----------------------------------------
 function linkedList:removeTail()
 	if (self.tail) then
-		self.tail = self.tail.prev
-		self.tail.next = false
+		self.tail = self.tail[self.prev]
+		self.tail[self.next] = false
 	end
 end
 
@@ -216,8 +219,8 @@ function linkedList:iterator()
 		if (head == nil) then
 			return self.head
 		end
-		if (head.next) then
-			return head.next
+		if (head[self.next]) then
+			return head[self.next]
 		end
 		return
 	end
@@ -235,11 +238,11 @@ function linkedList:iterateFrom(inHead, isCircular)
 		if (head == nil) then
 			return inHead
 		end
-		if (isCircular and (head.next == inHead)) then
+		if (isCircular and (head[self.next] == inHead)) then
 			return
 		end
-		if (head.next) then
-			return head.next
+		if (head[self.next]) then
+			return head[self.next]
 		end
 		if (isCircular and (head ~= self.head)) then
 			
@@ -261,10 +264,10 @@ function linkedList:conditionalIterator(inConditionFunction)
 		while (state) do
 			if (inConditionFunction(state)) then
 				local rval = state
-				state = state.next
+				state = state[self.next]
 				return rval
 			end
-			state = state.next
+			state = state[self.next]
 		end
 		return
 	end
@@ -280,10 +283,10 @@ function linkedList:conditionalIterateFrom(inHead, inConditionFunction)
 		while (state) do
 			if (inConditionFunction(state)) then
 				local rval = state
-				state = state.next
+				state = state[self.next]
 				return rval
 			end
-			state = state.next
+			state = state[self.next]
 		end
 		return
 	end
@@ -302,8 +305,8 @@ function linkedList:reverseIterator()
 
 			return self.tail
 		end
-		if (tail.prev) then
-			return tail.prev
+		if (tail[self.prev]) then
+			return tail[self.prev]
 		end
 		return
 	end
@@ -328,8 +331,8 @@ function linkedList:ipairs()
 			head = self.head
 			return n, head
 		end
-		if (head.next) then
-			head = head.next
+		if (head[self.next]) then
+			head = head[self.next]
 			return n, head
 		end
 		return
@@ -374,7 +377,7 @@ end
 function linkedList:truncate(inNode)
 	local node 	= inNode or self.head
 
-	while (node.next) do
-		self:remove(node.next)
+	while (node[self.next]) do
+		self:remove(node[self.next])
 	end
 end

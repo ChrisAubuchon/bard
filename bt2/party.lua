@@ -2,9 +2,8 @@ require "bttable"
 require "btdebug"
 require "random"
 
-party = object:new()
+party = linkedList:new("partyNext", "partyPrev")
 party:addParent(battleBonus)
-party:addParent(linkedList)
 
 -- Graphics objects for party display
 party.gfxRect		= gfxRect:New(24, 288, 604, 112)
@@ -40,6 +39,7 @@ end
 function party:addCharacter(inCharacter)
 	-- Insert at the end of the list
 	--
+	log:print(log.LOG_DEBUG, "party:addCharacter(%s)", inCharacter.name)
 	self:insertTail(inCharacter)
 	self:sort()
 	self.size = self.size + 1
@@ -101,17 +101,15 @@ function party:isOccupied(inIndex)
 		inIndex = tonumber(inIndex)
 	end
 
-	head = self:getFirst()
-	while (inIndex ~= count) do
-		count = count + 1
-		if (head.next) then
-			head = head.next
-		else
-			return false
+	for head in self:iterator() do
+		if (inIndex == count) then
+			return head
 		end
+
+		count = count + 1
 	end
 
-	return head
+	return false
 end
 
 ----------------------------------------
@@ -282,18 +280,18 @@ end
 -- Update the party display
 ----------------------------------------
 function party:display()
-	local i
 	local strings
-	local member		= self:getFirst()
+	local member
+	local i			= 0
 
 	for i = 0,6 do
-		if (not member) then
-			strings = false
-		else
-			strings = member:getStatusLine()
-			member = member.next
-		end
+		self:printStatusLine(false, i)
+	end
+
+	for member in self:iterator() do
+		strings = member:getStatusLine()
 		self:printStatusLine(strings, i)
+		i = i + 1
 	end
 
 	self.gfxSurface:Draw(self.gfxRect)

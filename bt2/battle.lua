@@ -118,64 +118,15 @@ end
 
 
 ----------------------------------------
--- Internal battle Classes
-----------------------------------------
-
-----------------------------------------
--- battle class
---
--- This class holds all of the data
--- for a battle
-----------------------------------------
-if false then
-function battle:new()
-	local self = {
-		isPartyAttack		= false,
-		isPartyBigpicDone	= false,
-		skipParty		= false,
-		monDisbelieve		= false,
-		numGroups		= 0,
-		monParty		= false,
-		actionHead		= false,
-		actionTail		= false,
-		actionBySource	= {},
-		killCount		= btTable.new(true),
-		songToHitBonus		= 0,
-		sontDamageBonus		= 0,
-
-		--
-		-- The songToHitPenalty isn't used in the DOS version
-		-- of BT1. I've added it here but it isn't used by this
-		-- code.
-		--
-		songToHitPenalty	= 0,
-		preBattleSong		= false
-	}
-
-	btTable.addParent(self, battle)
-	btTable.setClassMetatable(self)
-
-	party.battle.antiMagic = 0
-	party.battle.acBonus = 0
-
-
-	return self
-end
-end
-
-----------------------------------------
 -- battle:addAction()
 ----------------------------------------
 function battle:addAction(inSource, inAction)
-	self.actionBySource[inSource.key] = inAction
 end
 
 function battle:removeAction(inSource)
-	self.actionBySource[inSource.key] = nil
 end
 
 function battle:resetPriority()
-	self.actionBySource	= {}
 	self.priorityQueue	= {}
 end
 
@@ -198,21 +149,6 @@ function battle:removePriority(inSource)
 
 	-- Remove the action from the list
 	self.actionList:remove(inSource)
-if false then
-	local action = self.actionBySource[inSource.key]
-
-	if (not action) then
-		return
-	end
-
-	self.actionBySource[inSource.key] = nil
-	if (action.next) then
-		action.next.prev = action.prev
-	end
-	if (action.prev) then
-		action.prev.next = action.next
-	end
-end
 end
 
 ----------------------------------------

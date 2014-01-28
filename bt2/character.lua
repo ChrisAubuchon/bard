@@ -15,6 +15,8 @@ function character:new()
 
 	self.isHiding		= false
 	self.action		= btAction:new()
+	self.partyNext		= false
+	self.partyPrev		= false
 	self.action.source	= self
 
 	self:addParent(bIICharacter)
@@ -23,7 +25,6 @@ function character:new()
 	self:addParent(battleParty)
 	self:addParent(battlePlayer)
 	self:addParent(battleBonus)
-	self:addParent(linkedListNode)
 	self:addParent(entity)
 
 	return self
