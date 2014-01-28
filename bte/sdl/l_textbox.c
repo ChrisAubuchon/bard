@@ -232,7 +232,6 @@ static uint32_t _textbox_wrap(l_textbox *tb, btstring_t *str, uint32_t base)
 	debug("nchars = %d\n", nchars);
 	debug("max = %d\n", max);
 
-/*	if ((tb->nchars + nchars) < tb->maxChar) {*/
 	if (nchars < max) {
 		debug("Returning nchars\n");
 		return nchars;
@@ -497,9 +496,14 @@ static int l_textbox_print(lua_State *L)
 		nchars = font_wrap(tb->font, text->buf, index, \
 					(tb->rect->w - tb->x));
 #endif
-
-		while ((tb->x == 0) && (index != 0) && (text->buf[index] == ' '))
+		/*
+		 * Output newlines first
+		 */
+		while (text->buf[index] == '\n') {
 			index++;
+			_textbox_newline(tb);
+		}
+
 		nchars = _textbox_wrap(tb, text, index);
 
 		if (nchars) {
@@ -528,14 +532,19 @@ static int l_textbox_print(lua_State *L)
 			SDL_FreeSurface(s);
 		}
 
-		/* Newline in the text. Reset x and increment y */
-		if (text->buf[index] == '\n') {
-			index++;
 
-			_textbox_newline(tb);
+		if (text->buf[index] == '\n') {
+			while (text->buf[index] == '\n') {
+				index++;
+				_textbox_newline(tb);
+			}
 		} else if (index < text->size - 1) {
 			/* Line wrapped. Reset x and increment y */
 			_textbox_newline(tb);
+
+			/* Skip past any spaces at the end of the line */
+			while ((text->buf[index] == ' ') && (index < text->size))
+				index++;
 		} 
 
 	}
