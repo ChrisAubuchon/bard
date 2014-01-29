@@ -2,7 +2,7 @@ require "bttable"
 
 btAction = {}
 function btAction:new()
-	local self = linkedListNode:new()
+	local self = object:new()
 
 	self:addParent(btAction)
 
@@ -11,6 +11,14 @@ function btAction:new()
 	self.func		= false
 	self.inData		= {}
 	self.outData		= {}
+
+	self.damage		= {
+		specialAttack	= false,
+		amount		= 0,
+		source		= false
+		}
+
+	setmetatable(self.damage, { __mode = "v" })
 
 	return self
 end
@@ -34,6 +42,23 @@ function btAction:dump()
 	log:print(log.LOG_DEBUG, "===========================")
 end
 
+----------------------------------------
+-- btAction:reset()
+----------------------------------------
+function btAction:reset()
+	self.target = false
+	self.func = false
+	self.action = false
+	self.inData = {}
+	self.outData = {}
+
+	self.damage.specialAttack = false
+	self.data.amount = 0
+	self.data.source = false
+end
+
+
+local xxx_candidate_for_battle_entity
 ----------------------------------------
 -- validateTarget()
 ----------------------------------------
@@ -106,9 +131,10 @@ end
 -- printDamage()
 ----------------------------------------
 function btAction:printDamage()
-	text:print("for %d point%s of damage",
-		self.outData.damage,
-		string.pluralize(self.outData.damage, "", "s")
+	local amount = self.target.action.damage.amount
+	text:print("for %d point%s of damage", 
+		amount,
+		string.pluralize(amount, "", "s")
 		)
 end
 
@@ -116,10 +142,16 @@ end
 -- doDamage()
 ----------------------------------------
 function btAction:doDamage()
-	if (self.target:doDamage(self)) then
+	local target = self.target
+
+	log:print(log.LOG_DEBUG, "self.damage: %s", self.damage)
+	if (target:doDamage()) then
+		local damage = target.action.damage
+
+		log:print(log.LOG_DEBUG, damage.specialAttack)
 		if (not globals.partyDied) then
-			text:print(stringTables.effects[self.outData.specialAttack])
-			text:print("%s!\n\n", self.target:getPronoun())
+			text:print(stringTables.effects[damage.specialAttack])
+			text:print("%s!\n\n", target:getPronoun())
 		end
 	else
 		text:print(".\n\n")
@@ -133,7 +165,7 @@ function btAction:singleTargetSpell()
 	local target		= self.target
 	local source		= self.source
 	local inData		= self.inData
-	local outData		= self.outData
+	local damage		= target.action.damage
 	local possessFlag	= false
 	local save
 	local half
@@ -156,7 +188,7 @@ function btAction:singleTargetSpell()
 		end
 
 		if (target.isDead) then
-			if (inData.specialAttack == "possess") then
+			if (damage.specialAttack == "possess") then
 				possessFlag = true
 			else
 				text:printEllipsis()
@@ -164,7 +196,7 @@ function btAction:singleTargetSpell()
 			end
 		end
 
-		if (inData.specialAttack == "possess" and
+		if (damage.specialAttack == "possess" and
 				source:isCharacter() and
 				not possessFlag) then
 			text:printEllipsis()
@@ -184,7 +216,7 @@ function btAction:singleTargetSpell()
 		end
 	end
 
-	if (not outData.specialAttack) then
+	if (not damage.specialAttack) then
 		text:print(" and %s %s ",
 			stringTables.andEffects[inData.atype],
 			target:getPronoun()
@@ -262,6 +294,10 @@ end
 -- btAction:perform()
 ----------------------------------------
 function btAction:perform(inSource)
+	if (type(self.func) ~= "function") then
+		error("self.func not a function", 2)
+	end
+
 	if (self.func) then
 		self:func(inSource)
 	end

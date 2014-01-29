@@ -41,6 +41,142 @@ local monkMeleeDamage = {
 }
 
 ----------------------------------------
+-- battlePlayer:getBattleAction()
+----------------------------------------
+function battlePlayer:getBattleAction()
+	local inkey
+	local options = {}
+
+	table.setDefault(options,false)
+
+	if (self.isPossessed or self.isNuts) then
+		self.action.action = "possessedAttack"
+		return
+	end
+
+	while true do
+		self:generateBattleOptions(options)
+
+		repeat
+			inkey = getkey()
+		until (options[inkey])
+
+		if (self:readBattleOption(inkey)) then
+			return
+		end
+	end
+
+	error("Never reached")
+end
+
+----------------------------------------
+-- battlePlayer:generateBattleOptions()
+----------------------------------------
+function battlePlayer:generateBattleOptions(inOptions)
+	text:clear()
+	text:print("%s has these options this battle round:\n\n", self.name)
+
+	text:print("Party attack\n")
+	inOptions.P = true
+
+	if ((not currentBattle.isPartyAttack) and (self.inMeleeRange)) then
+		text:print("Attack foes\n")
+		inOptions.A = true
+	end
+
+	text:print("Defend\n")
+	inOptions.D = true
+
+	if (self.currentSppt > 0) then
+		text:print("Cast a spell\n")
+		inOptions.C = true
+	end
+
+	text:print("Use an item\n")
+	inOptions.U = true
+
+	self.isHiding = false
+	if (self.class == "Rogue") then
+		text:print("Hide in shadows\n")
+		inOptions.H = true
+	end
+
+	if ((self.class == "Bard") and (self:isTypeEquipped("Instrument"))) then
+		text:print("Bard Song\n")
+		inOptions.B = true
+	end
+
+	text:print("\nSelect an option.")
+end
+
+----------------------------------------
+-- battlePlayer:readBattleOption()
+----------------------------------------
+function battlePlayer:readBattleOption(inkey)
+	if (inkey == "A") then
+		self.action.action = "melee"
+		if (self:getMeleeTarget()) then
+			return true
+		end
+	elseif (inkey == "B") then
+		self.action.action = "sing"
+		if (self:getBattleTune()) then
+			return true
+		end
+	elseif (inkey == "C") then
+		self.action.action = "cast"
+		if (self:getCombatSpell()) then
+			return true
+		end
+	elseif (inkey == "D") then
+		self.action.action = "defend"
+		return true
+	elseif (inkey == "H") then
+		self.action.action = "hide"
+		self:hideInShadows()
+		return true
+	elseif (inkey == "P") then
+		self.action.action = "partyAttack"
+		if (self:getMeleeTarget()) then
+			return true
+		end
+	elseif (inkey == "U") then
+		self.action.action = "use"
+		if (self:getUseItem()) then
+			return true
+		end
+	end
+
+	return false
+end
+
+----------------------------------------
+-- battlePlayer:getMeleeTarget()
+----------------------------------------
+function battlePlayer:getMeleeTarget()
+	local action = self.action
+	if (currentBattle.isPartyAttack or action.action == "partyAttack") then
+		action.action = "melee"
+		text:cdprint(true, false, "Attack:")
+		action.target = self:getActionTarget({party = true})
+		if (not action.target) then
+			return false
+		end
+	else
+		if (currentBattle.monParty.size > 1) then
+			text:cdprint(true, false, "Attack:")
+		end
+
+		action.target = self:getActionTarget({melee = true})
+		if (not action.target) then
+			return false
+		end
+	end
+
+	return true
+end
+
+----------------------------------------
 -- doAction()
 ----------------------------------------
 function battlePlayer:doAction()
@@ -52,19 +188,19 @@ function battlePlayer:doAction()
 
 	if (self.action.action == "melee") then
 		log:print(log.LOG_DEBUG, "Performing melee attack")
-		self:doMeleeAttack(inAction)
+		self:doMeleeAttack()
 	elseif (self.action.action == "cast") then
 		log:print(log.LOG_DEBUG, "Performing cast a spell")
-		self:doCombatSpell(inAction)
+		self:doCombatSpell()
 	elseif (self.action.action == "defend") then
-		log:print(log.LOG_DEBUG, "Source: " .. tostring(inAction.source.name) .. " defends")
+		log:print(log.LOG_DEBUG, "Source: " .. tostring(self.name) .. " defends")
 		return
 	elseif (self.action.action == "use") then
 		log:print(log.LOG_DEBUG, "Using an item")
-		self:useItem(inAction)
+		self:useItem()
 	elseif (self.action.action == "sing") then
 		log:print(log.LOG_DEBUG, "Singing a bard song")
-		self:doBardSong(inAction)
+		self:doBardSong()
 	elseif (self.action.action == "possessedAttack") then
 		local attackParty	= false
 
@@ -78,10 +214,10 @@ function battlePlayer:doAction()
 		end
 
 		if (attackParty) then
-			inAction.target = party:randomCharacter()
+			self.action.target = party:randomCharacter()
 		else
 			if (currentBattle.monParty) then
-				inAction.target=currentBattle.monParty:getLeadGroup()
+				self.action.target=currentBattle.monParty:getLeadGroup()
 			else
 				-- This should probably attack a random
 				-- party member. In the DOS version it does
@@ -91,14 +227,14 @@ function battlePlayer:doAction()
 			end
 		end
 
-		self:doMeleeAttack(inAction)
+		self:doMeleeAttack()
 	end
 end
 
 ----------------------------------------
 -- getMeleeAttackString()
 ----------------------------------------
-function battlePlayer:getMeleeAttackString(inAction)
+function battlePlayer:getMeleeAttackString()
 	local function getWeaponString()
 		if (self:isTypeEquipped("Weapon")) then
 			return " swings at "
@@ -110,23 +246,24 @@ function battlePlayer:getMeleeAttackString(inAction)
 	return string.format("%s%s%s",
 				self.name,
 				getWeaponString(),
-				inAction.target:getTargetString()
+				self.action.target:getTargetString()
 				)
 end
 
 ----------------------------------------
 -- getMeleeDamage()
 ----------------------------------------
-function battlePlayer:getMeleeDamage(inAction)
-	local target		= inAction.target
-	local outData		= inAction.outData
+function battlePlayer:getMeleeDamage()
+	local target		= self.action.target
+	local damage		= target.action.damage
 	local damageBonus	= 0
 	local weapon
 	local ndice
 	local dieValue
 	local i
 
-	outData.damage = 0
+	damage.amount = 0
+	damage.source = self
 
 	weapon = self:isTypeEquipped("Weapon")
 	if (not weapon) then
@@ -145,7 +282,7 @@ function battlePlayer:getMeleeDamage(inAction)
 		ndice = weapon.ndice
 		dieValue = weapon.die
 		damageBonus = weapon.dmg_bonus
-		outData.specialAttack = weapon.sp_attack
+		damage.specialAttack = weapon.sp_attack
 	end
 
 	if (self.st > 15) then
@@ -153,16 +290,16 @@ function battlePlayer:getMeleeDamage(inAction)
 	end
 
 	for i = 1,self.numAttacks do
-		outData.damage = outData.damage + damageBonus
-		outData.damage = outData.damage + random:xdy(ndice, dieValue)
-		outData.damage = outData.damage + self.damageBonus
-		outData.damage = outData.damage + random:xdy(self.damageRandom,8)
-		outData.damage = outData.damage - self.damagePenalty
+		damage.amount = damage.amount + damageBonus
+		damage.amount = damage.amount + random:xdy(ndice, dieValue)
+		damage.amount = damage.amount + self.damageBonus
+		damage.amount = damage.amount + random:xdy(self.damageRandom,8)
+		damage.amount = damage.amount - self.damagePenalty
 	end
 
 	if (self.class == "Hunter") then
 		if (random:xdy(1,256) < self.rogu_level) then
-			outData.specialAttack = "critical"
+			damage.specialAttack = "critical"
 		end
 	end
 end
@@ -171,8 +308,9 @@ end
 ----------------------------------------
 -- getCombatSpell()
 ----------------------------------------
-function battlePlayer:getCombatSpell(inAction)
+function battlePlayer:getCombatSpell()
 	local s
+	local action	= self.action
 
 	s = self:getSpell(false)
 	if (not s) then
@@ -189,14 +327,14 @@ function battlePlayer:getCombatSpell(inAction)
 		return false
 	end
 
-	inAction.func		= s.action.func
-	inAction.inData		= s.action.inData
-	inAction.inData.sppt	= s.sppt
+	action.func		= s.action.func
+	action.inData		= s.action.inData
+	action.inData.sppt	= s.sppt
 
 	if (s.targetted) then
 		text:cdprint(true, false, "Use on:")
-		inAction.target = self:getActionTarget(s.targetted) 
-		if (not inAction.target) then
+		action.target = self:getActionTarget(s.targetted) 
+		if (not action.target) then
 			return false
 		end
 	end
@@ -207,26 +345,27 @@ end
 ----------------------------------------
 -- doCombatSpell()
 ----------------------------------------
-function battlePlayer:doCombatSpell(inAction)
+function battlePlayer:doCombatSpell()
 	text:print(self.name)
-	self:castSpell(inAction)
+	self:castSpell()
 end
 
 ----------------------------------------
 -- doUseItem()
 ----------------------------------------
-function battlePlayer:doUseItem(inAction)
-	local inData	= inAction.inData
-	local target	= inAction.target
+function battlePlayer:doUseItem()
+	local inData	= self.action.inData
+	local target	= self.action.target
 	local item	= inData.item
 
-	use.doUse(inAction)
+	local xxx_wtf_is_use_doUse = true
+	use.doUse(self.action)
 end
 
 ----------------------------------------
 -- battlePlayer:getBattleTune()
 ----------------------------------------
-function battlePlayer:getBattleTune(inAction)
+function battlePlayer:getBattleTune()
 	local tune
 
 	tune = song:getTune()
@@ -234,7 +373,7 @@ function battlePlayer:getBattleTune(inAction)
 		return false
 	end
 
-	inAction.func = tune
+	self.action.func = tune
 
 	return true
 end
@@ -242,7 +381,7 @@ end
 ----------------------------------------
 -- battlePlayer:doBardSong()
 ----------------------------------------
-function battlePlayer:doBardSong(inAction)
+function battlePlayer:doBardSong()
 	text:print(self.name)
 
 	if (not self:doVoiceCheck()) then
@@ -256,7 +395,7 @@ function battlePlayer:doBardSong(inAction)
 
 	text:print(" plays a tune...\n\n")
 
-	song:activateCombatSong(inAction)
+	song:activateCombatSong(self.action)
 	party:display()
 end
 
@@ -299,11 +438,12 @@ end
 ----------------------------------------
 -- attackSpell()
 ----------------------------------------
-function battlePlayer:attackSpell(inAction)
-	local inData		= inAction.inData
-	local outData		= inAction.outData
-	local source		= inAction.source
-	local target		= inAction.target
+function battlePlayer:attackSpell()
+	local inData		= self.action.inData
+	local outData		= self.action.outData
+	local source		= self.action.source
+	local target		= self.action.target
+	local damage		= target.action.damage
 
 	log:print(log.LOG_DEBUG, "battlePlayer:attackSpell()")
 	-- printEllipsis if a group or allFoes spell was cast
@@ -333,32 +473,32 @@ function battlePlayer:attackSpell(inAction)
 		local mgroup
 
 		for mgroup in currentBattle.monParty:iterator() do
-			inAction.target = mgroup
-			inAction:multiTargetSpell()
+			self.action.target = mgroup
+			self.action:multiTargetSpell()
 			if (not mgroup:isLast()) then
 				text:print("and")
 			end
 		end
 	elseif (inData.group) then
-		inAction:multiTargetSpell()
+		self.action:multiTargetSpell()
 	else
 		-- Single target spell
 		--
 		if (inData.levelMultiply) then
 			local i
-			outData.damage = 0
+			damage.amount = 0
 			for i = 1,inData.ndice do
-				outData.damage = outData.damage +
+				damage.amount = damage.amount +
 					random:xdy(self.cur_level + 1, inData.dieval)
 			end
 		elseif (inData.specialAttack) then
-			outData.specialAttack = inData.specialAttack
-			outData.damage = 0
+			damage.specialAttack = inData.specialAttack
+			damage.amount = 0
 		else
-			outData.damage = random:xdy(inData.ndice, inData.dieval)
+			damage.amount = random:xdy(inData.ndice, inData.dieval)
 		end
 
-		inAction:singleTargetSpell()
+		self.action:singleTargetSpell()
 	end
 end
 

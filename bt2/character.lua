@@ -25,6 +25,8 @@ function character:new()
 	self:addParent(battleParty)
 	self:addParent(battlePlayer)
 	self:addParent(battleBonus)
+	self:addParent(structures.partyNode)
+	self:addParent(structures.battleNode)
 	self:addParent(entity)
 
 	return self
@@ -829,12 +831,6 @@ function character:getUseItem()
 	self.action.inData.item = item
 	self.action.func = item.action.func
 
-if false then
-	inAction.inData = item.action.inData
-	inAction.inData.item = item
-	inAction.func = item.action.func
-end
-
 	if (item.targetted) then
 		text:cdprint(true, false, "Use on:")
 
@@ -965,7 +961,7 @@ function character:castSpell()
 		return
 	end
 
-	self:doAction()
+	self:executeAction()
 end
 
 ----------------------------------------
@@ -1071,11 +1067,8 @@ end
 
 
 ----------------------------------------
--- character:doAction()
+-- character:executeAction()
 ----------------------------------------
-function character:doAction()
+function character:executeAction()
 	self.action:perform(self)
 end
-
-
-

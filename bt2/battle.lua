@@ -22,7 +22,7 @@ function battle:init()
 	self.numGroups		= 0
 	self.monParty		= nil
 	self.priorityQueue	= {}
-	self.actionList		= linkedList:new()
+	self.actionList		= linkedList:new("battleNext", "battlePrev")
 	self.killCount		= {}
 	table.setDefault(self.killCount, 0)
 	self.songToHitBonus	= 0
@@ -118,14 +118,8 @@ end
 
 
 ----------------------------------------
--- battle:addAction()
+-- battle:resetPriority()
 ----------------------------------------
-function battle:addAction(inSource, inAction)
-end
-
-function battle:removeAction(inSource)
-end
-
 function battle:resetPriority()
 	self.priorityQueue	= {}
 end
@@ -165,7 +159,7 @@ function battle:sortPriorities()
 
 	-- Link up the priority queue nodes
 	for _,action in ipairs(self.priorityQueue) do
-		self.actionList:insertTail(action.action)
+		self.actionList:insertTail(action)
 	end
 end
 
@@ -173,8 +167,8 @@ function battle:dumpPriorities()
 	local action
 
 	for action in self.actionList:iterator() do
-		print("Source: " .. action.source:getSingularName())
-		print("Priority: " .. tostring(action.priority))
+		print("Source: " .. action:getSingularName())
+		print("Priority: " .. tostring(action.action.priority))
 		print("---")
 	end
 end
@@ -193,6 +187,7 @@ function battle:start()
 
 	if (not self.isPartyAttack) then
 		for mgroup in self.monParty:iterator() do
+			log:print(log.LOG_DEBUG, "mgroup: %s", mgroup)
 			self.killCount[mgroup:getSingularName()] = 0
 		end
 	end
@@ -201,12 +196,11 @@ function battle:start()
 
 	repeat
 		self:updateBigpic()
-		if (not self:getPlayerOptions()) then
+		if (not party:getBattleActions()) then
 			partyRan = true
 			break
 		end
 
-		self:getMonsterActions()
 		self:getPriorities()
 
 		self:doRound()
@@ -320,7 +314,7 @@ end
 -- battle:doRound()
 ----------------------------------------
 function battle:doRound()
-	local action
+	local char
 
 	text:setCursor(0, 11)
 	if (party.advance) then
@@ -334,13 +328,12 @@ function battle:doRound()
 		party.advance = false
 	end
 
-	for action in self.actionList:iterator() do
-		--log:print(log.LOG_DEBUG, "source: %s", action.name)
-		action.source:doAction()
+	for char in self.actionList:iterator() do
+		char:doAction()
 		if (globals.partyDied) then
 			return
 		end
-		self.actionList:remove(action)
+		self.actionList:remove(char)
 	end
 end
 
@@ -447,7 +440,7 @@ function battle:getPriorities()
 	if (not self.isPartyAttack) then
 		for p in self.monParty:iterator() do
 			for c in p:iterator() do
-				self:addPriority(c, c:getBattlePriority())
+				self:addPriority(c)
 				c.beenAttacked = false
 			end
 		end
@@ -455,255 +448,6 @@ function battle:getPriorities()
 
 	self:sortPriorities()
 	self:dumpPriorities()
-end
-
-
-----------------------------------------
---
--- Player battle option section
---
-----------------------------------------
-function battle:getPlayerOptions()
-	local c
-	local done = false
-	local action
-
-	if (self:getRunFightOption()) then
-		return false
-	end
-
-	if (party.advance) then
-		return true
-	end
-
-	repeat
-		for c in party:iterator("skipDisabled") do
-			self:getPlayerOption(c)
-			if (c.isDoppleganger) then
-				c.action.action = "possessedAttack"
-			end
-		end 
-
-		text:cdprint(true, false, "Use these attack commands?")
-		if (not text:getYesNo()) then
-			for c in party:iterator() do
-				self:removeAction(c)
-			end
-		else
-			text:clear()
-			done = true
-		end	
-	until (done)
-
-	return true
-end
-
-----------------------------------------
--- battle:getRunFightOption()
-----------------------------------------
-function battle:getRunFightOption()
-	local inkey
-
-	if (self.isPartyAttack) then
-		return false
-	end
-
-	if (not party:canRun()) then
-		timer:delay(3)
-		return false
-	end
-
-	text:print("Will your stalwart band choose to\n")
-	text:print("Fight")
-	if (not self.monParty:isInMeleeRange()) then
-		text:print(",\nAdvance")
-	end
-	text:print(" or\nRun?")
-
-	repeat
-		inkey = getkey()
-
-		if (inkey == "A") then
-			party.advance = true
-			return false
-		elseif (inkey == "R") then
-			local saveAction = btAction:new()
-			saveAction.target = party:getFirstCharacter()
-			saveAction.source = self.monParty:getLeadGroup()
-			if (saveAction:savingThrow()) then
-				return true
-			end
-
-			if (random:band(7) == 0) then
-				return true
-			end
-			if (currentLevel:isCity() and not globals.isNight) then
-				if (random:band(3) == 0) then
-					return true
-				end
-			end
-
-			return false
-		elseif (inkey == "D") then
-			log:print(log.LOG_DEBUG, "songHpRegen: %s", party.battle.songHpRegen)
-			self:dumpBattleBonus()
-		end
-	until (inkey == "F")
-
-	return false
-end
-
-----------------------------------------
--- battle:getPlayerOption
-----------------------------------------
-function battle:getPlayerOption(c)
-	local options = {}
-	local inkey
-
-	table.setDefault(options, false)
-
-	if (c:isSummon()) then
-		c.action.action = battle.doSummonAttack
-		return
-	end
-
-	if ((c.isPossessed) or (c.isNuts)) then
-		c.action.action = "possessedAttack"
-		return
-	end
-
-	while true do
-		text:clear()
-		text:print(c.name.." has these options this battle round:\n\n")
-
-		text:print("Party attack\n")
-		options["P"] = true
-
-		if ((not self.isPartyAttack) and (c.inMeleeRange)) then
-			text:print("Attack foes\n")
-			options["A"] = true
-		end
-
-		text:print("Defend\n")
-		options["D"] = true
-
-		if (c.currentSppt > 0) then
-			text:print("Cast a spell\n")
-			options["C"] = true
-		end
-
-		text:print("Use an item\n")
-		options["U"] = true
-
-		if (c.class == "Rogue") then
-			text:print("Hide in shadows\n")
-			options["H"] = true
-			self.isHiding = false
-		end
-
-		if ((c.class == "Bard") and 
-		    (c:isTypeEquipped("Instrument"))) then
-			text:print("Bard Song\n")
-			options["B"] = true
-		end
-
-		text:print("\nSelect an option.")
-
-		local continue = true
-		while continue do
-			inkey = getkey()
-
-			if (options[inkey]) then
-				if (inkey == "A") then
-					c.action.action = "melee"
-					if (self:meleeTarget(c.action)) then
-						return
-					end
-					continue = false
-				elseif (inkey == "B") then
-					c.action.action = "sing"
-					if (c:getBattleTune(c.action, true)) then
-						return
-					end
-					continue = false
-				elseif (inkey == "C") then
-					c.action.action = "cast"
-					if (c:getCombatSpell(c.action)) then
-						return
-					end
-					continue = false
-				elseif (inkey == "D") then
-					c.action.action = "defend"
-					return
-				elseif (inkey == "H") then
-					c:hideInShadows()
-					c.action.action = "hide"
-					return
-				elseif (inkey == "P") then
-					c.action.action = "partyAttack"
-					if (self:meleeTarget(c.action)) then
-						return
-					end
-					continue = false
-				elseif (inkey == "U") then
-					c.action.action = "use"
-					if (c:getUseItem(c.action)) then
-						return
-					end
-					continue = false
-				end
-			end
-		end
-	end
-end
-
-----------------------------------------
--- battle:meleeTarget()
-----------------------------------------
-function battle:meleeTarget(inAction)
-	if (self.isPartyAttack or inAction.action == "partyAttack") then
-		inAction.action = "melee"
-		text:cdprint(true, false, "Attack:")
-		inAction.target = inAction.source:getActionTarget(
-					{party = true}
-					)
-		if (not inAction.target) then
-			return false
-		end
-	else
-		if (self.monParty.size > 1) then
-			text:cdprint(true, false, "Attack:")
-		end
-
-		inAction.target=inAction.source:getActionTarget({melee = true})
-		if (not inAction.target) then
-			return false
-		end
-	end
-
-	return true
-end
-
-----------------------------------------
--- battle:getMonsterActions()
-----------------------------------------
-function battle:getMonsterActions()
-	local action
-	local mgroup
-	local m
-
-	log:print(log.LOG_DEBUG, "getMonsterActions()")
-	if (self.isPartyAttack) then
-		return
-	end
-
-	for mgroup in self.monParty:iterator() do
-		for m in mgroup:iterator() do
-			action = btAction.new()
-			action.source = m
-			self:addAction(m, action)
-		end
-	end
 end
 
 ----------------------------------------

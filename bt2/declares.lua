@@ -4,11 +4,6 @@ declare_global("btAction")
 -- bank.lua
 declare_global("bank")
 
--- bttable.lua
-declare_global("btTable")
-declare_global("btArray")
-declare_global("btDefaultTable")
-
 -- battle.lua
 declare_global("battle")
 declare_global("doDamage")
@@ -30,8 +25,6 @@ declare_global("compileString")
 declare_global("building")
 
 -- btdebug.lua
-declare_global("dprint")
-declare_global("dwhere")
 declare_global("btdebug")
 
 -- btio.lua
@@ -79,8 +72,9 @@ declare_global("globals")
 declare_global("directions")
 declare_global("currentLevel")
 declare_global("currentBattle")
+declare_global("currentAction")
 declare_global("stringTables")
-declare_global("m_window")
+declare_global("text")
 
 -- guild.lua
 declare_global("guild")
@@ -96,10 +90,6 @@ declare_global("items")
 
 -- level.lua
 declare_global("level")
-
--- linkedList.lua
-declare_global("linkedList")
-declare_global("linkedListNode")
 
 -- monster.lua
 declare_global("monsterData")
@@ -125,23 +115,14 @@ declare_global("roster")
 -- sagehut.lua
 declare_global("sagehut")
 
--- sdl_video.lua
-declare_global("gfxScreen")
-declare_global("gfxWindow")
-declare_global("gfxImage")
-declare_global("gfxRectangle")
-declare_global("gfxColor")
-declare_global("gfxFont")
-
--- sdl_text.lua
-declare_global("text")
-declare_global("textBox")
-
 -- song.lua
 declare_global("song")
 
 -- spells.lua
 declare_global("spells")
+
+-- structures.lua
+declare_global("structures")
 
 -- summon.lua
 declare_global("summon")
@@ -152,9 +133,5 @@ declare_global("tavern")
 -- temple.lua
 declare_global("temple")
 
--- timer.lua
-declare_global("timer")
-
--- use.lua
-declare_global("use")
+-- wild.lua
 declare_global("wild")

@@ -36,10 +36,11 @@ setmetatable(_G, {
 require "declares"
 require "btlib"
 
-log.level = log.LOG_MEMORY
+log.level = log.LOG_DEBUG
 
 gfx:Init("Bard's Tale II")
 require "globals"
+require "structures"
 require "btdebug"
 
 local title = gfxImage:new("images/title.png", "png")
@@ -66,8 +67,8 @@ require "monsterGroup"
 require "summon"
 require "durationSpell"
 require "songs"
-require "party"
 require "action"
+require "party"
 require "guild"
 require "level"
 require "building"

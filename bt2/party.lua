@@ -19,6 +19,8 @@ party.light	= lightEffect:new()
 party.compass	= compassEffect:new()
 party.levitate	= levitateEffect:new()
 
+party.advance	= false
+party.action	= btAction:new()
 party.song = song:new()
 party.battle	= {
 	acBonus		= 0,
@@ -959,10 +961,89 @@ function party:meleeMarch()
 	self:display()
 end
 
+----------------------------------------
+-- party:getBattleActions()
+----------------------------------------
+function party:getBattleActions()
+	local c
 
+	if (self:battleRunCheck()) then
+		return false
+	end
 
+	if (self.advance) then
+		return true
+	end
 
+	while true do
+		for c in self:iterator("skipDisabled") do
+			c:getBattleAction()
+			if (c.isDoppleganger) then
+				c.action.action = "possessedAttack"
+			end
+		end
 
+		text:cdprint(true, false, "Use these attack commands?")
+		if (not text:getYesNo()) then
+			for c in self:iterator() do
+				c.action:reset()
+			end
+		else
+			text:clear()
+			return true
+		end
+	end
 
+	error("Should never be reached")
+end
 
+----------------------------------------
+-- party:battleRunCheck()
+----------------------------------------
+function party:battleRunCheck()
+	local inkey
+
+	if (currentBattle.isPartyAttack) then
+		return false
+	end
+
+	if (not party:canRun()) then
+		timer:delay(3)
+		return false
+	end
+
+	text:print("Will your stalwart band choose to\n")
+	text:print("Fight")
+	if (not currentBattle.monParty:isInMeleeRange()) then
+		text:print(",\nAdvance")
+	end
+	text:print(" or\nRun?")
+
+	repeat
+		inkey = getkey()
+
+		if (inkey == "A") then
+			self.advance = true
+			return false
+		elseif (inkey == "R") then
+			self.action.target = self:getFirstCharacter()
+			self.action.source = currentBattle.monParty:getLeadGroup()
+			if (self.action:savingThrow()) then
+				return true
+			end
+
+			if (random:band(7) == 0) then	
+				return true
+			end
+			if (currentLevel:isCity() and not globals.isNight) then
+				if (random:band(3) == 0) then
+					return true
+				end
+			end
+			return false
+		end
+	until (inkey == "F")
+
+	return false
+end
 

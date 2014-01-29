@@ -5,7 +5,7 @@
 ----------------------------------------
 battleMonster	= {}
 
-function battleMonster:doAction(inAction)
+function battleMonster:doAction()
 	local attack
 	local i
 
@@ -16,43 +16,43 @@ function battleMonster:doAction(inAction)
 		return
 	end
 
-	inAction.target = party:randomMeleeCharacter()
+	self.action.target = party:randomMeleeCharacter()
 
 	for attack in self:attackIterator() do
 		if (attack.type == "melee") then
 			if (self:inMeleeRange()) then
-				inAction.inData = attack.action.inData
-				self:meleeAttack(inAction)
+				self.action.inData = attack.action.inData
+				self:meleeAttack()
 				return
 			else
-				self:advanceGroup(inAction)
+				self:advanceGroup()
 				timer:delay()
 				return
 			end
 		elseif (attack.type == "spell") then
-			if (inAction.target:isDisabled()) then
+			if (self.action.target:isDisabled()) then
 				return
 			end
 
-			inAction.inData = attack.action.inData
-			inAction.func = attack.action.func
-			self:combatSpell(inAction)
+			self.action.inData = attack.action.inData
+			self.action.func = attack.action.func
+			self:combatSpell()
 
 			return 
 		elseif (attack.type == "dopple") then
-			if (self:doDoppleganger(inAction)) then
-				if (inAction.target:isDisabled()) then
+			if (self:doDoppleganger()) then
+				if (self.action.target:isDisabled()) then
 					return
 				end
-				inAction.inData = attack.action.inData
-				self:meleeAttack(inAction)
+				self.action.inData = attack.action.inData
+				self:meleeAttack()
 				return	
 			end
 		elseif (attack.type == "breath") then
 			text:print("%s breathes", self.singular)
-			inAction.inData = attack.action.inData
-			inAction.func = attack.action.func
-			inAction:multiTargetSpell()
+			self.action.inData = attack.action.inData
+			self.action.func = attack.action.func
+			self.action:multiTargetSpell()
 			
 			return
 		else
@@ -65,31 +65,31 @@ end
 ----------------------------------------
 -- battleMonster:meleeAttack()
 ----------------------------------------
-function battleMonster:meleeAttack(inAction)
-	local inData	= inAction.inData
-	local outData	= inAction.outData
+function battleMonster:meleeAttack()
+	local inData	= self.action.inData
+	local outData	= self.action.outData
 
 	log:print(log.LOG_DEBUG, "battleMonster:meleeAttack() inData: " .. tostring(inData))
-	if (not inAction:validateTarget()) then
+	if (not self.action:validateTarget()) then
 		return
 	end
 
 	text:print("A %s%s%s", 
 			self.singular,
 			inData.meleeString[random:xdy(1,2)],
-			inAction.target:getSingularName()
+			self.action.target:getSingularName()
 		)
 
-	if (self:checkMeleeHits(inAction)) then
-		self:getMeleeDamage(inAction)
+	if (self:checkMeleeHits()) then
+		self:getMeleeDamage()
 		text:print(", and hits for %d point%s of damage", 
 			outData.damage,
 			string.pluralize(outData.damage, "", "s")
 			)
 
-		if (inAction.target:doDamage(inAction)) then
+		if (self.action.target:doDamage()) then
 			text:print(stringTables.effects[outData.specialAttack])
-			text:print("%s!\n\n", inAction.target:getPronoun())
+			text:print("%s!\n\n", self.action.target:getPronoun())
 		else
 			text:print(".\n\n")
 		end
@@ -109,8 +109,8 @@ end
 ----------------------------------------
 -- battleMonster:checkMeleeHits()
 ----------------------------------------
-function battleMonster:checkMeleeHits(inAction)
-	local target	= inAction.target
+function battleMonster:checkMeleeHits()
+	local target	= self.action.target
 	local sourceAttack
 	local targetAC
 	local bonus
@@ -142,9 +142,9 @@ end
 ----------------------------------------
 -- battleMonster:getMeleeDamage()
 ----------------------------------------
-function battleMonster:getMeleeDamage(inAction)
-	local inData	= inAction.inData
-	local outData	= inAction.outData
+function battleMonster:getMeleeDamage()
+	local inData	= self.action.inData
+	local outData	= self.action.outData
 
 	outData.damage = random:xdy(inData.ndice, inData.dieval)
 	outData.damage = outData.damage + self.parentGroup.damageBonus
@@ -158,25 +158,27 @@ end
 ----------------------------------------
 -- battleMonster:doDamage()
 ----------------------------------------
-function battleMonster:doDamage(inAction)
-	local outData		= inAction.outData
+function battleMonster:doDamage()
+	local damage		= self.action.damage
 	local target		= false
 	local m
+
+	log:print(log.LOG_DEBUG, "self.action.damage: %s", self.action.damage)
 
 	target = self:randomMember()
 	if (not target) then
 		error("randomMember() failed to select a member")
 	end
 
-	if ((outData.specialAttack ~= "stone") and
-	    (outData.specialAttack ~= "critical")) then
-		outData.specialAttack = false
-		if (outData.damage < target.currentHp) then
-			target.currentHp = target.currentHp - outData.damage
+	if ((damage.specialAttack ~= "stone") and
+	    (damage.specialAttack ~= "critical")) then
+		damage.specialAttack = false
+		if (damage.amount < target.currentHp) then
+			target.currentHp = target.currentHp - damage.amount
 			target.beenAttacked = true
 			return false
 		else
-			outData.specialAttack = "kill"
+			damage.specialAttack = "kill"
 		end
 	end
 
@@ -198,10 +200,10 @@ end
 ----------------------------------------
 -- battleBonus()
 ----------------------------------------
-function battleMonster:battleBonus(inAction)
-	local inData		= inAction.inData
-	local inSource		= inAction.source
-	local inTarget		= inAction.target
+function battleMonster:battleBonus()
+	local inData		= self.action.inData
+	local inSource		= self.action.source
+	local inTarget		= self.action.target
 	local updateParty	= false
 
 	log:print(log.LOG_DEBUG, "battleMonster:battleBonus()")
@@ -217,14 +219,14 @@ function battleMonster:battleBonus(inAction)
 	end
 
 	if (inData.acPenalty) then
-		inAction.target = party:getFirstCharacter()
-		if (inAction:savingThrow()) then
+		self.action.target = party:getFirstCharacter()
+		if (self.action:savingThrow()) then
 			text:cdprint(false, true, " but it had no effect!\n\n")
 			return false
 		end
 		updateParty = true
-		party:addBattleBonus("acPenalty", inAction.toHitAmount,
-						  inAction.toHitStack)
+		party:addBattleBonus("acPenalty", self.action.toHitAmount,
+						  self.action.toHitStack)
 	end
 
 	if (inData.toHitPenalty) then
@@ -262,28 +264,28 @@ function battleMonster:battleBonus(inAction)
 	return true
 end
 
-function battleMonster:mageStar(inAction)
+function battleMonster:mageStar()
 	text:print(" and the party misses an attack")
 	party.missTurn = true
 end
 
-function battleMonster:combatSpell(inAction)
-	if (inAction.target:isDisabled()) then
+function battleMonster:combatSpell()
+	if (self.action.target:isDisabled()) then
 		return
 	end
 
 	text:print("%s casts a spell", self.singular)
-	inAction.func(inAction)
+	self.action:perform(self)
 end
 
-function battleMonster:attackSpell(inAction)
-	local inData		= inAction.inData
-	local outData		= inAction.outData
-	local source		= inAction.source
+function battleMonster:attackSpell()
+	local inData		= self.action.inData
+	local outData		= self.action.outData
+	local source		= self.action.source
 
 	log:print(log.LOG_DEBUG, "battleMonster:attackSpell()")
 	if (inData.group or inData.allFoes) then
-		inAction:multiTargetSpell()
+		self.action:multiTargetSpell()
 	else
 		if (inData.specialAttack) then
 			outData.specialAttack = inData.specialAttack
@@ -291,14 +293,14 @@ function battleMonster:attackSpell(inAction)
 		else
 			outData.damage = random:xdy(inData.ndice, inData.dieval)
 		end
-		inAction:singleTargetSpell()
+		self.action:singleTargetSpell()
 	end
 end
 
 ----------------------------------------
 -- battleMonster:doDoppleganger()
 ----------------------------------------
-function battleMonster:doDoppleganger(inAction)
+function battleMonster:doDoppleganger()
 	local randomCharacter
 	local doppleganger
 

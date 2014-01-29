@@ -3,6 +3,9 @@ monster = {}
 function monster:new(inName)
 	local self = object:new()
 
+	self.action		= btAction:new()
+	self.action.source	= self
+
 	self:addParent(monster)
 	self:addParent(monsterData[inName])
 	self:addParent(entity)

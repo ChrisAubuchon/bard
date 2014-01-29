@@ -7,6 +7,13 @@
 battleSummon	= {}
 
 ----------------------------------------
+-- battleSummon:getBattleAction()
+----------------------------------------
+function battleSummon:getBattleAction()
+	self.action.action = "monster"
+end
+
+----------------------------------------
 -- doAction()
 ----------------------------------------
 function battleSummon:doAction(inAction)

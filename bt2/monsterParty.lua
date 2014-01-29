@@ -40,11 +40,16 @@ end
 -- addMonsterGroup()
 ----------------------------------------
 function monsterParty:addMonsterGroup(inGroup)
+	log:print(log.LOG_DEBUG, "monsterParty:addMonsterGroup()")
+	log:print(log.LOG_DEBUG, "inGroup.next = %s", inGroup.next)
 	self.size = self.size + 1
-	log:print(log.LOG_DEBUG, inGroup)
 	self:insertTail(inGroup)
-	log:print(log.LOG_DEBUG, self.head)
-	log:print(log.LOG_DEBUG, self.tail)
+
+	local mgroup
+	for mgroup in self:iterator() do
+		log:print(log.LOG_DEBUG, "mgroup: %s", mgroup)
+		log:print(log.LOG_DEBUG, "mgroup.next: %s", mgroup.next)
+	end
 end
 
 ----------------------------------------
