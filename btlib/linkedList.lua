@@ -214,6 +214,19 @@ end
 -- iterator()
 ----------------------------------------
 function linkedList:iterator()
+if false then
+	local state = self.head
+	local function f(_, head)
+		local rval
+		if (not state) then
+			return
+		end
+
+		rval = state
+		state = state[self.__next]
+		return rval
+	end
+end
 	local function f(_, head)
 		if (not self.head) then return end
 		if (head == nil) then
@@ -225,7 +238,7 @@ function linkedList:iterator()
 		return
 	end
 
-	return f, nil, nil
+	return f, nil, nil 
 end
 
 ----------------------------------------
@@ -312,6 +325,25 @@ function linkedList:reverseIterator()
 	end
 
 	return f, nil, nil
+end
+
+----------------------------------------
+-- linkedList:reverseConditionalIterator()
+----------------------------------------
+function linkedList:reverseConditionalIterator(inConditionFunction)
+	local state = self.tail
+	local function f(_)
+		while(state) do
+			if (inConditionFunction(state)) then
+				local rval = state
+				state = state[self.__prev]
+				return rval
+			end
+			state = state[self.__prev]
+		end
+		return
+	end
+	return f,nil,state
 end
 
 ----------------------------------------

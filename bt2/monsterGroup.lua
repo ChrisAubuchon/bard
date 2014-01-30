@@ -34,7 +34,6 @@ function monsterGroup:new(inName, inSize)
 		self:addMonster()
 	end
 
-	self.__index = self
 	log:print(log.LOG_DEBUG, "self.next: %s", self.next)
 
 	return self
@@ -51,6 +50,7 @@ function monsterGroup:addMonster()
 end
 
 function monsterGroup:removeMonster(inMonster)
+	inMonster.parentGroup = false
 	self:remove(inMonster)
 	self.size = self.size - 1
 end

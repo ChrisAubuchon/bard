@@ -82,12 +82,12 @@ end
 ----------------------------------------
 -- doDamage()
 ----------------------------------------
-function battleParty:doDamage()
-	local damage	= self.action.damage
+function battleParty:doDamage(inAction)
+	local result	= inAction.result
 	local rval
 
 	if (self.isDead) then
-		if (damage.specialAttack ~= "possess") then
+		if (result.specialAttack ~= "possess") then
 			return false
 		end
 	end
@@ -96,9 +96,9 @@ function battleParty:doDamage()
 		return false
 	end
 
-	if (damage.amount > 0) then
-		if (self.currentHp > damage.amount) then
-			self.currentHp = self.currentHp - damage.amount
+	if (result.damage > 0) then
+		if (self.currentHp > result.damage) then
+			self.currentHp = self.currentHp - result.damage
 		else
 			self.currentHp = 0
 			self.possessed = false
@@ -106,7 +106,7 @@ function battleParty:doDamage()
 
 			self:songTimeout()
 
-			damage.specialAttack = "kill"
+			result.specialAttack = "kill"
 
 			party:isLive()
 
@@ -114,11 +114,11 @@ function battleParty:doDamage()
 		end
 	end
 
-	if (not damage.specialAttack) then
+	if (not result.specialAttack) then
 		return false
 	end
 
-	rval = self:inflictStatus()
+	rval = self:inflictStatus(inAction)
 
 	party:isLive()
 
@@ -128,14 +128,15 @@ end
 ----------------------------------------
 -- inflictStatus()
 ----------------------------------------
-function battleParty:inflictStatus()
-	local damage = self.damage
+function battleParty:inflictStatus(inAction)
+	local source	= inAction.source
+	local result	= inAction.result
 
-	if (damage.specialAttack == "poison") then
+	if (result.specialAttack == "poison") then
 		if (not self.isDestinyKnight) then
 			self.isPoisoned = true
 		end
-	elseif (damage.specialAttack == "drain") then
+	elseif (result.specialAttack == "drain") then
 		if (self:isSummon()) then
 			return
 		end
@@ -144,11 +145,11 @@ function battleParty:inflictStatus()
 			self.xp = self:getXpForLevel(self.cur_level)
 		end
 		return true
-	elseif (damage.specialAttack == "nuts") then
+	elseif (result.specialAttack == "nuts") then
 		if (not self.isDestinyKnight) then
 			self.isNuts = true
 		end
-	elseif (damage.specialAttack == "old") then
+	elseif (result.specialAttack == "old") then
 		if (self.isOld) then
 			return true
 		end
@@ -169,8 +170,8 @@ function battleParty:inflictStatus()
 		self.cn = 1
 		self.lk = 1
 		self.isOld = true
-	elseif (damage.specialAttack == "possess") then
-		if (not damage.source:isMonster()) then
+	elseif (result.specialAttack == "possess") then
+		if (not source:isMonster()) then
 			if (self:hasItem("Kato's Bracer")) then
 				self.isDocile = true
 			end
@@ -186,15 +187,15 @@ function battleParty:inflictStatus()
 		self.isStoned		= false
 		self.isNuts		= false
 		self.isParalyzed	= false
-	elseif (damage.specialAttack == "stone") then
+	elseif (result.specialAttack == "stone") then
 		if (self.isDestinyKnight) then
 			return true
 		end
 		self.currentHp		= 0
 		self.isStoned		= true
 		self:songTimeout()
-	elseif ((damage.specialAttack == "critical") or 
-		(damage.specialAttack == "kill")) then
+	elseif ((result.specialAttack == "critical") or 
+		(result.specialAttack == "kill")) then
 		if (self.isDestinyKnight) then
 			self.currentHp = self.maxHp
 		else
@@ -203,7 +204,7 @@ function battleParty:inflictStatus()
 			self.isDead		= true
 		end
 		self:songTimeout()
-	elseif (damage.specialAttack == "unequip") then
+	elseif (result.specialAttack == "unequip") then
 		local i
 
 		for i in self.inventory:iterator() do
@@ -234,15 +235,6 @@ function battleParty:battleBonus(inAction)
 	if (inData.antiMagic) then
 		party:addBattleBonus("antiMagic", 2, true, 6)
 	end
-
-if false then
-	if (inData.antiMagic) then
-		party.antiMagic = party.antiMagic + 2
-		if (party.antiMagic > 6) then
-			party.antiMagic = 6
-		end
-	end
-end
 
 	----------------------------------------
 	-- AC Bonus

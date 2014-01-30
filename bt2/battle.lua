@@ -137,9 +137,13 @@ end
 -- battle:removePriority()
 ----------------------------------------
 function battle:removePriority(inSource)
+	log:print(log.LOG_DEBUG, "removePriority(%s)", inSource.key)
+	log:print(log.LOG_DEBUG, "inSource.action: %s", inSource.action)
 	if (not inSource.action) then
 		return
 	end
+
+	log:print(log.LOG_DEBUG, "doing remove")
 
 	-- Remove the action from the list
 	self.actionList:remove(inSource)
@@ -167,9 +171,12 @@ function battle:dumpPriorities()
 	local action
 
 	for action in self.actionList:iterator() do
-		print("Source: " .. action:getSingularName())
-		print("Priority: " .. tostring(action.action.priority))
-		print("---")
+		log:print(log.LOG_DEBUG, "Source: %s (%s)",
+			action:getSingularName(),
+			action.key
+			)
+		log:print(log.LOG_DEBUG, "Priority: %s", action.action.priority)
+		log:print(log.LOG_DEBUG, "---")
 	end
 end
 
@@ -329,6 +336,9 @@ function battle:doRound()
 	end
 
 	for char in self.actionList:iterator() do
+		log:print(log.LOG_DEBUG, "doRound(%s (%s))",
+			char:getSingularName(),
+			char.key)
 		char:doAction()
 		if (globals.partyDied) then
 			return
@@ -409,6 +419,7 @@ function battle:postRoundCleanup()
 	end
 
 	party:sort()
+	party:display()
 
 	-- Something very weird in the DOS version. What it looks like
 	-- is that if the reset of the part is disabled, then the first

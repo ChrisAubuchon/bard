@@ -17,6 +17,7 @@ log = {
 
 	level	= 0,
 	file	= io.stdout
+	--file	= io.open("output.log", "w+")
 }
 
 local message = {

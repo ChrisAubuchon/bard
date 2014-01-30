@@ -122,7 +122,8 @@ stringTables.andEffects = {
 	drain	= "drains",
 	burn	= "burns",
 	choke	= "chokes",
-	steam	= "steams"
+	steam	= "steams",
+	hit	= "hits"
 }
 
 stringTables.isEffects = {

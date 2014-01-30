@@ -50,7 +50,7 @@ function battlePlayer:getBattleAction()
 	table.setDefault(options,false)
 
 	if (self.isPossessed or self.isNuts) then
-		self.action.action = "possessedAttack"
+		self.action.type = "possessedAttack"
 		return
 	end
 
@@ -113,35 +113,37 @@ end
 -- battlePlayer:readBattleOption()
 ----------------------------------------
 function battlePlayer:readBattleOption(inkey)
+	local action	= self.action
+
 	if (inkey == "A") then
-		self.action.action = "melee"
+		action.type = "melee"
 		if (self:getMeleeTarget()) then
 			return true
 		end
 	elseif (inkey == "B") then
-		self.action.action = "sing"
+		action.type = "sing"
 		if (self:getBattleTune()) then
 			return true
 		end
 	elseif (inkey == "C") then
-		self.action.action = "cast"
+		action.type = "cast"
 		if (self:getCombatSpell()) then
 			return true
 		end
 	elseif (inkey == "D") then
-		self.action.action = "defend"
+		action.type = "defend"
 		return true
 	elseif (inkey == "H") then
-		self.action.action = "hide"
+		action.type = "hide"
 		self:hideInShadows()
 		return true
 	elseif (inkey == "P") then
-		self.action.action = "partyAttack"
+		action.type = "partyAttack"
 		if (self:getMeleeTarget()) then
 			return true
 		end
 	elseif (inkey == "U") then
-		self.action.action = "use"
+		action.type = "use"
 		if (self:getUseItem()) then
 			return true
 		end
@@ -155,8 +157,9 @@ end
 ----------------------------------------
 function battlePlayer:getMeleeTarget()
 	local action = self.action
-	if (currentBattle.isPartyAttack or action.action == "partyAttack") then
-		action.action = "melee"
+
+	if (currentBattle.isPartyAttack or action.type == "partyAttack") then
+		action.type = "melee"
 		text:cdprint(true, false, "Attack:")
 		action.target = self:getActionTarget({party = true})
 		if (not action.target) then
@@ -180,28 +183,30 @@ end
 -- doAction()
 ----------------------------------------
 function battlePlayer:doAction()
+	local action = self.action
+
 	if (self:isDisabled()) then
 		return
 	end
 
-	log:print(log.LOG_DEBUG, "Action type: %s", self.action.action)
+	log:print(log.LOG_DEBUG, "Action type: %s", self.action.type)
 
-	if (self.action.action == "melee") then
+	if (action.type == "melee") then
 		log:print(log.LOG_DEBUG, "Performing melee attack")
 		self:doMeleeAttack()
-	elseif (self.action.action == "cast") then
+	elseif (action.type == "cast") then
 		log:print(log.LOG_DEBUG, "Performing cast a spell")
 		self:doCombatSpell()
-	elseif (self.action.action == "defend") then
+	elseif (action.type == "defend") then
 		log:print(log.LOG_DEBUG, "Source: " .. tostring(self.name) .. " defends")
 		return
-	elseif (self.action.action == "use") then
+	elseif (action.type == "use") then
 		log:print(log.LOG_DEBUG, "Using an item")
 		self:useItem()
-	elseif (self.action.action == "sing") then
+	elseif (action.type == "sing") then
 		log:print(log.LOG_DEBUG, "Singing a bard song")
 		self:doBardSong()
-	elseif (self.action.action == "possessedAttack") then
+	elseif (action.type == "possessedAttack") then
 		local attackParty	= false
 
 		-- A nuts attack randomly attacks player or monster
@@ -214,10 +219,10 @@ function battlePlayer:doAction()
 		end
 
 		if (attackParty) then
-			self.action.target = party:randomCharacter()
+			action.target = party:randomCharacter()
 		else
 			if (currentBattle.monParty) then
-				self.action.target=currentBattle.monParty:getLeadGroup()
+				action.target=currentBattle.monParty:getLeadGroup()
 			else
 				-- This should probably attack a random
 				-- party member. In the DOS version it does
@@ -235,6 +240,9 @@ end
 -- getMeleeAttackString()
 ----------------------------------------
 function battlePlayer:getMeleeAttackString()
+	local action	= self.action
+	local target	= action.target
+
 	local function getWeaponString()
 		if (self:isTypeEquipped("Weapon")) then
 			return " swings at "
@@ -246,7 +254,7 @@ function battlePlayer:getMeleeAttackString()
 	return string.format("%s%s%s",
 				self.name,
 				getWeaponString(),
-				self.action.target:getTargetString()
+				target:getTargetString()
 				)
 end
 
@@ -255,15 +263,12 @@ end
 ----------------------------------------
 function battlePlayer:getMeleeDamage()
 	local target		= self.action.target
-	local damage		= target.action.damage
+	local result		= self.action.result
 	local damageBonus	= 0
 	local weapon
 	local ndice
 	local dieValue
 	local i
-
-	damage.amount = 0
-	damage.source = self
 
 	weapon = self:isTypeEquipped("Weapon")
 	if (not weapon) then
@@ -282,24 +287,25 @@ function battlePlayer:getMeleeDamage()
 		ndice = weapon.ndice
 		dieValue = weapon.die
 		damageBonus = weapon.dmg_bonus
-		damage.specialAttack = weapon.sp_attack
+		result.specialAttack = weapon.sp_attack
 	end
 
 	if (self.st > 15) then
 		damageBonus = damageBonus + (self.st - 15)
 	end
 
+	result.damage = 0
 	for i = 1,self.numAttacks do
-		damage.amount = damage.amount + damageBonus
-		damage.amount = damage.amount + random:xdy(ndice, dieValue)
-		damage.amount = damage.amount + self.damageBonus
-		damage.amount = damage.amount + random:xdy(self.damageRandom,8)
-		damage.amount = damage.amount - self.damagePenalty
+		result.damage = result.damage + damageBonus
+		result.damage = result.damage + random:xdy(ndice, dieValue)
+		result.damage = result.damage + self.damageBonus
+		result.damage = result.damage + random:xdy(self.damageRandom,8)
+		result.damage = result.damage - self.damagePenalty
 	end
 
 	if (self.class == "Hunter") then
 		if (random:xdy(1,256) < self.rogu_level) then
-			damage.specialAttack = "critical"
+			result.specialAttack = "critical"
 		end
 	end
 end
@@ -440,10 +446,9 @@ end
 ----------------------------------------
 function battlePlayer:attackSpell()
 	local inData		= self.action.inData
-	local outData		= self.action.outData
+	local result		= self.action.result
 	local source		= self.action.source
 	local target		= self.action.target
-	local damage		= target.action.damage
 
 	log:print(log.LOG_DEBUG, "battlePlayer:attackSpell()")
 	-- printEllipsis if a group or allFoes spell was cast
@@ -486,16 +491,16 @@ function battlePlayer:attackSpell()
 		--
 		if (inData.levelMultiply) then
 			local i
-			damage.amount = 0
+			result.damage = 0
 			for i = 1,inData.ndice do
-				damage.amount = damage.amount +
+				result.damage = result.damage +
 					random:xdy(self.cur_level + 1, inData.dieval)
 			end
 		elseif (inData.specialAttack) then
-			damage.specialAttack = inData.specialAttack
-			damage.amount = 0
+			result.specialAttack = inData.specialAttack
+			result.damage = 0
 		else
-			damage.amount = random:xdy(inData.ndice, inData.dieval)
+			result.damage = random:xdy(inData.ndice, inData.dieval)
 		end
 
 		self.action:singleTargetSpell()

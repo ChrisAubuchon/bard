@@ -147,15 +147,15 @@ end
 ----------------------------------------
 -- doSummon()
 ----------------------------------------
-function monsterParty:doSummon(inSummon)
+function monsterParty:doSummon(inData)
 	local mgroup
 
 	if (self.size >= 4) then
 		text:printEllipsis()
 		return
 	end
-	mgroup = monsterGroup:new(inSummon.type, 1)
-	mgroup.isIllusion = inSummon.isIllusion or false
+	mgroup = monsterGroup:new(inData.summons[1], 1)
+	mgroup.isIllusion = inData.isIllusion or false
 	self:addMonsterGroup(mgroup)
 	party:display()
 	text:ctdprint(false, true, " and a %s appears!\n\n", mgroup.singular)

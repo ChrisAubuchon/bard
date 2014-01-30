@@ -6,19 +6,13 @@ function btAction:new()
 
 	self:addParent(btAction)
 
+	self.type		= false
 	self.source		= false
 	self.target		= false
 	self.func		= false
 	self.inData		= {}
+	self.result		= {}
 	self.outData		= {}
-
-	self.damage		= {
-		specialAttack	= false,
-		amount		= 0,
-		source		= false
-		}
-
-	setmetatable(self.damage, { __mode = "v" })
 
 	return self
 end
@@ -34,8 +28,8 @@ function btAction:dump()
 		log:print(log.LOG_DEBUG, "  %s: %s", k, v)
 	end
 	log:print(log.LOG_DEBUG, "}")
-	log:print(log.LOG_DEBUG, "outData: {")
-	for k,v in pairs(self.outData) do
+	log:print(log.LOG_DEBUG, "result: {")
+	for k,v in pairs(self.result) do
 		log:print(log.LOG_DEBUG, "  %s: %s", k, v)
 	end
 	log:print(log.LOG_DEBUG, "}")
@@ -50,11 +44,7 @@ function btAction:reset()
 	self.func = false
 	self.action = false
 	self.inData = {}
-	self.outData = {}
-
-	self.damage.specialAttack = false
-	self.data.amount = 0
-	self.data.source = false
+	self.result = {}
 end
 
 
@@ -131,7 +121,8 @@ end
 -- printDamage()
 ----------------------------------------
 function btAction:printDamage()
-	local amount = self.target.action.damage.amount
+	local amount = self.result.damage
+
 	text:print("for %d point%s of damage", 
 		amount,
 		string.pluralize(amount, "", "s")
@@ -142,15 +133,13 @@ end
 -- doDamage()
 ----------------------------------------
 function btAction:doDamage()
-	local target = self.target
+	local target	= self.target
 
-	log:print(log.LOG_DEBUG, "self.damage: %s", self.damage)
-	if (target:doDamage()) then
-		local damage = target.action.damage
+	if (target:doDamage(self)) then
+		local result = self.result
 
-		log:print(log.LOG_DEBUG, damage.specialAttack)
 		if (not globals.partyDied) then
-			text:print(stringTables.effects[damage.specialAttack])
+			text:print(stringTables.effects[result.specialAttack])
 			text:print("%s!\n\n", target:getPronoun())
 		end
 	else
@@ -165,7 +154,7 @@ function btAction:singleTargetSpell()
 	local target		= self.target
 	local source		= self.source
 	local inData		= self.inData
-	local damage		= target.action.damage
+	local result		= self.result
 	local possessFlag	= false
 	local save
 	local half
@@ -188,7 +177,7 @@ function btAction:singleTargetSpell()
 		end
 
 		if (target.isDead) then
-			if (damage.specialAttack == "possess") then
+			if (result.specialAttack == "possess") then
 				possessFlag = true
 			else
 				text:printEllipsis()
@@ -196,7 +185,7 @@ function btAction:singleTargetSpell()
 			end
 		end
 
-		if (damage.specialAttack == "possess" and
+		if (result.specialAttack == "possess" and
 				source:isCharacter() and
 				not possessFlag) then
 			text:printEllipsis()
@@ -208,15 +197,22 @@ function btAction:singleTargetSpell()
 	save, half = self:savingThrow()
 	if (save) then
 		if (half) then
-			bit32.rshift(outData.damage, 1)
+			bit32.rshift(result.damage, 1)
 		else
-			text:ctdprint(false, true, " but it had no effect!\n\n")
+			log:print(log.LOG_DEBUG, "%s", self.type)
+			if (self.type == "fire") then
+				text:ctdprint(false, true, 
+					" but it missed!\n\n")
+			else
+				text:ctdprint(false, true, 
+					" but it had no effect!\n\n")
+			end
 			party:display()
 			return
 		end
 	end
 
-	if (not damage.specialAttack) then
+	if (not result.specialAttack) then
 		text:print(" and %s %s ",
 			stringTables.andEffects[inData.atype],
 			target:getPronoun()
@@ -240,7 +236,7 @@ function btAction:multiTargetSpell()
 	local source		= self.source
 	local target		= self.target
 	local inData		= self.inData
-	local outData		= self.outData
+	local result		= self.result
 	local t
 	local lastDamage	= 0
 
@@ -260,9 +256,9 @@ function btAction:multiTargetSpell()
 		local half
 
 		repeat
-			outData.damage = random:xdy(inData.ndice, inData.dieval)
-		until (outData.damage ~= lastDamage)
-		lastDamage = outData.damage
+			result.damage = random:xdy(inData.ndice, inData.dieval)
+		until (result.damage ~= lastDamage)
+		lastDamage = result.damage
 
 		if (t:isCharacter() or t:isSummon()) then
 			text:print(t:getSingularName())
@@ -278,7 +274,7 @@ function btAction:multiTargetSpell()
 			text:print(" repelled the spell!\n\n")
 		else
 			if (half) then
-				bit32.rshift(outData.damage, 1)
+				bit32.rshift(result.damage, 1)
 			end
 			text:print(" is %s ",
 				stringTables.isEffects[inData.atype])

@@ -296,13 +296,6 @@ function guild:doEnter()
 			self:quitGame()
 		elseif (inkey == "G") then
 			collectgarbage()
-		elseif (inkey == "H") then
-			log:print(log.LOG_DEBUG, "party:isOccupied(2): %s",
-				party:isOccupied(2).name)
-			log:print(log.LOG_DEBUG, "party:isOccupied(4): %s",
-				party:isOccupied(4).name)
-			log:print(log.LOG_DEBUG, "party:isOccupied(5): %s",
-				party:isOccupied(5))
 		end
 	until (inkey == "E")
 end

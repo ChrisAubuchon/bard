@@ -42,8 +42,14 @@ function monster:advanceGroup()
 	-- Remove the attack priority for the other monsters in the group
 	--
 	for m in parent:iterator() do
-		currentBattle:removePriority(m)
+		-- Don't remove this object from the battle list. It will
+		-- be removed in doRound() when its turn is done.
+		-- 
+		if (m ~= self) then
+			currentBattle:removePriority(m)
+		end
 	end
+	currentBattle:dumpPriorities()
 end
 
 ----------------------------------------
@@ -86,7 +92,6 @@ function monster:getPronoun()
 end
 
 function monster:inMeleeRange()
-	log:print(log.LOG_DEBUG, self.parentGroup.range)
 	return (self.parentGroup.range == 10)
 end
 

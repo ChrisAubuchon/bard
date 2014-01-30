@@ -309,32 +309,14 @@ function party:sort()
 	log:print(log.LOG_DEBUG, "party:sort() called")
 	local function __sort(inAttr)
 		local tail
-		local current
-		local save
 
-		tail = self:getLast()
-		if (not tail[inAttr]) then
-			current = tail
-			tail = false
-		else
-			while (tail[inAttr]) do
-				tail = tail.prev
-			end
-			current = tail
+		local function __iter(c) 
+			return c[inAttr]
 		end
 
-		while (current) do
-			save = current.prev
-			if (current[inAttr]) then
-				self:remove(current)
-				if (not tail) then
-					self:insertTail(current)
-					tail = current.prev
-				else
-					self:insertAfter(current, tail)
-				end
-			end
-			current = save
+		for tail in self:reverseConditionalIterator(__iter) do
+			self:remove(tail)
+			self:insertTail(tail)
 		end
 	end
 

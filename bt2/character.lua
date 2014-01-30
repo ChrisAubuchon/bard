@@ -19,6 +19,8 @@ function character:new()
 	self.partyPrev		= false
 	self.action.source	= self
 
+	log:print(log.LOG_DEBUG, "validateAction: %s", self.action.validateTarget)
+
 	self:addParent(bIICharacter)
 	self:addParent(character)
 	self:addParent(classes)

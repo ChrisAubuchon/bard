@@ -45,14 +45,14 @@ static uint8_t *meleeStr[] = {
 
 static uint8_t *fireType[] = {
 	NULL,
-	" shoots an arrow ",
-	" throws a spear ",
-	" throws an axe ",
-	" hurls a shuriken ",
-	" throws a boomerang ",
-	" hurls a hammer ",
-	" throws a blade ",
-	" makes a light "
+	"shoots an arrow",
+	"throws a spear",
+	"throws an axe",
+	"hurls a shuriken",
+	"throws a boomerang",
+	"hurls a hammer",
+	"throws a blade",
+	"makes a light"
 };
 
 static uint8_t *useType[] = {

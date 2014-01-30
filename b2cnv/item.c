@@ -136,31 +136,6 @@ void convertItems(void)
 				b->use = USE_FIGURINE;
 			}
 		}
-#if 0
-		if (spell == 0) {
-			b->spell = noSpellEffect();
-		} else if (spell < 79) {
-			b->spell = getSpellEffect(spell);
-			b->spell->subtype = USE_CASTSPELL;
-			b->spell->type = ACT_USE;
-		} else if (spell < 96) {
-			b->spell = getSpellEffect(spell);
-			b->spell->subtype = USE_BREATH;
-			b->spell->type = ACT_USE;
-		} else if ((spell == 96) || (spell == 97)) {
-			b->spell = getSpellEffect(spell);
-			b->spell->subtype = useWeap[spell - 96];
-			b->spell->type = ACT_USE;
-		} else if (spell < 112) {
-			b->spell = getSpellEffect(spell);
-			b->spell->subtype = useWeap[spell - 96];
-			b->spell->type = ACT_USE;
-		} else if (spell > 111) {
-			b->spell = getSummonEffect(spell);
-			b->spell->subtype = USE_FIGURINE;
-			b->spell->type = ACT_USE;
-		}
-#endif
 
 		cnvList_add(il, b);
 
@@ -189,11 +164,4 @@ void convertItems(void)
 	}
 	printf("}");
 
-#if 0
-	for (i = 1; i < 127; i++) {
-		if (itemB1map[i]) {
-			printf("%s:%s\n", itemB1name[i], itemName[itemB1map[i] - 1]);
-		}
-	}
-#endif
 }

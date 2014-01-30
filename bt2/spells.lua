@@ -97,42 +97,6 @@ spells.scrySite = function()
 			)
 	end
 			
-if false then
-	if (currentLevel:isCity()) then
-		text:splashMessage(outString .. currentLevel.direction .. " and are in Skara Brae.")
-	else
-		local east
-		local north
-
-		east,north = currentLevel:getCoordinates()
-
-		outString = outString .. currentLevel.direction .. ", and are " 
-		outString = outString .. tostring(currentLevel.dungeonLevel)
-		if (currentLevel.dungeonLevel == 1) then
-			outString = outString .. " level "
-		else
-			outString = outString .." levels "
-		end
-		outString = outString..currentLevel.dungeonDirection..",\n"
-
-		outString = outString .. tostring(north)
-		if (north == 1) then
-			outString = outString .. " square north\n"
-		else
-			outString = outString .. " squares north\n"
-		end
-		outString = outString .. tostring(east)
-		if (east == 1) then
-			outString = outString .. " square "
-		else
-			outString = outString .. " squares "
-		end
-		outString = outString .. "east of the entry stairs"
-		text:csplash(false, true, outString)
-		text:clear()
-	end
-end
-
 	text:clear()
 end
 
@@ -277,12 +241,13 @@ end
 ----------------------------------------
 -- spells.summon()
 ----------------------------------------
-function spells.summon(inAction, inSource)
+function spells.summon(inAction)
+	local source	= inAction.source
 	local inData	= inAction.inData
 
-	if (inSource:isCharacter()) then
+	if (source:isCharacter()) then
 		party:doSummon(inData)
-	elseif (inSource:isSummon()) then
+	elseif (source:isSummon()) then
 		local xxx_add_party_monster_summon_spell = true
 
 		text:printEllipsis()
@@ -416,16 +381,20 @@ end
 ----------------------------------------
 -- spells.attack()
 ----------------------------------------
-function spells.attack(inAction, inSource)
+function spells.attack(inAction)
+	local source	= inAction.source
+
 	log:print(log.LOG_DEBUG, "spells.attack()")
-	inSource:attackSpell(inAction)
+	source:attackSpell(inAction)
 end
 
 ----------------------------------------
 -- spells:battleBonus()
 ----------------------------------------
-function spells:battleBonus(inAction, inSource)
-	if (inSource:battleBonus(inAction)) then
+function spells:battleBonus(inAction)
+	local source	= inAction.source
+
+	if (source:battleBonus(inAction)) then
 		text:printEllipsis()
 	end
 end

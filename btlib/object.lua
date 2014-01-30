@@ -36,7 +36,10 @@ function object:new(inTable)
 
 	if (memoryTrace) then
 		self.__location = log:getLocation(3)
+		--self.__location = debug.traceback()
 	end
+
+	log:print(log.LOG_MEMORY, "Key: %s created from %s", self.key, self.__location)
 
 	setmetatable(self, {
 		__index = object.index,
@@ -79,6 +82,10 @@ function object:searchParents(inKey)
 		if ((type(c) ~= "table") and
 		    (type(c) ~= "userdata")) then
 			error("Invalid class", 4)
+		end
+
+		if (c == self) then
+			error("self as parent")
 		end
 
 		local v = c[inKey]
@@ -134,11 +141,17 @@ end
 function object:dumpAll()
 	local key
 	local value
+	local t = {}
 
-	for key,value in pairs(objectData) do
-		log:print(log.LOG_INFO, "Key: %s from %s",
+	for key,_ in pairs(objectData) do
+		table.insert(t, key)
+	end
+	table.sort(t)
+
+	for _,key in ipairs(t) do
+		log:print(log.LOG_MEMORY, "Key: %s from %s",
 			key,
-			value.__location
+			objectData[key].__location
 			)
 	end
 end

@@ -47,6 +47,7 @@ function keyboardCommand(inkey)
 		return true
 	elseif (inkey == "G") then
 		collectgarbage()
+	elseif (inkey == "H") then
 		object.dumpAll()
 	elseif (inkey == "N") then
 		party:reorder()

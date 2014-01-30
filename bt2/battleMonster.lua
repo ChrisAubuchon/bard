@@ -16,9 +16,12 @@ function battleMonster:doAction()
 		return
 	end
 
+	log:print(log.LOG_DEBUG, "%s (%s) turn", self.singular, self.key)
+
 	self.action.target = party:randomMeleeCharacter()
 
 	for attack in self:attackIterator() do
+		log:print(log.LOG_DEBUG, "attack.type: %s", attack.type)
 		if (attack.type == "melee") then
 			if (self:inMeleeRange()) then
 				self.action.inData = attack.action.inData
@@ -55,6 +58,14 @@ function battleMonster:doAction()
 			self.action:multiTargetSpell()
 			
 			return
+		elseif (attack.type == "fire") then
+			self.action.type = "fire"
+			self.action.inData = attack.action.inData
+
+			text:print("%s %s", 
+				self.singular, self.action.inData.fireString)
+			self:attackSpell()
+			return
 		else
 			error("Unknown monster attack type: " .. 
 				tostring(attack.type))
@@ -67,7 +78,8 @@ end
 ----------------------------------------
 function battleMonster:meleeAttack()
 	local inData	= self.action.inData
-	local outData	= self.action.outData
+	local result	= self.action.result
+	local target	= self.action.target
 
 	log:print(log.LOG_DEBUG, "battleMonster:meleeAttack() inData: " .. tostring(inData))
 	if (not self.action:validateTarget()) then
@@ -77,18 +89,18 @@ function battleMonster:meleeAttack()
 	text:print("A %s%s%s", 
 			self.singular,
 			inData.meleeString[random:xdy(1,2)],
-			self.action.target:getSingularName()
+			target:getSingularName()
 		)
 
 	if (self:checkMeleeHits()) then
 		self:getMeleeDamage()
 		text:print(", and hits for %d point%s of damage", 
-			outData.damage,
-			string.pluralize(outData.damage, "", "s")
+			result.damage,
+			string.pluralize(result.damage, "", "s")
 			)
 
-		if (self.action.target:doDamage()) then
-			text:print(stringTables.effects[outData.specialAttack])
+		if (target:doDamage(self.action)) then
+			text:print(stringTables.effects[result.specialAttack])
 			text:print("%s!\n\n", self.action.target:getPronoun())
 		else
 			text:print(".\n\n")
@@ -144,13 +156,13 @@ end
 ----------------------------------------
 function battleMonster:getMeleeDamage()
 	local inData	= self.action.inData
-	local outData	= self.action.outData
+	local result	= self.action.result
 
-	outData.damage = random:xdy(inData.ndice, inData.dieval)
-	outData.damage = outData.damage + self.parentGroup.damageBonus
+	result.damage = random:xdy(inData.ndice, inData.dieval)
+	result.damage = result.damage + self.parentGroup.damageBonus
 
 	if (random:band(1) == 0) then
-		outData.specialAttack = inData.specialAttack
+		result.specialAttack = inData.specialAttack
 	end
 end
 	
@@ -158,27 +170,25 @@ end
 ----------------------------------------
 -- battleMonster:doDamage()
 ----------------------------------------
-function battleMonster:doDamage()
-	local damage		= self.action.damage
+function battleMonster:doDamage(inAction)
+	local result		= inAction.result
 	local target		= false
 	local m
-
-	log:print(log.LOG_DEBUG, "self.action.damage: %s", self.action.damage)
 
 	target = self:randomMember()
 	if (not target) then
 		error("randomMember() failed to select a member")
 	end
 
-	if ((damage.specialAttack ~= "stone") and
-	    (damage.specialAttack ~= "critical")) then
-		damage.specialAttack = false
-		if (damage.amount < target.currentHp) then
-			target.currentHp = target.currentHp - damage.amount
+	if ((result.specialAttack ~= "stone") and
+	    (result.specialAttack ~= "critical")) then
+		result.specialAttack = false
+		if (result.damage < target.currentHp) then
+			target.currentHp = target.currentHp - result.damage
 			target.beenAttacked = true
 			return false
 		else
-			damage.specialAttack = "kill"
+			result.specialAttack = "kill"
 		end
 	end
 
@@ -269,18 +279,21 @@ function battleMonster:mageStar()
 	party.missTurn = true
 end
 
+----------------------------------------
+--
+----------------------------------------
 function battleMonster:combatSpell()
 	if (self.action.target:isDisabled()) then
 		return
 	end
 
 	text:print("%s casts a spell", self.singular)
-	self.action:perform(self)
+	self.action:perform(self.action)
 end
 
 function battleMonster:attackSpell()
 	local inData		= self.action.inData
-	local outData		= self.action.outData
+	local result		= self.action.result
 	local source		= self.action.source
 
 	log:print(log.LOG_DEBUG, "battleMonster:attackSpell()")
@@ -288,10 +301,10 @@ function battleMonster:attackSpell()
 		self.action:multiTargetSpell()
 	else
 		if (inData.specialAttack) then
-			outData.specialAttack = inData.specialAttack
-			outData.damage = 0
+			result.specialAttack = inData.specialAttack
+			result.damage = 0
 		else
-			outData.damage = random:xdy(inData.ndice, inData.dieval)
+			result.damage = random:xdy(inData.ndice, inData.dieval)
 		end
 		self.action:singleTargetSpell()
 	end
@@ -326,9 +339,14 @@ function battleMonster:doDoppleganger()
 	text:ctdprint(false, true, "A Doppleganger jumps into your party!\n\n")
 end
 
+----------------------------------------
+-- battleMonster:fireWeapon()
+----------------------------------------
+function battleMonster:fireWeapon()
+	text:print(inData.fireString)
 
-
-
+	self:attackSpell()
+end
 
 
 
