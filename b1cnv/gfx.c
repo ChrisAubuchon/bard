@@ -54,7 +54,7 @@ static void icon_write_clear(btstring_t *data, int index);
 static void outputScreens(uint8_t indent)
 {
 	uint8_t i;
-	uint8_t *fnames[] = { "bardtit", "bardscr" };
+	uint8_t *fnames[] = { "BARDTIT", "BARDSCR" };
 	uint8_t *tags[] = { "title", "screen" };
 
 	bta_cell_t *img;
@@ -256,12 +256,10 @@ static void outputIcons(uint8_t indent)
 
 void convertGFX(void)
 {
-#if 0
 	outputScreens(2);
 	outputIcons(2);
 	outputBigpic(2);
 	outputBitmapFont();
 	outputCitypics(2);
-#endif
 	outputDunpics(2);
 }

@@ -608,8 +608,6 @@ gl_LIBOBJS
 am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
-BARDTWODIR
-BARDONEDIR
 LIBOBJS
 LIBGNU_LTLIBDEPS
 LIBGNU_LIBDEPS
@@ -1040,8 +1038,6 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_dependency_tracking
-with_dos_bard1
-with_dos_bard2
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1674,12 +1670,6 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
-
-Optional Packages:
-  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
-  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-dos-bard1=PATH   Specify path to DOS Bard1 installation
-  --with-dos-bard2=PATH   Specify path to DOS Bard2 installation
 
 Some influential environment variables:
   CC          C compiler command
@@ -7925,7 +7915,7 @@ $as_echo "$gl_cv_next_string_h" >&6; }
 
 
 
-    for gl_func in ffsl ffsll memmem mempcpy memrchr rawmemchr stpcpy stpncpy strchrnul      strdup strncat strndup strnlen strpbrk strsep strcasestr strtok_r      strerror_r strsignal strverscmp; do
+    for gl_func in ffsl ffsll memmem mempcpy memrchr rawmemchr stpcpy stpncpy strchrnul      strdup strncat strndup strnlen strpbrk strsep strcasestr strtok_r      strerror_r strsignal strverscmp; do
     as_gl_Symbol=`$as_echo "gl_cv_have_raw_decl_$gl_func" | $as_tr_sh`
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $gl_func is declared without a macro" >&5
 $as_echo_n "checking whether $gl_func is declared without a macro... " >&6; }
@@ -8494,7 +8484,7 @@ $as_echo "$gl_cv_next_stdlib_h" >&6; }
 
 
 
-    for gl_func in _Exit atoll canonicalize_file_name getloadavg getsubopt grantpt     initstate initstate_r mkdtemp mkostemp mkostemps mkstemp mkstemps     posix_openpt ptsname ptsname_r random random_r realpath rpmatch     setenv setstate setstate_r srandom srandom_r     strtod strtoll strtoull unlockpt unsetenv; do
+    for gl_func in _Exit atoll canonicalize_file_name getloadavg getsubopt grantpt     initstate initstate_r mkdtemp mkostemp mkostemps mkstemp mkstemps     posix_openpt ptsname ptsname_r random random_r realpath rpmatch     setenv setstate setstate_r srandom srandom_r     strtod strtoll strtoull unlockpt unsetenv; do
     as_gl_Symbol=`$as_echo "gl_cv_have_raw_decl_$gl_func" | $as_tr_sh`
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $gl_func is declared without a macro" >&5
 $as_echo_n "checking whether $gl_func is declared without a macro... " >&6; }
@@ -8765,7 +8755,7 @@ $as_echo "$gl_cv_next_unistd_h" >&6; }
 
 
 
-    for gl_func in chdir chown dup dup2 dup3 environ euidaccess faccessat fchdir fchownat     fdatasync fsync ftruncate getcwd getdomainname getdtablesize getgroups     gethostname getlogin getlogin_r getpagesize     getusershell setusershell endusershell     group_member isatty lchown link linkat lseek pipe pipe2 pread pwrite     readlink readlinkat rmdir sethostname sleep symlink symlinkat ttyname_r     unlink unlinkat usleep; do
+    for gl_func in chdir chown dup dup2 dup3 environ euidaccess faccessat fchdir fchownat     fdatasync fsync ftruncate getcwd getdomainname getdtablesize getgroups     gethostname getlogin getlogin_r getpagesize     getusershell setusershell endusershell     group_member isatty lchown link linkat lseek pipe pipe2 pread pwrite     readlink readlinkat rmdir sethostname sleep symlink symlinkat ttyname_r     unlink unlinkat usleep; do
     as_gl_Symbol=`$as_echo "gl_cv_have_raw_decl_$gl_func" | $as_tr_sh`
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $gl_func is declared without a macro" >&5
 $as_echo_n "checking whether $gl_func is declared without a macro... " >&6; }
@@ -10312,44 +10302,6 @@ fi
 ac_config_headers="$ac_config_headers config.h"
 
 ac_config_files="$ac_config_files  Makefile bte/Makefile b1cnv/Makefile b2cnv/Makefile btcscnv/Makefile lib/Makefile lib/lua/Makefile lib/libbard/Makefile lib/libcnv/Makefile lib/libgnu/Makefile lib/jansson/Makefile"
-
-
-
-# Check whether --with-dos-bard1 was given.
-if test "${with_dos_bard1+set}" = set; then :
-  withval=$with_dos_bard1;
-		if test "x$withval" != "xno" ; then
-			case "$withval" in
-				./*|../*)	withval="`pwd`/$withval"
-			esac
-			if test -f "$withval/BARD.EXE" ; then
-				BARDONEDIR=$withval
-			else
-				BARDONEDIR=
-			fi
-		fi
-
-
-fi
-
-
-
-# Check whether --with-dos-bard2 was given.
-if test "${with_dos_bard2+set}" = set; then :
-  withval=$with_dos_bard2;
-		if test "x$withval" != "xno" ; then
-			case "$withval" in
-				./*|../*)	withval="`pwd`/$withval"
-			esac
-			if test -f "$withval/DK.EXE" ; then
-				BARDTWODIR=$withval
-			else
-				BARDTWODIR=
-			fi
-		fi
-
-
-fi
 
 
 cat >confcache <<\_ACEOF

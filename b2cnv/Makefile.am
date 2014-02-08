@@ -6,8 +6,7 @@ AM_CFLAGS = @CFLAGS@	\
 	-I$(top_srcdir)/lib/jansson \
 	-I$(top_srcdir)/lib/libcnv
 
-AM_CPPFLAGS = -DHAVE_CONFIG_H -DDATADIR=\"$(datadir)\" \
-	-DBASEDIR=\"$(BARDTWODIR)\"
+AM_CPPFLAGS = -DHAVE_CONFIG_H 
 
 b2cnv_SOURCES = 	\
 	b2cnv.c		\

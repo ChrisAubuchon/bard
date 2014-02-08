@@ -7,6 +7,7 @@ FILE *xfopen(btstring_t *fname, uint8_t *mode)
 	fp = fopen(fname->buf, mode);
 	if (fp == NULL) {
 		perror("xfopen()");
+		fprintf(stderr, "file: %s", fname->buf);
 		exit(1);
 	}
 

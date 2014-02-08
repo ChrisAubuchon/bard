@@ -283,7 +283,7 @@ static void outputMousePointers(void)
 /*				*/
 /********************************/
 
-void convertGFX(void)
+void convertGFX()
 {
 	outputScreens();
 	outputIcons();

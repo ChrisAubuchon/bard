@@ -20,9 +20,9 @@ end
 
 -- Set the data path
 --
-package.path = package.path .. ";" .. sys.dataPath .. "/../btlib/?.lua"
-sys.sharedPath = sys.dataPath .. "/share"
-sys.dataPath = sys.dataPath .. "/bt2"
+package.path = package.path .. ";../btlib/?.lua"
+sys.sharedPath = "../data/share"
+sys.dataPath   = "../data/bt2"
 
 setmetatable(_G, {
 	__newindex = function(_, n)

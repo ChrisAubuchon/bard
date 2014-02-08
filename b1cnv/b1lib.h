@@ -5,27 +5,42 @@
 #include <cnv_action.h>
 #include <bt_string.h>
 
+/********************************/
+/*				*/
+/* Global Variables		*/
+/*				*/
+/********************************/
+
+extern btstring_t	*inputDir;
+extern btstring_t	*outputDir;
+
+/********************************/
+/*				*/
+/* Macros			*/
+/*				*/
+/********************************/
+
 #define IFBIT(x,y,true,false)	((x) & (y)) ? (true) : (false)
 
 #define DIEVAL(x)       4 << ((x) >> 5)
 #define NDICE(x)        (((x) & 0x1f) + 1)
 
 #define mkImagePath(format, ...)	\
-	bts_sprintf("%s/bt1/images/"format, DATADIR, ## __VA_ARGS__)
+	bts_sprintf("%s/bt1/images/"format, outputDir->buf, ## __VA_ARGS__)
 #define mkImagePathRel(format, ...)	\
 	bts_sprintf("images/"format, ## __VA_ARGS__)
 
 #define mkFontPath(format, ...)		\
-	bts_sprintf("%s/bt1/fonts/"format, DATADIR, ## __VA_ARGS__)
+	bts_sprintf("%s/bt1/fonts/"format, outputDir->buf, ## __VA_ARGS__)
 
 #define mkJsonPath(format, ...)		\
-	bts_sprintf("%s/bt1/json/"format, DATADIR, ## __VA_ARGS__)
+	bts_sprintf("%s/bt1/json/"format, outputDir->buf, ## __VA_ARGS__)
 
 #define mkJsonPathRel(format, ...)	\
 	bts_sprintf("json/"format, ## __VA_ARGS__)
 
 #define mkBardOnePath(format, ...)		\
-	bts_sprintf("%s/"format, BASEDIR, ## __VA_ARGS__)
+	bts_sprintf("%s/"format, inputDir->buf, ## __VA_ARGS__)
 
 /* class.c */
 void		convertClasses(void);
