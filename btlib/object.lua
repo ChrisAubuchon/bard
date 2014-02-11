@@ -72,6 +72,23 @@ function object:addParent(...)
 end
 
 ----------------------------------------
+-- object:addSelf()
+--
+-- Add a parent as the main class. All
+-- this does is sets inSelf as the first
+-- member of the __parents table
+----------------------------------------
+function object:addSelf(inSelf)
+	if (type(inSelf) ~= "table") then
+		error("addSelf(): inSelf not a table", 2)
+	end
+	
+	if (inSelf ~= self) then
+		table.insert(self.__parents, 1, inSelf)
+	end
+end
+
+----------------------------------------
 -- object:searchParents()
 ----------------------------------------
 function object:searchParents(inKey)
@@ -133,6 +150,13 @@ function object:gc()
 	end
 
 	objectData[self.key] = nil
+end
+
+----------------------------------------
+-- object:delete()
+----------------------------------------
+function object:delete()
+	log:print(log.LOG_MEMORY, "object:delete() called")
 end
 
 ----------------------------------------

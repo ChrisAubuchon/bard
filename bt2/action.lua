@@ -4,7 +4,7 @@ btAction = {}
 function btAction:new()
 	local self = object:new()
 
-	self:addParent(btAction)
+	self:addSelf(btAction)
 
 	self.type		= false
 	self.source		= false
@@ -15,6 +15,14 @@ function btAction:new()
 	self.outData		= {}
 
 	return self
+end
+
+----------------------------------------
+-- btAction:delete()
+----------------------------------------
+function btAction:delete()
+	self.source	= nil
+	self.target	= nil
 end
 
 function btAction:dump()
@@ -40,13 +48,27 @@ end
 -- btAction:reset()
 ----------------------------------------
 function btAction:reset()
-	self.target = false
-	self.func = false
-	self.action = false
-	self.inData = {}
-	self.result = {}
+	self.target	= false
+	self.func	= false
+	self.action	= false
+	self.type	= false
+	self.inData	= {}
+	self.result	= {}
 end
 
+----------------------------------------
+-- btAction:renew()
+--
+-- Clear all data including the source
+----------------------------------------
+function btAction:renew()
+	self.target	= false
+	self.source	= false
+	self.action	= false
+	self.inData	= {}
+	self.result	= {}
+	self.type	= false
+end
 
 local xxx_candidate_for_battle_entity
 ----------------------------------------

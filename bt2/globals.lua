@@ -29,7 +29,6 @@ globals.partyDied	= false
 globals.citySquare	= false
 globals.guildCity	= "Tangramayne"
 
---m_window		= gfxScreen:new()
 globals.fonts		= {}
 globals.fonts.mono	= gfxFont:new("fonts/bt2font.btf", true)
 globals.fonts.var	= gfxFont:new("fonts/bt2font.btf", false)

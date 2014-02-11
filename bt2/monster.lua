@@ -6,7 +6,7 @@ function monster:new(inName)
 	self.action		= btAction:new()
 	self.action.source	= self
 
-	self:addParent(monster)
+	self:addSelf(monster)
 	self:addParent(monsterData[inName])
 	self:addParent(entity)
 	self:addParent(linkedListNode)
@@ -20,6 +20,16 @@ function monster:new(inName)
 	self.__index = self
 
 	return self
+end
+
+----------------------------------------
+-- monster:delete()
+----------------------------------------
+function monster:delete()
+	self.action:delete()
+	self.action = nil
+	self.parentGroup = nil
+	linkedListNode.delete(self)
 end
 
 ----------------------------------------

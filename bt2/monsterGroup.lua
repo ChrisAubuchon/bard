@@ -4,9 +4,10 @@ monsterGroup = {}
 function monsterGroup:new(inName, inSize)
 	local self = linkedList:new()
 
+	log:print(log.LOG_MEMORY, "monsterGroup.key: %s", self.key)
 	self.action	= btAction:new()
 
-	self:addParent(monsterGroup)
+	self:addSelf(monsterGroup)
 	self:addParent(monster) 
 	self:addParent(linkedListNode)
 	self:addParent(monsterData[inName]) 
@@ -14,7 +15,6 @@ function monsterGroup:new(inName, inSize)
 	self:addParent(entity)
 	self:addParent(battleBonus)
 
-	log:print(log.LOG_DEBUG, "self.next: %s", self.next)
 	self.size	= 0
 	self.range	= self.distance
 	self.name	= inName
@@ -34,9 +34,16 @@ function monsterGroup:new(inName, inSize)
 		self:addMonster()
 	end
 
-	log:print(log.LOG_DEBUG, "self.next: %s", self.next)
-
 	return self
+end
+
+----------------------------------------
+-- monsterGroup:delete()
+----------------------------------------
+function monsterGroup:delete()
+	self.action:delete()
+	self.action = nil
+	linkedList.delete(self)
 end
 
 function monsterGroup:addMonster()

@@ -58,7 +58,7 @@ function battle:random()
 	currentBattle = battle:init()
 
 	currentBattle.isPartyAttack = false
-	currentBattle.monParty = monsterParty.new()
+	currentBattle.monParty = monsterParty:new()
 	mgroups = currentLevel:getBattleOpponents()
 	for _,mgroup in ipairs(mgroups) do
 		currentBattle.monParty:addMonsterGroup(monsterGroup:new(mgroup, false))
@@ -254,6 +254,15 @@ end
 function battle:stop()
 	text:clear()
 	party:display()
+
+	party.action:renew()
+
+	if (not self.isPartyAttack) then
+		self.monParty:delete()
+		self.monParty = nil
+	end
+
+	self.actionList:delete()
 end
 
 ----------------------------------------

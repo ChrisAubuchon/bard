@@ -16,7 +16,7 @@ battleBonus = {
 function battleBonus:new()
 	local self = object:new()
 
-	self:addParent(battleBonus)
+	self:addSelf(battleBonus)
 
 	return self
 end

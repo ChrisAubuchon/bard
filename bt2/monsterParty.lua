@@ -2,12 +2,21 @@ monsterParty = {}
 function monsterParty:new()
 	local self = linkedList:new()
 
-	self:addParent(monsterParty)
+	self:addSelf(monsterParty)
 	self:addParent(battleBonus)
 
 	self.size = 0
 
 	return self
+end
+
+----------------------------------------
+-- monsterParty:delete()
+----------------------------------------
+function monsterParty:delete()
+	linkedList.delete(self)
+	log:print(log.LOG_MEMORY, "monsterParty.head: %s", self.head)
+	log:print(log.LOG_MEMORY, "monsterParty.tail: %s", self.tail)
 end
 
 ----------------------------------------
@@ -40,16 +49,8 @@ end
 -- addMonsterGroup()
 ----------------------------------------
 function monsterParty:addMonsterGroup(inGroup)
-	log:print(log.LOG_DEBUG, "monsterParty:addMonsterGroup()")
-	log:print(log.LOG_DEBUG, "inGroup.next = %s", inGroup.next)
 	self.size = self.size + 1
 	self:insertTail(inGroup)
-
-	local mgroup
-	for mgroup in self:iterator() do
-		log:print(log.LOG_DEBUG, "mgroup: %s", mgroup)
-		log:print(log.LOG_DEBUG, "mgroup.next: %s", mgroup.next)
-	end
 end
 
 ----------------------------------------
@@ -112,6 +113,7 @@ function monsterParty:doDisbelieve()
 		if (not action:savingThrow()) then
 			text:cdprint(false, true, "Your foes see through your illusion!\n\n")
 		end
+		action:delete()
 	end
 end
 

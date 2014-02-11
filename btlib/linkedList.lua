@@ -17,6 +17,11 @@ function linkedListNode:new()
 	return self
 end
 
+function linkedListNode:delete()
+	self.prev = nil
+	self.next = nil
+end
+
 ----------------------------------------
 -- linkedListNode:compare()
 ----------------------------------------
@@ -412,4 +417,25 @@ function linkedList:truncate(inNode)
 	while (node[self.__next]) do
 		self:remove(node[self.__next])
 	end
+end
+
+----------------------------------------
+-- linkedList:delete()
+----------------------------------------
+function linkedList:delete()
+	local node 
+	local next	 = self.head
+
+	while (next) do
+		node = next
+		next = next[self.__next]
+
+		self:remove(node)
+		if ((node.delete) and (type(node.delete) == "function")) then
+			node:delete()
+		end
+	end
+
+	self.head = false
+	self.tail = false
 end
