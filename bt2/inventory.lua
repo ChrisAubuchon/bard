@@ -41,6 +41,10 @@ function inventorySlot:toInventoryLine(inCharacter)
 		rval = rval .. self.type
 	end
 
+	if (self.count) and (self.count > 1) then
+		rval = string.format("%s #%d", rval, self.count)
+	end
+
 	return rval
 end
 
@@ -129,7 +133,7 @@ function inventory:addItem(inName, isIdentified, inCount)
 
 	i = inventorySlot:new(inName)
 	i.isIdentified = isIdentified
-	i.count = inCount or 1
+	i.count = inCount or i.max_charges
 	self:add(i)
 
 	return true

@@ -69,6 +69,11 @@ void convertItems(void)
 		b->macro = bts_strcpy(itemName[i]);
 		str2macro(b->macro->buf);
 
+		if (i < 22)
+			b->shopCount = -1;
+		else
+			b->shopCount = 0;
+
 		b->type = itemType[i] & 0x0f;
 		b->eclass = itemEClass[i] & 0x0f;
 		b->spAttack = itemType[i] >> 4;
@@ -112,6 +117,7 @@ void convertItems(void)
 		b->value = getValue(itemValue[i]);
 
 		uint8_t spell = itemSpell[i];
+		printf("%d: %d\n", i, spell);
 		if (spell) {
 			getTargetting(itemSpell[i], &b->targetting);
 			if (spell > 111) {
@@ -146,6 +152,7 @@ void convertItems(void)
 	cnvList_free(il);
 
 	
+#if 0
 	/*
 	 * This block of code generates IDC commands to define an
 	 * enum of all of the item names for IDA
@@ -163,5 +170,6 @@ void convertItems(void)
 		bts_free(buf);
 	}
 	printf("}");
+#endif
 
 }

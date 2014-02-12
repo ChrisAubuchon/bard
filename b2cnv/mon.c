@@ -122,6 +122,9 @@ static monster_t *convertMonster(b2mon_t *inMonster)
 			ba->attype	= 8;
 			ba->meleeString	= ((inMonster->meleeatttype & 0xf0) >> 4) + 1;
 		} else if (att < 79) {
+			/* Convert Mage Maelstrom to Fire Column */
+			if (att == 55) 
+				att = 61;
 			ma = monsterAttack_new(ACT_SPELL);
 			ma->action = getSpellAction(att);
 		} else if ((att > 79) && (att < 96)) {

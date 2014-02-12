@@ -18,13 +18,6 @@ bIICharacter = {
 	isDoppleganger	= false,
 	songs		= 0,
 	possessed	= false,
-	spellLevel = {
-		Magician = 0,
-		Conjurer = 0,
-		Sorcerer = 0,
-		Wizard   = 0,
-		Archmage = 0
-	},
 	version		= 2,
 	inventory	= false
 }

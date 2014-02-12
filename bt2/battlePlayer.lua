@@ -202,7 +202,7 @@ function battlePlayer:doAction()
 		return
 	elseif (action.type == "use") then
 		log:print(log.LOG_DEBUG, "Using an item")
-		self:useItem()
+		self:doUseItem()
 	elseif (action.type == "sing") then
 		log:print(log.LOG_DEBUG, "Singing a bard song")
 		self:doBardSong()
@@ -364,8 +364,17 @@ function battlePlayer:doUseItem()
 	local target	= self.action.target
 	local item	= inData.item
 
-	local xxx_wtf_is_use_doUse = true
-	use.doUse(self.action)
+	if (item.useString) then
+		text:print("%s%s", self.name, item.useString)
+	else
+		text:print("%s%s", self.name, inData.fireString)
+	end
+
+	self:consumeItem()
+
+	if (self.action.func) then
+		self.action.func(self.action)
+	end
 end
 
 ----------------------------------------

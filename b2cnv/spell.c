@@ -490,4 +490,13 @@ void convertSpells(void)
 
 	spellList_to_json(spells, mkJsonPath("spells.json"));
 	cnvList_free(spells);
+
+	printf("static main() {\n");
+	printf("auto eid;\n");
+	printf("eid = GetEnum(\"spellName\");\n");
+	for (i = 0; i < 79; i++) {
+		printf("AddConstEx(eid, \"spell_%s\", %d, -1);\n",
+			spellAbbr[i], i);
+	}
+	printf("}");
 }

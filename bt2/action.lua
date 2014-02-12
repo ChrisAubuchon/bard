@@ -215,14 +215,15 @@ function btAction:singleTargetSpell()
 		end
 	end
 
-	text:print(" at %s", target:getSingularName())
+	text:print(" at ")
+	self:printTarget()
 	save, half = self:savingThrow()
 	if (save) then
 		if (half) then
 			bit32.rshift(result.damage, 1)
 		else
 			log:print(log.LOG_DEBUG, "%s", self.type)
-			if (self.type == "fire") then
+			if (inData.fireString) then
 				text:ctdprint(false, true, 
 					" but it missed!\n\n")
 			else
@@ -321,7 +322,18 @@ function btAction:perform(inSource)
 	end
 end
 
+----------------------------------------
+-- btAction:printTarget()
+----------------------------------------
+function btAction:printTarget()
+	local target	= self.target
 
+	if ((target:isMonster()) and (not target:isSummon())) then
+		text:print("a %s", target.singular)
+	else
+		text:print(target.name)
+	end
+end
 
 
 

@@ -309,5 +309,17 @@ function guild:enter()
 	self:addParent(guild)
 	self:addParent(building:new("The Guild", "PIC_GUILDINT"))
 
+	local c = diskio:readTable("gameState", true)
+	if (not globals.guildCity) then
+		if (not c.guildCity) then
+			globals.guildCity = "Tangramayne"
+		else
+			globals.guildCity = c.guildCity
+		end
+	else
+		c.guildCity = globals.guildCity
+		diskio:writeTable(c, "gameState")
+	end
+
 	self:doEnter()
 end

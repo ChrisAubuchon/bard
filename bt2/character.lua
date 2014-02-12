@@ -147,9 +147,10 @@ function character:toTable()
 
 	local function toTable(inSelf, inDest, inHeader)
 		local k
+		local hv
 		local v
 
-		for k,_ in pairs(inHeader) do
+		for k,hv in pairs(inHeader) do
 			v = inSelf[k]
 
 			if (type(v) == "function") then
@@ -168,6 +169,7 @@ function character:toTable()
 
 	toTable(self, t, bIICharacter)
 	toTable(self, t, entity)
+
 
 	return t
 end
@@ -553,10 +555,15 @@ function character:printCharacter()
 
 		self.inventory:printScreen(self)
 
-		text:print("\nConj:" .. self.spellLevel.Conjurer)
-		text:print(" Sorc:" .. self.spellLevel.Sorcerer)
-		text:print("\nMagi:" .. self.spellLevel.Magician)
-		text:print(" Wizd:" .. self.spellLevel.Wizard)
+		text:print("\nCon:%d Sor:%d",
+			self.spellLevel.Conjurer,
+			self.spellLevel.Sorcerer
+			)
+		text:print("\nMag:%d Wiz:%d Amg:%d",
+			self.spellLevel.Magician,
+			self.spellLevel.Wizard,
+			self.spellLevel.Archmage
+			)
 		text:print("\n     (DONE)")
 
 		inkey = getkey()
@@ -877,12 +884,27 @@ end
 -- of charges of the item
 ----------------------------------------
 function character:consumeItem()
-	local inItem	= self.action.inData.item
+--	local inItem	= self.action.inData.item
+	local inItem
+	local itemSlot
 
+	itemSlot = self.inventory:findItem(self.action.inData.item)
+	inItem = self.inventory[itemSlot]
+	if (not inItem.count) then
+		return
+	end
+
+	inItem.count = inItem.count - 1
+	if (inItem.count == 0) then
+		self.inventory:dropItem(itemSlot)
+	end
+
+if false then
 	if ((inItem.max_charges == 1) or
 	    ((inItem.max_charges == 0) and (random:band(63) == 1))) then
 		self.inventory:dropItem(self.inventory:findItem(inItem))
 	end
+end
 end
 
 ----------------------------------------
@@ -1018,9 +1040,11 @@ end
 -- getActionTarget()
 ----------------------------------------
 function character:getActionTarget(inTargetOptions)
-	local optionKeys	= btTable:new()
+	local optionKeys	= {}
 	local inkey
 	local i
+
+	table.setDefault(optionKeys, false)
 
 	if (inTargetOptions.party) then
 		local count = 1
@@ -1033,8 +1057,12 @@ function character:getActionTarget(inTargetOptions)
 		text:print("\nMember #[1-%d]", party.size)
 	end
 
-	if (currentBattle and (not currentBattle.isPartyAttack)) then
-		if (inTargetOptions.melee or inTargetOptions.monster) then
+	if (currentBattle) then
+		if (currentBattle.isPartyAttack) then
+			if (not inTargetOptions.party) then
+				return false
+			end
+		elseif (inTargetOptions.melee or inTargetOptions.monster) then
 			local i
 			local monGroup
 
