@@ -27,6 +27,7 @@ function guild:addMember()
 			text:csplash(true, true, 
 				"\n\nThat member is already in the party."
 				)
+			return
 		end
 		
 		party:addCharacter(roster:readCharacter(member))
@@ -287,7 +288,9 @@ function guild:doEnter()
 				return
 			end
 		elseif (inkey == "L") then
-			local xxx_load_game = true
+			globals.gameState = globals.STATE_INGAME
+			globals:restoreGame()
+			return
 		elseif (inkey == "N") then
 			party:reorder()
 		elseif (inkey == "R") then

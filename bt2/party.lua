@@ -21,7 +21,7 @@ party.levitate	= levitateEffect:new()
 
 party.advance	= false
 party.action	= btAction:new()
-party.song = song:new()
+party.song		= song:new()
 party.battle	= {
 	acBonus		= 0,
 	antiMagic	= 0,
@@ -342,6 +342,115 @@ function party:toTable()
 	end
 
 	return t
+end
+
+----------------------------------------
+-- party:saveState()
+----------------------------------------
+function party:saveState()
+	local t	
+	local c
+
+	-- Save party order
+	t = self:toTable()
+
+	t.characters = {}
+
+	-- Save characters
+	for c in self:iterator() do
+		t.characters[c.name] = c:toTable()
+	end
+
+	if (self.light.active) then
+		t.light = {}
+		t.light.duration	= self.light.duration
+		t.light.distance	= self.light.distance
+		t.light.seeSecret	= self.light.seeSecret
+		t.light.noRandom	= true
+	end
+
+	if (self.levitate.active) then
+		t.levitate = {}
+		t.levitate.duration	= self.levitate.duration
+		t.levitate.noRandom	= true
+	end
+
+	if (self.shield.active) then
+		t.shield = {}
+		t.shield.duration	= self.shield.duration
+		t.shield.acBonus	= self.shield.bonus
+		t.shield.noRandom	= true
+	end
+
+	if (self.detect.active) then
+		t.detect = {}
+		t.detect.duration	= self.detect.duration
+		t.detect.stairs		= self.detect.stairs
+		t.detect.traps		= self.detect.traps
+		t.detect.special	= self.detect.special
+		t.detect.noRandom	= true
+	end
+
+	if (self.compass.active) then
+		t.compass = {}
+		t.compass.duration	= self.compass.duration
+		t.detect.noRandom	= true
+	end
+
+	if (self.song.active) then
+		t.song = {}
+		t.song.currentTune 	= self.song.currentTune
+		t.song.duration		= self.song.duration
+		t.song.singer		= self.song.singer.name
+	end
+
+	return t
+end
+
+----------------------------------------
+-- party:restoreState()
+----------------------------------------
+function party:restoreState(inTable)
+	local i
+	local c
+
+	-- Empty the party first
+	self:delete()
+
+	for i,c in ipairs(inTable) do
+		self:addCharacter(character:fromTable(inTable.characters[c]))
+	end
+
+	if (inTable.light) then
+		self.light:activate(inTable.light)
+	end
+
+	if (inTable.levitate) then
+		self.levitate:activate(inTable.levitate)
+	end
+
+	if (inTable.shield) then
+		self.shield:activate(inTable.shield)
+	end
+
+	if (inTable.detect) then
+		self.detect:activate(inTable.detect)
+	end
+
+	if (inTable.compass) then
+		self.compass:activate(inTable.compass)
+	end
+
+	log:print(log.LOG_DEBUG, "inTable.song: %s", inTable.song)
+	if (inTable.song) then
+		self.song:activate(
+			self:findByName(inTable.song.singer),
+			inTable.song.currentTune, 
+			inTable.song.duration
+		)
+	end
+
+	self:display()
 end
 
 ----------------------------------------

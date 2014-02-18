@@ -83,10 +83,11 @@ end
 ----------------------------------------
 -- song:activate()
 ----------------------------------------
-function song:activate(inSinger, inTune)
+function song:activate(inSinger, inTune, inDuration)
 	local tune
 	local action
 
+	log:print(log.LOG_DEBUG, "inTune: %s", inTune)
 	self:__tuneNumberCheck(inTune)
 
 	tune = songList[inTune]
@@ -104,7 +105,7 @@ function song:activate(inSinger, inTune)
 
 	self:__activate()
 	self.currentTune	= inTune
-	self.duration		= 12
+	self.duration		= inDuration or 12
 	self.singer		= inSinger
 	inSinger.isSinging	= true
 end
@@ -132,7 +133,7 @@ end
 function song:__activate()
 	local xxx_start_music_here = true
 
-	self.active = false
+	self.active = true
 end
 
 ----------------------------------------

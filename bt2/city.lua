@@ -12,83 +12,120 @@ local cities = {}
 -- buildings
 ----------------------------------------
 local square = {}
-square.new = function(lab, inEnterFunction) 
-	local self = {
-		enterFunction	= false,
-		label		= lab
-	}
+function square:new(inLabel, inEnterFunction)
+	local self = object:new()
+
+	self.enterFunction	= false
+	self.label		= inLabel
 
 	if (inEnterFunction) then
-		self.enterFunction = compileString("return " .. inEnterFunction)
+		self.enterFunction = compileString(
+			"return " .. inEnterFunction
+			)
 	end
 
-	function self.isPath()		return false end
-	function self.isBuilding()	return false end
-
-	----------------------------------------
-	-- onEnter
-	--
-	--   Execute code associated with the
-	-- square. Errors in the square code are
-	-- fatal.
-	--
-	--   Returns false if there is no code
-	-- for the square
-	----------------------------------------
-	function self.onEnter(city)
-		local rval
-		local msg
-
-		if (not self.enterFunction) then
-			return false
-		end
-
-		rval = self.enterFunction()
-
-		return rval
-	end
-
-	function self.clearEnter()
-		self.enterFunction = nil
-	end
+	self:addSelf(square)
 
 	return self
+			
+end
+
+----------------------------------------
+-- square:isPath()
+----------------------------------------
+function square:isPath()
+	return false
+end
+
+----------------------------------------
+-- square:isBuilding()
+----------------------------------------
+function square:isBuilding()
+	return false
+end
+
+----------------------------------------
+-- square:onEnter()
+----------------------------------------
+function square:onEnter()
+	local rval
+
+	if (not self.enterFunction) then
+		return false
+	end
+
+	rval = self.enterFunction()
+
+	return rval
+end
+
+----------------------------------------
+-- square:clearEnter()
+----------------------------------------
+function square:clearEnter()
+	self.enterFunction = nil
 end
 
 ----------------------------------------
 -- City path square class
 ----------------------------------------
 local citysq = {}
-citysq.new = function(inLabel, inSquare)
-	local self
+function citysq:new(inLabel, inSquare)
+	local self = square:new(inLabel, inSquare.enterFunction)
 
-	self = square.new(inLabel, inSquare.enterFunction)
 	self.location	= inSquare.location
 	self.north	= inSquare.north
 	self.south	= inSquare.south
 	self.east	= inSquare.east
 	self.west	= inSquare.west
 
-	function self.isPath() 	return true 	end
+	self:addSelf(citysq)
 
 	return self
+end
+
+----------------------------------------
+-- citysq:isPath()
+----------------------------------------
+function citysq:isPath()
+	return true
+end
+
+----------------------------------------
+-- citySquare:toCoordinates()
+----------------------------------------
+function citysq:toCoordinates()
+	local x
+	local y
+
+	x = tonumber(string.sub(self.label, 1, 2))
+	y = tonumber(string.sub(self.label, 4, 5))
+
+	return x,y
 end
 
 ----------------------------------------
 -- City building class
 ----------------------------------------
 local citybldg = {}
-citybldg.new = function(inLabel, inBuilding)
-	local self
+function citybldg:new(inLabel, inBuilding)
+	local self = square:new(inLabel, inBuilding.enterFunction)
 
-	self		= square.new(inLabel, inBuilding.enterFunction)
+	self:addSelf(citybldg)
+
 	self.distFace	= inBuilding.distFace
 	self.nearFace	= inBuilding.nearFace
 
-	function self.isBuilding()	return true	end
-
 	return self
 end
+
+----------------------------------------
+-- citybldg:isBuilding()
+----------------------------------------
+function citybldg:isBuilding()
+	return true
+end
+
 
 ----------------------------------------
 -- __buildView
@@ -194,7 +231,7 @@ function city:new(inName)
 		local square
 
 		for label, square in pairs(cities[inName].squares) do
-			self.sqs[label] = citysq.new(label, square)
+			self.sqs[label] = citysq:new(label, square)
 		end
 	end
 
@@ -203,7 +240,7 @@ function city:new(inName)
 		local square
 
 		for label, square in pairs(cities[inName].buildings) do
-			self.sqs[label] = citybldg.new(label, square)
+			self.sqs[label] = citybldg:new(label, square)
 		end
 	end
 
@@ -224,6 +261,32 @@ function city:new(inName)
 	__linkSquares()
 
 	return self
+end
+
+----------------------------------------
+-- city:saveState()
+----------------------------------------
+function city:saveState(inTable)
+	local t		= inTable or {}
+
+	t.class		= "city"
+	t.name		= self.name
+	t.direction	= self.direction
+	t.x, t.y	= self.currentSquare:toCoordinates()
+
+	return t
+end
+
+----------------------------------------
+-- city:restoreState()
+----------------------------------------
+function city:restoreState(inTable)
+	local c
+
+	c = city:new(inTable.name)
+	c:enter(inTable.x, inTable.y, inTable.direction)
+
+	return c
 end
 
 ----------------------------------------
@@ -303,8 +366,8 @@ function city:moveForward()
 	local front_sq = self.currentSquare[self.direction]
 	local rval
 
-	if (front_sq.isBuilding()) then
-		front_sq.onEnter()
+	if (front_sq:isBuilding()) then
+		front_sq:onEnter()
 		if (self.exit) then
 			return true
 		end
@@ -313,7 +376,7 @@ function city:moveForward()
 		self:animateMove()
 		self.previousSquare = self.currentSquare
 		self.currentSquare = front_sq
-		if (self.currentSquare.onEnter()) then
+		if (self.currentSquare:onEnter()) then
 			self.currentSquare = self.previousSquare
 		end
 		self:buildView()
@@ -350,6 +413,7 @@ function city:enter(inX, inY, inDirection)
 	else
 		self.direction = inDirection
 		self.currentSquare = self:getSq(self:getLabelXY(inX, inY))
+		log:print(log.LOG_DEBUG, "currentSquare: %s", self.currentSquare)
 	end
 end
 
@@ -359,6 +423,7 @@ end
 function city:main()
 	local inkey
 
+	log:print(log.LOG_DEBUG, "currentSquare: %s", self.currentSquare.label)
 	text:clear()
 	self:resetBigpic()
 

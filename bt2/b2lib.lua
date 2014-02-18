@@ -59,6 +59,8 @@ function keyboardCommand(inkey)
 		end
 		local xxx_might_need_to_reset_bigpic_here = true
 		currentLevel:resetBigpic()
+	elseif (inkey == "S") then
+		globals:saveGame()
 	elseif (inkey == "T") then
 		globals.isPaused = true
 

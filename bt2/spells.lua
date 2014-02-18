@@ -12,18 +12,22 @@ spells.passive = {}
 ----------------------------------------
 spells.passive.light = function(inAction)
 	party.light:activate(inAction.inData)
+	text:printEllipsis()
 end
 
 spells.passive.levitate = function(inAction)
 	party.levitate:activate(inAction.inData)
+	text:printEllipsis()
 end
 
 spells.passive.detect = function(inAction)
 	party.detect:activate(inAction.inData)
+	text:printEllipsis()
 end
 
 spells.passive.shield = function(inAction)
 	party.shield:activate(inAction.inData)
+	text:printEllipsis()
 end
 
 spells.passive.compass = function(inAction)

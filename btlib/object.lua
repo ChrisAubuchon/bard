@@ -181,6 +181,32 @@ function object:dumpAll()
 end
 
 ----------------------------------------
+-- object:pairs()
+--
+-- Return the pairs of the object
+-- without the internal object
+-- attributes
+----------------------------------------
+function object:pairs()
+	local function iter(_,k)
+		local key
+		local val
+
+		key,val = next(self, k)
+		while (key) do
+			if ((key ~= "__parents") and (key ~= "__location") and
+			    (key ~= "key")) then
+				return key,val
+			end
+			key,val = next(self, key)
+		end
+		return
+	end
+
+	return iter,self,nil
+end
+
+----------------------------------------
 -- table.copy()
 --
 -- Recursive copy of a table
@@ -225,3 +251,5 @@ function table.setDefault(inTable, inValue)
 		}
 	)
 end
+
+

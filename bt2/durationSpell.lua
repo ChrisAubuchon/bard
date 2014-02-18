@@ -19,11 +19,8 @@ end
 ----------------------------------------
 -- durationSpell:__activate()
 ----------------------------------------
-function durationSpell:__activate(inDuration)
-	if (not inDuration) then
-		error("nil inDuration", 2)
-	end
-	if (inDuration > 0) then
+function durationSpell:__activate(inDuration, inNoRandom)
+	if ((inDuration > 0) and (not inNoRandom)) then
 		self.duration = inDuration + random:xdy(1,16)
 	else
 		self.duration = inDuration
@@ -62,7 +59,7 @@ function lightEffect:activate(inData)
 	self.distance	= inData.distance
 	self.seeSecret	= inData.detectSecret
 
-	self:__activate(inData.duration)
+	self:__activate(inData.duration, inData.noRandom)
 
 	if (party.song.lightSong) then
 		party.song:deactivate()
@@ -71,7 +68,6 @@ function lightEffect:activate(inData)
 	if (currentLevel:isDungeon()) then
 		currentLevel:buildView()
 	end
-	text:printEllipsis()
 end
 
 ----------------------------------------
@@ -110,9 +106,8 @@ function shieldEffect:activate(inData)
 	self.bonus	= inData.acBonus
 
 	log:print(log.LOG_DEBUG, "inAction.duration: %d", inData.duration)
-	self:__activate(inData.duration)
+	self:__activate(inData.duration, inData.noRandom)
 	party:display()
-	text:printEllipsis()
 end
 
 ----------------------------------------
@@ -149,8 +144,7 @@ function detectEffect:activate(inData)
 	self.stairs	= inData.detectStairs
 	self.traps	= inData.detectTraps
 	self.special	= inData.detectSpecial
-	self:__activate(inAction.duration)
-	text:printEllipsis()
+	self:__activate(inData.duration, inData.noRandom)
 end
 
 ----------------------------------------
@@ -181,8 +175,7 @@ end
 ----------------------------------------
 function levitateEffect:activate(inData)
 	self.active	= true
-	self:__activate(inData.duration)
-	text:printEllipsis()
+	self:__activate(inData.duration, inData.noRandom)
 end
 
 ----------------------------------------
@@ -210,7 +203,7 @@ end
 ----------------------------------------
 function compassEffect:activate(inData)
 	self.active	= true
-	if (inData.duration > 0) then
+	if ((inData.duration > 0) and (not inData.noRandom)) then
 		self.duration = inData.duration + random:xdy(1,16)
 	else
 		self.duration = inData.uration

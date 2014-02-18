@@ -135,3 +135,56 @@ stringTables.isEffects = {
 	steam	= "steamed"
 }
 
+
+----------------------------------------
+-- globals:saveGame()
+----------------------------------------
+function globals:saveGame()
+	local saveState		= {}
+
+	text:cdprint(true, false, "Do you wish to save your game?")
+	if (not text:getYesNo()) then
+		return
+	end
+
+	text:cdprint(true, false, "Saving the game...")
+
+	saveState.currentLevel	= currentLevel:saveState()
+	saveState.party		= party:saveState()
+	saveState.gameHour	= globals.gameHour
+	saveState.garth		= table.copy(garths.inventory)
+
+	diskio:writeTable(saveState, "savedGame")
+
+	timer:delay(1)
+
+	text:cdprint(true, false, "Your game has been saved to disk.\n\n" ..
+				 "Do you wish to exit?")
+	if (text:getYesNo()) then
+		os.exit(0)
+	end
+end
+
+----------------------------------------
+-- globals:restoreGame()
+----------------------------------------
+function globals:restoreGame()
+	local savedState	= diskio:readTable("savedGame")
+
+	globals.gameHour	= savedState.gameHour
+
+	if (savedState.currentLevel.class == "city") then
+		currentLevel = city:restoreState(savedState.currentLevel)
+	elseif (savedState.currentLevel.class == "dun") then
+		currentLevel = dun:restoreState(savedState.currentLevel)
+	elseif (savedState.currentLevel.class == "wild") then
+		currentLevel = wild:restoreState(savedState.currentLevel)
+	else
+		error("Invalid currentLevel.class", 2)
+	end
+
+	garths.inventory	= table.copy(savedState.garth)
+
+	party:restoreState(savedState.party)
+	party.compass:update(currentLevel.direction)
+end

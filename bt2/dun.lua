@@ -153,7 +153,7 @@ dun = {}
 function dun:new(inName, inLevel, inX, inY, inDirection)
 	local self = object:new()
 
-	self:addParent(dun)
+	self:addSelf(dun)
 	self:addParent(level)
 	self:addParent(dunSquares)
 
@@ -205,6 +205,63 @@ function dun:fromTable(inTable)
 			end
 		end
 	end
+end
+
+----------------------------------------
+-- dun:saveState()
+----------------------------------------
+function dun:saveState(inTable)
+	local t		= inTable or {}
+	local label
+	local square
+	local attribute
+	local value
+
+	t.class		= "dun"
+	t.name		= self.name
+	t.currentLevel	= self.currentLevel
+	t.direction	= self.direction
+	t.currentSquare	= self.currentSquare.label
+
+	local function writePath(inDest, inPath)
+		local key
+		local value
+
+		for key,value in pairs(inPath) do
+			if (key == "path") then
+				inDest.path = inPath.path.label
+			elseif (type(value) ~= "function") then
+				inDest[key] = value
+			end
+		end
+
+	end
+
+	for label,square in pairs(self.squares) do
+		t[label] = {}
+
+		for attribute,value in square:pairs() do
+			if ((attribute == "north") or (attribute == "south") or
+			    (attribute == "east" ) or (attribute == "west"))then
+				t[label][attribute] = {}
+				writePath(t[label][attribute], 
+					square[attribute])
+			else
+				t[label][attribute] = value
+			end
+		end
+	end
+
+	return t
+end
+
+----------------------------------------
+-- dun:restoreState()
+----------------------------------------
+function dun:restoreState(inTable)
+	local t
+
+	
 end
 
 ----------------------------------------

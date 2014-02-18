@@ -33,9 +33,9 @@ end
 ----------------------------------------
 function shoppe:writeInventory(inFileName)
 	if (inFileName) then
-		write_table(self.inventory, inFileName)
+		diskio:writeTable(self.inventory, inFileName)
 	else
-		write_table(self.inventory, self.fileName)
+		diskio:writeTable(self.inventory, self.fileName)
 	end
 end
 
