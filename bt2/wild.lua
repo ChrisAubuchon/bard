@@ -9,18 +9,11 @@ local wildData = diskio:readTable("wild")
 -- buildings
 ----------------------------------------
 local square = {}
-square.new = function(inLabel, inSquare)
-	local self = {
-		label		= false,
-		north		= false,
-		south		= false,
-		east		= false,
-		west		= false,
-		enterFunction	= false,
-		face		= false,
-		isPath		= false,
-		isWall		= false
-	}
+function square:new(inLabel, inSquare)
+	local self = object:new()
+
+	self.enterFunction	= false
+	self.face		= false
 
 	assert(type(inSquare) == "table", "inSquare not a table")
 
@@ -38,47 +31,55 @@ square.new = function(inLabel, inSquare)
 	self.isWall		= ((self.face == "wall") or 
 				   (self.face == "entr"))
 
-	----------------------------------------
-	-- onEnter
-	--
-	--   Execute code associated with the
-	-- square. Errors in the square code are
-	-- fatal.
-	--
-	--   Returns false if there is no code
-	-- for the square
-	----------------------------------------
-	function self.onEnter(city)
-		local rval
-		local msg
-
-		if (not self.enterFunction) then
-			return false
-		end
-
-		rval = self.enterFunction()
-
-		return rval
-	end
-
-	function self.clearEnter()
-		self.enterFunction = nil
-	end
-
-	function self.toCoordinates()
-		local x
-		local y
-
-		x = tonumber(string.sub(self.label, 2, 3), 10)
-		y = tonumber(string.sub(self.label, 5, 6), 10)
-
-		log:print(log.LOG_DEBUG, "x: %d", x)
-		log:print(log.LOG_DEBUG, "y: %d", y)
-
-		return x,y
-	end
+	self:addSelf(square)
 
 	return self
+end
+
+----------------------------------------
+-- onEnter
+--
+--   Execute code associated with the
+-- square. Errors in the square code are
+-- fatal.
+--
+--   Returns false if there is no code
+-- for the square
+----------------------------------------
+function square:onEnter(city)
+	local rval
+	local msg
+
+	if (not self.enterFunction) then
+		return false
+	end
+
+	rval = self.enterFunction()
+
+	return rval
+end
+
+----------------------------------------
+-- square:clearEnter()
+----------------------------------------
+function square:clearEnter()
+	self.enterFunction = nil
+end
+
+----------------------------------------
+-- square:toCoordinates()
+----------------------------------------
+function square:toCoordinates()
+	local x
+	local y
+
+	x = tonumber(string.sub(self.label, 2, 3), 10)
+	y = tonumber(string.sub(self.label, 5, 6), 10)
+
+	log:print(log.LOG_DEBUG, "x: %d", x)
+	log:print(log.LOG_DEBUG, "y: %d", y)
+
+	return x,y
 end
 
 local function doWallSquare(sq, dir, depth, facet)
@@ -169,7 +170,7 @@ wild = {}
 function wild:new()
 	local self = object:new()
 
-	self:addParent(wild)
+	self:addSelf(wild)
 	self:addParent(level)
 
 	self.sqs	= {}
@@ -185,7 +186,7 @@ function wild:new()
 		local s
 
 		for label, s in pairs(wildData.squares) do
-			self.sqs[label] = square.new(label, s)
+			self.sqs[label] = square:new(label, s)
 		end
 	end
 
@@ -230,6 +231,31 @@ function wild:isCity()
 end
 
 ----------------------------------------
+-- wild:saveState()
+----------------------------------------
+function wild:saveState(inTable)
+	local t		= inTable or {}
+
+	t.class		= "wild"
+	t.direction	= self.direction
+	t.x, t.y	= self.currentSquare:toCoordinates()
+
+	return t
+end
+
+----------------------------------------
+-- wild:restoreState()
+----------------------------------------
+function wild:restoreState(inTable)
+	local w
+
+	w = wild:new()
+	w:enter(inTable.x, inTable.y, inTable.direction)
+
+	return w
+end
+
+----------------------------------------
 -- buildView()
 ----------------------------------------
 function wild:buildView()
@@ -256,7 +282,7 @@ end
 function wild:moveForward()
 	local front_sq = self.currentSquare[self.direction]
 
-	if (not front_sq.onEnter()) then
+	if (not front_sq:onEnter()) then
 		if (self.exit) then
 			return
 		end
@@ -324,7 +350,7 @@ function wild:main()
 		end
 
 		if (globals.partyDied) then
-			globals.gameState = globals.STATE_PARTYDIED
+			globals.gameState = globals.STATE_GUILD
 			self.exit = true
 		end
 	until (self.exit)

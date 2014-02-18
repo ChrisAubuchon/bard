@@ -66,7 +66,7 @@ function character:getAcString()
 		elseif (self.ac == -20) then
 			return "L-"
 		else
-			return string.format("L%d", self.ac + 20)
+			return string.format("L%d", (self.ac + 20) % 10)
 		end
 	else
 		return sprintf("%2d", self.ac)
@@ -946,7 +946,7 @@ function character:getSpell(mouseFlag)
 
 	text:cdprint(true, false, "\nSpell to cast:\n")
 	spellAbbr = text:readString(4)
-	s = spells.getSpellByAbbreviation(spellAbbr)
+	s = spells:getSpellByAbbreviation(spellAbbr)
 	if (not s) then
 		text:cdprint(false, true, "\nNo spell by that name.")
 		return false
@@ -1093,6 +1093,18 @@ function character:getActionTarget(inTargetOptions)
 	end
 
 	return optionKeys[inkey]
+end
+
+----------------------------------------
+-- character:cureOld()
+----------------------------------------
+function character:cureOld()
+	self.st	= self.save_st
+	self.iq	= self.save_iq
+	self.dx	= self.save_dx
+	self.cn	= self.save_cn
+	self.lk	= self.save_lk
+	self.isOld = false
 end
 
 

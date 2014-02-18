@@ -47,8 +47,6 @@ function keyboardCommand(inkey)
 		return true
 	elseif (inkey == "G") then
 		collectgarbage()
-	elseif (inkey == "H") then
-		object.dumpAll()
 	elseif (inkey == "N") then
 		party:reorder()
 		text:clear()
@@ -59,6 +57,11 @@ function keyboardCommand(inkey)
 		end
 		local xxx_might_need_to_reset_bigpic_here = true
 		currentLevel:resetBigpic()
+	elseif (inkey == "R") then
+		party:releaseSummon()
+		if (globals.partyDied) then
+			return true
+		end
 	elseif (inkey == "S") then
 		globals:saveGame()
 	elseif (inkey == "T") then
@@ -88,7 +91,9 @@ function keyboardCommand(inkey)
 		battle:random()
 		return true
 	elseif (inkey == "Q") then
-		os.exit(0)
+		currentLevel.exit = true
+		globals.gameState = globals.STATE_EXIT
+		return true
 	else
 		return false
 	end

@@ -101,11 +101,7 @@ function temple:healAffliction(inChar)
 	end
 
 	if (inChar.isOld) then
-		inChar.st = inChar.save_st
-		inChar.iq = inChar.save_iq
-		inChar.dx = inChar.save_dx
-		inChar.cn = inChar.save_cn
-		inChar.lk = inChar.save_lk
+		inChar:cureOld()
 	end
 
 	if (inChar.currentHp == 0) then

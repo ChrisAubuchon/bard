@@ -19,5 +19,6 @@ bIICharacter = {
 	songs		= 0,
 	possessed	= false,
 	version		= 2,
+	learnedZZGO	= false,
 	inventory	= false
 }

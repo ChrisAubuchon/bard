@@ -314,7 +314,6 @@ function dun:doExit()
 	self.exit = true
 
 	if (globals.guildCity == "Wild") then
-		local xxx_implement_wild
 		currentLevel = wild:new()
 	else
 		currentLevel = city:new(globals.guildCity)
@@ -678,7 +677,7 @@ function dun:main()
 		end
 
 		if (globals.partyDied) then
-			globals.gameState = globals.STATE_PARTYDIED
+			globals.gameState = globals.STATE_GUILD
 			return
 		end
 	until (self.exit)

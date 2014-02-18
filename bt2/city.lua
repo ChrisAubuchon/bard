@@ -446,7 +446,7 @@ function city:main()
 		end
 
 		if (globals.partyDied) then
-			globals.gameState = globals.STATE_PARTYDIED
+			globals.gameState = globals.STATE_GUILD
 			self.exit = true
 		end
 	until (self.exit)
@@ -479,7 +479,7 @@ function city:getBattleReward()
 end
 
 function city:printCredits()
-	text:csplash(true, true, "Bard's Tale I: Reimplemented by me")
+	text:csplash(true, true, "Bard's Tale II: Reimplemented by me")
 end
 	
 

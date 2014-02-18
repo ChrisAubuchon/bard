@@ -4,43 +4,41 @@ require "btdebug"
 local spellList = {}
 
 spells = {}
-spells.passive = {}
-
 
 ----------------------------------------
 -- Constant effect spells
 ----------------------------------------
-spells.passive.light = function(inAction)
+function spells:light(inAction)
 	party.light:activate(inAction.inData)
 	text:printEllipsis()
 end
 
-spells.passive.levitate = function(inAction)
+function spells:levitate(inAction)
 	party.levitate:activate(inAction.inData)
 	text:printEllipsis()
 end
 
-spells.passive.detect = function(inAction)
+function spells:detect(inAction)
 	party.detect:activate(inAction.inData)
 	text:printEllipsis()
 end
 
-spells.passive.shield = function(inAction)
+function spells:shield(inAction)
 	party.shield:activate(inAction.inData)
 	text:printEllipsis()
 end
 
-spells.passive.compass = function(inAction)
+function spells:compass(inAction)
 	party.compass:activate(inAction.inData)
 	party.compass:update(currentLevel.direction)
 	text:printEllipsis()
 end
 
 ----------------------------------------
--- spells.trapZap()
+-- spells:trapZap()
 ----------------------------------------
-spells.trapZap = function()
-	if (globals.gameState == globals.STATE_CITY) then
+function spells:trapZap()
+	if (not currentLevel:isDungeon()) then
 		text:printEllipsis()
 		return
 	end
@@ -61,7 +59,7 @@ end
 ----------------------------------------
 -- spells.scrySite()
 ----------------------------------------
-spells.scrySite = function()
+function spells:scrySite()
 	local outString = "You face "
 
 	text:cdprint(true, false, "You face %s", currentLevel.direction)
@@ -104,7 +102,10 @@ spells.scrySite = function()
 	text:clear()
 end
 
-spells.phaseDoor = function()
+----------------------------------------
+-- spells:phaseDoor()
+----------------------------------------
+function spells:phaseDoor()
 	if (currentLevel:isDungeon()) then
 		local sq = currentLevel.currentSquare
 
@@ -126,7 +127,7 @@ local function teleportHelper(inValue, inLine)
 	text:print(tostring(inValue))
 end
 
-spells.teleport = function()
+function spells:teleport()
 
 	local inkey
 	local cursorPosition = 2
@@ -245,11 +246,12 @@ end
 ----------------------------------------
 -- spells.summon()
 ----------------------------------------
-function spells.summon(inAction)
+function spells:summon(inAction)
 	local source	= inAction.source
 	local inData	= inAction.inData
 
 	if (source:isCharacter()) then
+		inData.type = inData.summons[1]
 		party:doSummon(inData)
 	elseif (source:isSummon()) then
 		local xxx_add_party_monster_summon_spell = true
@@ -315,14 +317,14 @@ local function __doHeal(inAction, inTarget)
 	if (inData.poison) then inTarget.isPoisoned = false end
 	if (inData.insanity) then inTarget.isNuts = false end
 	if (inData.paralysis) then inTarget.isParalyzed = false end
-	if (inData.old) then inTarget.isOld = false end
+	if (inData.old) then inTarget:cureOld() end
 	if (inData.stoned) then inTarget.isStoned = false end
 end
 
 ----------------------------------------
 -- spells.heal
 ----------------------------------------
-function spells.heal(inAction)
+function spells:heal(inAction)
 	local inData = inAction.inData
 
 	local hpHealed = 0
@@ -341,22 +343,25 @@ function spells.heal(inAction)
 end
 
 ----------------------------------------
--- spellBind()
+-- spells:spellBind()
 ----------------------------------------
-function spells.spellBind(inAction)
+function spells:spellBind(inAction)
 	local target		= inAction.target
 	local last
 
 	if (inAction:savingThrow() 
 			or target.size == 0
 			or target.isIllusion
+			or target.singular == "Lagoth Zanta"
 		) then
 
 		text:ctdprint(false, true, " but it had no effect!\n\n")
 		return
 	end
 
-	party:doSummon({ type = target.name })
+	if (not party:doSummon({ type = target.name })) then
+		return
+	end
 
 	-- Remove the last monster from the group
 	--
@@ -366,10 +371,12 @@ function spells.spellBind(inAction)
 	if (target.size == 0) then
 		currentBattle.monParty:removeMonsterGroup(target)
 	end
-	text:printEllipsis()
 end
 
-function spells.mageStar(inAction, inSource)
+----------------------------------------
+-- spells:mageStar()
+----------------------------------------
+function spells:mageStar(inAction, inSource)
 	log:print(log.LOG_DEBUG, "spells.mageStar")
 
 	if (inAction:groupSavingThrow()) then
@@ -385,7 +392,7 @@ end
 ----------------------------------------
 -- spells.attack()
 ----------------------------------------
-function spells.attack(inAction)
+function spells:attack(inAction)
 	local source	= inAction.source
 
 	log:print(log.LOG_DEBUG, "spells.attack()")
@@ -403,7 +410,42 @@ function spells:battleBonus(inAction)
 	end
 end
 
-function spells.disbelieve(inAction, inSource)
+----------------------------------------
+-- spells:batchSpell()
+----------------------------------------
+function spells:batchSpell(inAction)
+	-- GRRE
+	inAction.inData.duration	= 80
+	inAction.inData.distance	= 5
+	inAction.inData.detectSecret	= true
+	party.light:activate(inAction.inData)
+
+	-- MALE
+	inAction.inData.duration	= -1
+	party.levitate:activate(inAction.inData)
+
+	-- MACO
+	party.compass:activate(inAction.inData)
+	party.compass:update(currentLevel.direction)
+
+	-- SOSI
+	inAction.inData.detectStairs	= true
+	inAction.inData.detectTraps	= true
+	inAction.inData.detectSpecial	= true
+	party.detect:activate(inAction.inData)
+
+	-- YMCA
+	inAction.inData.acBonus		= 2
+	party.shield:activate(inAction.inData)
+
+	party:display()
+	text:printEllipsis()
+end
+
+----------------------------------------
+-- spells:disbelieve()
+----------------------------------------
+function spells:disbelieve(inAction, inSource)
 	-- disbelieve is kind of broken in the DOS version of BT1
 	--
 	if (inSource:isMonster()) then
@@ -425,7 +467,128 @@ function spells.disbelieve(inAction, inSource)
 	text:printEllipsis()
 end
 
-function spells.getSpellByAbbreviation(abbr)
+----------------------------------------
+-- spells:camaraderie()
+----------------------------------------
+function spells:camaraderie()
+	local c
+
+	local function condition(c)
+		if (not c:isSummon()) then
+			return false
+		end
+
+		if (c.isDocile) then
+			return false
+		end
+
+		if (c.isDead or c.isPoisoned or c.isStoned or c.isParalyzed or
+		    c.isPossessed or c.isNuts) then
+			return false
+		end
+
+		return true
+	end
+
+	for c in party:conditionalIterator(condition) do
+		if (rnd:band(3) ~= 0) then
+			c.isDocile = true
+		end
+	end
+end
+
+----------------------------------------
+-- spells:dreamSpell()
+----------------------------------------
+function spells:dreamSpell(inAction)
+	local source	= inAction.source
+	local c
+
+	if (not source.learnedZZGO) then
+		text:print(" but it fizzles!\n\n")
+		timer:delay()
+	end
+
+	if (currentBattle) then
+		for c in party:iterator() do
+			if (c.isOld) then
+				c:cureOld()
+			end
+
+			if (c.isDead) then
+				local xxx_remove_battle_option_from_queue
+			end
+
+			c.isDead	= false
+			c.isOld		= false
+			c.isPoisoned	= false
+			c.isStoned	= false
+			c.isParalyzed	= false
+			c.isPossessed	= false
+			c.isNuts	= false
+
+			c.currentHp	= c.maxHp
+
+			if (c:isSummon() and c.isIllusion) then
+				c.class		= "Mn"
+				c.isIllusion	= false
+			end
+		end
+
+		party.damageBonus	= 20
+		party.toHitBonus	= 20
+		party.antiMagic		= 20
+		party.acBonus		= 20
+		party.extraAttacks	= 8
+
+		-- MIBL
+		inAction.inData = table.copy(spellList.MIBL.action.inData)
+		spells:attack(inAction)
+	else
+		local inkey
+
+		text:clear()
+		text:print(	"\nDark Domain" ..
+				"\nThe Tombs" ..
+				"\nThe Castle" ..
+				"\nThe Tower" ..
+				"\nMaze of Dread" ..
+				"\nOscon's Fort" ..
+				"\nGrey Crypt" ..
+				"\nDestiny Stone"
+			)
+		text:printExit()
+
+		inkey = getkey()
+
+		if ((inkey < "1") or (inkey > "8")) then
+			return
+		end
+
+		if (inkey == "1") then
+			currentLevel:toDungeon("domain", 1)
+		elseif (inkey == "2" then
+			currentLevel:toDungeon("tombs", 1)
+		elseif (inkey == "3") then
+			currentLevel:toDungeon("castle", 1)
+		elseif (inkey == "4") then
+			currentLevel:toDungeon("tower", 1)
+		elseif (inkey == "5") then
+			currentLevel:toDungeon("maze", 1)
+		elseif (inkey == "6") then
+			currentLevel:toDungeon("fort", 1)
+		elseif (inkey == "7") then
+			currentLevel:toDungeon("crypt", 1)
+		elseif (inkey == "8") then
+			currentLevel:toDungeon("stone", 1)
+		end
+	end
+end
+
+----------------------------------------
+-- spells:getSpellByAbbreviation()
+----------------------------------------
+function spells:getSpellByAbbreviation(abbr)
 	local s
 
 	s = spells[abbr]

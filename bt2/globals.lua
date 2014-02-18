@@ -71,7 +71,7 @@ directions = {
 
 globals.STATE_GUILD	= 1
 globals.STATE_INGAME	= 2
-globals.STATE_PARTYDIED	= 3
+globals.STATE_EXIT	= 3
 globals.gameState	= globals.STATE_GUILD
 
 globals.timeOfDay = {
@@ -122,6 +122,7 @@ stringTables.andEffects = {
 	burn	= "burns",
 	choke	= "chokes",
 	steam	= "steams",
+	blast	= "blasts",
 	hit	= "hits"
 }
 
@@ -132,7 +133,9 @@ stringTables.isEffects = {
 	drain	= "drained",
 	burn	= "burnt",
 	choke	= "choked",
-	steam	= "steamed"
+	steam	= "steamed",
+	blast	= "blasted",
+	hit	= "hit"
 }
 
 

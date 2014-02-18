@@ -62,6 +62,7 @@ function party:removeCharacter(inCharacter)
 		return c
 	else
 		self:remove(inCharacter)
+		self.size = self.size - 1
 		return inCharacter
 	end
 
@@ -215,9 +216,6 @@ function party:characterIterator(inCondition)
 	end
 
 	return self:conditionalIterator(iteratorConditionals[condition])
-
---	return self:conditionalIterateFrom(self:getFirstCharacter(),
---				iteratorConditionals[condition])
 end
 
 ----------------------------------------
@@ -415,7 +413,9 @@ function party:restoreState(inTable)
 	local c
 
 	-- Empty the party first
-	self:delete()
+	for c in self:iterator() do
+		self:removeCharacter(c)
+	end
 
 	for i,c in ipairs(inTable) do
 		self:addCharacter(character:fromTable(inTable.characters[c]))
@@ -441,7 +441,6 @@ function party:restoreState(inTable)
 		self.compass:activate(inTable.compass)
 	end
 
-	log:print(log.LOG_DEBUG, "inTable.song: %s", inTable.song)
 	if (inTable.song) then
 		self.song:activate(
 			self:findByName(inTable.song.singer),
@@ -749,7 +748,7 @@ function party:doSummon(inData)
 		text:print(" but there was no room for a summoning!\n\n")
 		self:display()
 		timer:delay()
-		return
+		return false
 	end
 
 	repeat
@@ -757,26 +756,37 @@ function party:doSummon(inData)
 			break
 		end
 
-		log:print(log.LOG_DEBUG, summon)
-		self:addCharacter(summon:new(inData.summons[1], inData.isIllusion))
+		self:addCharacter(summon:new(inData.type, inData.isIllusion))
 	until (not inData.fillParty)
 
 	self:display()
 	text:printEllipsis()
+
+	return true
 end
 
 ----------------------------------------
--- removeSummon()
---
--- Remove the summoned monster
+-- party:releaseSummon()
 ----------------------------------------
-function party:removeSummon()
-	log:print(log.LOG_DEBUG, self.summon)
-	if (not self.summon) then return end
+function party:releaseSummon()
+	local c
 
-	self:remove(self.summon)
-	self.summon	= false
-	party:display()
+	text:cdprint(true, false, 
+		"\nPick the monster to release from the party")
+
+	c = self:readSlot()
+	if (c) then
+		if (c:isSummon()) then
+			self:removeCharacter(c)
+			self:sort()
+			party:display()
+		else
+			text:csplash(true, true, "Not a monster!")
+		end
+	end
+
+	text:clear()
+	self:isLive()
 end
 
 ----------------------------------------
@@ -979,10 +989,11 @@ end
 ----------------------------------------
 function party:died()
 --	timer:delay(5)
+	self:display()
 	bigpic:drawImage("PIC_GAMEOVER")
 	bigpic:setTitle("Sorry, bud")
-	text:clear()
-	text:splashMessage("Alas, your party has expired, but has gone to adventurer heaven.")
+	text:csplash(true, true, "Alas, your party has expired, but " ..
+				 "has gone to adventurer heaven.")
 end
 
 
@@ -1137,4 +1148,5 @@ function party:battleRunCheck()
 
 	return false
 end
+
 
