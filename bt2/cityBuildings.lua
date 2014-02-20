@@ -78,7 +78,7 @@ function domain:enter()
 				"here for you to return.\""
 				)
 		elseif (inkey == "T") then
-			city:enterDungeon("domain", 1)
+			currentLevel:toLevel("dun", "domain", 1, 0, 0, "north")
 			buildingRval.turnParty = false
 			text:clear()
 			return

@@ -158,7 +158,7 @@ function btdebug.toCity(inObject)
 		return false
 	end
 
-	currentLevel:toCity(newCity.city, newCity.x, newCity.y, newCity.dir)
+	currentLevel:toLevel("city", newCity.city, 0, newCity.x, newCity.y, newCity.dir)
 end
 
 function btdebug.cityDebug() 

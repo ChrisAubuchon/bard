@@ -186,33 +186,76 @@ static uint32_t getVertex(int32_t x, int32_t y)
 }
 
 static uint8_t *stairCode[] = {
-	"if (currentLevel:doStairs(\"%s\")) then \
-		currentLevel:changeLevel(%d)\
-	end",
-	"if (currentLevel:doStairs(\"%s\")) then \
-		currentLevel:exit() \
+	/* Changing dungeon level */
+	"if (currentLevel:doStairs(\"%s\")) then currentLevel:toLevel(\"dun\", currentLevel.name, %d, currentLevel:getX(), currentLevel:getY(), currentLevel.direction) end",
+	/* Changing location */
+	"if (currentLevel:doStairs(\"%s\")) then\
+		currentLevel:toLevel(\"%s\", \"%s\", %d, %d, %d, \"%s\") \
 	end"
 };
+	
 
 static void convertStairs(b2level_t *level, uint32_t index, dunVertex_t *v)
 {
 	uint8_t		direction;
-	uint8_t		stairCodeIndex = 0;
-	int8_t		newLevel = 0;
+	uint8_t		type;
+	uint8_t		levelNo		= 0;
+	uint8_t		stairCodeIndex	= 0;
+	dungeonLevel_t	*src		= level->src;
+	uint8_t		exitLocation	= 7;
+	uint8_t		exitSqE;
+	uint8_t		exitSqN;
+	uint8_t		exitDir;
 
-	direction = (level->src->direction & 1) ^ ((level->src->loFlags[index] >> 1) & 1);
-	if (level->src->loFlags[index] & DUN_DOWNSTAIR) {
-		newLevel = 1;
+	direction = (src->direction & 1) ^ ((src->loFlags[index] >> 1) & 1);
+
+	if ((src->loFlags[index] & DUN_UPSTAIR) && (!level->levno)) {
+		if (src->exitLocation) 
+			type = 1;
+		else
+			type = 0;
+
+		exitDir = dunExitDirection[level->dunno + 1];
+		exitSqN = src->exitSQN;
+		exitSqE = src->exitSQE;
+
+		switch (exitDir) {
+		case 0:
+			exitSqN -= 1;
+			break;
+		case 2:
+			exitSqN += 1;
+			break;
+		case 1:
+			exitSqE += 1;
+			break;
+		case 3:
+			exitSqE -= 1;
+			break;
+		}
+		v->isStairs = bts_sprintf(stairCode[1],
+			direction ? "down" : "up",
+			levelTypes[type],
+			dunExitLocations[src->exitLocation],
+			0,
+			exitSqE,
+			exitSqN,
+			directions[exitDir]
+			);
 	} else {
-		if (!level->levno)
-			stairCodeIndex = 1;
-		newLevel = -1;
-	}
+		if (src->loFlags[index] & DUN_DOWNSTAIR) {
+			levelNo = level->levno + 1;
+		} else {
+			levelNo = level->levno - 1;
+		}
 
-	v->isStairs = bts_sprintf(stairCode[stairCodeIndex],
-				direction ? "down" : "up",
-				newLevel);
+		v->isStairs = bts_sprintf(stairCode[0],
+			direction ? "down" : "up",
+			levelNo
+			);
+	}
 }
+
 
 static void setVertex(b2level_t *level, int32_t x, int32_t y, uint32_t index) 
 {

@@ -360,7 +360,7 @@ static btcity_t *convertCity(btstring_t *data, uint32_t cityIndex)
 		NULL,
 		NULL,
 		NULL,
-		bts_sprintf("currentLevel:toCity(\"Wild\", %d, %d)", 
+		bts_sprintf("currentLevel:toLevel(\"wild\", \"wild\", 0, %d, %d, currentLevel.direction)", 
 			cityToWildX[cityIndex], 47 - cityToWildY[cityIndex]
 				),
 		NULL,

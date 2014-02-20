@@ -72,7 +72,7 @@ static btstring_t *enterCity(uint32_t y)
 		exit(1);
 	}
 
-	return bts_sprintf("currentLevel:toCity(\"%s\", %d, %d)",
+	return bts_sprintf("currentLevel:toLevel(\"city\", \"%s\", 0, %d, %d, currentLevel.direction)",
 		locationTitleList[cityIndex],
 		wildToCityX[cityIndex], wildToCityY[cityIndex]
 		);

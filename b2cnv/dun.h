@@ -10,4 +10,9 @@ typedef struct {
 extern b2levData_t	b2dungeons[];
 extern uint8_t		*b2dun_specialCode[];
 
+extern uint8_t		*levelTypes[];
+extern uint8_t		*directions[];
+extern uint8_t		dunExitDirection[];
+extern uint8_t		*dunExitLocations[];
+
 #endif

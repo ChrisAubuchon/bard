@@ -12,6 +12,32 @@ b2levData_t b2dungeons[] = {
 	{ "stone",	3, {22, 23, 24, -1, -1 }}
 };
 
+uint8_t	*levelTypes[] = {
+	"wild",
+	"city"
+};
+
+uint8_t	*directions[] = {
+	"north",
+	"west",
+	"south",
+	"east"
+};
+
+uint8_t	dunExitDirection[] = {
+	0, 3, 2, 3, 0, 2, 2, 0, 1
+};
+
+uint8_t	*dunExitLocations[] = {
+	"wild",
+	"Tangramayne",
+	"Ephesus",
+	"Philippi",
+	"Colosse",
+	"Corinth",
+	"Thessalonica"
+};
+
 uint8_t *b2dun_specialCode[] = {
 	"--tombs_Mouth1",
 	"--_magic_mouth_1",

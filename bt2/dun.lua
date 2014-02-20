@@ -150,7 +150,7 @@ end
 
 
 dun = {}
-function dun:new(inName, inLevel, inX, inY, inDirection)
+function dun:new(inName, inLevel)
 	local self = object:new()
 
 	self:addSelf(dun)
@@ -163,7 +163,6 @@ function dun:new(inName, inLevel, inX, inY, inDirection)
 	self.squares		= {}
 
 	self.name		= inName
-	self.direction		= inDirection
 
 	if (type(dunData[inName][inLevel].level) == "string") then
 		dunData[inName][inLevel].level = diskio:readTable(
@@ -173,11 +172,39 @@ function dun:new(inName, inLevel, inX, inY, inDirection)
 
 	self:fromTable(dunData[inName][inLevel].level)
 
-	self.currentSquare = string.format("x%02x%02x", inX, inY)
-	self.currentSquare = self.squares[self.currentSquare]
-
 	return self
 end
+
+----------------------------------------
+-- dun:getLabelXY()
+----------------------------------------
+function dun:getLabelXY(inX, inY)
+	return string.format("x%02x%02x", inX, inY)
+end
+
+----------------------------------------
+-- dun:getX()
+----------------------------------------
+function dun:getX()
+	return tonumber(string.sub(self.label, 2, 3), 16)
+end
+
+----------------------------------------
+-- dun:getY()
+----------------------------------------
+function dun:getY()
+	return tonumber(string.sub(self.label, 4, 5), 16)
+end
+
+
+----------------------------------------
+-- dun:enter()
+----------------------------------------
+function dun:enter(inX, inY, inDirection)
+	self.currentSquare	= self:getSq(self:getLabelXY(inX, inY))
+	self.direction		= inDirection
+end
+
 
 ----------------------------------------
 -- dun:fromTable()
@@ -261,7 +288,7 @@ end
 function dun:restoreState(inTable)
 	local t
 
-	
+	local xxx_dun_restore_state
 end
 
 ----------------------------------------

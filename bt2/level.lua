@@ -43,36 +43,26 @@ function level:doStairs(inDirection)
 end
 
 ----------------------------------------
--- level:toCity()
+-- level:toLevel()
 ----------------------------------------
-function level:toCity(inCity, inX, inY, inDirection)
-	if (not inDirection) then
-		inDirection = self.direction
+function level:toLevel(inType, inName, inLevel, inX, inY, inDirection)
+	if (currentLevel) then
+		currentLevel.exit = true
 	end
 
-	self.exit = true
-
-	if (inCity == "Wild") then
+	log:print(log.LOG_DEBUG, "toLevel(%s, %s, %s, %s, %s, %s) called",
+		inType, inName, inLevel, inX, inY, inDirection)
+	if (inType == "city") then
+		currentLevel = city:new(inName)
+	elseif (inType == "wild") then
 		currentLevel = wild:new()
+	elseif (inType == "dun") then
+		currentLevel = dun:new(inName, inLevel)
 	else
-		currentLevel = city:new(inCity)
+		error("Invalid level type", 2)
 	end
 
 	currentLevel:enter(inX, inY, inDirection)
-end
-
-----------------------------------------
--- level:toDungeon()
-----------------------------------------
-function level:toDungeon(inName, inLevel)
-	self.exit = true
-
-	if (self:isCity()) then
-		globals.citySquare = self.currentSquare.label
-		globals.cityDirection = currentLevel.direction
-	end
-
-	currentLevel = dun:new(inName, inLevel, 0, 0, "north")
 end
 
 ----------------------------------------

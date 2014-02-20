@@ -278,8 +278,7 @@ function guild:doEnter()
 				globals.gameHour = 7
 
 				globals.gameState = globals.STATE_INGAME
-				currentLevel = city:new(globals.guildCity)
-				currentLevel:enter()
+				level:toLevel("city", globals.guildCity)
 				party.light:__activate(-1)
 				party.light.distance = 5
 				party.light.seeSecret = true

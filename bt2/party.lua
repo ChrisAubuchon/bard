@@ -760,7 +760,6 @@ function party:doSummon(inData)
 	until (not inData.fillParty)
 
 	self:display()
-	text:printEllipsis()
 
 	return true
 end

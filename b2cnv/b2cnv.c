@@ -17,12 +17,6 @@ void usage(void)
 	fprintf(stderr, "  -l\tConvert levels\n");
 	fprintf(stderr, "  -m\tConvert monsters\n");
 	fprintf(stderr, "  -s\tConvert spells\n");
-
-	printf("  -M\tMonster header\n");
-	printf("  -h\tHelp message\n");
-	printf("  -i\tItem data\n");
-	printf("  -m\tMonster data\n");
-	printf("  -s\tSpell data\n");
 }
 
 int main(int argc, char *argv[])
