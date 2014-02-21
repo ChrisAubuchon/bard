@@ -162,6 +162,13 @@ typedef struct {
 		v = dunVertex_get(inDl, getVertex(inX, inY));	\
 		v->flag = value;				\
 	} while(0)
+#define setSquareMemberIfSpecial(inDl, inX, inY, flag, value)	\
+	do {							\
+		dunVertex_t *v;					\
+		v = dunVertex_get(inDl, getVertex(inX, inY));	\
+		if (v->isSpecial)				\
+			v->flag = value;			\
+	} while(0)
 #define setSquareFlag(inDl, inX, inY, flag)			\
 	setSquareMember(inDl, inX, inY, flag, 1)
 

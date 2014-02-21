@@ -137,5 +137,6 @@ uint8_t *b2dun_specialCode[] = {
 	"--ancientScribe",
 	"--arkast",
 	"--getZenMaster",
-	"--getSegment7"
+	"--getSegment7",
+	"party:setFlag(\"learnedZZGO\")"
 };

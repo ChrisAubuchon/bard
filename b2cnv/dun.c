@@ -359,7 +359,7 @@ static void getInfoMessage(b2level_t *level, uint32_t index)
 		offset++;
 	}
 
-	setSquareMember(dl, 
+	setSquareMemberIfSpecial(dl, 
 		l->infoMess[index].sqEast,
 		l->infoMess[index].sqNorth,
 		isMessage,
@@ -376,7 +376,7 @@ static void getTeleport(b2level_t *level, uint32_t index)
 	    (l->teleporter[index].sqEast == l->teleDest[index].sqEast))
 		return;
 
-	setSquareMember(dl,
+	setSquareMemberIfSpecial(dl,
 		l->teleporter[index].sqEast,
 		l->teleporter[index].sqNorth,
 		isTeleport,
@@ -407,7 +407,7 @@ static void getRequiredBattle(b2level_t *level, uint32_t index)
 		);
 	bts_free(mString);
 
-	setSquareMember(level->dst,
+	setSquareMemberIfSpecial(level->dst,
 		l->reqBattle[index].sqEast,
 		l->reqBattle[index].sqNorth,
 		isForcedBattle,
@@ -443,6 +443,12 @@ static void addSpecialSquares(b2level_t *level)
 		getTeleport(level, i);
 		getRequiredBattle(level, i);
 		getSpecialSquare(level, i);
+	}
+
+	if ((level->dunno == 7) && (level->levno == 0)) {
+		debug("Here\n");
+		setSquareMember(level->dst,
+			18, 9, code, bts_strcpy(b2dun_specialCode[99]));
 	}
 }
 

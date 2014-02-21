@@ -1149,3 +1149,13 @@ function party:battleRunCheck()
 end
 
 
+----------------------------------------
+-- party:setFlag()
+----------------------------------------
+function party:setFlag(inFlag)
+	local c
+
+	for c in self:iterator() do
+		c[inFlag] = true
+	end
+end
