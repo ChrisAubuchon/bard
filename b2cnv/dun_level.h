@@ -68,13 +68,16 @@
  * 0x4e4 - 0x5ff	Unused
  * 0x600 - 0x60d	Level Name AND'd with 0x80
  * 0x60e		curLevelForSong value
+ * 0x60f		
  * 0x610 		Dungeon direction. 
  * 0x611
  * 0x612
  * 0x613		Squares north upon exiting
  * 0x614		Squares east upon exiting
  * 0x615		Location number upon exiting
- * 0x610 - 0x61f	Unknown
+ * 0x616		Unknown
+ * 0x617		Current level canTeleportTo flag
+ * 0x618 - 0x61f	Array with canTeleportTo flags
  * 0x620 - 0x62f	Coordinates for magic mouths (sqNorth, sqEast) pairs
  * 0x630 - 0x63f	Special square index number (index, unknown) pairs
  * 0x640 - 0x64f	Coordinates for teleporters (sqNorth, sqEast) pairs
@@ -103,27 +106,29 @@ typedef struct {
 } _batGroup_t;
 
 typedef struct {
-  uint8_t wallData[0x200];
-  uint8_t loFlags[0x200];
-  uint8_t hiFlags[0x200];
-  uint8_t title[14];
-  uint8_t songLevel;
-  uint8_t phaseFlag;
-  uint8_t direction;
-  uint8_t unknown5[2];
-  uint8_t exitSQN;
-  uint8_t exitSQE;
-  uint8_t exitLocation;
-  uint8_t unknown2[10];
-  _dunCoord_t magicMouth[8];
-  _magicMouth_t mouthNum[8];
-  _dunCoord_t teleporter[8];
-  _dunCoord_t teleDest[8];
-  _dunCoord_t reqBattle[8];
-  _batGroup_t reqBatMon[8];
-  _dunCoord_t infoMess[8];
-  uint16_t infoOffset[8];
-  uint8_t text[0x260];
+	uint8_t		wallData[0x200];
+	uint8_t		loFlags[0x200];
+	uint8_t		hiFlags[0x200];
+	uint8_t		title[14];
+	uint8_t		songLevel;
+	uint8_t		unknown;
+	uint8_t		direction;
+	uint8_t		unknown5[2];
+	uint8_t		exitSQN;
+	uint8_t		exitSQE;
+	uint8_t		exitLocation;
+	uint8_t		unknown2;
+	uint8_t		phaseFlag;
+	uint8_t		canTeleportToFlag[8];
+	_dunCoord_t	magicMouth[8];
+	_magicMouth_t	mouthNum[8];
+	_dunCoord_t	teleporter[8];
+	_dunCoord_t	teleDest[8];
+	_dunCoord_t	reqBattle[8];
+	_batGroup_t	reqBatMon[8];
+	_dunCoord_t	infoMess[8];
+	uint16_t	infoOffset[8];
+	uint8_t		text[0x260];
 } dungeonLevel_t;
 
 /*

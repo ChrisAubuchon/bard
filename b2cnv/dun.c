@@ -158,7 +158,7 @@ static void getPath(
 	path->dstSquare = getNodeLabel(	wrapNumber(x + deltaX),
 					wrapNumber(y + deltaY));
 	if (square & squareMask) {
-		path->canPhase = level->phaseFlag;
+		path->canPhase = !level->phaseFlag;
 		if (square & wallMask) {
 			path->gfx = bts_strcpy("wall");
 			if (square & doorMask) {
@@ -446,7 +446,6 @@ static void addSpecialSquares(b2level_t *level)
 	}
 
 	if ((level->dunno == 7) && (level->levno == 0)) {
-		debug("Here\n");
 		setSquareMember(level->dst,
 			18, 9, code, bts_strcpy(b2dun_specialCode[99]));
 	}
@@ -553,6 +552,9 @@ static void convertDunLevel(b2level_t *level)
 
 	dl->dungeonLevel	= level->levno + 1;
 	dl->dungeonDirection	= l->direction ? DIR_UPWARD : DIR_DOWNWARD;
+
+	dl->canTeleportFrom	= 1;
+	dl->canTeleportTo	= !level->src->canTeleportToFlag[level->levno];
 
 	index = 0;
 	for (y = 0; y < 22; y++) {

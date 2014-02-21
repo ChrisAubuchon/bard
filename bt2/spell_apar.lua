@@ -33,6 +33,16 @@ local function cityTeleport()
 	text:clear()
 end
 
+local function teleportHelper(inValue, inLine)
+	text:setCursor(108, inLine)
+	text:print("     ")
+	text:setColumn(9)
+	if (inValue > 0) then
+		text:print("+")
+	end
+	text:print(tostring(inValue))
+end
+
 local function dungeonTeleport()
 	local inkey
 	local cursorPosition = 2
@@ -42,22 +52,21 @@ local function dungeonTeleport()
 		[4] = 0			-- Z
 	}
 
-	if (not currentLevel:isDungeon()) then
+	if (globals.inSnare) then
 		text:cdprint(false, true, " but it fizzles!\n\n")
-		text:clear()
 		return
 	end
 
 	repeat
 		text:cdprint(true, false, "\n\n  North\n  East\n  Up\n")
-		text:setCursor(0, cursorPosition)
-		text:print("*")
 		text:setCursor(0, 11)
 		text:print("Done         Cancel")
-		text:setCursor(18 * 12, 2)
+		text:setCursor(20 * 12, 2)
 		text:print("+")
-		text:setCursor(18 * 12, 4)
+		text:setCursor(20 * 12, 4)
 		text:print("-")
+		text:setCursor(0, cursorPosition)
+		text:print("*")
 		teleportHelper(deltas[2], 2)
 		teleportHelper(deltas[3], 3)
 		teleportHelper(deltas[4], 4)
@@ -97,7 +106,7 @@ local function dungeonTeleport()
 				local x
 				local y
 
-				if (not currentLevel.canTeleportFrom) then
+				if (not currentLevel:canTeleportTo()) then
 					return
 				end
 
@@ -133,9 +142,13 @@ local function dungeonTeleport()
 				y = (y + deltas[2]) % 22
 
 				if (currentLevel:canTeleportTo(newLevel)) then
-					currentLevel.currentLevel = newLevel
-					currentLevel.currentSquare = currentLevel:getSq(string.format("x%02x%02x", x, y))
-					currentLevel:changeLevel(0)
+					currentLevel:toLevel("dun",
+						currentLevel.name,
+						newLevel,
+						x,
+						y,
+						currentLevel.direction
+					)
 					currentLevel.clearFlags = true
 				end
 

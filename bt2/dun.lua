@@ -150,7 +150,7 @@ end
 
 
 dun = {}
-function dun:new(inName, inLevel)
+function dun:new(inName, inLevel, inSaved)
 	local self = object:new()
 
 	self:addSelf(dun)
@@ -166,11 +166,16 @@ function dun:new(inName, inLevel)
 
 	if (type(dunData[inName][inLevel].level) == "string") then
 		dunData[inName][inLevel].level = diskio:readTable(
-				dunData[inName][inLevel].level, false
-				)
+			dunData[inName][inLevel].level, false
+			)
 	end
 
-	self:fromTable(dunData[inName][inLevel].level)
+	if (inSaved) then
+		self:fromTable(dunData[inName][inLevel].level, inSaved)
+	else 
+
+		self:fromTable(dunData[inName][inLevel].level)
+	end
 
 	return self
 end
@@ -209,8 +214,9 @@ end
 ----------------------------------------
 -- dun:fromTable()
 ----------------------------------------
-function dun:fromTable(inTable)
+function dun:fromTable(inTable, inSquares)
 	local label, object
+	local squareP		= inSquares or inTable.squares
 
 	for label, object in pairs(inTable.squares) do
 		self.squares[label] = dunSq.new(label, object)
@@ -248,7 +254,7 @@ function dun:saveState(inTable)
 	t.name		= self.name
 	t.currentLevel	= self.currentLevel
 	t.direction	= self.direction
-	t.currentSquare	= self.currentSquare.label
+	t.x, t.y	= self.currentSquare:toCoordinates()
 
 	local function writePath(inDest, inPath)
 		local key
@@ -264,17 +270,18 @@ function dun:saveState(inTable)
 
 	end
 
+	t.squares = {}
 	for label,square in pairs(self.squares) do
-		t[label] = {}
+		t.squares[label] = {}
 
 		for attribute,value in square:pairs() do
 			if ((attribute == "north") or (attribute == "south") or
 			    (attribute == "east" ) or (attribute == "west"))then
-				t[label][attribute] = {}
-				writePath(t[label][attribute], 
+				t.squares[label][attribute] = {}
+				writePath(t.squares[label][attribute], 
 					square[attribute])
 			else
-				t[label][attribute] = value
+				t.squares[label][attribute] = value
 			end
 		end
 	end
@@ -286,9 +293,12 @@ end
 -- dun:restoreState()
 ----------------------------------------
 function dun:restoreState(inTable)
-	local t
+	local d
 
-	local xxx_dun_restore_state
+	d = dun:new(inTable.name, inTable.currentLevel, inTable)
+	d:enter(inTable.x, inTable.y, inTable.direction)
+
+	return d
 end
 
 ----------------------------------------
@@ -331,7 +341,9 @@ function dun:getNumLevels()
 end
 
 function dun:canTeleportTo(inLevel)
-	return dunData[self.name][inLevel].canTeleportTo
+	local l	= inLevel or self.currentLevel
+
+	return dunData[self.name][l].canTeleportTo
 end
 
 ----------------------------------------
@@ -675,8 +687,7 @@ function dun:main()
 		globals.doTimeEvents = false
 
 		if (keyboardCommand(inkey)) then
-			--self:resetBigpic()
-			local xxx_doNothing = true
+			self:resetBigpic()
 		elseif (inkey == "A") then
 			if (self.currentSquare.hasCeilPortal) then
 				if (party.levitate.active) then

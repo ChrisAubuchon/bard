@@ -28,6 +28,7 @@ globals.debug		= true
 globals.partyDied	= false
 globals.citySquare	= false
 globals.guildCity	= false
+globals.inSnare		= false
 
 globals.fonts		= {}
 globals.fonts.mono	= gfxFont:new("fonts/bt2font.btf", true)
