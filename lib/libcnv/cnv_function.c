@@ -58,7 +58,7 @@ btFunction_t *btFunction_new(uint8_t type, ...)
 	bf = (btFunction_t *)xzalloc(sizeof(btFunction_t));
 	bf->type = type;
 
-	if ((type == FUNC_STRING) || (type == FUNC_CODE)) {
+	if (type == FUNC_STRING) {
 		va_start(args, type);
 		bf->string = va_arg(args, btstring_t *);
 		va_end(args);
@@ -90,8 +90,6 @@ json_t *btFunction_toJson(const void *vbf)
 
 	if (bf->type == FUNC_STRING) {
 		JSON_BTSTRING(root, "inFunction", bf->string);
-	} else if (bf->type == FUNC_CODE) {
-		JSON_BTSTRING(root, "inCode", bf->string);
 	} else {
 		if (bf->type != FUNC_NONE)
 			JSON_STRING(root, "inFunction", functionList[bf->type]);

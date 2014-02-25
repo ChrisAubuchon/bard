@@ -3,14 +3,14 @@
 uint8_t *song_combatStrings[] = {
 	"local missile_damage_bonus_penalty = true",
 	"currentBattle.song:addBattleBonus(\"antiMagic\", 2, true)", 
-	"party.acBonus = party.acBonus + inAction.inData.data",
+	"party.acBonus = party.acBonus + self.inData.data",
 	"currentBattle.song:addBattleBonus(\"toHitBonus\",\
-				inAction.inData.data,\
+				self.inData.data,\
 				true);\
 	 currentBattle.song:addBattleBonus(\"damageBonus\", \
-				inAction.inData.data,\
+				self.inData.data,\
 				true);",
-	"currentBattle.song:addBattleBonus(\"hpRegen\", inAction.inData.data, \
+	"currentBattle.song:addBattleBonus(\"hpRegen\", self.inData.data, \
 				true)",
 	"currentBattle.song:addBattleBonus(\"extraAttacks\", 1, false)",
 	""
@@ -19,11 +19,11 @@ uint8_t *song_combatStrings[] = {
 uint8_t *song_activateStrings[] = {
 	"",
 	"party:addBattleBonus(\"antiMagic\", 3, true)",
-	"party.song.acBonus = party.song.acBonus + inAction.inData.data; party:display()",
+	"party.song.acBonus = party.song.acBonus + self.inData.data; party:display()",
 	"party:meleeMarch()",
 	"party.song.trapProtect = true", 
 	"party.song.spptRegen = true",
-	"spells.passive.light(inAction); party.song.lightSong = true"
+	"spells.passive.light(self); party.song.lightSong = true"
 };
 
 uint8_t *song_deactivateStrings[] = {
@@ -39,15 +39,15 @@ uint8_t *song_deactivateStrings[] = {
 uint8_t *song_toCombatStrings[] = {
 	"",
 	"currentBattle.song:addBattleBonus(\"antiMagic\", \
-				inAction.inData.data, false)",
+				self.inData.data, false)",
 	"",
 	"currentBattle.song:addBattleBonus(\"toHitBonus\",\
-				inAction.inData.data,\
+				self.inData.data,\
 				false);\
 	 currentBattle.song:addBattleBonus(\"damageBonus\", \
-				inAction.inData.data,\
+				self.inData.data,\
 				false);",
-	"currentBattle.song:addBattleBonus(\"hpRegen\", inAction.inData.data, \
+	"currentBattle.song:addBattleBonus(\"hpRegen\", self.inData.data, \
 				false)",
 	"currentBattle.song:addBattleBonus(\"extraAttacks\", 1, false)",
 	""

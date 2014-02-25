@@ -41,7 +41,6 @@
 #define FUNC_DETECT		31
 #define FUNC_RANGE		32
 #define FUNC_STRING		33
-#define FUNC_CODE		34
 
 /********************************/
 /*				*/

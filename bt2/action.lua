@@ -1,4 +1,4 @@
-require "bttable"
+require "object"
 
 btAction = {}
 function btAction:new()
@@ -312,13 +312,12 @@ end
 ----------------------------------------
 -- btAction:perform()
 ----------------------------------------
-function btAction:perform(inSource)
-	if (type(self.func) ~= "function") then
-		error("self.func not a function", 2)
-	end
-
+function btAction:perform()
 	if (self.func) then
-		self:func(inSource)
+		if (type(self.func) ~= "function") then
+			error("self.func not a function", 2)
+		end
+		self:func()
 	end
 end
 
@@ -334,8 +333,6 @@ function btAction:printTarget()
 		text:print(target.name)
 	end
 end
-
-
 
 
 

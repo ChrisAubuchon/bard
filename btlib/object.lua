@@ -1,4 +1,5 @@
 require "random"
+require "log"
 
 local memoryTrace = true
 

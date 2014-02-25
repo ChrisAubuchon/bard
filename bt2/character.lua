@@ -872,9 +872,7 @@ function character:useItem()
 	text:cdprint(true, false, "%s%s", self.name,
 				self.action.inData.item.useString)
 
-	if (self.action.func) then
-		self.action.func(self.action)
-	end
+	self.action:perform()
 end
 
 ----------------------------------------
@@ -985,7 +983,7 @@ function character:castSpell()
 		return
 	end
 
-	self:executeAction()
+	self.action:perform()
 end
 
 ----------------------------------------
@@ -1107,10 +1105,3 @@ function character:cureOld()
 	self.isOld = false
 end
 
-
-----------------------------------------
--- character:executeAction()
-----------------------------------------
-function character:executeAction()
-	self.action:perform(self)
-end

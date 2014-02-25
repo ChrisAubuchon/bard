@@ -975,7 +975,7 @@ function party:singSong()
 	text:print(" plays a tune")
 
 	if (party.song.active) then
-		party.song:deactivate()()
+		party.song:deactivate()
 	end
 
 	party.song:activate(char, tune)

@@ -46,18 +46,21 @@ function compileAction(inAction)
 	local mesg
 
 	if (inAction.inFunction) then
-		inAction.func, mesg = load(inAction.inFunction)
+		inAction.func, mesg = load(
+			"local self = select(1, ...)" ..
+			inAction.inFunction
+			)
+if false then
+		inAction.func, mesg = load(
+			"local function f(...) " 
+			.. "local inAction = select(1, ...) " 
+			.. inAction.inFunction 
+			.. " end f(...)"
+			)
+end
 		if (inAction.func == nil) then
 			error("Compilation error: \n" ..
 				inAction.inFunction .. "\n" .. mesg, 2)
-		end
-	elseif (inAction.inCode) then
-		inAction.func, mesg = load(
-			"local function f(inAction) " .. inAction.inCode ..
-			" end f(...)")
-		if (inAction.func == nil) then
-			error("Compilation error: \n" ..
-				inAction.inCode .. "\n" .. mesg, 2)
 		end
 	end
 end

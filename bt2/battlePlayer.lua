@@ -372,9 +372,7 @@ function battlePlayer:doUseItem()
 
 	self:consumeItem()
 
-	if (self.action.func) then
-		self.action.func(self.action)
-	end
+	self.action:perform()
 end
 
 ----------------------------------------

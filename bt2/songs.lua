@@ -36,6 +36,8 @@ function song:new()
 	self.acBonus		= 0
 	self.spptRegen		= false
 
+	self.action		= btAction:new()
+
 	self:addParent(song)
 
 	return self
@@ -92,15 +94,12 @@ function song:activate(inSinger, inTune, inDuration)
 
 	tune = songList[inTune]
 	if (tune.activate) then
-		action = btAction:new()
-		action.source = inSinger
-		action.func = tune.activate.func
-		action.inData = tune.nonCombatData[currentLevel.level].inData
+		self.action.source = inSinger
+		self.action.func = tune.activate.func
+		self.action.inData = tune.nonCombatData[currentLevel.level].inData
 
 		log:print(log.LOG_DEBUG, "Singing tune #%d", inTune)
-		if (action.func) then
-			action.func(action)
-		end
+		self.action:perform()
 	end
 
 	self:__activate()
@@ -125,6 +124,7 @@ function song:deactivate()
 	self.singer.isSinging	= false
 	self.singer		= false
 	self.duration		= 0
+	self.action:renew()
 end
 
 ----------------------------------------
@@ -163,10 +163,10 @@ function song:convertToCombat()
 	if (self.currentTune ~= 3) then
 		local tune	= songList[self.currentTune]
 
-		local action = btAction:new()
-		action.inData = tune.combatData[currentLevel.level].inData
+		self.action.inData = tune.combatData[currentLevel.level].inData
+		self.action.func = tune.toCombat.func
 
-		tune.toCombat.func(action)
+		action:perform()
 	end
 end
 
@@ -189,6 +189,6 @@ function song:activateCombatSong(inAction)
 
 	inAction.func = tune.combatFunction.func
 	inAction.inData = tune.combatData[currentLevel.level].inData
-	inAction.func()
+	inAction:perform()
 	timer:delay()
 end
