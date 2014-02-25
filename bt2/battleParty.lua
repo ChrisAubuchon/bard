@@ -337,13 +337,6 @@ function battleParty:battleBonus(inAction)
 	return true
 end
 
-----------------------------------------
--- mageStar()
-----------------------------------------
-function battleParty:mageStar(inAction)
-	inAction.target.missTurn = true
-end
-
 
 
 

@@ -21,12 +21,11 @@ end
 
 local function __addPortal(sq, quad, tileSet)
 	if (sq.hasCeilPortal) then
-		bigpic:dunAdd(quad, tileSet, "portal", sq, "ceil")
+		bigpic:dunAdd(quad, tileSet, "ceiling", sq)
 	end
 
 	if (sq.hasFloorPortal) then
-		log:print(log.LOG_DEBUG, quad)
-		bigpic:dunAdd(quad, tileSet, "portal", sq, "floor")
+		bigpic:dunAdd(quad, tileSet, "floor", sq)
 	end
 end
 
@@ -115,10 +114,10 @@ end
 -- Local class for dungeon squares
 ----------------------------------------
 local dunSq	= {}
-dunSq.new = function(inLabel, inSquare)
+function dunSq:new(inLabel, inSquare)
 	local self = object:new()
 
-	self:addParent(dunSq)
+	self:addSelf(dunSq)
 
 	table.copy(inSquare, self)
 	self.label = inLabel
@@ -171,7 +170,7 @@ function dun:new(inName, inLevel, inSaved)
 	end
 
 	if (inSaved) then
-		self:fromTable(dunData[inName][inLevel].level, inSaved)
+		self:fromTable(dunData[inName][inLevel].level, inSaved.squares)
 	else 
 
 		self:fromTable(dunData[inName][inLevel].level)
@@ -218,8 +217,8 @@ function dun:fromTable(inTable, inSquares)
 	local label, object
 	local squareP		= inSquares or inTable.squares
 
-	for label, object in pairs(inTable.squares) do
-		self.squares[label] = dunSq.new(label, object)
+	for label, object in pairs(squareP) do
+		self.squares[label] = dunSq:new(label, object)
 	end
 
 	for label, object in pairs(self.squares) do
@@ -347,36 +346,8 @@ function dun:canTeleportTo(inLevel)
 end
 
 ----------------------------------------
--- exitToCity()
+-- dun:doDetect()
 ----------------------------------------
-function dun:doExit()
-	self.exit = true
-
-	if (globals.guildCity == "Wild") then
-		currentLevel = wild:new()
-	else
-		currentLevel = city:new(globals.guildCity)
-	end
-	currentLevel.direction = globals.cityDirection
-	currentLevel.currentSquare = currentLevel:getSq(globals.citySquare)
-end
-
-----------------------------------------
--- changeLevel()
-----------------------------------------
-function dun:changeLevel(inLevelDelta)
-	local newDun
-
-	self.exit = true
-	newDun = dun:new(currentLevel.name, 
-			currentLevel.currentLevel + inLevelDelta,
-			0, 0, "north"
-			)
-	newDun.currentSquare = newDun:getSq(currentLevel.currentSquare.label)
-	newDun.direction = currentLevel.direction
-	currentLevel = newDun
-end
-
 function dun:doDetect()
 	local found = {}
 	local i
@@ -423,6 +394,9 @@ function dun:doDetect()
 	end
 end
 
+----------------------------------------
+-- dun:buildView()
+----------------------------------------
 function dun:buildView()
 	bigpic:dunBackground(self.tileSet)
 	if (party.light.active) then
@@ -436,6 +410,9 @@ function dun:buildView()
 	end
 end
 
+----------------------------------------
+-- dun:doSpinnerCheck()
+----------------------------------------
 function dun:doSpinnerCheck()
 	if (self.currentSquare.isSpinner) then
 		text:cdprint(true, false, "isSpinner")
@@ -456,6 +433,9 @@ function dun:doSpinnerCheck()
 	end
 end
 
+----------------------------------------
+-- dun:turnParty()
+----------------------------------------
 function dun:turnParty(inRelDirection)
 	self.direction = directions[inRelDirection][self.direction]
 	self.isPhasedFlag = false
@@ -476,6 +456,9 @@ function dun:turnParty(inRelDirection)
 	self:buildView()
 end
 
+----------------------------------------
+-- dun:moveForward()
+----------------------------------------
 function dun:moveForward()
 	local curSq = self.currentSquare
 	local edge = curSq[self.direction]
@@ -682,6 +665,7 @@ function dun:main()
 	self:resetBigpic()
 
 	repeat
+		text:cdprint(true, false, self.currentSquare.label)
 		globals.doTimeEvents = true
 		inkey = getkey()
 		globals.doTimeEvents = false
@@ -691,7 +675,7 @@ function dun:main()
 		elseif (inkey == "A") then
 			if (self.currentSquare.hasCeilPortal) then
 				if (party.levitate.active) then
-					self:doPortal(-1, 1)
+					self:doPortal(1)
 				end
 			end
 		elseif (inkey == "D") then
@@ -702,7 +686,7 @@ function dun:main()
 						break
 					end
 				end
-				self:doPortal(1, -1)
+				self:doPortal(-1)
 			end
 		elseif (inkey == btkeys.WANDERING) then
 			self:wanderingMonster()
@@ -724,12 +708,26 @@ end
 ----------------------------------------
 -- doPortal()
 ----------------------------------------
-function dun:doPortal(inDeltaUp, inDeltaDown)
+--function dun:doPortal(inDeltaUp, inDeltaDown)
+function dun:doPortal(inDelta)
+	local newLevel
+	local x
+	local y
+
 	if (self.dungeonDirection == "below") then
-		self:changeLevel(inDeltaUp)
+		newLevel = self.currentLevel - inDelta
 	else
-		self:changeLevel(inDeltaDown)
+		newLevel = self.currentLevel + inDelta
 	end
+
+	x,y = self:getCoordinates()
+
+	self:toLevel("dun", 
+		self.name,
+		newLevel,
+		x,
+		y,
+		self.direction)
 end
 
 ----------------------------------------
@@ -741,7 +739,7 @@ function dun:doLifeDrain()
 
 	for c in party:iterator() do
 		action = btAction.new()
-		action.outData.damage = self.level
+		action.result.damage = self.level
 		c:doDamage(action)
 		if (globals.partyDied) then
 			return	

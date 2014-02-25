@@ -274,11 +274,6 @@ function battleMonster:battleBonus()
 	return true
 end
 
-function battleMonster:mageStar()
-	text:print(" and the party misses an attack")
-	party.missTurn = true
-end
-
 ----------------------------------------
 --
 ----------------------------------------

@@ -257,3 +257,5 @@ uint8_t wordoffear[] = {
 uint8_t battleskill[] = {
   4,10,7,0
 };
+
+uint8_t	magmString[] = "spells:magm(...)";

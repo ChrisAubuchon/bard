@@ -167,6 +167,8 @@ function globals:saveGame()
 	if (text:getYesNo()) then
 		os.exit(0)
 	end
+
+	text:clear()
 end
 
 ----------------------------------------

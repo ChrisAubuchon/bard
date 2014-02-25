@@ -28,9 +28,9 @@ static void song_lightSpell(btSong_t *bs, uint32_t index)
 	uint32_t	i;
 	uint32_t	offset;
 
-	bs->activate = btFunction_new(FUNC_STRING,
+	bs->activate = btFunction_new(FUNC_CODE,
 				bts_strcpy(song_activateStrings[index]));
-	bs->deactivate = btFunction_new(FUNC_STRING,
+	bs->deactivate = btFunction_new(FUNC_CODE,
 				bts_strcpy(song_deactivateStrings[index]));
 
 	for (i = 0; i < 8; i++) {
@@ -91,18 +91,18 @@ void convertSongs(void)
 		b = btSong_new();
 		b->name = bts_strcpy(songName[i]);
 
-		b->toCombat = btFunction_new(FUNC_STRING,
+		b->toCombat = btFunction_new(FUNC_CODE,
 				bts_strcpy(song_toCombatStrings[i]));
-		b->combatFunction = btFunction_new(FUNC_STRING,
+		b->combatFunction = btFunction_new(FUNC_CODE,
 				bts_strcpy(song_combatStrings[i]));
 		switch (i) {
 		case 6:
 			song_lightSpell(b, i);
 			break;
 		default:
-			b->activate = btFunction_new(FUNC_STRING,
+			b->activate = btFunction_new(FUNC_CODE,
 					bts_strcpy(song_activateStrings[i]));
-			b->deactivate = btFunction_new(FUNC_STRING,
+			b->deactivate = btFunction_new(FUNC_CODE,
 					bts_strcpy(song_deactivateStrings[i]));
 			song_generic(b->combatData, i);
 			song_generic(b->nonCombatData, i);

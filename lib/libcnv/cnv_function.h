@@ -39,7 +39,9 @@
 #define FUNC_LEVITATE		29
 #define FUNC_SHIELD		30
 #define FUNC_DETECT		31
-#define FUNC_STRING		32
+#define FUNC_RANGE		32
+#define FUNC_STRING		33
+#define FUNC_CODE		34
 
 /********************************/
 /*				*/

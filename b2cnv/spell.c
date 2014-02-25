@@ -3,7 +3,7 @@
 #include <cnv_spell.h>
 #include <cnv_song.h>
 
-/*#define DEBUG*/
+#define DEBUG
 #include <debug.h>
 
 /********************************/
@@ -179,6 +179,11 @@ static btAction_t *spf_damagespell(uint32_t index)
 			if (index == 55) {
 				ba->group = 1;
 				ba->rflags.spellcaster = 1;
+				btFunction_free(rval->function);
+				rval->function = btFunction_new(
+					FUNC_STRING,
+					bts_strcpy(magmString)
+					);
 			} else {
 				ba->rflags.evil = 1;
 			}
@@ -290,16 +295,18 @@ static btAction_t *spf_rangespell(uint32_t index)
 	btAction_t	*rval;
 	bteAttack_t	*ba;
 
-	rval	= btAction_new(FUNC_ATTACK, EFFECT_ATTACK);
+	debug("spf_rangespell(%d)\n", index);
+
+	rval	= btAction_new(FUNC_RANGE, EFFECT_ATTACK);
 	ba	= btEffect_attack(rval->effect);
 
 	switch (spellType[index]) {
 	case sp_FarFoe:
 		ba->addDistance = 1;
-		ba->distance	= 4;
+		ba->distance	= 40;
 		break;
 	case sp_MeleeMen:
-		ba->distance	= 1;
+		ba->distance	= 10;
 		break;
 	}
 
@@ -377,9 +384,7 @@ static btAction_t *spf_summon(uint32_t index)
 
 	bs->isIllusion = IFBIT(spellDuration[index], 0x80, 1, 0);
 
-	debug("spellDuration[%d] = %2d\n", index, spellDuration[index]);
 	sum = spellSummonMap[spellDuration[index] & 0x7f];
-	debug("sum = %d\n", sum);
 	cnvList_add(bs->monsters, getSummonMacro(sum));
 
 	return rval;
@@ -491,6 +496,7 @@ void convertSpells(void)
 	spellList_to_json(spells, mkJsonPath("spells.json"));
 	cnvList_free(spells);
 
+#if 0
 	printf("static main() {\n");
 	printf("auto eid;\n");
 	printf("eid = GetEnum(\"spellName\");\n");
@@ -499,4 +505,5 @@ void convertSpells(void)
 			spellAbbr[i], i);
 	}
 	printf("}");
+#endif
 }

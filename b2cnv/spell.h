@@ -31,6 +31,8 @@ extern uint8_t shieldSelf[];
 extern uint8_t wordoffear[];
 extern uint8_t battleskill[];
 
+extern uint8_t magmString[];
+
 #define sp_Lightspell	0
 #define sp_ArcFire	1
 #define sp_ShieldSelf	2

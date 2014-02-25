@@ -476,6 +476,12 @@ function battlePlayer:attackSpell()
 		local repelType
 
 		repelType = next(inData.repel)
+		if (target:isSummon() and not target.repel[repelType]) then
+			text:ctdprint(false, true, " but it fizzles!\n\n")
+			party:display()
+			return
+		end
+
 		if (target:isCharacter() or not target.repel[repelType]) then
 			text:ctdprint(false, true, " but it fizzles!\n\n")
 			party:display()
@@ -508,7 +514,7 @@ function battlePlayer:attackSpell()
 		elseif (inData.specialAttack) then
 			result.specialAttack = inData.specialAttack
 			result.damage = 0
-		else
+		elseif (inData.ndice) then
 			result.damage = random:xdy(inData.ndice, inData.dieval)
 		end
 

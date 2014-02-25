@@ -91,14 +91,12 @@ end
 ----------------------------------------
 local empty = building:new("Empty Building", "PIC_EMPTYBLDG")
 function empty:enter()
-if false then
 	if (random:band(3) == 0) then
 		battle:random()
 		if (globals.partyDied) then
 			return
 		end
 	end
-end
 
 	self:resetBigpic()
 	text:cdprint(true, false, "You're in an empty building.")
@@ -112,14 +110,12 @@ end
 ----------------------------------------
 local emptyhut = building:new("Empty Hut", "PIC_EMPTYHUT")
 function emptyhut:enter()
-if false then
 	if (random:band(3) == 0) then
 		battle:random()
 		if (globals.partyDied) then
 			return true
 		end
 	end
-end
 
 	self:resetBigpic()
 	text:cdprint(true, false, "You're in an empty hut.")
@@ -589,7 +585,6 @@ function cityBuildings:enter(inBuilding, ...)
 	self[inBuilding]:enter(...)
 
 	if (buildingRval.turnParty) then
-		log:print(log.LOG_DEBUG, "Turning party")
 		currentLevel:turnParty("back")
 	end
 

@@ -251,21 +251,43 @@ end
 ----------------------------------------
 -- spells:mageStar()
 ----------------------------------------
-function spells:mageStar(inAction, inSource)
+function spells:mageStar(inAction)
+	local source	= inAction.source
+
 	log:print(log.LOG_DEBUG, "spells.mageStar")
+
+	-- groupSavingThrow() needs a target. The Halt Foe
+	-- spell is untargetted. This looks to be a bug since
+	-- the target is never set for the spell. It probably
+	-- will just use the last target. We'll use the lead
+	-- monster group instead.
+	--
+	if (source:isCharacter()) then
+		inAction.target = currentBattle.monParty:getLeadGroup()
+	end
 
 	if (inAction:groupSavingThrow()) then
 		text:ctdprint(false, true, " but it had no effect!\n\n")
 		party:display()
 		return
 	end
-	inSource:mageStar(inAction)
+
+	if (source:isCharacter()) then
+		local mgroup
+
+		for mgroup in currentBattle.monParty:iterator() do
+			mgroup.missTurn = true
+		end
+	else
+		text:print(" and the party misses an attack")
+		party.missTurn = true
+	end
 	text:printEllipsis()
 end
 
 
 ----------------------------------------
--- spells.attack()
+-- spells:attack()
 ----------------------------------------
 function spells:attack(inAction)
 	local source	= inAction.source
@@ -382,6 +404,7 @@ function spells:dreamSpell(inAction)
 	if (not source.learnedZZGO) then
 		text:print(" but it fizzles!\n\n")
 		timer:delay()
+		return
 	end
 
 	if (currentBattle) then
@@ -423,14 +446,14 @@ function spells:dreamSpell(inAction)
 		local inkey
 
 		text:clear()
-		text:print(	"\nDark Domain" ..
-				"\nThe Tombs" ..
-				"\nThe Castle" ..
-				"\nThe Tower" ..
-				"\nMaze of Dread" ..
-				"\nOscon's Fort" ..
-				"\nGrey Crypt" ..
-				"\nDestiny Stone"
+		text:print(	"\n1) Dark Domain" ..
+				"\n2) The Tombs" ..
+				"\n3) The Castle" ..
+				"\n4) The Tower" ..
+				"\n5) Maze of Dread" ..
+				"\n6) Oscon's Fort" ..
+				"\n7) Grey Crypt" ..
+				"\n8) Destiny Stone"
 			)
 		text:printExit()
 
@@ -458,6 +481,84 @@ function spells:dreamSpell(inAction)
 			currentLevel:toLevel("dun", "stone", 1, 0, 0, "north")
 		end
 	end
+end
+
+----------------------------------------
+-- spells:range()
+----------------------------------------
+function spells:range(inAction)
+	local target	= inAction.target
+	local source	= inAction.source
+	local inData	= inAction.inData
+
+	if (target:isCharacter()) then
+		text:print(" but it had no effect!\n\n")
+		timer:delay()
+		return
+	end
+
+	if (inAction:groupSavingThrow()) then
+		text:print(" but it had no effect!\n\n")
+		timer:delay()
+		return
+	end
+
+	if (inData.addDistance) then
+		target.range = target.range + inData.distance
+		if (target.range > 90) then
+			target.range = 90
+		end
+	else
+		target.range = inData.distance
+	end
+
+	text:printEllipsis()
+end
+
+----------------------------------------
+-- spells:safetySpell()
+----------------------------------------
+function spells:safetySpell()
+	local c
+
+	if ((random:band(7) < 3) or (globals.inSnare)) then
+		text:print(" but it fizzles!\n\n")
+		party:display()
+		timer:delay()
+		return
+	end
+
+	if (currentBattle) then
+		globals.partyDied = true
+	end
+
+	globals.gameState = globals.STATE_GUILD
+	currentLevel.exit = true
+
+	for c in party:iterator() do
+		c.gold = 0
+	end
+end
+
+----------------------------------------
+-- spells:magm()
+----------------------------------------
+function spells:magm(inAction)
+	local inData	= inAction.inData
+	local result	= inAction.result
+	local r
+
+	result.damage = 0
+
+	r = random:band(3)
+	if (r == 0) then
+		result.specialAttack = "stone"
+	elseif (r == 1) then
+		result.specialAttack = "crit"
+	end
+
+	inAction:multiTargetSpell()
+		
 end
 
 ----------------------------------------

@@ -265,7 +265,7 @@ function bigpic:dunAdd(inQuad, inTileSet, inFacet, inSq)
 	end
 
 	if ((inFacet == "floor") or (inFacet == "ceiling")) then
-		gfx = inFacet
+		gfx = "portal"
 	else
 		if ((inSq.isSecret) and (party.light.seeSecret)) then
 			gfx = "door"

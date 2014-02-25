@@ -364,12 +364,6 @@ function battle:endRound()
 
 	self:resetPriority()
 
-	if (self.monParty) then
-		for mgroup in self.monParty:iterator() do
-			mgroup.missTurn = false
-		end
-	end
-
 	party:doDisbelieve(self)
 	if (globals.partyDied) then
 		return
@@ -459,10 +453,13 @@ function battle:getPriorities()
 
 	if (not self.isPartyAttack) then
 		for p in self.monParty:iterator() do
-			for c in p:iterator() do
-				self:addPriority(c)
-				c.beenAttacked = false
+			if (not p.missTurn) then
+				for c in p:iterator() do
+					self:addPriority(c)
+					c.beenAttacked = false
+				end
 			end
+			p.missTurn = false
 		end
 	end
 

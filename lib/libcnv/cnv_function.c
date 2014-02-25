@@ -40,7 +40,8 @@ static uint8_t *functionList[] = {
 	"spells:compass(...)",
 	"spells:levitate(...)",
 	"spells:shield(...)",
-	"spells:detect(...)"
+	"spells:detect(...)",
+	"spells:range(...)"
 };
 
 /********************************/
@@ -57,7 +58,7 @@ btFunction_t *btFunction_new(uint8_t type, ...)
 	bf = (btFunction_t *)xzalloc(sizeof(btFunction_t));
 	bf->type = type;
 
-	if (type == FUNC_STRING) {
+	if ((type == FUNC_STRING) || (type == FUNC_CODE)) {
 		va_start(args, type);
 		bf->string = va_arg(args, btstring_t *);
 		va_end(args);
@@ -88,6 +89,8 @@ json_t *btFunction_toJson(const void *vbf)
 	root = json_object();
 
 	if (bf->type == FUNC_STRING) {
+		JSON_BTSTRING(root, "inFunction", bf->string);
+	} else if (bf->type == FUNC_CODE) {
 		JSON_BTSTRING(root, "inCode", bf->string);
 	} else {
 		if (bf->type != FUNC_NONE)
