@@ -186,23 +186,20 @@ end
 -- 
 ----------------------------------------
 function battle:start()
-	local mgroup
-	local continue = true
-	local partyRan = false
+	local continue		= true
+	local partyRan 		= false
+	local firstRound	= true
 
 	self:convertPreBattleSong()
 
-	if (not self.isPartyAttack) then
-		for mgroup in self.monParty:iterator() do
-			log:print(log.LOG_DEBUG, "mgroup: %s", mgroup)
-			self.killCount[mgroup:getSingularName()] = 0
-		end
-	end
-
-	self:printEncounter()
+	--self:printEncounter()
 
 	repeat
 		self:updateBigpic()
+
+		self:printOpponents(firstRound)
+		firstRound = false
+
 		if (not party:getBattleActions()) then
 			partyRan = true
 			break
@@ -226,10 +223,10 @@ function battle:start()
 				end
 			end
 		elseif (self.monParty:isAlive()) then
-			text:cdprint(true, false, "\nYou still face ")
-			self:printOpponents()
+			--text:cdprint(true, false, "\nYou still face ")
+			--self:printOpponents()
 
-			self.monParty:advance()
+			--self.monParty:advance()
 		else
 			break
 		end
@@ -300,30 +297,26 @@ local encounterStringList = {
 }
 
 ----------------------------------------
--- battle:printEncounter()
-----------------------------------------
-function battle:printEncounter()
-	text:clear()
-
-	if (self.isPartyAttack) then
-		text:print("\nDissention in your ranks...\n\n")
-		timer:delay(3)
-	else
-		text:print(random:randomMember(encounterStringList))
-		self:printOpponents()
-	end
-end
-
-----------------------------------------
 -- battle:printOpponents()
 ----------------------------------------
-function battle:printOpponents()
-	if (self.isPartyAttack) then
-		text:print("\nhostile party members!\n\n")
-		return
+function battle:printOpponents(inFirstRound, inBattleCryFlag)
+	if (not inBattleCryFlag) then
+		if (not inFirstRound) then
+			text:cdprint(true, false, "You still face ")
+		else
+			if (self.isPartyAttack) then
+				text:cdprint(true, false, 
+					"\nDissention in your ranks...\n\n")
+			else
+				text:cdprint(true, false, 
+					random:randomMember(encounterStringList))
+			end
+		end
 	end
 
-	self.monParty:printGroups()
+	if (not self.isPartyAttack) then
+		self.monParty:printGroups()
+	end
 end
 
 ----------------------------------------
