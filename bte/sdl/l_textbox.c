@@ -200,8 +200,6 @@ static void _update_screen(l_textbox *tb)
  *
  * 20 looks like it wraps like the original
  */
-/*#define MAX_CHAR	21*/
-/*#define MAX_CHAR	20*/
 static uint32_t _textbox_wrap(l_textbox *tb, btstring_t *str, uint32_t base)
 {
 	uint32_t	max;
@@ -217,8 +215,12 @@ static uint32_t _textbox_wrap(l_textbox *tb, btstring_t *str, uint32_t base)
 	debug("max = %d\n", max);
 
 	while ((*textp != '\0') && (*textp != '\n')) {
-		if ((tb->nchars + nchars) >= tb->maxChar) 
+/*		if ((tb->nchars + nchars) >= tb->maxChar) */
+		if (nchars >= max) {
+			debug("tb->nchars(%d) + nchars(%d) >= max(%d)\n",
+				tb->nchars, nchars, max);
 			break;
+		}
 
 		if ((*textp == 'm') || ((*textp != ' ') && (!islower(*textp)))){
 			ncaps++;
@@ -237,7 +239,15 @@ static uint32_t _textbox_wrap(l_textbox *tb, btstring_t *str, uint32_t base)
 		return nchars;
 	}
 
-	while ((*--textp != ' ') && (nchars)) {
+#if 0
+	while (nchars > max)
+		nchars--;
+	debug("nchars = %d\n", nchars);
+#endif
+
+	debug("textp = \"%.*s\"\n", nchars, &str->buf[base]);
+/*	while ((*--textp != ' ') && (nchars)) {*/
+	while ((*textp-- != ' ') && (nchars)) {
 		debug("Stripping back\n");
 		nchars--;
 	}

@@ -74,6 +74,7 @@ function level:getBattleOpponents()
 	local picked	= {}
 	local monType
 	local i
+	local j
 	local monP
 
 	if (self:isCity()) then
@@ -87,11 +88,13 @@ function level:getBattleOpponents()
 	end
 
 	for i = 1,numGroups do
+		j = ((i - 1) * 2) + 1
 		repeat
 			monType = random:xdy(1,16)
 		until (not picked[monType])
 		picked[monType] = true
-		monGroups[i] = monP[monType]
+		monGroups[j] = monP[monType]
+		monGroups[j+1] = false
 	end
 
 	return monGroups

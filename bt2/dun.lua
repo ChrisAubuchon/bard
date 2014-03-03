@@ -560,7 +560,7 @@ function dun:runSquareCode()
 
 	if (curSq.isRandomBattle) then
 		text:cdprint(true, false, "Random battle")
-		battle:random()
+		battle:new()
 		if (globals.partyDied) then
 			return
 		end

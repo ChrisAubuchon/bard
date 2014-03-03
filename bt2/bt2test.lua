@@ -20,9 +20,9 @@ end
 
 -- Set the data path
 --
-package.path = package.path .. ";" .. sys.dataPath .. "/../btlib/?.lua"
-sys.sharedPath = sys.dataPath .. "/share"
-sys.dataPath = sys.dataPath .. "/bt2"
+package.path = package.path .. ";../btlib/?.lua"
+sys.sharedPath = "../data/share"
+sys.dataPath = "../data/bt2"
 
 if false then
 setmetatable(_G, {
@@ -42,6 +42,7 @@ log.level = log.LOG_DEBUG
 
 gfx:Init("Bard's Tale II")
 require "globals"
+require "structures"
 require "btdebug"
 
 local title = gfxImage:new("images/title.png", "png")
@@ -67,8 +68,8 @@ require "monsterParty"
 require "monsterGroup"
 require "summon"
 require "durationSpell"
-require "party"
 require "action"
+require "party"
 require "guild"
 require "level"
 require "building"
@@ -91,6 +92,12 @@ getkey()
 title = gfxImage:new("images/screen.png", "png")
 title:Draw(nil)
 
+text:print("\nSnarls of defiance are heard from ")
+text:print("5 Goblins (10').")
+getkey()
+os.exit()
+
+text:clear()
 text:print("\n   (POOL GOLD)\n   (TRADE GOLD)")
 getkey()
 

@@ -353,7 +353,7 @@ static dunLevel_t *convertDunLevel(btstring_t *data, uint32_t dunIndex)
 		if (l->dun_reqBattle[i].sqNorth != 0xff) {
 			btstring_t *enc;
 
-			enc = bts_sprintf("battle:new(\"%s\", %d)",
+			enc = bts_sprintf("battle:new({\"%s\"}, %d)",
 					getMonMacro(l->dun_reqBatMon[i].monName-1),
 					l->dun_reqBatMon[i].monSize
 					);

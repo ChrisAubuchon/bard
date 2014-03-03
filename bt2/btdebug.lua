@@ -185,7 +185,7 @@ function btdebug.cityDebug()
 			btdebug.toCity(wildList)
 			return
 		elseif (inkey == "4") then
-			battle:random()
+			battle:new()
 		elseif (inkey == "5") then
 			if (globals.isNight) then
 				globals.isNight = false
@@ -195,45 +195,6 @@ function btdebug.cityDebug()
 			currentLevel:buildView()
 		elseif (inkey == "6") then
 			btdebug.doBattle()
-		end
-if false then
-		text:cdprint(true, false, "1. Toggle night\n")
-		text:print("2. Enter dungeon\n")
-		text:print("3. Random battle\n")
-		text:print("4. Enter building\n")
-		text:print("5. Battle\n")
-		text:print("6. Add doppleganger\n")
-		text:print("7. Enter wild\n")
-		text:printExit()
-		inkey = getkey()
-
-		if (inkey == "1") then
-			if (globals.isNight) then
-				globals.isNight = false
-			else
-				globals.isNight = true
-			end
-			currentLevel:buildView()
-		elseif (inkey == "2") then
-			if (btdebug.enterDungeon()) then
-				return 
-			end
-		elseif (inkey == "3") then
-			battle:random()
-		elseif (inkey == "4") then
-			btdebug.enterBuilding()
-			return
-		elseif (inkey == "5") then
-			btdebug.doBattle()
-		elseif (inkey == "6") then
-			text:clear()
-			battleMonster:doDoppleganger()
-			return
-		elseif (inkey == "7") then
-			text:clear()
-			
-			return
-end
 		end
 
 	until (inkey == "E")
@@ -322,7 +283,7 @@ function btdebug.dunDebug()
 			btdebug.moveToSquare()
 			return
 		elseif (inkey == "3") then
-			battle:random()
+			battle:new()
 			return
 		elseif (inkey == "4") then
 			if (btdebug.enterDungeon()) then	
@@ -433,5 +394,5 @@ function btdebug.doBattle()
 		table.insert(groups, count)
 	end
 
-	battle:new(table.unpack(groups))
+	battle:new(groups)
 end

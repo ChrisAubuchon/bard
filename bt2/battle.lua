@@ -30,6 +30,7 @@ function battle:init()
 	self.songToHitPenalty	= 0
 	self.preBattleSong	= false
 
+	self.monParty		= false
 	self.currentBigpic	= false
 
 	self.song = battleBonus:new()
@@ -46,60 +47,21 @@ end
 --
 ----------------------------------------
 
-----------------------------------------
--- random()
---
--- Levelled random battle
-----------------------------------------
-function battle:random()
-	local mgroups
-	local mgroup
-
-	currentBattle = battle:init()
-
-	currentBattle.isPartyAttack = false
-	currentBattle.monParty = monsterParty:new()
-	mgroups = currentLevel:getBattleOpponents()
-	for _,mgroup in ipairs(mgroups) do
-		currentBattle.monParty:addMonsterGroup(monsterGroup:new(mgroup, false))
-	end
-
-	return currentBattle:start()
-end
-
-----------------------------------------
--- partyAttack()
-----------------------------------------
-function battle:partyAttack()
-	currentBattle = battle:init()
-
-	currentBattle.isPartyAttack = true
-	currentBattle.battleGroup	= false
-
-	return currentBattle:start()
-end
-
-----------------------------------------
--- new()
---
--- Predefined battle
--- Function arguments are
--- Monster type, Group size pairs
-----------------------------------------
-function battle:new(...)
-	local name
+function battle:new(inMonsters, inDoBattleCry)
+	local doBattleCry = inDoBattleCry or true
+	local monsterList = inMonsters or currentLevel:getBattleOpponents()
+	local name 
 	local count
 	local i
 
 	currentBattle = battle:init()
-	currentBattle.isPartyAttack = false
-	currentBattle.monParty = monsterParty:new()
 
-	log:print(log.LOG_DEBUG, select('#', ...))
-	for i = 1,select('#', ...),2 do
-		name,count = select(i, ...)
+	currentBattle.monParty		= monsterParty:new()
+	currentBattle.isPartyAttack	= false
 
-		log:print(log.LOG_DEBUG, "name: %s, count: %d", name, count)
+	for i = 1,#monsterList,2 do
+		name = monsterList[i]
+		count = monsterList[i+1] 
 
 		if (type(name) ~= "string") then
 			error("Invalid monster type: "..tostring(type(name)),2)
@@ -112,10 +74,20 @@ function battle:new(...)
 		local g = monsterGroup:new(name, count)
 		currentBattle.monParty:addMonsterGroup(g)
 	end
-
+		
 	return currentBattle:start()
 end
 
+----------------------------------------
+-- partyAttack()
+----------------------------------------
+function battle:partyAttack()
+	currentBattle = battle:init()
+
+	currentBattle.isPartyAttack = true
+
+	return currentBattle:start()
+end
 
 ----------------------------------------
 -- battle:resetPriority()
@@ -290,7 +262,7 @@ function battle:updateBigpic()
 end
 
 local encounterStringList = {
-	"\n\"Give me blood, men!\" you scream as you face ",
+	"\n\"Give me blood, men!\" you scream, as you face ",
 	"\nYour foes seem endless, their tales unknown. You face ",
 	"\n\"Death and drek!\" you curse, as you see ",
 	"\nSnarls of defiance are heard from "

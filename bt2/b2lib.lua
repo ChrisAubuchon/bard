@@ -88,7 +88,7 @@ function keyboardCommand(inkey)
 	elseif (inkey == btkeys.UP) then
 		currentLevel:moveForward()
 	elseif (inkey == btkeys.RANDOMBATTLE) then
-		battle:random()
+		battle:new()
 		return true
 	elseif (inkey == "Q") then
 		currentLevel.exit = true
