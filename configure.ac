@@ -23,6 +23,7 @@ AC_CONFIG_FILES([
  bte/Makefile
  b1cnv/Makefile
  b2cnv/Makefile
+ b3cnv/Makefile
  btcscnv/Makefile
  lib/Makefile
  lib/lua/Makefile

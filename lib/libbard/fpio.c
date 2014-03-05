@@ -1,5 +1,8 @@
 #include <fpio.h>
 
+/*
+ * xfopen()
+ */
 FILE *xfopen(btstring_t *fname, uint8_t *mode)
 {
 	FILE *fp;
@@ -14,6 +17,9 @@ FILE *xfopen(btstring_t *fname, uint8_t *mode)
 	return fp;
 }
 
+/*
+ * xfseek()
+ */
 int xfseek(FILE *fp, long int offset, int origin)
 {
 	int rval;
@@ -27,6 +33,9 @@ int xfseek(FILE *fp, long int offset, int origin)
 	return ftell(fp);
 }
 
+/*
+ * xfread()
+ */
 size_t xfread(void *ptr, size_t size, size_t count, FILE *fp)
 {
 	size_t c;
@@ -42,6 +51,9 @@ size_t xfread(void *ptr, size_t size, size_t count, FILE *fp)
 	return c;
 }
 
+/*
+ * xfwrite()
+ */
 size_t xfwrite(void *ptr, size_t size, size_t count, FILE *fp)
 {
 	size_t c;
@@ -55,6 +67,9 @@ size_t xfwrite(void *ptr, size_t size, size_t count, FILE *fp)
 	return c;
 }
 
+/*
+ * fp_moveToIndex16()
+ */
 void fp_moveToIndex16(FILE *fp, int index, int endian)
 {
 	uint16_t dest;
@@ -67,6 +82,9 @@ void fp_moveToIndex16(FILE *fp, int index, int endian)
 	xfseek(fp, dest, SEEK_SET);
 }
 
+/*
+ * fp_moveToIndex32()
+ */
 void fp_moveToIndex32(FILE *fp, int index, int endian)
 {
 	uint32_t dest;
@@ -78,4 +96,26 @@ void fp_moveToIndex32(FILE *fp, int index, int endian)
 		dest = fp_read32le(fp);
 
 	xfseek(fp, dest, SEEK_SET);
+}
+
+/*
+ * fp_readFile()
+ */
+btstring_t *fp_readFile(btstring_t *fname)
+{
+	FILE		*fp;
+	int		size;
+	btstring_t	*rval;
+
+	fp = xfopen(fname, "rb");
+	size = xfseek(fp, 0, SEEK_END);
+	xfseek(fp, 0, SEEK_SET);
+
+	rval = bts_new(size);
+	xfread(rval->buf, 1, size, fp);
+
+	fclose(fp);
+	bts_free(fname);
+
+	return rval;
 }

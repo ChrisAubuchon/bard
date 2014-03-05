@@ -36,7 +36,7 @@ btstring_t *dehufFile(uint8_t *fname, uint16_t size);
 btstring_t *dehufFile(btstring_t *fname, uint16_t size);
 
 btstring_t *d3comp(uint8_t *buf, uint32_t size);
-btstring_t *d3compFile(uint8_t *fname, uint32_t size);
+btstring_t *d3compFile(btstring_t *fname, uint32_t size);
 
 #endif
 

@@ -28,7 +28,7 @@ int rpl_asprintf(char **, const char *, ...);
 
 #include <stdio.h>
 
-#define bt_error(format, ...) error_at_line(1, __LINE__, __FILE__, format, __VA_ARGS__)
+#define bt_error(format, ...) error_at_line(1, 1, __FILE__, __LINE__, format, __VA_ARGS__)
 
 #include <bt_string.h>
 #include <endian.h>

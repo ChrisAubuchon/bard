@@ -413,9 +413,7 @@ void outputBigpic(void)
 
 		bp = bigpic_new();
 		bp->name = getPicMacro(i);
-#if 0
-		bp->isTimeAware = isTimeAware[i];
-#endif
+/*		bp->isTimeAware = isTimeAware[i];*/
 
 		if (nloops) {
 			img = bta_new(b2a->nloops);

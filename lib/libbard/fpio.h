@@ -11,4 +11,6 @@ size_t xfwrite(void *ptr, size_t size, size_t count, FILE *fp);
 void fp_moveToIndex16(FILE *fp, int index, int endian);
 void fp_moveToIndex32(FILE *fp, int index, int endian);
 
+btstring_t	*fp_readFile(btstring_t *);
+
 #endif

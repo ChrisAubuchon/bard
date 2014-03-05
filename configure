@@ -10301,7 +10301,7 @@ fi
 
 ac_config_headers="$ac_config_headers config.h"
 
-ac_config_files="$ac_config_files  Makefile bte/Makefile b1cnv/Makefile b2cnv/Makefile btcscnv/Makefile lib/Makefile lib/lua/Makefile lib/libbard/Makefile lib/libcnv/Makefile lib/libgnu/Makefile lib/jansson/Makefile"
+ac_config_files="$ac_config_files  Makefile bte/Makefile b1cnv/Makefile b2cnv/Makefile b3cnv/Makefile btcscnv/Makefile lib/Makefile lib/lua/Makefile lib/libbard/Makefile lib/libcnv/Makefile lib/libgnu/Makefile lib/jansson/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -11096,6 +11096,7 @@ do
     "bte/Makefile") CONFIG_FILES="$CONFIG_FILES bte/Makefile" ;;
     "b1cnv/Makefile") CONFIG_FILES="$CONFIG_FILES b1cnv/Makefile" ;;
     "b2cnv/Makefile") CONFIG_FILES="$CONFIG_FILES b2cnv/Makefile" ;;
+    "b3cnv/Makefile") CONFIG_FILES="$CONFIG_FILES b3cnv/Makefile" ;;
     "btcscnv/Makefile") CONFIG_FILES="$CONFIG_FILES btcscnv/Makefile" ;;
     "lib/Makefile") CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
     "lib/lua/Makefile") CONFIG_FILES="$CONFIG_FILES lib/lua/Makefile" ;;
