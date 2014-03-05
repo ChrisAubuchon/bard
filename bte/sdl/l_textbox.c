@@ -32,8 +32,8 @@ typedef struct {
 	uint32_t	maxChar;
 	uint32_t	x;		/* Cursor x coordinate		*/
 	uint32_t	y;		/* Cursor y coordinate		*/
-	uint32_t	ws;
 	uint32_t	nchars;	
+	uint32_t	ncaps;
 } l_textbox;
 
 /********************************/
@@ -53,6 +53,7 @@ static void		_textbox_highlight(l_textbox *tb, uint8_t srci,
 static uint32_t		_textbox_wrap(l_textbox *tb, btstring_t *str,
 				uint32_t base);
 static void		_update_screen(l_textbox *tb);
+static inline uint32_t	__adjust_max(l_textbox *tb);
 
 /* Class methods */
 static int		l_textbox_free(lua_State *L);
@@ -129,8 +130,8 @@ static void _textbox_newline(l_textbox *tb)
 	tb->x = 0;
 	tb->y += font_height(tb->font);
 
-	/* Clear the whitespace and number of chars counters */
-	tb->ws = 0;
+	/* Clear the number of caps and number of chars counters */
+	tb->ncaps = 0;
 	tb->nchars = 0;
 
 	/* Scroll the text */
@@ -188,6 +189,14 @@ static void _update_screen(l_textbox *tb)
 }
 
 /*
+ * __adjust_max()
+ */
+static inline uint32_t __adjust_max(l_textbox *tb)
+{
+	return tb->maxChar - tb->nchars - (((tb->ncaps * 2) + 4) / 6);
+}
+
+/*
  * _textbox_wrap()
  * Wrap text in the text window
  *
@@ -197,17 +206,14 @@ static void _update_screen(l_textbox *tb)
  * not a space, not lower case or 'm'. For every three of those types
  * of characters, the maximum number of characters allowed is reduced
  * by one.
- *
- * 20 looks like it wraps like the original
  */
 static uint32_t _textbox_wrap(l_textbox *tb, btstring_t *str, uint32_t base)
 {
+	uint8_t		*textp;
 	uint32_t	max;
-	uint32_t nchars = 0;
-	uint32_t ncaps = 0;
-	uint8_t *textp;
+	uint32_t	nchars = 0;
 
-	max = tb->maxChar - tb->nchars;
+	max = __adjust_max(tb);
 
 	textp = &str->buf[base];
 
@@ -223,9 +229,9 @@ static uint32_t _textbox_wrap(l_textbox *tb, btstring_t *str, uint32_t base)
 		}
 
 		if ((*textp == 'm') || ((*textp != ' ') && (!islower(*textp)))){
-			ncaps++;
+			tb->ncaps++;
 
-			max = tb->maxChar - tb->nchars - (((ncaps * 2)+4) / 6);
+			max = __adjust_max(tb);
 		}
 		nchars++;
 		textp++;
@@ -282,7 +288,7 @@ static int l_textbox_new(lua_State *L)
 
 	tb->x = 0;
 	tb->y = 0;
-	tb->ws = 0;
+	tb->ncaps = 0;
 	tb->nchars = 0;
 
 	if (tb->rect) {
@@ -427,7 +433,7 @@ static int l_textbox_clear(lua_State *L)
 	/* Reset the cursor */
 	tb->x = 0;
 	tb->y = 0;
-	tb->ws = 0;
+	tb->ncaps = 0;
 	tb->nchars = 0;
 }
 
@@ -448,7 +454,7 @@ static int l_textbox_setcursor(lua_State *L)
 	tb->x = luaL_checkinteger(L, 2);
 	tb->y = luaL_checkinteger(L, 3) * font_height(tb->font);
 
-	tb->ws = 0;
+	tb->ncaps = 0;
 	tb->nchars = 0;
 
 	return 0;

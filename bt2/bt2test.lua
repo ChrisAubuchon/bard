@@ -92,8 +92,8 @@ getkey()
 title = gfxImage:new("images/screen.png", "png")
 title:Draw(nil)
 
-text:print("\nSnarls of defiance are heard from ")
-text:print("5 Goblins (10').")
+text:print("THIS IS A ")
+text:print("test of the emergency")
 getkey()
 os.exit()
 
