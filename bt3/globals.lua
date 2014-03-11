@@ -31,8 +31,8 @@ globals.guildCity	= false
 globals.inSnare		= false
 
 globals.fonts		= {}
---globals.fonts.mono	= gfxFont:new("fonts/bt2font.btf", true)
---globals.fonts.var	= gfxFont:new("fonts/bt2font.btf", false)
+globals.fonts.mono	= gfxFont:new("fonts/bt3font.btf", true)
+globals.fonts.var	= gfxFont:new("fonts/bt3font.btf", false)
 if false then
 text			= textBox:new(
 				gfxRect:New(340, 12, 276, 192),

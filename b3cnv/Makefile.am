@@ -11,11 +11,13 @@ AM_CPPFLAGS = -DHAVE_CONFIG_H
 b3cnv_SOURCES = 	\
 	b3cnv.c		\
 	b3lib.h		\
+	bitmap.c	\
 	gfx.c		\
 	gfx.h		\
 	gfx_bigpic.c	\
 	gfx_tile.c	\
-	gfx_tile.h
+	gfx_tile.h	\
+	picIndex.c
 
 b3cnv_LDADD = \
 	$(top_builddir)/lib/libcnv/libcnv.a	\

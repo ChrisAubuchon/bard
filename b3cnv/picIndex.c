@@ -154,19 +154,16 @@ void printPicMacro(uint8_t pi)
   printf("%s", picMac[index]);
 }
 
-uint8_t *getPicMacro(uint8_t pi)
+btstring_t *getPicMacro(pic_t *p)
 {
-  uint8_t index = 0xff;
-  uint8_t hi = 0;
+	uint8_t		index;
 
-  if (picTran[pi] == 0xff) {
-    index = pi + 88;
-    hi = 1;
-  } else {
-    index = pi;
-  }
+	if (p->hiflag)
+		index = p->index + 88;
+	else
+		index = p->index;
 
-  return picMac[index];
+	return bts_strcpy(picMac[index]);
 }
 
 void printPicMacros(void)
@@ -196,32 +193,3 @@ uint8_t *getHiLoPicMacro(uint8_t hiflag, uint8_t index)
   return NULL;
 }
 
-/*
-void outputPicXML(void)
-{  
-  uint8_t  fname[32];
-  uint32_t i;
-  uint8_t *gfx;
-
-  printf("<b3_pics\n");
-  for (i = 0; i < 176; i++) {
-    if (picTran[i] != 0xff) {
-      uint8_t tran = picTran[i];
-
-      printf("  <%s>\n", picMac[tran]);
-      if (i < 88) 
-	sprintf(fname, "low-pic-%d.b64", tran);
-      else
-	sprintf(fname, "hi-pic-%d.b64", tran);
-
-      gfx = readFile(fname);
-      printf("    <gfx>\n");
-      printf(gfx);
-      printf("    </gfx>\n");
-      printf("  </%s>\n", picMac[tran]);
-
-      free(gfx);
-    }
-  }
-}
-*/

@@ -11,4 +11,11 @@ typedef struct {
 	bta_cell_t	*cell;
 } b3tile_t;
 
+typedef struct {
+	uint8_t		depth;
+	uint8_t		*quad;
+	uint8_t		*facet;
+	uint8_t		index;
+} cityTile_t;
+
 #endif

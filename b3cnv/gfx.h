@@ -36,8 +36,8 @@ typedef struct {
 } iconGfx_t;
 
 typedef struct {
-  uint8_t hiflag;
-  uint8_t index;
+	uint8_t		hiflag;
+	uint8_t		index;
 } pic_t;
 
 typedef struct {

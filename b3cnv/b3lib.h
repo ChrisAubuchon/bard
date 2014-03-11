@@ -3,6 +3,7 @@
 
 #include <cnv_spell.h>
 #include <bt_string.h>
+#include <gfx.h>
 
 /********************************/
 /*				*/
@@ -29,12 +30,18 @@ extern btstring_t	*outputDir;
 	bts_sprintf("images/"format, ## __VA_ARGS__)
 #define mkBardThreePath(format, ...) \
 	bts_sprintf("%s/"format, inputDir->buf, ## __VA_ARGS__)
+#define mkJsonPath(format, ...) \
+	bts_sprintf("%s/bt3/json/"format, outputDir->buf, ## __VA_ARGS__)
+#define mkFontPath(format, ...) \
+	bts_sprintf("%s/bt3/fonts/"format, outputDir->buf, ## __VA_ARGS__)
 
 /********************************/
 /*				*/
 /* Prototypes			*/
 /*				*/
 /********************************/
+
+btstring_t	*getPicMacro(pic_t *p);
 
 #if 0
 /* common.c */

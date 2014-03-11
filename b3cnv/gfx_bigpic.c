@@ -93,16 +93,21 @@ void outputBigpic(uint8_t indent)
 
 	uint8_t		*picBuf;
 
-	int i, j;
+	int		i, j;
 
-	btstring_t *data;
-	btstring_t *bbuf;
-	btstring_t *tmp;
+	btstring_t	*data;
+	btstring_t	*bbuf;
+	btstring_t	*tmp;
 
-	bta_t *img;
+	bta_t		*img;
+
+	cnvList_t	*bpl;
+	bt_bigpic_t	*bp;
 
 	lowfp	= xfopen(mkBardThreePath("LOW.PIC"), "rb");
 	hifp	= xfopen(mkBardThreePath("HI.PIC"), "rb");
+
+	bpl = bigpicList_new();
 
 	for (i = 0; i < NPIC_TOTAL; i++) {
 		picBuf = (uint8_t *)xzalloc(PICBUF_SIZE);
@@ -115,6 +120,12 @@ void outputBigpic(uint8_t indent)
 		fp_moveToIndex32(curfp, pics[i].index, 0);
 		xfread(picBuf, 1, PICBUF_SIZE, curfp);
 		data = d3comp(picBuf, PICBUF_SIZE);
+
+		bp = bigpic_new();
+		bp->name = getPicMacro(&pics[i]);
+		bp->type = IMAGE_BTA;
+		bp->path = mkImagePathRel("bigpic_%d.bta", i);
+		cnvList_add(bpl, bp);
 
 		img = bta_new(1);
 		bta_loop_new(img, 0, 4);
@@ -151,6 +162,9 @@ void outputBigpic(uint8_t indent)
 
 		free(picBuf);
 	}
+
+	bigpicList_toJson(bpl, mkJsonPath("bigpic.json"));
+	cnvList_free(bpl);
 
 	fclose(lowfp);
 	fclose(hifp);

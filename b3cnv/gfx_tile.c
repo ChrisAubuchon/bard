@@ -6,6 +6,8 @@
 #define DEBUG
 #include <debug.h>
 
+#define NEWVERSION 1
+
 #define DUN_FRONT	0x01
 #define DUN_LTSIDE	0x02
 #define DUN_RTSIDE	0x04
@@ -16,13 +18,15 @@
 /*					*/
 /****************************************/
 
-static bta_cell_t	*getImage();
+static void		buildView(bt_view_t *view, cityTile_t *tiles,
+				uint32_t tagIndex);
+static void		makeImages(cityTile_t *tile, uint32_t tagIndex,
+				uint8_t width, uint32_t imageCount);
 static void		copy_topoElement(b3tile_t *tile);
-static btstring_t *getBackground(uint8_t dunFlag);
-static void initBuffers(void);
-static uint8_t getHeight(uint8_t h, uint8_t a_e);
+static void		outputBackground(uint32_t tagIndex);
+static void		initBuffers(void);
+static uint8_t		getHeight(uint8_t h, uint8_t a_e);
 
-static void tile2png(uint8_t dindex, uint32_t findex, uint8_t dunflag);
 
 /****************************************/
 /*					*/
@@ -49,57 +53,53 @@ static bta_color_t b3palette[] = {
         { 255, 255, 255, 255 }  /*f*/
 };
 
+static cityTile_t cityTiles[] = {
+	{ 4, "FL", "face",	30	},	
+	{ 4, "L" , "face",	31	},	
+	{ 4, "M" , "face",	32	},	
+	{ 4, "R" , "face",	33	},	
+	{ 4, "FR", "face",	34	},	
+	{ 3, "L" , "face",	45	},
+	{ 3, "L" , "side",	42	},
+	{ 3, "M" , "face",	46	},
+	{ 3, "R" , "face",	47	},
+	{ 3, "R" , "side",	43	},
+	{ 2, "L" , "side",	54	},
+	{ 2, "L" , "face",	56	},
+	{ 2, "M" , "face",	57	},
+	{ 2, "R" , "face",	58	},
+	{ 2, "R" , "side",	55	},
+	{ 1, "L" , "side",	59	},
+	{ 1, "R" , "side",	60	},
+	{ 0, ""  , "",		0	}
+};
+
+static cityTile_t dunTiles[] = {
+	{ 5, "L" , "face",	15	},	
+	{ 5, "M" , "face",	16	},	
+	{ 5, "R" , "face",	17	},	
+	{ 4, "L" , "face",	31	},	
+	{ 4, "L" , "side",	27	},	
+	{ 4, "M" , "face",	32	},	
+	{ 4, "R" , "face",	33	},	
+	{ 4, "R" , "side",	28	},	
+	{ 3, "L" , "face",	45	},	
+	{ 3, "L" , "side",	42	},	
+	{ 3, "M" , "face",	46	},	
+	{ 3, "R" , "face",	47	},	
+	{ 3, "R" , "side",	43	},	
+	{ 2, "L" , "face",	56	},	
+	{ 2, "L" , "side",	54	},	
+	{ 2, "M" , "face",	57	},	
+	{ 2, "R" , "face",	58	},	
+	{ 2, "R" , "side",	55	},	
+	{ 1, "L" , "side",	59	},	
+	{ 1, "R" , "side",	60	},	
+	{ 0, ""  , "",		0	}
+};
+
 static uint8_t *gfx_fnames[] = { "skara.grp", "wildwal.grp", "gdung.grp" };
-static uint8_t *gfx_tags[] = { "tile_skara", "tile_wild", "tile_gdung" };
-static uint8_t wild_images[] = {
-	30, 42, 43, 45, 54, 55, 56, 57, 58, 59, 60
-};
-
-static uint8_t wild_dims[] = {
-	30, 31, 32, 33, 34, 42, 43, 45, 46, 47, 54, 55, 56, 57, 58, 59, 60
-};
-
-static uint8_t *wild_face_desc[] = {
-	"_4_face",
-	"_3_leftside",
-	"_3_rightside",
-	"_3_face",
-	"_2_leftside",
-	"_2_rightside",
-	"_2_leftface",
-	"_2_face",
-	"_2_rightface",
-	"_1_leftside",
-	"_1_rightside"
-};
-
-static uint8_t wild_facets[] = {
-	DUN_FRONT, 
-	DUN_LTSIDE, DUN_RTSIDE, DUN_FRONT, 
-	DUN_LTSIDE, DUN_RTSIDE, DUN_FRONT, DUN_FRONT, DUN_FRONT,
-	DUN_LTSIDE, DUN_RTSIDE
-};
-
-static uint8_t dun_images[] = {
-	15, 27, 28, 31, 42, 43, 45, 54, 55, 56, 57, 58, 59, 60
-};
-
-static uint8_t *dun_face_desc[] = {
-	"_4_face",
-	"_4_leftside",
-	"_4_rightside",
-	"_3_face",
-	"_3_leftside",
-	"_3_rightside",
-	"_2_face",
-	"_2_leftside",
-	"_2_rightside",
-	"_1_leftface",
-	"_1_face",
-	"_1_rightface",
-	"_1_leftside",
-	"_1_rightside"
-};
+static uint8_t *gfx_tags[] = { "skara", "wild", "gdung" };
 
 static quadXY_t quadXYmap[] = {
 	{12, 42}, {15, 42}, {18, 42}, {21, 42},
@@ -295,110 +295,169 @@ static void copy_topoElement(b3tile_t *tile)
 	}
 }
 
-static bta_cell_t *getImage()
+/*
+ * getBackground()
+ */
+static void outputBackground(uint32_t tagIndex)
 {
-}
+	bta_cell_t	*bg;
+	btstring_t	*b;
+	uint32_t	i;
+	uint16_t	index;
 
-static void tile2png(uint8_t dindex, uint32_t findex, uint8_t dunflag)
-{
-	bta_cell_t *rval;
-	uint8_t facet;
-	uint8_t nimgs;
-	uint8_t i;
-	uint16_t offset, baseOffset;
-	uint8_t srcSkip;
-	uint8_t h, height, width;
-	int8_t x, y;
+	b = bts_new(4928);
 
-	b3tile_t	*tile;
-
-	nimgs = str_read16le(dundata->buf) / 4;
-
-	facet = (dunflag) ? dun_images[findex] : wild_images[findex];
-
-	x = quadXYmap[facet].column;
-	y = quadXYmap[facet].row;
-
-	if (x < 0) {
-		if ((x + b44278[facet]) < 0)
-			width = 0;
-		else
-			width = x + b44278[facet];
+	if (tagIndex < 2) {
+		for (i = 0; i < 2576; i++)
+			b->buf[i] = 0xbb;
+		for (; i < 4928; i++) 
+			b->buf[i] = 0x44;
 	} else {
-		if ((x + b44278[facet]) > 56)
-			width = 55 - x;
-		else
-			width = b44278[facet];
+		index = str_read16le(&dundata->buf[0x10]) + 0x0d;
+		for (i = 0; i < 0x9a0; i++)
+			b->buf[i] = dundata->buf[index + i];
+
+		index = str_read16le(&dundata->buf[0x12]) + 0x0d;
+		for (i = 0; i < 0x9a0; i++)
+			b->buf[i + 0x9a0] = dundata->buf[index + i];
 	}
 
-	debug("facet: %2d, x = %3d, y: %3d, width = %d\n", facet, x, y, width);
-	height = 0;
+	bg = bta_cell_new(0, 0, 56, 88, 0, b);
+	bg = bta_cell_convert(bg);
 
-	for (i = 0; i < nimgs; i++) {
-		tile = xzalloc(sizeof(b3tile_t));
+	bta_toPNG(bg, mkImagePath("%s/bg-day.png", gfx_tags[tagIndex]));
+	bta_cell_free(bg);
 
-		tile->cell = bta_cell_new(0, 0, 0, 0, 0, NULL);
-		baseOffset = (i * 4) + b442f4[facet];
+	b = bts_new(4928);
 
-		offset = str_read16le(&dundata->buf[baseOffset]);
+	if (tagIndex < 2) {
+		for (i = 0; i < 2576; i++)
+			b->buf[i] = 0x00;
+		for (; i < 4928; i++)
+			b->buf[i] = 0x44;
+	} else {
+		index = str_read16le(&dundata->buf[0x10]) + 0x0d;
+		for (i = 0; i < 0x9a0; i++)
+			b->buf[i] = dundata->buf[index + i];
+
+		index = str_read16le(&dundata->buf[0x12]) + 0x0d;
+		for (i = 0; i < 0x9a0; i++)
+			b->buf[i + 0x9a0] = dundata->buf[index + i];
+	}
+
+	bg = bta_cell_new(0, 0, 56, 88, 0, b);
+	bg = bta_cell_convert(bg);
+
+	bta_toPNG(bg, mkImagePath("%s/bg-night.png", gfx_tags[tagIndex]));
+	bta_cell_free(bg);
+}
+
+static void makeImages(cityTile_t *tile, uint32_t tagIndex, uint8_t width,
+		uint32_t imageCount)
+{
+	uint32_t	i;
+	b3tile_t	*t;
+	uint16_t	offset, base;
+	uint8_t		height;
+
+	for (i = 0; i < imageCount; i++) {
+		t = xzalloc(sizeof(b3tile_t));
+
+		t->cell = bta_cell_new(0, 0, 0, 0, 0, NULL);
+		base = (i * 4) + b442f4[tile->index];
+
+		offset = str_read16le(&dundata->buf[base]);
 		offset += 9;
 
-		tile->width = width;
-		tile->srcSkip = dundata->buf[offset++];
-		tile->height = dundata->buf[offset++];
-		if (tile->height == 0) 
+		t->width	= width;
+		t->srcSkip	= dundata->buf[offset++];
+		t->height	= dundata->buf[offset++];
+		if (t->height == 0) {
+			bta_cell_free(t->cell);
+			free(t);
 			continue;
-		height = getHeight(tile->height, b442b6[facet]);
+		}
+
+		height = getHeight(t->height, b442b6[tile->index]);
 		offset += 2;
 
-		tile->rightFlag = topo_rightFlag[facet];
-		tile->scale	= b442b6[facet];
+		t->rightFlag	= topo_rightFlag[tile->index];
+		t->scale	= b442b6[tile->index];
 
-		tile->cell->width = width + 1;
-		tile->cell->height = height;
-		tile->cell->gfx = bts_new(tile->cell->width * 
-						tile->cell->height);
+		t->cell->width	= width + 1;
+		t->cell->height	= height;
+		t->cell->gfx	= bts_new(t->cell->width * t->cell->height);
+		t->base		= offset;
 
-		tile->base = offset;
-		copy_topoElement(tile);
+		copy_topoElement(t);
 
-		tile->cell = bta_cell_4bitTo8bit(tile->cell);
-		tile->cell = bta_cell_scale(tile->cell);
-		tile->cell = bta_cell_toRGBA(tile->cell, b3palette);
+		t->cell	= bta_cell_4bitTo8bit(t->cell);
+		t->cell	= bta_cell_scale(t->cell);
+		t->cell	= bta_cell_toRGBA(t->cell, b3palette);
 
-		bta_toPNG(tile->cell, bts_sprintf("%s_%d%s.png", gfx_tags[dindex], i, (dunflag) ? dun_face_desc[findex] : wild_face_desc[findex]));
+		bta_toPNG(t->cell,
+			mkImagePath("%s/%d%s/%d-%s.png",
+				gfx_tags[tagIndex],
+				tile->depth,
+				tile->quad,
+				i,
+				tile->facet
+				)
+			);
 
-		bta_cell_free(tile->cell);
-		free(tile);
+		bta_cell_free(t->cell);
+		free(t);
 	}
+
 }
 
-static btstring_t *getBackground(uint8_t dunFlag)
+/*
+ * buildView()
+ */
+static void buildView(bt_view_t *view, cityTile_t *tiles, uint32_t tagIndex)
 {
-	btstring_t *rval = NULL;
-	uint32_t i, j;
+	uint32_t	i;
+	int32_t		x, y;
+	uint8_t		imageCount;
+	uint8_t		width;
 
-	rval = bts_new(4928);
+	imageCount = str_read16le(dundata->buf) / 4;
 
-	if (dunFlag) {
+	i = 0;
+	while (tiles[i].depth) {
+		x = quadXYmap[tiles[i].index].column;
+		y = quadXYmap[tiles[i].index].row;
 
-		i = str_read16le(&dundata->buf[0x10]) + 0x0d;
-		for (j = 0; j < 0x9a0; j++)
-			rval->buf[j] = dundata->buf[i + j];
+		if (x < 0) {
+			if ((x + b44278[tiles[i].index]) < 0)
+				width = 0;
+			else
+				width = x + b44278[tiles[i].index];
+			x = 0;
+		} else {
+			if ((x + b44278[tiles[i].index]) > 56)
+				width = 55 - x;
+			else
+				width = b44278[tiles[i].index];
+		}
 
-		i = str_read16le(&dundata->buf[0x12]) + 0x0d;
-		for (j = 0; j < 0x9a0; j++)
-			rval->buf[j + 0x9a0] = dundata->buf[i + j];
+		xmkdir(mkImagePath("%s/%d%s",
+			gfx_tags[tagIndex],
+			tiles[i].depth,
+			tiles[i].quad
+			));
 
-	} else {
-		for (i = 0; i < 2576; i++)
-			rval->buf[i] = 0x44;
+		makeImages(&tiles[i], tagIndex, width, imageCount);
 
-		for (; i < 4928; i++)
-			rval->buf[i] = 0xbb;
+		bt_view_new_facet(
+			view,
+			bts_sprintf("%d%s", tiles[i].depth, tiles[i].quad),
+			bts_strcpy(tiles[i].facet),
+			x << 2, y << 1, 0, 0
+			);
+
+		i++;
 	}
-
-	return rval;
 }
 
 /****************************************/
@@ -411,29 +470,30 @@ static btstring_t *getBackground(uint8_t dunFlag)
 
 void outputTilepics(uint8_t indent)
 {
-	int i, j, k;
-	bta_cell_t *cell;
+	uint32_t	i;
+	bt_view_t	*view;
+
 
 	initBuffers();
 
-	for (i = 0; i < 2; i++) {
+	for (i = 0; i < 3; i++) {
+		view = bt_view_new();
+
+		xmkdir(mkImagePath("%s", gfx_tags[i]));
 
 		dundata = fp_readFile(mkBardThreePath("%s", gfx_fnames[i]));
 
-		for (j = 0; j < 11; j++) {
-			tile2png(i, j, 0);
-		}
+		outputBackground(i);
 
+		if (i < 2)
+			buildView(view, cityTiles, i);
+		else
+			buildView(view, dunTiles, i);
+
+		bt_view_to_json(view, mkJsonPath("%sview.json", gfx_tags[i]));
+
+		bt_view_free(view);
 		bts_free(dundata);
 	}
-
-	i = 2;
-
-	dundata = fp_readFile(mkBardThreePath("%s", gfx_fnames[i]));
-	for (j = 0; j < 14; j++) {
-		tile2png(i, j, 1);
-	}
-
-	bts_free(dundata);
 
 }
