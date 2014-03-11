@@ -1,8 +1,9 @@
 #include <b3lib.h>
 #include <gfx.h>
 #include <cnv_gfx.h>
+#include <gfx_tile.h>
 
-/*#define DEBUG*/
+#define DEBUG
 #include <debug.h>
 
 #define DUN_FRONT	0x01
@@ -15,8 +16,8 @@
 /*					*/
 /****************************************/
 
-static void copy_topoElement(uint16_t base, uint8_t width, uint8_t srcSkip, uint8_t height, uint8_t a_e, uint8_t rightFlag,
-			     btstring_t * data);
+static bta_cell_t	*getImage();
+static void		copy_topoElement(b3tile_t *tile);
 static btstring_t *getBackground(uint8_t dunFlag);
 static void initBuffers(void);
 static uint8_t getHeight(uint8_t h, uint8_t a_e);
@@ -28,6 +29,25 @@ static void tile2png(uint8_t dindex, uint32_t findex, uint8_t dunflag);
 /* Static variables			*/
 /*					*/
 /****************************************/
+
+static bta_color_t b3palette[] = {
+        {   0,   0,   0, 255 }, /*0*/
+        {   0,   0, 170, 255 }, /*1*/
+        {   0, 170,   0, 255 }, /*2*/
+        {   0, 170, 170, 255 }, /*3*/
+        { 170,   0,   0, 255 }, /*4*/
+        { 170,   0, 170, 0   }, /*5*/
+        { 170,  85,   0, 255 }, /*6*/
+        { 170, 170, 170, 255 }, /*7*/
+        {  85,  85,  85, 255 }, /*8*/
+        {  85,  85, 255, 255 }, /*9*/
+        {  85, 255,  85, 255 }, /*a*/
+        {  85, 255, 255, 255 }, /*b*/
+        { 255,  85,  85, 255 }, /*c*/
+        { 255,  85, 255, 255 }, /*d*/
+        { 255, 255,  85, 255 }, /*e*/
+        { 255, 255, 255, 255 }  /*f*/
+};
 
 static uint8_t *gfx_fnames[] = { "skara.grp", "wildwal.grp", "gdung.grp" };
 static uint8_t *gfx_tags[] = { "tile_skara", "tile_wild", "tile_gdung" };
@@ -82,14 +102,21 @@ static uint8_t *dun_face_desc[] = {
 };
 
 static quadXY_t quadXYmap[] = {
-/*0*/ {12, 42}, {15, 42}, {18, 42}, {21, 42}, {24, 42}, {27, 42}, {30, 42}, {5, 38},
-/*8*/ {12, 38}, {26, 38}, {29, 38}, {31, 38}, {39, 38}, {-2, 38}, {5, 38}, {17, 44},
-/*16*/ {24, 44}, {31, 44}, {33, 38}, {40, 38}, {13, 33}, {21, 33}, {31, 33}, {13, 55},
-/*24*/ {21, 55}, {31, 55}, {-1, 38}, {23, 38}, {31, 38}, {42, 38}, {2, 42}, {12, 42},
-/*32*/ {23, 42}, {34, 42}, {45, 42}, {4, 21}, {20, 21}, {34, 21}, {4, 63}, {20, 63},
-/*40*/ {34, 63}, {3, 35}, {19, 35}, {33, 35}, {48, 35}, {0, 35}, {18, 35}, {37, 35},
-/*48*/ {0, 8}, {17, 4}, {44, 8}, {0, 77}, {17, 77}, {44, 77}, {12, 22}, {37, 22},
-/*56*/ {-21, 22}, {11, 22}, {43, 22}, {0, 0}, {44, 0}
+	{12, 42}, {15, 42}, {18, 42}, {21, 42},
+	{24, 42}, {27, 42}, {30, 42}, {5, 38},
+	{12, 38}, {26, 38}, {29, 38}, {31, 38},
+	{39, 38}, {-2, 38}, {5, 38}, {17, 44},
+	{24, 44}, {31, 44}, {33, 38}, {40, 38},
+	{13, 33}, {21, 33}, {31, 33}, {13, 55},
+	{21, 55}, {31, 55}, {-1, 38}, {23, 38},
+	{31, 38}, {42, 38}, {2, 42}, {12, 42},
+	{23, 42}, {34, 42}, {45, 42}, {4, 21},
+	{20, 21}, {34, 21}, {4, 63}, {20, 63},
+	{34, 63}, {3, 35}, {19, 35}, {33, 35},
+	{48, 35}, {0, 35}, {18, 35}, {37, 35},
+	{0, 8}, {17, 4}, {44, 8}, {0, 77},
+	{17, 77}, {44, 77}, {12, 22}, {37, 22},
+	{-21, 22}, {11, 22}, {43, 22}, {0, 0}, {44, 0}
 };
 
 static uint8_t b44278[] = {
@@ -114,13 +141,22 @@ static uint8_t b442f4[] = {
 };
 
 static uint8_t topo_rightFlag[] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	1, 1, 1, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 1, 0, 0, 1, 0, 0, 1, 1,
-	0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-	1, 0, 0, 1, 1, 0, 0, 0, 0, 0,
-	1, 0, 0, 1, 0, 1, 0, 0, 0, 0,
-	1, 0
+/*  0*/	0, 0, 0, 0,
+/*  4*/ 0, 0, 0, 0,
+/*  8*/ 0, 0, 1, 1,
+/* 12*/ 1, 0, 0, 0,
+/* 16*/ 0, 0, 0, 0,
+/* 20*/ 0, 0, 1, 0,
+/* 24*/ 0, 1, 0, 0,
+/* 28*/ 1, 1, 0, 0,
+/* 32*/ 0, 0, 0, 0,
+/* 36*/ 0, 1, 0, 0,
+/* 40*/ 1, 0, 0, 1,
+/* 44*/ 1, 0, 0, 0,
+/* 48*/ 0, 0, 1, 0,
+/* 52*/ 0, 1, 0, 1,
+/* 56*/ 0, 0, 0, 0,
+/* 60*/ 1, 0
 };
 
 static uint8_t b442b6[] = {
@@ -138,7 +174,6 @@ static uint8_t b2bf34[0x100];
 static uint8_t b2c034[0x100];
 static uint8_t b2c134[0x100];
 static uint8_t b2c234[0x100];
-static uint8_t b2c334[0x100];
 
 static btstring_t *dundata;
 
@@ -172,102 +207,96 @@ static void initBuffers(void)
 		b2bf34[i] = i & 0xf0;
 		b2c234[i] = i & 0x0f;
 		b2c134[i] = b2c234[i] << 4;
-		b2c334[i] = ((b2c234[i] == 0x05) ? 0x0f : 0) | ((b2bf34[i] == 0x50) ? 0xf0 : 0);
 		b2c034[i] = b2bf34[i] >> 4;
 	}
 }
 
-static void copy_topoElement(uint16_t base, uint8_t width, uint8_t srcSkip, uint8_t height, uint8_t a_e, uint8_t rightFlag,
-			     btstring_t * data)
+static void copy_topoElement(b3tile_t *tile)
 {
-	uint32_t i;
-	int16_t src = 0;
-	uint8_t y = 0;
-	uint16_t outOffset;
-	uint16_t offset = 0;
+	uint8_t		y		= 0;
+	uint16_t	offset		= 0;
+	int16_t		src		= 0;
+	uint16_t	outOffset;
+	uint32_t	i;
 
-	for (i = 0; i < height; i++) {
-		if ((src -= a_e) < 0) {
+	uint8_t		inCh, outCh;
+	uint16_t	base;
+	uint8_t		width;
+	int8_t		count;
+
+	for (i = 0; i < tile->height; i++) {
+		if ((src -= tile->scale) < 0) {
 			src += 64;
-			outOffset = (width + 1) * y;
+			outOffset = (tile->width + 1) * y;
+			count = 0;
 
-			{
-				int8_t count = 0;
-				uint8_t inCh, outCh, tmp;
-				uint16_t b;
-				uint8_t w;
+			width = tile->width;
 
-				w = width;
+			if (tile->rightFlag)
+				base = tile->base + offset + (tile->srcSkip-1);
+			else
+				base = tile->base + offset;
 
-				if (rightFlag)
-					b = base + offset + (srcSkip - 1);
-				else
-					b = base + offset;
+		      loc_loopStart:
+			if (tile->rightFlag)
+				inCh = dundata->buf[base--];
+			else
+				inCh = dundata->buf[base++];
 
-			      loc_loopStart:
-				if (rightFlag)
-					inCh = dundata->buf[b--];
-				else
-					inCh = dundata->buf[b++];
+			if ((count -= tile->scale) < 0) {
+				count += 64;
+				outCh = b2bf34[inCh];
 
-				if ((count -= a_e) < 0) {
-					count += 64;
-					outCh = b2bf34[inCh];
-
-				      loc_loop_1:
-					if ((count -= a_e) >= 0) {
-					      loc_loop_2:
-						if (rightFlag)
-							inCh = dundata->buf[b--];
-						else
-							inCh = dundata->buf[b++];
-						if ((count -= a_e) >= 0) {
-							goto loc_loop_1;
-						} else {
-							count += 64;
-							outCh |= b2c034[inCh];
-							tmp = outCh;
-							outCh &= b2c334[tmp];
-							outCh ^= tmp;
-							data->buf[outOffset++] = outCh;
-							if (w) {
-								w--;
-								goto loc_loop_3;
-							} else {
-								goto loc_out;
-							}
-						}
+			      loc_loop_1:
+				if ((count -= tile->scale) >= 0) {
+				      loc_loop_2:
+					if (tile->rightFlag)
+						inCh = dundata->buf[base--];
+					else
+						inCh = dundata->buf[base++];
+					if ((count -= tile->scale) >= 0) {
+						goto loc_loop_1;
 					} else {
 						count += 64;
-						outCh |= b2c234[inCh];
-						inCh = outCh;
-						outCh &= b2c334[inCh];
-						outCh ^= inCh;
-						data->buf[outOffset++] = outCh;
-						if (w) {
-							w--;
-							goto loc_loopStart;
+						outCh |= b2c034[inCh];
+						tile->cell->gfx->buf[outOffset++] = outCh;
+						if (width) {
+							width--;
+							goto loc_loop_3;
 						} else {
 							goto loc_out;
 						}
 					}
+				} else {
+					count += 64;
+					outCh |= b2c234[inCh];
+					tile->cell->gfx->buf[outOffset++] = outCh;
+					if (width) {
+						width--;
+						goto loc_loopStart;
+					} else {
+						goto loc_out;
+					}
 				}
-
-			      loc_loop_3:
-				if ((count -= a_e) >= 0)
-					goto loc_loopStart;
-
-				count += 64;
-				outCh = b2c134[inCh];
-				goto loc_loop_2;
 			}
+
+		      loc_loop_3:
+			if ((count -= tile->scale) >= 0)
+				goto loc_loopStart;
+
+			count += 64;
+			outCh = b2c134[inCh];
+			goto loc_loop_2;
 
 		      loc_out:
 			y++;
 		}
-
-		offset += srcSkip;
+	offset += tile->srcSkip;
 	}
+}
+
+static bta_cell_t *getImage()
+{
 }
 
 static void tile2png(uint8_t dindex, uint32_t findex, uint8_t dunflag)
@@ -280,6 +309,8 @@ static void tile2png(uint8_t dindex, uint32_t findex, uint8_t dunflag)
 	uint8_t srcSkip;
 	uint8_t h, height, width;
 	int8_t x, y;
+
+	b3tile_t	*tile;
 
 	nimgs = str_read16le(dundata->buf) / 4;
 
@@ -300,30 +331,45 @@ static void tile2png(uint8_t dindex, uint32_t findex, uint8_t dunflag)
 			width = b44278[facet];
 	}
 
-	debug("facet: %d, x = %d, width = %d\n", facet, quadXYmap[facet].column, width);
+	debug("facet: %2d, x = %3d, y: %3d, width = %d\n", facet, x, y, width);
 	height = 0;
 
 	for (i = 0; i < nimgs; i++) {
-		rval = bta_cell_new(0, 0, 0, 0, 0, NULL);
+		tile = xzalloc(sizeof(b3tile_t));
+
+		tile->cell = bta_cell_new(0, 0, 0, 0, 0, NULL);
 		baseOffset = (i * 4) + b442f4[facet];
 
 		offset = str_read16le(&dundata->buf[baseOffset]);
 		offset += 9;
 
-		srcSkip = dundata->buf[offset++];
-		h = dundata->buf[offset++];
-		if (h == 0) 
+		tile->width = width;
+		tile->srcSkip = dundata->buf[offset++];
+		tile->height = dundata->buf[offset++];
+		if (tile->height == 0) 
 			continue;
-		height = getHeight(h, b442b6[facet]);
+		height = getHeight(tile->height, b442b6[facet]);
 		offset += 2;
 
-		rval->width = width + 1;
-		rval->height = height;
-		rval->gfx = bts_new(rval->width * rval->height);
-		copy_topoElement(offset, width, srcSkip, h, b442b6[facet], topo_rightFlag[facet], rval->gfx);
-		rval = bta_cell_convert(rval);
-		bta_toPNG(rval, bts_sprintf("%s_%d%s.png", gfx_tags[dindex], i, (dunflag) ? dun_face_desc[findex] : wild_face_desc[findex]));
-		bta_cell_free(rval);
+		tile->rightFlag = topo_rightFlag[facet];
+		tile->scale	= b442b6[facet];
+
+		tile->cell->width = width + 1;
+		tile->cell->height = height;
+		tile->cell->gfx = bts_new(tile->cell->width * 
+						tile->cell->height);
+
+		tile->base = offset;
+		copy_topoElement(tile);
+
+		tile->cell = bta_cell_4bitTo8bit(tile->cell);
+		tile->cell = bta_cell_scale(tile->cell);
+		tile->cell = bta_cell_toRGBA(tile->cell, b3palette);
+
+		bta_toPNG(tile->cell, bts_sprintf("%s_%d%s.png", gfx_tags[dindex], i, (dunflag) ? dun_face_desc[findex] : wild_face_desc[findex]));
+
+		bta_cell_free(tile->cell);
+		free(tile);
 	}
 }
 
@@ -365,7 +411,6 @@ static btstring_t *getBackground(uint8_t dunFlag)
 
 void outputTilepics(uint8_t indent)
 {
-	huffile_t *huf;
 	int i, j, k;
 	bta_cell_t *cell;
 
@@ -373,7 +418,7 @@ void outputTilepics(uint8_t indent)
 
 	for (i = 0; i < 2; i++) {
 
-		dundata = readFile(gfx_fnames[i]);
+		dundata = fp_readFile(mkBardThreePath("%s", gfx_fnames[i]));
 
 		for (j = 0; j < 11; j++) {
 			tile2png(i, j, 0);
@@ -384,7 +429,7 @@ void outputTilepics(uint8_t indent)
 
 	i = 2;
 
-	dundata = readFile(gfx_fnames[i]);
+	dundata = fp_readFile(mkBardThreePath("%s", gfx_fnames[i]));
 	for (j = 0; j < 14; j++) {
 		tile2png(i, j, 1);
 	}

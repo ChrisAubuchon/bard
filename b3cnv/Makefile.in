@@ -521,7 +521,8 @@ b3cnv_SOURCES = \
 	gfx.c		\
 	gfx.h		\
 	gfx_bigpic.c	\
-	gfx_tile.c	
+	gfx_tile.c	\
+	gfx_tile.h
 
 b3cnv_LDADD = \
 	$(top_builddir)/lib/libcnv/libcnv.a	\

@@ -7915,7 +7915,7 @@ $as_echo "$gl_cv_next_string_h" >&6; }
 
 
 
-    for gl_func in ffsl ffsll memmem mempcpy memrchr rawmemchr stpcpy stpncpy strchrnul      strdup strncat strndup strnlen strpbrk strsep strcasestr strtok_r      strerror_r strsignal strverscmp; do
+    for gl_func in ffsl ffsll memmem mempcpy memrchr rawmemchr stpcpy stpncpy strchrnul      strdup strncat strndup strnlen strpbrk strsep strcasestr strtok_r      strerror_r strsignal strverscmp; do
     as_gl_Symbol=`$as_echo "gl_cv_have_raw_decl_$gl_func" | $as_tr_sh`
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $gl_func is declared without a macro" >&5
 $as_echo_n "checking whether $gl_func is declared without a macro... " >&6; }
@@ -8484,7 +8484,7 @@ $as_echo "$gl_cv_next_stdlib_h" >&6; }
 
 
 
-    for gl_func in _Exit atoll canonicalize_file_name getloadavg getsubopt grantpt     initstate initstate_r mkdtemp mkostemp mkostemps mkstemp mkstemps     posix_openpt ptsname ptsname_r random random_r realpath rpmatch     setenv setstate setstate_r srandom srandom_r     strtod strtoll strtoull unlockpt unsetenv; do
+    for gl_func in _Exit atoll canonicalize_file_name getloadavg getsubopt grantpt     initstate initstate_r mkdtemp mkostemp mkostemps mkstemp mkstemps     posix_openpt ptsname ptsname_r random random_r realpath rpmatch     setenv setstate setstate_r srandom srandom_r     strtod strtoll strtoull unlockpt unsetenv; do
     as_gl_Symbol=`$as_echo "gl_cv_have_raw_decl_$gl_func" | $as_tr_sh`
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $gl_func is declared without a macro" >&5
 $as_echo_n "checking whether $gl_func is declared without a macro... " >&6; }
@@ -8755,7 +8755,7 @@ $as_echo "$gl_cv_next_unistd_h" >&6; }
 
 
 
-    for gl_func in chdir chown dup dup2 dup3 environ euidaccess faccessat fchdir fchownat     fdatasync fsync ftruncate getcwd getdomainname getdtablesize getgroups     gethostname getlogin getlogin_r getpagesize     getusershell setusershell endusershell     group_member isatty lchown link linkat lseek pipe pipe2 pread pwrite     readlink readlinkat rmdir sethostname sleep symlink symlinkat ttyname_r     unlink unlinkat usleep; do
+    for gl_func in chdir chown dup dup2 dup3 environ euidaccess faccessat fchdir fchownat     fdatasync fsync ftruncate getcwd getdomainname getdtablesize getgroups     gethostname getlogin getlogin_r getpagesize     getusershell setusershell endusershell     group_member isatty lchown link linkat lseek pipe pipe2 pread pwrite     readlink readlinkat rmdir sethostname sleep symlink symlinkat ttyname_r     unlink unlinkat usleep; do
     as_gl_Symbol=`$as_echo "gl_cv_have_raw_decl_$gl_func" | $as_tr_sh`
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $gl_func is declared without a macro" >&5
 $as_echo_n "checking whether $gl_func is declared without a macro... " >&6; }

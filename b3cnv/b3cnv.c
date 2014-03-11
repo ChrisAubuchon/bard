@@ -1,6 +1,6 @@
 #include <b3lib.h>
 
-char *program_name = "b2cnv";
+char *program_name = "b3cnv";
 
 btstring_t	*inputDir	= NULL;
 btstring_t	*outputDir	= NULL;
