@@ -10,10 +10,10 @@ bigpic.titleRect	= gfxRect:New(32, 212, 224, 16)
 bigpic.gfxRect	= gfxRect:New(32, 30, 224, 176)
 bigpic.dun.lightRect = {}
 bigpic.dun.lightRect[0] = gfxRect:New(0, 0, 224, 176)
-bigpic.dun.lightRect[1] = gfxRect:New(0, 40, 224, 136)
-bigpic.dun.lightRect[2] = gfxRect:New(0, 74, 224, 130)
-bigpic.dun.lightRect[3] = gfxRect:New(0, 88, 224, 118)
-bigpic.dun.lightRect[4] = gfxRect:New(0, 80, 224, 96)
+bigpic.dun.lightRect[1] = gfxRect:New(0, 40, 224, 96)
+bigpic.dun.lightRect[2] = gfxRect:New(0, 74, 224, 56)
+bigpic.dun.lightRect[3] = gfxRect:New(0, 88, 224, 30)
+bigpic.dun.lightRect[4] = gfxRect:New(0, 80, 224, 16)
 
 
 bigpic.surface		= gfxSurface:New(224, 176)
@@ -184,7 +184,6 @@ function bigpic:readWildImage(inQuadName, inFacetName, inFacet, inBuilding)
 	inFacet.rect = gfxRect:New(inFacet.x, inFacet.y, 
 					inFacet.w, inFacet.h)
 	path = string.format(format, inQuadName, inBuilding, inFacetName)
-	log:print(log.LOG_DEBUG, path)
 	inFacet[inBuilding] = gfxImage:new(path, "png")
 end
 
