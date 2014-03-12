@@ -90,7 +90,7 @@ static json_t *mageSpell_toJson(const void *vms)
 	JSON_STRING(spellNode,	"abbreviation",	ms->abbr->buf);
 	JSON_STRING(spellNode,	"fullName",	ms->full->buf);
 	JSON_NUMBER(spellNode,	"sppt",		ms->sppt);
-	JSON_STRING(spellNode,	"class",	ms->class->buf);
+	JSON_BTSTRING(spellNode,	"class",	ms->class);
 	JSON_NUMBER(spellNode,	"level",	ms->level);
 	JSON_TRUE_IF(spellNode,	"combat",	ms->combat);
 	JSON_TRUE_IF(spellNode, "noncombat",	ms->noncombat);

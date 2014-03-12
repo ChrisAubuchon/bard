@@ -21,6 +21,8 @@ extern btstring_t	*outputDir;
 /*				*/
 /********************************/
 
+#define	IFBIT(x,y,true,false)	((x) & (y)) ? (true) : (false)
+
 #define NDICE(x)	(((x) & 0x1f) + 1)
 #define DIEVAL(x)	2 << (((x) >> 5) & 7)
 

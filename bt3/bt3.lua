@@ -47,7 +47,6 @@ local title
 title = gfxImage:new("images/main_screen.png", "png")
 title:Draw(nil)
 
---bigpic:setBigpic("PIC_CAMP", "Testing")
 bigpic:cityBackground()
 bigpic:cityAdd("M", 2, "face", "0")
 bigpic:cityAdd("L", 2, "face", "1")

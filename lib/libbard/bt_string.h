@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 typedef struct {
   uint32_t size;
@@ -19,6 +20,7 @@ btstring_t *bts_strcpy(const uint8_t *str);
 btstring_t *bts_strncat(btstring_t *dest, const uint8_t *str, uint32_t len);
 btstring_t *bts_strcat(btstring_t *dest, const uint8_t *str);
 btstring_t *bts_sprintf(uint8_t *format, ...);
+btstring_t *bts_vsprintf(uint8_t *format, va_list args);
 btstring_t *bts_resize(btstring_t *in, uint32_t size);
 void bts_memset(btstring_t *t, int c);
 size_t		bts_hashcode(btstring_t *in);

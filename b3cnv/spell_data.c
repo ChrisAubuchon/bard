@@ -381,3 +381,86 @@ uint8_t weapIndex[] = {
 /*240*/0xff,0xff,0xff,0xff,22,0xff,0xff,0xff,
 /*240*/0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
 };
+
+uint8_t *spellStrings[] = {
+/*  0*/	"self.source:reenergize()",
+/*  1*/	"--spellString[1]",
+/*  2*/	NULL,
+/*  3*/	NULL,
+/*  4*/	NULL,
+/*  5*/	NULL,
+/*  6*/	"\
+self.source:addBattleBonus(\"acBonus\", %d, true)\
+",
+/*  7*/	"\
+party:addBattleBonus(\"antiMagic\", %d, true)\
+",
+/*  8*/	"\
+party.detect:activate( {\
+	duration = %d,\
+	detectStairs = %s,\
+	detectTraps = %s,\
+	detectSpecial = %s\
+}",
+/*  9*/	NULL,
+/* 10*/	"spells:calmCreatures()",
+/* 11*/	"party.compass:activate({ duration = %d })",
+/* 12*/	NULL,
+/* 13*/	NULL,
+/* 14*/	"spells:divineIntervention()",
+/* 15*/	NULL,
+/* 16*/	"--xxx_range_spell",
+/* 17*/	"\
+if (self.source:isCharacter()) then\
+	party:addBattleBonus(\"toHitBonus\", 2, true)\
+	self.target:addBattleBonus(\"acPenalty\", %d, true)\
+else\
+	party:addBattleBonus(\"acPenalty\", %d, true)\
+end\
+",
+/* 18*/	NULL,
+/* 19*/	"\
+if (self:groupSavingThrow()) then\
+	self.target:addBattleBonus(\"missTurn\", true, false)\
+end",
+/* 20*/	NULL,
+/* 21*/	"spells:identify()",
+/* 22*/	"party.levitate:activate({ duration = %d })",
+/* 23*/	"\
+party.light:activate({\
+	duration = %d,\
+	distance = %d,\
+	seeSecret = %s })\
+",
+/* 24*/	"\
+party:addBattleBonus(\"toHitBonus\", %d, true)\
+party:addBattleBonus(\"antiMagic\", %d, true)\
+",
+/* 25*/	"--xxx_range_spell",
+/* 26*/	"spells:phaseDoor(%s)",
+/* 27*/	"spells:possess()",
+/* 28*/	"spells:scrySite()",
+/* 29*/	"party.shield:activate({ duration = %d, acBonus = %d })",
+/* 30*/	"spells:spellBind()",
+/* 31*/	"\
+self.source:addBattleBonus(\"toHitBonus\", %d, false)\
+self.source:addBattleBonus(\"damageBonus\", %d, false)\
+",
+/* 32*/	"--xxx_summon_spell",
+/* 33*/	"spells:teleport()",
+/* 34*/	"spells:trapZap()",
+/* 35*/	"\
+self.target:addBattleBonus(\"damageRandom\", %d, false)\
+",
+/* 36*/	"\
+if (self:groupSavingThrow()) then\
+	self.target:addBattleBonus(\"toHitPenalty\", %d, true)\
+end\
+",
+/* 37*/	NULL,
+/* 38*/	"spells:mapSpell()",
+/* 39*/	"spells:mapSpell()",
+/* 40*/	NULL,
+/* 41*/	NULL,
+/* 42*/ "spells:mapSpell()"	
+};

@@ -64,7 +64,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_b3cnv_OBJECTS = b3cnv.$(OBJEXT) bitmap.$(OBJEXT) gfx.$(OBJEXT) \
-	gfx_bigpic.$(OBJEXT) gfx_tile.$(OBJEXT) picIndex.$(OBJEXT)
+	gfx_bigpic.$(OBJEXT) gfx_tile.$(OBJEXT) picIndex.$(OBJEXT) \
+	spell.$(OBJEXT) spell_data.$(OBJEXT)
 b3cnv_OBJECTS = $(am_b3cnv_OBJECTS)
 b3cnv_DEPENDENCIES = $(top_builddir)/lib/libcnv/libcnv.a \
 	$(top_builddir)/lib/libbard/libbard.a \
@@ -524,7 +525,10 @@ b3cnv_SOURCES = \
 	gfx_bigpic.c	\
 	gfx_tile.c	\
 	gfx_tile.h	\
-	picIndex.c
+	picIndex.c	\
+	spell.c		\
+	spell.h		\
+	spell_data.c
 
 b3cnv_LDADD = \
 	$(top_builddir)/lib/libcnv/libcnv.a	\
@@ -621,6 +625,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gfx_bigpic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gfx_tile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/picIndex.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spell.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spell_data.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

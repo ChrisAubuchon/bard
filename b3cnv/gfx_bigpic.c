@@ -147,6 +147,7 @@ void outputBigpic(uint8_t indent)
 			}
 
 			c->gfx = bts_copy(bbuf);
+			c->delay = 4;
 			c = bta_cell_convert(c);
 #ifdef DEBUG
 			bta_toPNG(c, bts_sprintf("bigpic_%d.png", i));

@@ -118,11 +118,13 @@ int main(int argc, char *argv[])
 		convertMonsters();
 	}
 
+#endif
 	if (_convertSpells) {
 		convertSpells();
+#if 0
 		convertSongs();
-	}
 #endif
+	}
 
 	bts_free(inputDir);
 	bts_free(outputDir);

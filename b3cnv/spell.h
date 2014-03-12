@@ -1,47 +1,58 @@
 #ifndef _B3_SPELL_H
 #define _B3_SPELL_H
 
-typedef spellEffect_t* (spfunc_t)(uint32_t index);
+/********************************/
+/*				*/
+/* Macros			*/
+/*				*/
+/********************************/
+
+#define	spellString(_type, ...) \
+	bts_sprintf(spellStrings[_type], __VA_ARGS__)
+
+typedef btAction_t *(spellFunction_t)(uint32_t index);
 
 typedef struct {
-  uint8_t abbr[5];
-  uint8_t full[32];
+	uint8_t		abbr[5];
+	uint8_t		full[32];
 } spName_t;
 
 typedef struct {
-  uint8_t effect;
-  uint8_t elements;
-  uint8_t breathFlag;
-  uint8_t repelFlags;
-  uint8_t damage;
-  uint8_t targetFlags;
-  uint8_t levelMult;
+	uint8_t		effect;
+	uint8_t		elements;
+	uint8_t		breathFlag;
+	uint8_t		repelFlags;
+	uint8_t		damage;
+	uint8_t		targetFlags;
+	uint8_t		levelMult;
 } breathAtt_t;
 
 typedef struct {
-  uint8_t effect;
-  uint8_t elements;
-  uint8_t damage;
-  uint8_t targetFlags;
-  uint8_t levelMult;
-  uint8_t range;
+	uint8_t		effect;
+	uint8_t		elements;
+	uint8_t		damage;
+	uint8_t		targetFlags;
+	uint8_t		levelMult;
+	uint8_t		range;
 } weapAtt_t;
 
 
-uint8_t spellType[];
-uint8_t spptReq[];
-uint8_t spellAttr[];
-uint8_t spellDuration[];
-uint8_t spellRange[];
+extern uint8_t		spellType[];
+extern uint8_t		spptReq[];
+extern uint8_t		spellAttr[];
+extern uint8_t		spellDuration[];
+extern uint8_t		spellRange[];
 
-uint8_t lightDist[];
-uint8_t lightDur[];
-uint8_t lightSDFlag[];
+extern uint8_t		lightDist[];
+extern uint8_t		lightDur[];
+extern uint8_t		lightSDFlag[];
 
-spName_t spName[];
-breathAtt_t dmgspells[];
-weapAtt_t weapeff[];
-uint8_t weapIndex[];
+extern spName_t		spName[];
+extern breathAtt_t	dmgspells[];
+extern weapAtt_t	weapeff[];
+extern uint8_t		weapIndex[];
+
+extern uint8_t		*spellStrings[];
 
 #define _sp_reenergizeMage	0
 #define _sp_useAcorn		1

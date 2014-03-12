@@ -96,6 +96,18 @@ btstring_t *bts_sprintf(uint8_t *format, ...)
 	return rval;
 }
 
+btstring_t *bts_vsprintf(uint8_t *format, va_list args)
+{
+	btstring_t	*rval;
+	uint32_t	len;
+
+	len = vsnprintf(NULL, 0, format, args);
+	rval = bts_new(len + 1);
+	vsnprintf(rval->buf, rval->size, format, args);
+
+	return rval;
+}
+
 btstring_t *bts_strcpy(const uint8_t *str)
 {
 	btstring_t *rval;

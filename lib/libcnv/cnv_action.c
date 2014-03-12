@@ -13,8 +13,10 @@ btAction_t *btAction_new(uint8_t ftype, uint8_t etype)
 	btAction_t	*ba;
 
 	ba = (btAction_t *)xzalloc(sizeof(btAction_t));
-	ba->function	= btFunction_new(ftype);
-	ba->effect	= btEffect_new(etype);
+	if (ftype)
+		ba->function	= btFunction_new(ftype);
+	if (etype)
+		ba->effect	= btEffect_new(etype);
 
 	return ba;
 }
