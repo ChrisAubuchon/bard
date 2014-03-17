@@ -108,6 +108,8 @@ static btAction_t *spf_batbonus(uint32_t index)
 
 	type = spellType[index];
 
+	btAction_addParam(rval, PARAM_NUMBER, bts_strcpy("amount"), spellDuration[index]);
+
 	switch (type) {
 	case sp_acBonus:
 	case sp_antiMagic:

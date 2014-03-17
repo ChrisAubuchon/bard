@@ -65,6 +65,15 @@ btstring_t *bts_ncopy(btstring_t *in, uint32_t len, uint32_t offset)
 	return rval;
 }
 
+btstring_t *bts_strcpy(const uint8_t *str)
+{
+	btstring_t *rval;
+
+	rval = bts_strncpy(str, strlen(str));
+
+	return rval;
+}
+
 btstring_t *bts_strncpy(const uint8_t *str, uint32_t len)
 {
 	uint32_t i;
@@ -96,6 +105,26 @@ btstring_t *bts_sprintf(uint8_t *format, ...)
 	return rval;
 }
 
+btstring_t *bts_strdup(btstring_t *in)
+{
+	btstring_t	*rval;
+	uint8_t		*src, *dst;
+	uint32_t	i;
+
+	if (in == NULL)
+		return NULL;
+
+	rval = bts_new(in->size);
+
+	src = in->buf;
+	dst = rval->buf;
+
+	for (i = 0; i < in->size; i++)
+		*dst++ = *src++;
+
+	return rval;
+}
+
 btstring_t *bts_vsprintf(uint8_t *format, va_list args)
 {
 	btstring_t	*rval;
@@ -108,14 +137,6 @@ btstring_t *bts_vsprintf(uint8_t *format, va_list args)
 	return rval;
 }
 
-btstring_t *bts_strcpy(const uint8_t *str)
-{
-	btstring_t *rval;
-
-	rval = bts_strncpy(str, strlen(str));
-
-	return rval;
-}
 
 btstring_t *bts_strncat(btstring_t *dest, const uint8_t *str, uint32_t len)
 {

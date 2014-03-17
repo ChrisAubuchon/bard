@@ -95,10 +95,6 @@ static json_t *mageSpell_toJson(const void *vms)
 	JSON_TRUE_IF(spellNode,	"combat",	ms->combat);
 	JSON_TRUE_IF(spellNode, "noncombat",	ms->noncombat);
 	json_object_update(spellNode, btTargetting_toJson(&ms->targetting));
-#if 0
-	json_object_set_new(spellNode, "action",
-					btEffect_toJson(ms->effect));
-#endif
 	json_object_set_new(spellNode, "action",
 					btAction_toJson(ms->action));
 

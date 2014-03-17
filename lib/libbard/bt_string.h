@@ -25,4 +25,6 @@ btstring_t *bts_resize(btstring_t *in, uint32_t size);
 void bts_memset(btstring_t *t, int c);
 size_t		bts_hashcode(btstring_t *in);
 
+btstring_t	*bts_strdup(btstring_t *in);
+
 #endif
