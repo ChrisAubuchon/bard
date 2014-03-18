@@ -17,6 +17,9 @@ declare_global("btTable")
 declare_global("btArray")
 declare_global("btDefaultTable")
 
+-- code.lua
+declare_global("code")
+
 -- diskio.lua
 declare_global("diskio")
 

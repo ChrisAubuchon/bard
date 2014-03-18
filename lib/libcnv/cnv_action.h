@@ -40,7 +40,7 @@ void		btAction_free(const void *vba);
 json_t		*btAction_toJson(const void *vba);
 
 void		btAction_addParam(btAction_t *ba, uint32_t type,
-					btstring_t *name, ...);
+					uint8_t *name, ...);
 
 #endif
 

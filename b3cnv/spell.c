@@ -23,7 +23,7 @@ static btAction_t	*spf_summon(uint32_t i);
 static btAction_t	*spf_grro(uint32_t i);
 static btAction_t	*spf_fota(uint32_t i);
 
-static btFunction_t	*getFunction(uint32_t type, ...);
+static btFunction_t	*getFunction(uint32_t type);
 btAction_t *cnvBreathAttack(breathAtt_t * b, uint8_t range);
 
 /********************************/
@@ -81,16 +81,11 @@ static uint8_t genSpell[] = {
 /*
  * getFunction()
  */
-static btFunction_t *getFunction(uint32_t type, ...)
+static btFunction_t *getFunction(uint32_t type)
 {
 	btFunction_t	*rval;
-	va_list		args;
 
-	va_start(args, type);
-	rval = btFunction_new(FUNC_STRING,
-		bts_vsprintf(spellStrings[type], args)
-		);
-	va_end(args);
+	rval = btFunction_new(FUNC_STRING, bts_strcpy(spellStrings[type]));
 
 	return rval;
 }
@@ -108,20 +103,19 @@ static btAction_t *spf_batbonus(uint32_t index)
 
 	type = spellType[index];
 
-	btAction_addParam(rval, PARAM_NUMBER, bts_strcpy("amount"), spellDuration[index]);
+	btAction_addParam(rval, PARAM_NUMBER, "amount", spellDuration[index]);
 
 	switch (type) {
 	case sp_acBonus:
 	case sp_antiMagic:
 	case sp_vorpalPlating:
 	case sp_wordOfFear:
-		rval->function = getFunction(type, spellDuration[index]);
+		rval->function = getFunction(type);
 		break;
 	case sp_freezeFoes:
 	case sp_luckSpell:
 	case sp_strengthBonus:
-		rval->function = getFunction(type, spellDuration[index],
-						spellDuration[index]);
+		rval->function = getFunction(type);
 
 		break;
 	}
@@ -244,13 +238,12 @@ static btAction_t *spf_generic(uint32_t index)
 
 	switch (type) {
 	case sp_phaseDoor:
-		rval->function = getFunction(type, 
-			(spellDuration[index] > 0) ? "true" : "false");
-		break;
-	default:
-		rval->function = getFunction(type);
+		btAction_addParam(rval, PARAM_BOOL, "isPermanent",
+			spellDuration[index] > 0);
 		break;
 	}
+
+	rval->function = getFunction(type);
 
 	return rval;
 }
@@ -359,32 +352,39 @@ static btAction_t *spf_passiveeffect(uint32_t index)
 	duration	= spellDuration[index];
 	flags		= spellRange[index];
 
+
 	rval = btAction_new(FUNC_NONE, EFFECT_NONE);
 
 	switch (spellType[index]) {
 	case sp_areaEnchant:
-		rval->function = getFunction(type, 
-			duration,
-			(flags != 0) ? "true" : "false",
-			(flags != 1) ? "true" : "false",
-			(flags == 2) ? "true" : "false"
-		);
+		btAction_addParam(rval, PARAM_NUMBER, "duration", duration);
+		btAction_addParam(rval, PARAM_BOOL, "detectStairs",
+					(flags != 0));
+		btAction_addParam(rval, PARAM_BOOL, "detectTraps",
+					(flags != 1));
+		btAction_addParam(rval, PARAM_BOOL, "detectSpecial",
+					(flags == 2));
+		
 		break;
 	case sp_compassSpell:
 	case sp_levitation:
-		rval->function = getFunction(type, duration);
+		btAction_addParam(rval, PARAM_NUMBER, "duration", duration);
 		break;
 	case sp_lightSpell:
-		rval->function = getFunction(type,
-			lightDur[duration],
-			lightDist[duration],
-			(lightSDFlag[duration] != 0) ? "true" : "false"
-			);
+		btAction_addParam(rval, PARAM_NUMBER, "duration", 
+					lightDur[duration]);
+		btAction_addParam(rval, PARAM_NUMBER, "distance", 
+					lightDur[duration]);
+		btAction_addParam(rval, PARAM_NUMBER, "seeSecret", 
+					lightDur[duration]);
 		break;
 	case sp_shieldSpell:
-		rval->function = getFunction(type, duration, flags);
+		btAction_addParam(rval, PARAM_NUMBER, "duration", duration);
+		btAction_addParam(rval, PARAM_NUMBER, "acBonus", flags);
 		break;
 	}
+
+	rval->function = getFunction(type); 
 
 	return rval;
 }

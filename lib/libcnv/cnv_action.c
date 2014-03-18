@@ -97,7 +97,7 @@ static json_t *param_toJson(const void *vp)
 /*
  * btAction_addParam()
  */
-void btAction_addParam(btAction_t *ba, uint32_t type, btstring_t *name, ...)
+void btAction_addParam(btAction_t *ba, uint32_t type, uint8_t *name, ...)
 {
 	__param_t	*p;
 	va_list		args;
@@ -107,7 +107,7 @@ void btAction_addParam(btAction_t *ba, uint32_t type, btstring_t *name, ...)
 
 	p = (__param_t *)xzalloc(sizeof(__param_t));
 
-	p->name = name;
+	p->name = bts_strcpy(name);
 	p->type = type;
 
 	va_start(args, name);

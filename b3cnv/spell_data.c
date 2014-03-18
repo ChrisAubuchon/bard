@@ -389,22 +389,16 @@ uint8_t *spellStrings[] = {
 /*  3*/	NULL,
 /*  4*/	NULL,
 /*  5*/	NULL,
-/*  6*/	"\
-self.source:addBattleBonus(\"acBonus\", %d, true)\
-",
+/*  6*/	"self.source:addBattleBonus(\"acBonus\", args.amount, true)",
 /*  7*/	"\
-party:addBattleBonus(\"antiMagic\", %d, true)\
+party:addBattleBonus(\"antiMagic\", args.amount, true)\
 ",
 /*  8*/	"\
-party.detect:activate( {\
-	duration = %d,\
-	detectStairs = %s,\
-	detectTraps = %s,\
-	detectSpecial = %s\
-}",
+party.detect:activate(args.duration, args.detectStairs, args.detectTraps, \
+	args.detectSpecial)",
 /*  9*/	NULL,
 /* 10*/	"spells:calmCreatures()",
-/* 11*/	"party.compass:activate({ duration = %d })",
+/* 11*/	"party.compass:activate(args.duration)",
 /* 12*/	NULL,
 /* 13*/	NULL,
 /* 14*/	"spells:divineIntervention()",
@@ -413,9 +407,9 @@ party.detect:activate( {\
 /* 17*/	"\
 if (self.source:isCharacter()) then\
 	party:addBattleBonus(\"toHitBonus\", 2, true)\
-	self.target:addBattleBonus(\"acPenalty\", %d, true)\
+	self.target:addBattleBonus(\"acPenalty\", args.amount, true)\
 else\
-	party:addBattleBonus(\"acPenalty\", %d, true)\
+	party:addBattleBonus(\"acPenalty\", args.amount, true)\
 end\
 ",
 /* 18*/	NULL,
@@ -425,36 +419,31 @@ if (self:groupSavingThrow()) then\
 end",
 /* 20*/	NULL,
 /* 21*/	"spells:identify()",
-/* 22*/	"party.levitate:activate({ duration = %d })",
-/* 23*/	"\
-party.light:activate({\
-	duration = %d,\
-	distance = %d,\
-	seeSecret = %s })\
-",
+/* 22*/	"party.levitate:activate(args.duration)",
+/* 23*/	"party.light:activate(args.duration, args.distance, args.seeSecret)",
 /* 24*/	"\
-party:addBattleBonus(\"toHitBonus\", %d, true)\
-party:addBattleBonus(\"antiMagic\", %d, true)\
+party:addBattleBonus(\"toHitBonus\", args.amount, true)\
+party:addBattleBonus(\"antiMagic\", args.amount, true)\
 ",
 /* 25*/	"--xxx_range_spell",
-/* 26*/	"spells:phaseDoor(%s)",
+/* 26*/	"spells:phaseDoor(args.isPermanent)",
 /* 27*/	"spells:possess()",
 /* 28*/	"spells:scrySite()",
-/* 29*/	"party.shield:activate({ duration = %d, acBonus = %d })",
+/* 29*/	"party.shield:activate(args.duration, args.acBonus)",
 /* 30*/	"spells:spellBind()",
 /* 31*/	"\
-self.source:addBattleBonus(\"toHitBonus\", %d, false)\
-self.source:addBattleBonus(\"damageBonus\", %d, false)\
+self.source:addBattleBonus(\"toHitBonus\", args.amount, false)\
+self.source:addBattleBonus(\"damageBonus\", args.amount, false)\
 ",
 /* 32*/	"--xxx_summon_spell",
 /* 33*/	"spells:teleport()",
 /* 34*/	"spells:trapZap()",
 /* 35*/	"\
-self.target:addBattleBonus(\"damageRandom\", %d, false)\
+self.target:addBattleBonus(\"damageRandom\", args.amount, false)\
 ",
 /* 36*/	"\
 if (self:groupSavingThrow()) then\
-	self.target:addBattleBonus(\"toHitPenalty\", %d, true)\
+	self.target:addBattleBonus(\"toHitPenalty\", args.amount, true)\
 end\
 ",
 /* 37*/	NULL,

@@ -4,6 +4,7 @@ require "log"
 require "object"
 require "array"
 
+require "code"
 require "sdl_video"
 require "sdl_timer"
 require "sdl_text"

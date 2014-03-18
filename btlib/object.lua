@@ -235,6 +235,32 @@ function table.copy(inSource, inDestination)
 end
 
 ----------------------------------------
+-- table.shallowCopy()
+--
+-- Non-recursive copy of a table
+----------------------------------------
+function table.shallowCopy(inSource, inDestination)
+	local t	= inDestination or {}
+	local k
+	local v
+
+	if (not inSource) then
+		return nil
+	end
+
+	if (type(inSource) ~= "table") then
+		error("table.copy() with a non-table source", 2)
+	end
+
+	for k,v in pairs(inSource) do
+		rawset(t, k, v)
+	end
+
+	return t
+end
+
+
+----------------------------------------
 -- table.setDefault()
 ----------------------------------------
 function table.setDefault(inTable, inValue)
