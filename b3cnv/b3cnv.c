@@ -113,12 +113,12 @@ int main(int argc, char *argv[])
 	if (_convertItems) {
 		convertItems();
 	}
+#endif
 
 	if (_convertMonsters) {
 		convertMonsters();
 	}
 
-#endif
 	if (_convertSpells) {
 		convertSpells();
 #if 0

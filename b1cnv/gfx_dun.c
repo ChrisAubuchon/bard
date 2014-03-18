@@ -255,7 +255,7 @@ static void getDunFacet(bt_view_t *outView, uint8_t tileset, dunfacet_t *fxxx, u
 	view.offset = dun->offset;
 
 	img = getImage(&view, dundata);
-	img = bta_cell_toRGBA(img, egapal);
+	bta_cell_toRGBA(img, egapal);
 
 	facetView = getFacetView(fxxx, img, xy, facet);
 
@@ -491,7 +491,7 @@ static void outputBackground(uint8_t tileset)
 	}
 
 	bg = bta_cell_new(0,0,56,88,0, rval);
-	bg = bta_cell_convert(bg);
+	bta_cell_convert(bg);
 	bta_toPNG(bg, mkImagePath("dpics/%d-bg.png", tileset));
 	bta_cell_free(bg);
 

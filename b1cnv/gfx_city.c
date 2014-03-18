@@ -275,7 +275,7 @@ bta_cell_t *getImage(view_t *view, btstring_t *data)
 		offset += src_skip;
 	}
 
-	rval = bta_cell_4bitTo8bit(rval);
+	bta_cell_4bitTo8bit(rval);
 
 	if ((view->left & 1) == (view->x & 1)) {
 		if (view->left & 1)
@@ -283,7 +283,7 @@ bta_cell_t *getImage(view_t *view, btstring_t *data)
 		if (!(view->right & 1))
 			right_skip = 1;
 
-		rval = bta_trim(rval, left_skip, right_skip);
+		bta_trim(rval, left_skip, right_skip);
 	} else {
 		if (!(view->right & 1)) {
 			right_skip = 1;
@@ -292,13 +292,15 @@ bta_cell_t *getImage(view_t *view, btstring_t *data)
 		 * Added during BT2 conversion. It removes a
 		 * black line from some images.
 		 */
-		rval = bta_trim(rval, left_skip, right_skip);
+		bta_trim(rval, left_skip, right_skip);
 	}
 
 	if (view->rflag == 1)
 		flipRight(rval->gfx, rval->height, rval->width);
 
-	return bta_cell_scale(rval);
+	bta_cell_scale(rval);
+
+	return rval;
 }
 
 static uint8_t *facetString[] = { "", "front", "face", "", "side" };
@@ -378,7 +380,7 @@ static void outputCityFacet(bt_view_t *oview, uint8_t facet, uint8_t quad)
 		view.offset = city->offset;
 
 		img = getImage(&view, data);
-		img = bta_cell_toRGBA(img, cityPalette);
+		bta_cell_toRGBA(img, cityPalette);
 
 		if (i == 0) {
 			btstring_t *q;
@@ -449,8 +451,9 @@ static void outputBldgFronts(bt_view_t *view)
 	for (i = 0; i < 4; i++) {
 		b = bta_cell_new(0, 0, 56, 88, 0, 
 			dehufFile(mkBardOnePath("b%d.huf", i), 0x1340));
-		b = bta_cell_scale(bta_cell_4bitTo8bit(b));
-		b = bta_cell_toRGBA(b, cityPalette);
+		bta_cell_4bitTo8bit(b);
+		bta_cell_scale(b);
+		bta_cell_toRGBA(b, cityPalette);
 		bta_toPNG(b, 
 			mkImagePath("citypics/base-1/face/%s.png",
 					bldgFace[i+1]));
@@ -527,7 +530,7 @@ static void outputBackground(void)
 		b->buf[i] = 0xcc;
 
 	bg = bta_cell_new(0,0,56,88,0,b);
-	bg = bta_cell_convert(bg);
+	bta_cell_convert(bg);
 
 	bta_toPNG(bg, mkImagePath("citypics/citybg-day.png"));
 
@@ -540,7 +543,7 @@ static void outputBackground(void)
 		b->buf[i] = 0xcc;
 
 	bg = bta_cell_new(0,0,56,88,0,b);
-	bg = bta_cell_convert(bg);
+	bta_cell_convert(bg);
 
 	bta_toPNG(bg, mkImagePath("citypics/citybg-night.png"));
 

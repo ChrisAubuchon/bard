@@ -62,7 +62,7 @@ static void outputScreens(uint8_t indent)
 	for (i = 0; i < 2; i++) {
 		img = bta_cell_new(0, 0, 160, 200, 0, 
 			gfx_vga2gfx(dehufFile(mkBardOnePath("%s", fnames[i]), 0x7d00)));
-		img = bta_cell_convert(img);
+		bta_cell_convert(img);
 		bta_toPNG(img, mkImagePath("%s.png", tags[i]));
 		bta_cell_free(img);
 	}
@@ -98,7 +98,7 @@ static void icon_write_detect(huffile_t *huf, int index)
 				icons[index].delay, NULL);
 
 		img->gfx = bts_ncopy(data, size, size * ((i > 3) ? 6 - i : i));
-		img = bta_cell_convert(img);
+		bta_cell_convert(img);
 		bta_cell_set(bta, 0, i, img);
 	}
 
@@ -137,7 +137,7 @@ static void icon_write_bta(huffile_t *huf, int index)
 			icons[index].delay, NULL);
 
 		img->gfx = bts_ncopy(data, size, offset);
-		img = bta_cell_convert(img);
+		bta_cell_convert(img);
 		bta_cell_set(bta, 0, i, img);
 
 		offset += size;
@@ -169,7 +169,7 @@ static void icon_write_clear(btstring_t *data, int index)
 			img->gfx->buf[(i * icons[index].width) + j] = 0x77;
 		}
 	}
-	img = bta_cell_convert(img);
+	bta_cell_convert(img);
 	bta_toPNG(img, mkImagePath("%s_clear.png", icons[index].name));
 	bta_cell_free(img);
 }
@@ -188,11 +188,11 @@ static void icon_write_png(huffile_t *huf, int index)
 		icons[index].width, icons[index].height,
 		0, NULL);
 
-	img->gfx = bts_copy(data);
-	img = bta_cell_convert(img);
+	img->gfx = bts_strdup(data);
+	bta_cell_convert(img);
 	bta_toPNG(img, mkImagePath("%s.png", icons[index].name));
 
-	icon_write_clear(bts_copy(data), index);
+	icon_write_clear(bts_strdup(data), index);
 
 	bta_cell_free(img);
 	bts_free(data);
@@ -220,7 +220,7 @@ static void icon_write_compass(huffile_t *huf, int index)
 		img = bta_cell_new(0, 0,
 			icons[index].width, icons[index].height,
 			0, bts_ncopy(data, size, offset));
-		img = bta_cell_convert(img);
+		bta_cell_convert(img);
 		bta_toPNG(img, mkImagePath("%s_%s.png",
 				icons[index].name, cdir[i]));
 		bta_cell_free(img);

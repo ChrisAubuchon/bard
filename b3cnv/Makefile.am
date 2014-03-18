@@ -17,6 +17,9 @@ b3cnv_SOURCES = 	\
 	gfx_bigpic.c	\
 	gfx_tile.c	\
 	gfx_tile.h	\
+	mon.c		\
+	mon.h		\
+	mon_data.c	\
 	picIndex.c	\
 	spell.c		\
 	spell.h		\

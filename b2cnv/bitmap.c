@@ -139,7 +139,7 @@ void outputBitmapFont(void)
 		}
 
 		img->gfx = cell;
-		img = bta_cell_scale(img);
+		bta_cell_scale(img);
 
 		c = i + ' ';
 		if (c == 'i') {
@@ -151,7 +151,7 @@ void outputBitmapFont(void)
 		}
 
 
-		btf_setChar(btf, i + ' ', varWidth, bts_copy(img->gfx));
+		btf_setChar(btf, i + ' ', varWidth, bts_strdup(img->gfx));
 
 		bta_cell_free(img);
 	}
@@ -162,8 +162,8 @@ void outputBitmapFont(void)
 		cell->buf[i] = 0;
 	img = bta_cell_new(0, 0, 8, 8, 0, NULL);
 	img->gfx = cell;
-	img = bta_cell_scale(img);
-	btf_setChar(btf, ' ', 12, bts_copy(img->gfx));
+	bta_cell_scale(img);
+	btf_setChar(btf, ' ', 12, bts_strdup(img->gfx));
 	bta_cell_free(img);
 
 	btf_write_btf(mkFontPath("bt2font.btf"), btf);

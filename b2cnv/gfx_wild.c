@@ -519,7 +519,7 @@ static void outputWildFacet(bt_view_t *oview, dunfacet_t *df, uint8_t facet)
 
 	xmkdir(mkImagePath("wpics/%d-%s", df->depth, df->name));	
 
-	img = bta_cell_toRGBA(img, wildPalette);
+	bta_cell_toRGBA(img, wildPalette);
 	bta_toPNG(img,
 		mkImagePath("wpics/%d-%s/%s%s.png",
 				df->depth,
@@ -547,7 +547,7 @@ static void outputBackground(void)
 		b->buf[i] = 0x22;
 
 	bg = bta_cell_new(0, 0, 56, 88, 0, b);
-	bg = bta_cell_convert(bg);
+	bta_cell_convert(bg);
 
 	bta_toPNG(bg, mkImagePath("wpics/wpic-day.png"));
 
@@ -560,7 +560,7 @@ static void outputBackground(void)
 		b->buf[i] = 0x22;
 
 	bg = bta_cell_new(0, 0, 56, 88, 0, b);
-	bg = bta_cell_convert(bg);
+	bta_cell_convert(bg);
 
 	bta_toPNG(bg, mkImagePath("wpics/wpic-night.png"));
 

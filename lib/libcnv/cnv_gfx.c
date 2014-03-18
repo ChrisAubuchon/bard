@@ -74,17 +74,28 @@ static png_color egapalette[16] = {
  *
  * Scale from 320x200 to 640x400
  */
-bta_cell_t *bta_cell_scale(bta_cell_t *in)
+void bta_cell_scale(bta_cell_t *in)
 {
-	uint16_t x, y;
-	bta_cell_t *rval;
-	uint8_t *srcbuf, *dstbuf, *tmpbuf;
+	uint16_t	x, y;
+	bta_cell_t	*rval;
+	uint8_t		*srcbuf, *dstbuf, *tmpbuf;
 
-	rval = bta_cell_new(in->x * 2, in->y * 2, in->width * 2, in->height * 2, in->delay * 60, NULL);
-	rval->gfx = bts_new(rval->width * rval->height);
+	btstring_t	*newgfx;
+	uint16_t	newX, newY;
+	uint16_t	newWidth, newHeight;
+	uint16_t	newDelay;
+
+
+	newX		= in->x * 2;
+	newY		= in->y * 2;
+	newWidth	= in->width * 2;
+	newHeight	= in->height * 2;
+	newDelay	= in->delay * 60;
+
+	newgfx = bts_new(newWidth * newHeight);
 
 	srcbuf = in->gfx->buf;
-	dstbuf = rval->gfx->buf;
+	dstbuf = newgfx->buf;
 
 	for (y = 0; y < in->height; y++) {
 		tmpbuf = dstbuf;
@@ -94,12 +105,18 @@ bta_cell_t *bta_cell_scale(bta_cell_t *in)
 			*dstbuf++ = *srcbuf++;
 		}
 
-		memcpy(dstbuf, tmpbuf, rval->width);
-		dstbuf += rval->width;
+		memcpy(dstbuf, tmpbuf, newWidth);
+		dstbuf += newWidth;
 	}
-	bta_cell_free(in);
 
-	return rval;
+	bts_free(in->gfx);
+	in->x		= newX;
+	in->y		= newY;
+	in->width	= newWidth;
+	in->height	= newHeight;
+	in->delay	= newDelay;
+	in->gfx		= newgfx;
+/*	printf("Here\n");*/
 }
 
 /*
@@ -107,22 +124,23 @@ bta_cell_t *bta_cell_scale(bta_cell_t *in)
  *
  * Trim bytes from the left side and right side of the image
  */
-bta_cell_t *bta_trim(bta_cell_t *in, uint16_t left, uint16_t right)
+void bta_trim(bta_cell_t *in, uint16_t left, uint16_t right)
 {
-	bta_cell_t *rval;
-	uint16_t x,y;
-	uint32_t soffset;
-	uint32_t doffset;
+	uint16_t	x,y;
+	uint32_t	soffset;
+	uint32_t	doffset;
+
+	btstring_t	*newgfx;
+	uint16_t	newWidth;
 
 	if ((left == 0) && (right == 0))
-		return in;
+		return;
 
 	if (in->width - left - right <= 0)
-		return NULL;
+		return;
 
-	rval = bta_cell_new(in->x, in->y, in->width - left - right, \
-				in->height, 0, NULL);
-	rval->gfx = bts_new(rval->height * rval->width);
+	newWidth = in->width - left - right;
+	newgfx = bts_new(in->height * newWidth);
 
 	soffset = 0;
 	doffset = 0;
@@ -138,13 +156,13 @@ bta_cell_t *bta_trim(bta_cell_t *in, uint16_t left, uint16_t right)
 				continue;
 			}
 			
-			rval->gfx->buf[doffset++] = in->gfx->buf[soffset++];
+			newgfx->buf[doffset++] = in->gfx->buf[soffset++];
 		}
 	}
 
-	bta_cell_free(in);
-
-	return rval;
+	bts_free(in->gfx);
+	in->width = newWidth;
+	in->gfx = newgfx;
 }
 
 /*
@@ -152,20 +170,20 @@ bta_cell_t *bta_trim(bta_cell_t *in, uint16_t left, uint16_t right)
  *
  * Unpack 4 bit data to 8 bit
  */
-bta_cell_t *bta_cell_4bitTo8bit(bta_cell_t *in)
+void bta_cell_4bitTo8bit(bta_cell_t *in)
 {
-	bta_cell_t *rval;
-	uint8_t *tobuf, *frombuf;
-	uint32_t i;
+	uint8_t		*tobuf, *frombuf;
+	uint32_t	i;
 
-	rval = bta_cell_new(
-		in->x * 2, in->y, 
-		in->width * 2, in->height, 
-		in->delay, NULL
-		);
-	rval->gfx = bts_new(rval->width * rval->height);
+	uint16_t	newWidth;
+	uint16_t	newX;
+	btstring_t	*newgfx;
 
-	tobuf = rval->gfx->buf;
+	newX		= in->x * 2;
+	newWidth	= in->width * 2;
+	newgfx		= bts_new(newWidth * in->height);
+
+	tobuf = newgfx->buf;
 	frombuf = in->gfx->buf;
 
 	for (i = 0; i < in->gfx->size; i++) {
@@ -173,27 +191,27 @@ bta_cell_t *bta_cell_4bitTo8bit(bta_cell_t *in)
 		*tobuf++ = *frombuf++ & 0x0f;
 	}
 
-	bta_cell_free(in);
-
-	return rval;
+	bts_free(in->gfx);
+	in->width	= newWidth;
+	in->x		= newX;
+	in->gfx		= newgfx;
 }
+
 
 /*
  * bta_cell_toRGBA()
  *
  * Convert a palettized image to RGBA
  */
-bta_cell_t *bta_cell_toRGBA(bta_cell_t *in, bta_color_t *pal)
+void bta_cell_toRGBA(bta_cell_t *in, bta_color_t *pal)
 {
-	bta_cell_t	*rval;
+	btstring_t	*newgfx;
 	uint8_t		*tobuf, *frombuf;
 	uint32_t	i;
 
-	rval = bta_cell_new(in->x, in->y, in->width, in->height, 
-				in->delay, NULL);
-	rval->gfx = bts_new((rval->width * rval->height) * 4);
+	newgfx = bts_new((in->width * in->height) * 4);
 
-	tobuf = rval->gfx->buf;
+	tobuf	= newgfx->buf;
 	frombuf = in->gfx->buf;
 
 	for (i = 0; i < in->gfx->size; i++) {
@@ -203,9 +221,8 @@ bta_cell_t *bta_cell_toRGBA(bta_cell_t *in, bta_color_t *pal)
 		*tobuf++ = pal[*frombuf++].alpha;
 	}
 
-	bta_cell_free(in);
-
-	return rval;
+	bts_free(in->gfx);
+	in->gfx = newgfx;
 }
 
 void bta_toPNG(bta_cell_t *in, btstring_t *fname)
@@ -238,14 +255,6 @@ void bta_toPNG(bta_cell_t *in, btstring_t *fname)
 	png_set_IHDR(png_ptr, info_ptr, in->width, in->height, 8, \
 		PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, \
 		PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-#if 0
-	png_set_IHDR(png_ptr, info_ptr, in->width, in->height, 8, \
-		PNG_COLOR_TYPE_PALETTE, PNG_INTERLACE_NONE, \
-		PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-
-
-	png_set_PLTE(png_ptr, info_ptr, egapalette, 16);
-#endif
 
 	png_write_info(png_ptr, info_ptr);
 

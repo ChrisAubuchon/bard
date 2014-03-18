@@ -885,7 +885,7 @@ static bt_cnode_t *cnvB3battle(bt_array_t *args, uint8_t cryFlag)
 	for (i = 1; i < alen; i += 2) {
 		a = bt_array_get(args, i);
 		a->type = ARG_BTSTRING;
-		a->bts = bts_copy(bt_array_get(disasm->curLevP->monsters, btarg_get_byte(args,i)));
+		a->bts = bts_strdup(bt_array_get(disasm->curLevP->monsters, btarg_get_byte(args,i)));
 		argstr->buf[i] = 'B';
 		argstr->buf[i+1] = 'b';
 	}
@@ -1345,7 +1345,7 @@ static bt_cnode_t *do_convertOpcode(uint16_t *offset, uint8_t opcode, bt_array_t
 		{
 			btstring_t *mon;
 
-			mon = bts_copy(bt_array_get(disasm->curLevP->monsters, btarg_get_byte(args,0)));
+			mon = bts_strdup(bt_array_get(disasm->curLevP->monsters, btarg_get_byte(args,0)));
 
 			return bt_code_new_branch(
 				OP_ADDMON,

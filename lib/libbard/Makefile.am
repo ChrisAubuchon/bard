@@ -9,7 +9,6 @@ libbard_a_SOURCES = \
 	bt_btf.c	\
 	bt_btf.h	\
 	bt_common.c	\
-	bt_common.h	\
 	bt_string.c	\
 	bt_string.h	\
 	debug.h	\

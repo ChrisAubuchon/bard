@@ -353,8 +353,8 @@ static void d3cmp_readData(void)
 
 btstring_t *d3comp(uint8_t *buf, uint32_t size)
 {
-	int i;
-	btstring_t *rval;
+	btstring_t	*rval;
+	int		i;
 
 	curFromOffset = 0;
 	toOffset = 0;
@@ -377,7 +377,10 @@ btstring_t *d3comp(uint8_t *buf, uint32_t size)
 	d3cmp_readData();
 	d3cmp_doDecomp();
 
-	rval = bts_resize(outBuf, toOffset);
+	rval = bts_strdup(outBuf);
+	bts_resize(rval, toOffset);
+
+	bts_free(outBuf);
 
 	return rval;
 }

@@ -154,6 +154,16 @@ void printPicMacro(uint8_t pi)
   printf("%s", picMac[index]);
 }
 
+void indexToPic(uint8_t index, pic_t *p)
+{
+	if (picTran[index] == 0xff) 
+		p->hiflag = 1;
+	else
+		p->hiflag = 0;
+
+	p->index = index;
+}
+
 btstring_t *getPicMacro(pic_t *p)
 {
 	uint8_t		index;

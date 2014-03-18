@@ -659,7 +659,7 @@ void convertSpells(void)
 		if (spName[i].full[0])
 			m->full = bts_strcpy(spName[i].full);
 		else
-			m->full = bts_copy(m->abbr);
+			m->full = bts_strdup(m->abbr);
 		m->sppt = spptReq[i];
 
 		m->combat = IFBIT(spellAttr[i], 8, 1, 0);

@@ -13,7 +13,12 @@
 #define	IMAGE_PNG		1
 #define IMAGE_BTA		2
 
-#define bta_cell_convert(x)	bta_cell_toRGBA(bta_cell_scale(bta_cell_4bitTo8bit((x))), egapal)
+#define bta_cell_convert(x)	\
+	do {								\
+		bta_cell_4bitTo8bit((x));				\
+		bta_cell_scale((x));					\
+		bta_cell_toRGBA((x), egapal);				\
+	} while (0)
 
 /********************************/
 /*				*/
@@ -39,21 +44,12 @@ typedef struct bt_bigpicList_t bt_bigpicList_t;
 
 extern 		bta_color_t egapal[];
 
-bta_cell_t	*bta_cell_scale(bta_cell_t *in);
-bta_cell_t	*bta_cell_4bitTo8bit(bta_cell_t *in);
-bta_cell_t	*bta_trim(bta_cell_t *in, uint16_t left, uint16_t right);
-bta_cell_t	*bta_cell_toRGBA(bta_cell_t *in, bta_color_t *pal);
-void bta_toPNG(bta_cell_t *in, btstring_t *fname);
-void bta_transparent_toPNG(bta_cell_t *in, btstring_t *fname);
-
-#if 0
-/* Bigpic list */
-bt_bigpicList_t *bigpic_list_new(uint32_t size);
-void bigpic_list_free(bt_bigpicList_t *bpl);
-void bigpic_list_set(bt_bigpicList_t *bpl, btstring_t *name, \
-		     btstring_t *path, uint8_t type);
-void bigpic_list_to_json(bt_bigpicList_t *bpl, btstring_t *fname);
-#endif
+void	bta_cell_scale(bta_cell_t *in);
+void	bta_cell_4bitTo8bit(bta_cell_t *in);
+void	bta_trim(bta_cell_t *in, uint16_t left, uint16_t right);
+void	bta_cell_toRGBA(bta_cell_t *in, bta_color_t *pal);
+void	bta_toPNG(bta_cell_t *in, btstring_t *fname);
+void	bta_transparent_toPNG(bta_cell_t *in, btstring_t *fname);
 
 /* View list */
 bt_view_t *bt_view_new(void);

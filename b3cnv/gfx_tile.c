@@ -323,7 +323,7 @@ static void outputBackground(uint32_t tagIndex)
 	}
 
 	bg = bta_cell_new(0, 0, 56, 88, 0, b);
-	bg = bta_cell_convert(bg);
+	bta_cell_convert(bg);
 
 	bta_toPNG(bg, mkImagePath("%s/bg-day.png", gfx_tags[tagIndex]));
 	bta_cell_free(bg);
@@ -346,7 +346,7 @@ static void outputBackground(uint32_t tagIndex)
 	}
 
 	bg = bta_cell_new(0, 0, 56, 88, 0, b);
-	bg = bta_cell_convert(bg);
+	bta_cell_convert(bg);
 
 	bta_toPNG(bg, mkImagePath("%s/bg-night.png", gfx_tags[tagIndex]));
 	bta_cell_free(bg);
@@ -391,9 +391,9 @@ static void makeImages(cityTile_t *tile, uint32_t tagIndex, uint8_t width,
 
 		copy_topoElement(t);
 
-		t->cell	= bta_cell_4bitTo8bit(t->cell);
-		t->cell	= bta_cell_scale(t->cell);
-		t->cell	= bta_cell_toRGBA(t->cell, b3palette);
+		bta_cell_4bitTo8bit(t->cell);
+		bta_cell_scale(t->cell);
+		bta_cell_toRGBA(t->cell, b3palette);
 
 		bta_toPNG(t->cell,
 			mkImagePath("%s/%d%s/%d-%s.png",

@@ -3,7 +3,6 @@
 
 #include <cnv_spell.h>
 #include <bt_string.h>
-#include <gfx.h>
 
 /********************************/
 /*				*/
@@ -14,6 +13,17 @@
 extern btstring_t	*inputDir;
 extern btstring_t	*outputDir;
 
+
+/********************************/
+/*				*/
+/* Structures			*/
+/*				*/
+/********************************/
+
+typedef struct {
+	uint8_t		hiflag;
+	uint8_t		index;
+} pic_t;
 
 /********************************/
 /*				*/
@@ -44,6 +54,7 @@ extern btstring_t	*outputDir;
 /********************************/
 
 btstring_t	*getPicMacro(pic_t *p);
+void		indexToPic(uint8_t index, pic_t *p);
 
 #if 0
 /* common.c */

@@ -121,7 +121,7 @@ void getAnimLoops(bta_t *bta, btstring_t *anim, anim_t *ba)
 		cycleCount = ba->base[i].cycles;
 		offset += 2;
 
-		buf = bts_copy(bta->base->gfx);
+		buf = bts_strdup(bta->base->gfx);
 
 		for (j = 0; j < ncells; j++) {
 			if (cycleCount == 0) {
@@ -134,8 +134,8 @@ void getAnimLoops(bta_t *bta, btstring_t *anim, anim_t *ba)
 			c->gfx = bts_new(ab->height * ab->width);
 
 			offset = copyCell(anim, offset, c->gfx, ab);
-			c = bta_cell_4bitTo8bit(c);
-			c = bta_cell_scale(c);
+			bta_cell_4bitTo8bit(c);
+			bta_cell_scale(c);
 			c = cellToRGBA(c, buf);
 
 			bta_cell_set(bta, i, j, c);
@@ -396,13 +396,13 @@ void outputBigpic(uint8_t indent)
 			img = bta_new(nloops);
 
 			c = bta_cell_new(0, 0, 56, 88, 0, big);
-			c = bta_cell_4bitTo8bit(c);
-			c = bta_cell_scale(c);
+			bta_cell_4bitTo8bit(c);
+			bta_cell_scale(c);
 			img->base = c;
  
 			getAnimLoops(img, anim, ba);
 
-			img->base = bta_cell_toRGBA(img->base, egapal);
+			bta_cell_toRGBA(img->base, egapal);
 			
 			bts_free(anim);
 
@@ -416,11 +416,11 @@ void outputBigpic(uint8_t indent)
 		} else {
 			c = bta_cell_new(0, 0, 56, 88, 0, big);
 			if (isTimeAware[i]) {
-				c = bta_cell_4bitTo8bit(c);
-				c = bta_cell_scale(c);
-				c = bta_cell_toRGBA(c, cityPalette);
+				bta_cell_4bitTo8bit(c);
+				bta_cell_scale(c);
+				bta_cell_toRGBA(c, cityPalette);
 			} else {
-				c = bta_cell_convert(c);
+				bta_cell_convert(c);
 			}
 			bta_toPNG(c, mkImagePath("bigpic_%d.png", i));
 

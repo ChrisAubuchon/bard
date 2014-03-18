@@ -92,10 +92,10 @@ static void dumpBig(btstring_t *fname, btstring_t *big)
 	bta_cell_t	*c;
 	btstring_t	*tmp;
 
-	tmp = bts_copy(big);
+	tmp = bts_strdup(big);
 
 	c = bta_cell_new(0, 0, 224, 176, 0, tmp);
-	c = bta_cell_toRGBA(c, egapal);
+	bta_cell_toRGBA(c, egapal);
 	bta_toPNG(c, fname);
 	bta_cell_free(c);
 }
@@ -119,7 +119,7 @@ static void getAnimLoops(bta_t *bta, btstring_t *anim, b2anim_t *b2a)
 		offset = b2a->base[i].offset;
 		cycleCount = b2a->base[i].cycles;
 
-		buf = bts_copy(bta->base->gfx);
+		buf = bts_strdup(bta->base->gfx);
 
 		for (j = 0; j < ncells; j++) {	
 			debug("Cell: %d\n", j);
@@ -137,8 +137,8 @@ static void getAnimLoops(bta_t *bta, btstring_t *anim, b2anim_t *b2a)
 			c->gfx = bts_new(ab->height * ab->width);
 
 			copyCell(anim, off, c->gfx, ab);
-			c = bta_cell_4bitTo8bit(c);
-			c = bta_cell_scale(c);
+			bta_cell_4bitTo8bit(c);
+			bta_cell_scale(c);
 			c = cellToRGBA(c, buf);
 
 			bta_cell_set(bta, i, j, c);
@@ -420,13 +420,13 @@ void outputBigpic(void)
 
 			bigpic_setBG(big);
 			c = bta_cell_new(0, 0, 56, 88, 0, big);
-			c = bta_cell_4bitTo8bit(c);
-			c = bta_cell_scale(c);
+			bta_cell_4bitTo8bit(c);
+			bta_cell_scale(c);
 			img->base = c;
 
 			getAnimLoops(img, anim, b2a);
 
-			img->base = bta_cell_toRGBA(img->base, egapal);
+			bta_cell_toRGBA(img->base, egapal);
 
 			bts_free(anim);
 
@@ -441,11 +441,11 @@ void outputBigpic(void)
 			bigpic_setBG(big);
 			c = bta_cell_new(0, 0, 56, 88, 0, big);
 			if (isTimeAware[i]) {
-				c = bta_cell_4bitTo8bit(c);
-				c = bta_cell_scale(c);
-				c = bta_cell_toRGBA(c, cityPalette);
+				bta_cell_4bitTo8bit(c);
+				bta_cell_scale(c);
+				bta_cell_toRGBA(c, cityPalette);
 			} else {
-				c = bta_cell_convert(c);
+				bta_cell_convert(c);
 			}
 			bta_toPNG(c, mkImagePath("bigpic_%d.png", i));
 

@@ -140,7 +140,8 @@ btstring_t *bts_vsprintf(uint8_t *format, va_list args)
 
 btstring_t *bts_strncat(btstring_t *dest, const uint8_t *str, uint32_t len)
 {
-	dest = bts_resize(dest, dest->size + len);
+	bts_resize(dest, dest->size + len);
+
 	strncat(dest->buf, str, len);
 
 	return dest;
@@ -153,18 +154,26 @@ btstring_t *bts_strcat(btstring_t *dest, const uint8_t *str)
 
 btstring_t *bts_resize(btstring_t *in, uint32_t size)
 {
-	btstring_t *rval;
-	uint32_t i;
+	uint8_t		*new;
+	uint32_t	i;
+	uint32_t	max;
 
-	rval = bts_new(size);
+	new = (uint8_t *)xzalloc(size);
+
 	if (size > in->size)
-		size = in->size;
-	for (i = 0; i < size; i++)
-		rval->buf[i] = in->buf[i];
+		max = in->size;
+	else
+		max = size;
 
-	bts_free(in);
+	for (i = 0; i < max; i++)
+		new[i] = in->buf[i];
 
-	return rval;
+	free(in->buf);
+
+	in->size = size;
+	in->buf  = new;
+
+	return in;
 }
 
 void bts_memset(btstring_t *t, int c)

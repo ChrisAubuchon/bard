@@ -57,7 +57,7 @@ static void outputScreens(void)
 		img = bta_cell_new(0, 0, 160, 200, 0, 
 			gfx_vga2gfx(dehufFile(mkBardTwoPath("%s", fnames[i]), 0x7d00)));
 
-		img = bta_cell_convert(img);
+		bta_cell_convert(img);
 
 		bta_toPNG(img, mkImagePath("%s.png", tags[i]));
 
@@ -75,8 +75,8 @@ static void __icon_write_png(btstring_t *data, btstring_t *fname,
 	bta_cell_t	*img;
 
 	img = bta_cell_new(0, 0, ip->width, ip->height, 0, NULL);
-	img->gfx = bts_copy(data);
-	img = bta_cell_convert(img);
+	img->gfx = bts_strdup(data);
+	bta_cell_convert(img);
 	bta_toPNG(img, fname);
 	bta_cell_free(img);
 }
@@ -109,7 +109,7 @@ static void icon_write_bta(huffile_t *huf, int index)
 				icons[index].delay, NULL
 				);
 		img->gfx = bts_ncopy(data, size, offset);
-		img = bta_cell_convert(img);
+		bta_cell_convert(img);
 		bta_cell_set(bta, 0, i, img);
 
 		offset += size;
@@ -153,7 +153,7 @@ static void icon_write_compass(huffile_t *huf, int index)
 	for (i = 0; i < ip->size / size; i++) {
 		img = bta_cell_new(0, 0, ip->width, ip->height, 0,
 				bts_ncopy(data, size, offset));
-		img = bta_cell_convert(img);
+		bta_cell_convert(img);
 		bta_toPNG(img, mkImagePath("%s_%s.png", ip->name, cdir[i]));
 		bta_cell_free(img);
 		offset += size;
@@ -193,7 +193,7 @@ static void icon_write_detect(huffile_t *huf, int index)
 		}
 
 		img->gfx = bts_ncopy(data, size, size * ((i > 3)? 6 - i : i));
-		img = bta_cell_convert(img);
+		bta_cell_convert(img);
 		bta_cell_set(bta, 0, i, img);
 	}
 
@@ -269,7 +269,7 @@ static void outputMousePointers(void)
 		data = bts_strncpy(&b2_mouseGfx[i][32], 128);
 		data = gfx_vga2gfx(data);
 		img = bta_cell_new(0, 0, 8, 16, 0, data);
-		img = bta_cell_convert(img);
+		bta_cell_convert(img);
 		bta_toPNG(img, bts_sprintf("mouse_%d.png", i));
 		bta_cell_free(img);
 	}
