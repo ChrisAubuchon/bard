@@ -262,4 +262,12 @@ void		*btEffect_getDataPointer(btEffect_t *be);
 
 json_t		*btTargetting_toJson(btTargetting_t *bto);
 
+bteAttack_t	*bteAttack_new(void);
+void		bteAttack_toParam(btAction_t *, bteAttack_t *);
+btePassive_t	*btePassive_new(void);
+bteDisbelieve_t	*bteDisbelieve_new(void);
+bteBonus_t	*bteBonus_new(void);
+bteHeal_t	*bteHeal_new(void);
+bteSummon_t	*bteSummon_new(void);
+
 #endif

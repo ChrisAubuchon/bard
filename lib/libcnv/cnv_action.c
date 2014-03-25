@@ -69,20 +69,17 @@ static json_t *param_toJson(const void *vp)
 	switch (p->type) {
 	case PARAM_STRING:
 	case PARAM_BTSTRING:
-		if (p->s == NULL);
+		if (p->s == NULL)
 			return NULL;
 
 		return json_string(p->s->buf);
-		break;
 	case PARAM_NUMBER:
 		return json_integer(p->n);
-		break;
 	case PARAM_BOOL:
 		if (p->b)
 			return json_true();
 		else
-			return json_false();
-		break;
+			return NULL;
 	}
 
 	return NULL;
@@ -114,13 +111,41 @@ void btAction_addParam(btAction_t *ba, uint32_t type, uint8_t *name, ...)
 
 	switch (type) {
 	case PARAM_STRING:
-		p->s = bts_strcpy(va_arg(args, uint8_t *));
+	{
+		uint8_t		*s;
+
+		s = va_arg(args, uint8_t *);
+		if (s == NULL) {
+			param_free(p);
+			return;
+		}
+		p->s = bts_strcpy(s);
 		break;
+	}
 	case PARAM_BTSTRING:
-		p->s = va_arg(args, btstring_t *);
+	{
+		btstring_t	*s;
+
+		s = va_arg(args, btstring_t *);
+		if (s == NULL) {
+			param_free(p);
+			return;	
+		}
+
+		p->s = s;
 		break;
+	}
 	case PARAM_NUMBER:
-		p->n = va_arg(args, uint32_t);
+	{
+		uint32_t	n;
+
+		n = va_arg(args, uint32_t);
+		if (n == 0) {
+			param_free(p);
+			return;
+		}
+
+		p->n = n;
 		break;
 	case PARAM_BOOL:
 		p->b = va_arg(args, uint32_t);

@@ -11,27 +11,27 @@
 /*				*/
 /********************************/
 
-static bteAttack_t *bteAttack_new(void);
+/*static bteAttack_t *bteAttack_new(void);*/
 static json_t *bteAttack_toJson(const void *vba);
 static void bteAttack_free(const void *vba);
 
-static btePassive_t *btePassive_new(void);
+/*static btePassive_t *btePassive_new(void);*/
 static json_t *btePassive_toJson(const void *vbp);
 static void btePassive_free(const void *vbp);
 
-static bteDisbelieve_t *bteDisbelieve_new(void);
+/*static bteDisbelieve_t *bteDisbelieve_new(void);*/
 static json_t *bteDisbelieve_toJson(const void *vbd);
 static void bteDisbelieve_free(const void *vbd);
 
-static bteBonus_t *bteBonus_new(void);
+/*static bteBonus_t *bteBonus_new(void);*/
 static json_t *bteBonus_toJson(const void *vbb);
 static void bteBonus_free(const void *vbb);
 
-static bteHeal_t *bteHeal_new(void);
+/*static bteHeal_t *bteHeal_new(void);*/
 static json_t *bteHeal_toJson(const void *vbh);
 static void bteHeal_free(const void *vbh);
 
-static bteSummon_t *bteSummon_new(void);
+/*static bteSummon_t *bteSummon_new(void);*/
 static json_t *bteSummon_toJson(const void *vbs);
 static void bteSummon_free(const void *vbs);
 
@@ -221,7 +221,7 @@ json_t *btTargetting_toJson(btTargetting_t *bto)
 /*				*/
 /********************************/
 
-static bteAttack_t *bteAttack_new(void)
+bteAttack_t *bteAttack_new(void)
 {
 	bteAttack_t	*rval;
 
@@ -277,6 +277,32 @@ static json_t *bteAttack_toJson(const void *vba)
 	return node;
 }
 
+/*
+ * bteAttack_toParam()
+ */
+void bteAttack_toParam(btAction_t *ba, bteAttack_t *at)
+{
+	btAction_addParam(ba, PARAM_NUMBER, "ndice", ba->ndice);
+	btAction_addParam(ba, PARAM_NUMBER, "dieval", ba->dieval);
+	btAction_addParam(ba, PARAM_BOOL, "allFoes", ba->allFoes);
+	btAction_addParam(ba, PARAM_BOOL, "group", ba->group);
+	btAction_addParam(ba, PARAM_BOOL, "levelMultiply", ba->levelMult);
+	btAction_addParam(ba, PARAM_BOOL, "isSpell", ba->isSpell);
+	btAction_addParam(ba, PARAM_BOOL, "isBreath", ba->isBreath);
+	btAction_addParam(ba, PARAM_BOOL, "outOfRange", ba->outOfRange);
+	btAction_addParam(ba, PARAM_NUMBER, "range", ba->range);
+	btAction_addParam(ba, PARAM_STRING, "specialAttack",
+		getSpecialAttack(ba->spAttack));
+	btAction_addParam(ba, PARAM_STRING, "atype",
+		getAttypeString(ba->atype));
+	btAction_addParam(ba, PARAM_STRING, "fireString",
+		getFireString(ba->fireString));
+	
+	btAction_addParam(ba, PARAM_BOOL, "allFoes", ba->allFoes);
+	btAction_addParam(ba, PARAM_BOOL, "allFoes", ba->allFoes);
+	btAction_addParam(ba, PARAM_BOOL, "allFoes", ba->allFoes);
+	btAction_addParam(ba, PARAM_BOOL, "allFoes", ba->allFoes);
+}
 
 /********************************/
 /*				*/
@@ -284,7 +310,7 @@ static json_t *bteAttack_toJson(const void *vba)
 /*				*/
 /********************************/
 
-static btePassive_t *btePassive_new(void)
+btePassive_t *btePassive_new(void)
 {
 	btePassive_t	*rval;
 
@@ -344,7 +370,7 @@ static json_t *btePassive_toJson(const void *vbp)
 /*				*/
 /********************************/
 
-static bteDisbelieve_t *bteDisbelieve_new(void)
+bteDisbelieve_t *bteDisbelieve_new(void)
 {
 	bteDisbelieve_t	*rval;
 
@@ -387,7 +413,7 @@ static json_t *bteDisbelieve_toJson(const void *vbd)
 /*				*/
 /********************************/
 
-static bteBonus_t *bteBonus_new(void)
+bteBonus_t *bteBonus_new(void)
 {
 	bteBonus_t	*rval;
 
@@ -449,7 +475,7 @@ static json_t *bteBonus_toJson(const void *vbb)
 /*				*/
 /********************************/
 
-static bteHeal_t *bteHeal_new(void)
+bteHeal_t *bteHeal_new(void)
 {
 	bteHeal_t	*rval;
 
@@ -502,7 +528,7 @@ static json_t *bteHeal_toJson(const void *vbh)
 /*				*/
 /********************************/
 
-static bteSummon_t *bteSummon_new(void)
+bteSummon_t *bteSummon_new(void)
 {
 	bteSummon_t	*rval;
 

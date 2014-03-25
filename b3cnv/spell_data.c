@@ -399,7 +399,7 @@ party.detect:activate(args.duration, args.detectStairs, args.detectTraps, \
 /*  9*/	NULL,
 /* 10*/	"spells:calmCreatures()",
 /* 11*/	"party.compass:activate(args.duration)",
-/* 12*/	NULL,
+/* 12*/	"spells:damageSpell(args)",
 /* 13*/	NULL,
 /* 14*/	"spells:divineIntervention()",
 /* 15*/	NULL,

@@ -96,7 +96,6 @@ static btFunction_t *getFunction(uint32_t type)
 static btAction_t *spf_batbonus(uint32_t index)
 {
 	btAction_t	*rval;
-	bteBonus_t	*bb;
 	uint8_t		type;
 
 	rval	= btAction_new(FUNC_NONE, EFFECT_NONE);
@@ -165,12 +164,48 @@ static btAction_t *spf_dmgspell(uint32_t i)
  * cnvBreathAttack()
  * Convert a breathAtt_t structure to a spell effect
  */
-btAction_t *cnvBreathAttack(breathAtt_t * b, uint8_t range)
+btAction_t *cnvBreathAttack(breathAtt_t *b, uint8_t range)
 {
 	btAction_t	*rval;
+	bteAttack_t	a;
 
 	rval = btAction_new(FUNC_NONE, EFFECT_NONE);
-	rval->function = btFunction_new(FUNC_STRING, bts_strcpy("--xxx_damage_spell"));
+	rval->function = getFunction(sp_damageSpell);
+
+	a.allFoes	= IFBIT(b->targetFlags, 0x80, 1, 0);
+	a.group		= IFBIT(b->targetFlags, 0x40, 1, 0);
+	a.levelMult	= (b->levelMult == 0);
+	a.isSpell	= IFBIT(b->targetFlags, 2, 1, 0);
+	a.isBreath	= IFBIT(b->targetFlags, 1, 1, 0);
+	a.spAttack	= b->effect);
+	
+	a.outOfRange	= IFBIT(range, 0x80, 1, 0);
+	a.range		= range & 0x7f;
+	a.attype	= (b->breathFlag & 0xfe) >> 1;
+	if (b->damage) {
+		a.ndice = NDICE(b->damage) * ((b->levelMult != 0) ? b->levelMult : 1);
+		a.dieval = DIEVAL(b->damage);
+	}
+
+	a.rflags.evil		= IFBIT(b->repelFlags, 0x80, 1, 0);
+	a.rflags.demon		= IFBIT(b->repelFlags, 0x40, 1, 0);
+	a.rflags.spellcaster	= IFBIT(b->repelFlags, 0x20, 1, 0);
+	a.rflags.unk1		= IFBIT(b->repelFlags, 0x10, 1, 0);
+	a.rflags.unk2		= IFBIT(b->repelFlags, 0x08, 1, 0);
+	a.rflags.unk3		= IFBIT(b->repelFlags, 0x04, 1, 0);
+	a.rflags.unk4		= IFBIT(b->repelFlags, 0x02, 1, 0);
+	a.rflags.unk5		= IFBIT(b->repelFlags, 0x01, 1, 0);
+
+	a.elem.fire		= IFBIT(b->elements, 0x80, 1, 0);
+	a.elem.unk1		= IFBIT(b->elements, 0x40, 1, 0);
+	a.elem.holy		= IFBIT(b->elements, 0x20, 1, 0);
+	a.elem.ice		= IFBIT(b->elements, 0x10, 1, 0);
+	a.elem.lightning	= IFBIT(b->elements, 0x08, 1, 0);
+	a.elem.spell		= IFBIT(b->elements, 0x04, 1, 0);
+	a.elem.unk2		= IFBIT(b->elements, 0x02, 1, 0);
+	a.elem.unk3		= IFBIT(b->elements, 0x01, 1, 0);
+
+	bteAttack_toParam(rval, &a);
 
 	return rval;
 #if 0
