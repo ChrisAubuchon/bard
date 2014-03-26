@@ -109,6 +109,9 @@ json_t *cnvList_toJsonObject(cnvList_t *cl)
 	gl_list_node_t		node;
 	const void		*data;
 
+	if (cl == NULL)
+		return NULL;
+
 	root = json_object();
 	iter = gl_list_iterator(cl->list);
 	while (gl_list_iterator_next(&iter, &data, &node)) {

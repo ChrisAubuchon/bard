@@ -98,11 +98,12 @@ static btAction_t *spf_batbonus(uint32_t index)
 	btAction_t	*rval;
 	uint8_t		type;
 
-	rval	= btAction_new(FUNC_NONE, EFFECT_NONE);
+	rval		= btAction_new(FUNC_NONE, EFFECT_NONE);
+	rval->pl	= paramList_new();
 
 	type = spellType[index];
 
-	btAction_addParam(rval, PARAM_NUMBER, "amount", spellDuration[index]);
+	param_add(rval->pl, PARAM_NUMBER, "amount", spellDuration[index]);
 
 	switch (type) {
 	case sp_acBonus:
@@ -169,6 +170,8 @@ btAction_t *cnvBreathAttack(breathAtt_t *b, uint8_t range)
 	btAction_t	*rval;
 	bteAttack_t	a;
 
+	memset(&a, 0, sizeof(bteAttack_t));
+
 	rval = btAction_new(FUNC_NONE, EFFECT_NONE);
 	rval->function = getFunction(sp_damageSpell);
 
@@ -177,7 +180,7 @@ btAction_t *cnvBreathAttack(breathAtt_t *b, uint8_t range)
 	a.levelMult	= (b->levelMult == 0);
 	a.isSpell	= IFBIT(b->targetFlags, 2, 1, 0);
 	a.isBreath	= IFBIT(b->targetFlags, 1, 1, 0);
-	a.spAttack	= b->effect);
+	a.spAttack	= b->effect;
 	
 	a.outOfRange	= IFBIT(range, 0x80, 1, 0);
 	a.range		= range & 0x7f;
@@ -205,55 +208,9 @@ btAction_t *cnvBreathAttack(breathAtt_t *b, uint8_t range)
 	a.elem.unk2		= IFBIT(b->elements, 0x02, 1, 0);
 	a.elem.unk3		= IFBIT(b->elements, 0x01, 1, 0);
 
-	bteAttack_toParam(rval, &a);
+	rval->pl = bteAttack_toParam(&a);
 
 	return rval;
-#if 0
-	uint16_t ndice;
-	uint16_t dieval;
-	uint8_t isBreath = 0;
-	uint8_t isSpell = 0;
-	btAction_t *rsp;
-
-	rsp = spellEffect_new(S_DMGSPELL);
-
-	DMGPTR(rsp, allFoes) = IFBIT(b->targetFlags, 0x80, 1, 0);
-	DMGPTR(rsp, group) = IFBIT(b->targetFlags, 0x40, 1, 0);
-	DMGPTR(rsp, levelMult) = (b->levelMult == 0);
-	DMGPTR(rsp, isSpell) = IFBIT(b->targetFlags, 2, 1, 0);
-	DMGPTR(rsp, isBreath) = IFBIT(b->targetFlags, 1, 1, 0);
-	DMGPTR(rsp, spAttack) = b->effect;
-
-	DMGPTR(rsp, outOfRange) = IFBIT(range, 0x80, 1, 0);
-	DMGPTR(rsp, range) = range & 0x7f;
-	DMGPTR(rsp, addFlag) = 0;
-	DMGPTR(rsp, distance) = 0;
-	DMGPTR(rsp, attype) = (b->breathFlag & 0xfe) >> 1;
-	if (b->damage) {
-		DMGPTR(rsp, ndice) = NDICE(b->damage) * ((b->levelMult != 0) ? b->levelMult : 1);
-		DMGPTR(rsp, dieval) = DIEVAL(b->damage);
-	}
-
-	DMGPTR(rsp, rflags.evil) = IFBIT(b->repelFlags, 0x80, 1, 0);
-	DMGPTR(rsp, rflags.demon) = IFBIT(b->repelFlags, 0x40, 1, 0);
-	DMGPTR(rsp, rflags.spellcaster) = IFBIT(b->repelFlags, 0x20, 1, 0);
-	DMGPTR(rsp, rflags.unk1) = IFBIT(b->repelFlags, 0x10, 1, 0);
-	DMGPTR(rsp, rflags.unk2) = IFBIT(b->repelFlags, 0x08, 1, 0);
-	DMGPTR(rsp, rflags.unk3) = IFBIT(b->repelFlags, 0x04, 1, 0);
-	DMGPTR(rsp, rflags.unk4) = IFBIT(b->repelFlags, 0x02, 1, 0);
-	DMGPTR(rsp, rflags.unk5) = IFBIT(b->repelFlags, 0x01, 1, 0);
-
-	DMGPTR(rsp, elem.fire) = IFBIT(b->elements, 0x80, 1, 0);
-	DMGPTR(rsp, elem.unk1) = IFBIT(b->elements, 0x40, 1, 0);
-	DMGPTR(rsp, elem.holy) = IFBIT(b->elements, 0x20, 1, 0);
-	DMGPTR(rsp, elem.ice) = IFBIT(b->elements, 0x10, 1, 0);
-	DMGPTR(rsp, elem.lightning) = IFBIT(b->elements, 0x08, 1, 0);
-	DMGPTR(rsp, elem.spell) = IFBIT(b->elements, 0x04, 1, 0);
-	DMGPTR(rsp, elem.unk2) = IFBIT(b->elements, 0x02, 1, 0);
-	DMGPTR(rsp, elem.unk3) = IFBIT(b->elements, 0x01, 1, 0);
-
-	return rsp;
-#endif
 }
 
 /*
@@ -273,7 +230,9 @@ static btAction_t *spf_generic(uint32_t index)
 
 	switch (type) {
 	case sp_phaseDoor:
-		btAction_addParam(rval, PARAM_BOOL, "isPermanent",
+		rval->pl = paramList_new();
+
+		param_add(rval->pl, PARAM_BOOL, "isPermanent",
 			spellDuration[index] > 0);
 		break;
 	}
@@ -308,70 +267,68 @@ static btAction_t *spf_geomancer(uint32_t i)
 /*
  * spf_healspell()
  */
-static btAction_t *spf_healspell(uint32_t i)
+static btAction_t *spf_healspell(uint32_t index)
 {
 	btAction_t	*rval;
+	bteHeal_t	bh;
+
+	memset(&bh, 0, sizeof(bh));
 
 	rval = btAction_new(FUNC_NONE, EFFECT_NONE);
-	rval->function = btFunction_new(FUNC_STRING, bts_strcpy("--xxx_heal_spell"));
+	rval->function = getFunction(sp_healSpell);
 
-	return rval;
-#if 0
-	btAction_t *rsp;
+	bh.groupHeal		= IFBIT(spellRange[index], 0x80, 1, 0);
 
-	rsp = spellEffect_new(S_HEALSPELL);
-
-	HEAPTR(rsp, groupHeal) = IFBIT(spellRange[i], 0x80, 1, 0);
-
-	switch (spellDuration[i]) {
+	switch (spellDuration[index]) {
 	case 0xfe:
-		HEAPTR(rsp, rndHeal) = 0;
-		HEAPTR(rsp, dice) = 8;
+		bh.randomHeal	= 0;
+		bh.ndice	= 8;
 		break;
 	case 0xfd:
-		HEAPTR(rsp, rndHeal) = 0;
-		HEAPTR(rsp, fullHeal) = 1;
+		bh.randomHeal	= 0;
+		bh.fullHeal	= 1;
 		break;
 	case 0xff:
-		HEAPTR(rsp, rndHeal) = 1;
-		HEAPTR(rsp, levelMult) = 1;
+		bh.randomHeal	= 1;
+		bh.levelMultiply	= 1;
+		bh.dieval	= 4;
 		break;
 	default:
-		HEAPTR(rsp, rndHeal) = 1;
-		HEAPTR(rsp, dice) = spellDuration[i];
+		bh.randomHeal	= 1;
+		bh.ndice	= spellDuration[index];
+		bh.dieval	= 4;
 		break;
 	}
 
-	switch (spellRange[i] & 0x7f) {
+	switch (spellRange[index] & 0x7f) {
 	case 1:
-		HEAPTR(rsp, poison) = 1;
-		HEAPTR(rsp, paralysis) = 1;
-		HEAPTR(rsp, insanity) = 1;
+		bh.poison	= 1;
+		bh.paralysis	= 1;
+		bh.insanity	= 1;
 		break;
 	case 2:
-		HEAPTR(rsp, stoned) = 1;
+		bh.stoned	= 1;
 		break;
 	case 3:
-		HEAPTR(rsp, dispossess) = 1;
+		bh.dispossess	= 1;
 		break;
 	case 4:
-		HEAPTR(rsp, resurrect) = 1;
+		bh.resurrect	= 1;
 		break;
 	case 5:
-		HEAPTR(rsp, old) = 1;
+		bh.old		= 1;
 		break;
 	case 6:
-		HEAPTR(rsp, poison) = 1;
-		HEAPTR(rsp, resurrect) = 1;
-		HEAPTR(rsp, paralysis) = 1;
-		HEAPTR(rsp, insanity) = 1;
-		break;
-	default:
+		bh.poison	= 1;
+		bh.resurrect	= 1;
+		bh.paralysis	= 1;
+		bh.insanity	= 1;
 		break;
 	}
 
-	return rsp;
-#endif
+	rval->pl = bteHeal_toParam(&bh);
+
+	return rval;
 }
 
 /*
@@ -382,44 +339,40 @@ static btAction_t *spf_passiveeffect(uint32_t index)
 	btAction_t	*rval;
 	uint8_t		type, flags;
 	int8_t		duration;
+	btePassive_t	bp;
+
+	memset(&bp, 0, sizeof(btePassive_t));
 
 	type		= spellType[index];
 	duration	= spellDuration[index];
 	flags		= spellRange[index];
 
-
 	rval = btAction_new(FUNC_NONE, EFFECT_NONE);
 
 	switch (spellType[index]) {
 	case sp_areaEnchant:
-		btAction_addParam(rval, PARAM_NUMBER, "duration", duration);
-		btAction_addParam(rval, PARAM_BOOL, "detectStairs",
-					(flags != 0));
-		btAction_addParam(rval, PARAM_BOOL, "detectTraps",
-					(flags != 1));
-		btAction_addParam(rval, PARAM_BOOL, "detectSpecial",
-					(flags == 2));
-		
+		bp.duration		= (duration == 0xff) ? -1 : duration;
+		bp.detectStairs		= (flags != 0);
+		bp.detectTraps		= (flags != 1);
+		bp.detectSpecial	= (flags == 2);
 		break;
 	case sp_compassSpell:
 	case sp_levitation:
-		btAction_addParam(rval, PARAM_NUMBER, "duration", duration);
+		bp.duration		= (duration == 0xff) ? -1 : duration;
 		break;
 	case sp_lightSpell:
-		btAction_addParam(rval, PARAM_NUMBER, "duration", 
-					lightDur[duration]);
-		btAction_addParam(rval, PARAM_NUMBER, "distance", 
-					lightDur[duration]);
-		btAction_addParam(rval, PARAM_NUMBER, "seeSecret", 
-					lightDur[duration]);
+		bp.duration		= lightDur[duration];
+		bp.lightDistance	= lightDist[duration];
+		bp.detectSecret		= lightSDFlag[duration];
 		break;
 	case sp_shieldSpell:
-		btAction_addParam(rval, PARAM_NUMBER, "duration", duration);
-		btAction_addParam(rval, PARAM_NUMBER, "acBonus", flags);
+		bp.duration		= (duration == 0xff) ? -1 : duration;
+		bp.acBonus		= flags;
 		break;
 	}
 
-	rval->function = getFunction(type); 
+	rval->function	= getFunction(type); 
+	rval->pl	= btePassive_toParam(&bp);
 
 	return rval;
 }

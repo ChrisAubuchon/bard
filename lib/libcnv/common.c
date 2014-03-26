@@ -111,9 +111,9 @@ json_t *meleeString_toJson(uint8_t index)
 
 uint8_t *getFireString(uint8_t f)
 {
-  assert(f < 14);
+	assert(f < 14);
 
-  return fireType[f];
+	return fireType[f];
 }
 
 uint8_t *getUseString(uint8_t u)

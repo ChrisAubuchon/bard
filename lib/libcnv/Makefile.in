@@ -68,12 +68,12 @@ am_libcnv_a_OBJECTS = libcnv_a-d3comp.$(OBJEXT) \
 	libcnv_a-cnv_bigpic.$(OBJEXT) libcnv_a-cnv_city.$(OBJEXT) \
 	libcnv_a-cnv_dun.$(OBJEXT) libcnv_a-cnv_function.$(OBJEXT) \
 	libcnv_a-cnv_gfx.$(OBJEXT) libcnv_a-cnv_item.$(OBJEXT) \
-	libcnv_a-cnv_mon.$(OBJEXT) libcnv_a-cnv_song.$(OBJEXT) \
-	libcnv_a-cnv_spell.$(OBJEXT) libcnv_a-cnv_trap.$(OBJEXT) \
-	libcnv_a-cnv_list.$(OBJEXT) libcnv_a-cnv_class.$(OBJEXT) \
-	libcnv_a-cnv_race.$(OBJEXT) libcnv_a-bt_gfx.$(OBJEXT) \
-	libcnv_a-cnv_effect.$(OBJEXT) libcnv_a-gfx_view.$(OBJEXT) \
-	libcnv_a-common.$(OBJEXT)
+	libcnv_a-cnv_mon.$(OBJEXT) libcnv_a-cnv_param.$(OBJEXT) \
+	libcnv_a-cnv_song.$(OBJEXT) libcnv_a-cnv_spell.$(OBJEXT) \
+	libcnv_a-cnv_trap.$(OBJEXT) libcnv_a-cnv_list.$(OBJEXT) \
+	libcnv_a-cnv_class.$(OBJEXT) libcnv_a-cnv_race.$(OBJEXT) \
+	libcnv_a-bt_gfx.$(OBJEXT) libcnv_a-cnv_effect.$(OBJEXT) \
+	libcnv_a-gfx_view.$(OBJEXT) libcnv_a-common.$(OBJEXT)
 libcnv_a_OBJECTS = $(am_libcnv_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -544,6 +544,8 @@ libcnv_a_SOURCES = \
 	cnv_item.c	\
 	cnv_mon.h	\
 	cnv_mon.c	\
+	cnv_param.h	\
+	cnv_param.c	\
 	cnv_song.h	\
 	cnv_song.c	\
 	cnv_spell.h	\
@@ -624,6 +626,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-cnv_item.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-cnv_list.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-cnv_mon.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-cnv_param.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-cnv_race.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-cnv_song.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcnv_a-cnv_spell.Po@am__quote@
@@ -786,6 +789,20 @@ libcnv_a-cnv_mon.obj: cnv_mon.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cnv_mon.c' object='libcnv_a-cnv_mon.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-cnv_mon.obj `if test -f 'cnv_mon.c'; then $(CYGPATH_W) 'cnv_mon.c'; else $(CYGPATH_W) '$(srcdir)/cnv_mon.c'; fi`
+
+libcnv_a-cnv_param.o: cnv_param.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-cnv_param.o -MD -MP -MF $(DEPDIR)/libcnv_a-cnv_param.Tpo -c -o libcnv_a-cnv_param.o `test -f 'cnv_param.c' || echo '$(srcdir)/'`cnv_param.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libcnv_a-cnv_param.Tpo $(DEPDIR)/libcnv_a-cnv_param.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cnv_param.c' object='libcnv_a-cnv_param.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-cnv_param.o `test -f 'cnv_param.c' || echo '$(srcdir)/'`cnv_param.c
+
+libcnv_a-cnv_param.obj: cnv_param.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-cnv_param.obj -MD -MP -MF $(DEPDIR)/libcnv_a-cnv_param.Tpo -c -o libcnv_a-cnv_param.obj `if test -f 'cnv_param.c'; then $(CYGPATH_W) 'cnv_param.c'; else $(CYGPATH_W) '$(srcdir)/cnv_param.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libcnv_a-cnv_param.Tpo $(DEPDIR)/libcnv_a-cnv_param.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cnv_param.c' object='libcnv_a-cnv_param.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -c -o libcnv_a-cnv_param.obj `if test -f 'cnv_param.c'; then $(CYGPATH_W) 'cnv_param.c'; else $(CYGPATH_W) '$(srcdir)/cnv_param.c'; fi`
 
 libcnv_a-cnv_song.o: cnv_song.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libcnv_a_CFLAGS) $(CFLAGS) -MT libcnv_a-cnv_song.o -MD -MP -MF $(DEPDIR)/libcnv_a-cnv_song.Tpo -c -o libcnv_a-cnv_song.o `test -f 'cnv_song.c' || echo '$(srcdir)/'`cnv_song.c

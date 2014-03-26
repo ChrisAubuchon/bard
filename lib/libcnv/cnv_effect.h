@@ -1,6 +1,8 @@
 #ifndef _LIBCNV_LIB_EFFECT_H
 #define _LIBCNV_LIB_EFFECT_H
 
+#include <cnv_param.h>
+
 /********************************/
 /*				*/
 /* Macros			*/
@@ -149,7 +151,7 @@ typedef struct {
  */
 typedef struct {
 	uint8_t		type;
-	uint8_t		duration;
+	int8_t		duration;
 
 	uint8_t		lightDistance;
 	uint8_t		detectSecret;
@@ -254,6 +256,8 @@ typedef struct {
 
 json_t		*repel_toJson(repel_t *r);
 json_t		*elements_toJson(elements_t *e);
+paramList_t	*repel_toParam(repel_t *r);
+paramList_t	*elements_toParam(elements_t *e);
 
 btEffect_t	*btEffect_new(uint8_t type);
 void		btEffect_free(const void *vbe);
@@ -263,11 +267,13 @@ void		*btEffect_getDataPointer(btEffect_t *be);
 json_t		*btTargetting_toJson(btTargetting_t *bto);
 
 bteAttack_t	*bteAttack_new(void);
-void		bteAttack_toParam(btAction_t *, bteAttack_t *);
+paramList_t	*bteAttack_toParam(bteAttack_t *);
 btePassive_t	*btePassive_new(void);
+paramList_t	*btePassive_toParam(btePassive_t *);
 bteDisbelieve_t	*bteDisbelieve_new(void);
 bteBonus_t	*bteBonus_new(void);
 bteHeal_t	*bteHeal_new(void);
+paramList_t	*bteHeal_toParam(bteHeal_t *);
 bteSummon_t	*bteSummon_new(void);
 
 #endif

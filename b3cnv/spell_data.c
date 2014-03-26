@@ -417,10 +417,10 @@ end\
 if (self:groupSavingThrow()) then\
 	self.target:addBattleBonus(\"missTurn\", true, false)\
 end",
-/* 20*/	NULL,
+/* 20*/	"spells:healSpell(args)",
 /* 21*/	"spells:identify()",
 /* 22*/	"party.levitate:activate(args.duration)",
-/* 23*/	"party.light:activate(args.duration, args.distance, args.seeSecret)",
+/* 23*/	"party.light:activate(args.duration, args.distance, args.detectSecret)",
 /* 24*/	"\
 party:addBattleBonus(\"toHitBonus\", args.amount, true)\
 party:addBattleBonus(\"antiMagic\", args.amount, true)\

@@ -160,6 +160,24 @@ json_t *repel_toJson(repel_t *r)
 	return root;
 }
 
+paramList_t *repel_toParam(repel_t *r)
+{
+	paramList_t	*rval;
+
+	rval = paramList_new();
+
+	param_add(rval, PARAM_BOOL, "evil", r->evil);
+	param_add(rval, PARAM_BOOL, "demon", r->demon);
+	param_add(rval, PARAM_BOOL, "spellcaster", r->spellcaster);
+	param_add(rval, PARAM_BOOL, "unk1", r->unk1);
+	param_add(rval, PARAM_BOOL, "unk2", r->unk2);
+	param_add(rval, PARAM_BOOL, "unk3", r->unk3);
+	param_add(rval, PARAM_BOOL, "unk4", r->unk4);
+	param_add(rval, PARAM_BOOL, "unk5", r->unk5);
+
+	return rval;
+}
+
 /********************************/
 /*				*/
 /* elements_t functions		*/
@@ -185,6 +203,24 @@ json_t *elements_toJson(elements_t *e)
 	json_object_set_new(root, "elements", node);
 
 	return root;
+}
+
+paramList_t *elements_toParam(elements_t *e)
+{
+	paramList_t	*rval;
+
+	rval = paramList_new();
+
+	param_add(rval, PARAM_BOOL, "fire", e->fire);
+	param_add(rval, PARAM_BOOL, "unk1", e->unk1);
+	param_add(rval, PARAM_BOOL, "holy", e->holy);
+	param_add(rval, PARAM_BOOL, "ice", e->ice);
+	param_add(rval, PARAM_BOOL, "lightning", e->lightning);
+	param_add(rval, PARAM_BOOL, "spell", e->spell);
+	param_add(rval, PARAM_BOOL, "unk2", e->unk2);
+	param_add(rval, PARAM_BOOL, "unk3", e->unk3);
+
+	return rval;
 }
 
 /********************************/
@@ -280,28 +316,39 @@ static json_t *bteAttack_toJson(const void *vba)
 /*
  * bteAttack_toParam()
  */
-void bteAttack_toParam(btAction_t *ba, bteAttack_t *at)
+paramList_t *bteAttack_toParam(bteAttack_t *at)
 {
-	btAction_addParam(ba, PARAM_NUMBER, "ndice", ba->ndice);
-	btAction_addParam(ba, PARAM_NUMBER, "dieval", ba->dieval);
-	btAction_addParam(ba, PARAM_BOOL, "allFoes", ba->allFoes);
-	btAction_addParam(ba, PARAM_BOOL, "group", ba->group);
-	btAction_addParam(ba, PARAM_BOOL, "levelMultiply", ba->levelMult);
-	btAction_addParam(ba, PARAM_BOOL, "isSpell", ba->isSpell);
-	btAction_addParam(ba, PARAM_BOOL, "isBreath", ba->isBreath);
-	btAction_addParam(ba, PARAM_BOOL, "outOfRange", ba->outOfRange);
-	btAction_addParam(ba, PARAM_NUMBER, "range", ba->range);
-	btAction_addParam(ba, PARAM_STRING, "specialAttack",
-		getSpecialAttack(ba->spAttack));
-	btAction_addParam(ba, PARAM_STRING, "atype",
-		getAttypeString(ba->atype));
-	btAction_addParam(ba, PARAM_STRING, "fireString",
-		getFireString(ba->fireString));
+	paramList_t	*pl;
+
+	pl = paramList_new();
+
+	param_add(pl, PARAM_NUMBER, "ndice", at->ndice);
+	param_add(pl, PARAM_NUMBER, "dieval", at->dieval);
+	param_add(pl, PARAM_BOOL, "allFoes", at->allFoes);
+	param_add(pl, PARAM_BOOL, "group", at->group);
+	param_add(pl, PARAM_BOOL, "levelMultiply", at->levelMult);
+	param_add(pl, PARAM_BOOL, "isSpell", at->isSpell);
+	param_add(pl, PARAM_BOOL, "isBreath", at->isBreath);
+	param_add(pl, PARAM_BOOL, "outOfRange", at->outOfRange);
+	param_add(pl, PARAM_NUMBER, "range", at->range);
+	param_add(pl, PARAM_STRING, "specialAttack",
+		getSpecialAttack(at->spAttack));
+	param_add(pl, PARAM_STRING, "atype",
+		getAttypeString(at->attype));
+	param_add(pl, PARAM_STRING, "fireString",
+		getFireString(at->fireString));
+
+	param_add(pl, PARAM_LIST, "repel", repel_toParam(&at->rflags));
+	param_add(pl, PARAM_LIST, "elements", elements_toParam(&at->elem));
 	
-	btAction_addParam(ba, PARAM_BOOL, "allFoes", ba->allFoes);
-	btAction_addParam(ba, PARAM_BOOL, "allFoes", ba->allFoes);
-	btAction_addParam(ba, PARAM_BOOL, "allFoes", ba->allFoes);
-	btAction_addParam(ba, PARAM_BOOL, "allFoes", ba->allFoes);
+#if 0
+	param_add(pl, PARAM_BOOL, "allFoes", at->allFoes);
+	param_add(pl, PARAM_BOOL, "allFoes", at->allFoes);
+	param_add(pl, PARAM_BOOL, "allFoes", at->allFoes);
+	param_add(pl, PARAM_BOOL, "allFoes", at->allFoes);
+#endif
+
+	return pl;
 }
 
 /********************************/
@@ -362,6 +409,28 @@ static json_t *btePassive_toJson(const void *vbp)
 	json_object_set_new(node, "inData", inData);
 
 	return node;
+}
+
+/*
+ * btePassive_toParam()
+ */
+paramList_t *btePassive_toParam(btePassive_t *bp)
+{
+	paramList_t	*rval;
+
+	rval = paramList_new();
+
+	param_add(rval, PARAM_NUMBER, "duration", 
+			(bp->duration == 255 ? -1 : bp->duration));
+
+	param_add(rval, PARAM_NUMBER, "distance", bp->lightDistance);
+	param_add(rval, PARAM_BOOL, "detectSecret", bp->detectSecret);
+	param_add(rval, PARAM_BOOL, "detectStairs", bp->detectStairs);
+	param_add(rval, PARAM_BOOL, "detectTraps", bp->detectTraps);
+	param_add(rval, PARAM_BOOL, "detectSpecial", bp->detectSpecial);
+	param_add(rval, PARAM_NUMBER, "acBonus", bp->acBonus);
+
+	return rval;
 }
 
 /********************************/
@@ -520,6 +589,32 @@ static json_t *bteHeal_toJson(const void *vbh)
 	json_object_set_new(node, "inData", inData);
 
 	return node;
+}
+
+/*
+ * bteHeal_toParam()
+ */
+paramList_t *bteHeal_toParam(bteHeal_t *bh)
+{
+	paramList_t	*pl;
+
+	pl = paramList_new();
+
+	param_add(pl, PARAM_NUMBER, "ndice", bh->ndice);
+	param_add(pl, PARAM_NUMBER, "dieval", bh->dieval);
+	param_add(pl, PARAM_BOOL, "randomHeal", bh->randomHeal);
+	param_add(pl, PARAM_BOOL, "fullHeal", bh->fullHeal);
+	param_add(pl, PARAM_BOOL, "groupHeal", bh->groupHeal);
+	param_add(pl, PARAM_BOOL, "levelMultiply", bh->levelMultiply);
+	param_add(pl, PARAM_BOOL, "old", bh->old);
+	param_add(pl, PARAM_BOOL, "dispossess", bh->dispossess);
+	param_add(pl, PARAM_BOOL, "resurrect", bh->resurrect);
+	param_add(pl, PARAM_BOOL, "poison", bh->poison);
+	param_add(pl, PARAM_BOOL, "paralysis", bh->paralysis);
+	param_add(pl, PARAM_BOOL, "insanity", bh->insanity);
+	param_add(pl, PARAM_BOOL, "stoned", bh->stoned);
+
+	return pl;
 }
 
 /********************************/

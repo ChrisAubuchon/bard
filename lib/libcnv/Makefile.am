@@ -30,6 +30,8 @@ libcnv_a_SOURCES = \
 	cnv_item.c	\
 	cnv_mon.h	\
 	cnv_mon.c	\
+	cnv_param.h	\
+	cnv_param.c	\
 	cnv_song.h	\
 	cnv_song.c	\
 	cnv_spell.h	\
