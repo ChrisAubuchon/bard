@@ -1,4 +1,4 @@
-local codeEnvironment = nil
+local codeEnvironment	= nil
 
 code = {}
 
@@ -25,6 +25,8 @@ function code:execute(inCode, inArgs)
 	if (not rval) then
 		error("Execution error: " .. mesg, 2)
 	end
+
+	codeEnvironment.args = nil
 
 	return mesg
 end

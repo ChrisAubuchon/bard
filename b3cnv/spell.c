@@ -11,17 +11,16 @@
 /*				*/
 /********************************/
 
-static btAction_t	*spf_batbonus(uint32_t i);
-static btAction_t	*spf_disbelieve(uint32_t i);
-static btAction_t	*spf_dmgspell(uint32_t i);
-static btAction_t	*spf_generic(uint32_t i);
-static btAction_t	*spf_geomancer(uint32_t i);
-static btAction_t	*spf_healspell(uint32_t i);
-static btAction_t	*spf_passiveeffect(uint32_t i);
-static btAction_t	*spf_rangespell(uint32_t i);
-static btAction_t	*spf_summon(uint32_t i);
-static btAction_t	*spf_grro(uint32_t i);
-static btAction_t	*spf_fota(uint32_t i);
+static btAction_t	*spf_batbonus(uint32_t);
+static btAction_t	*spf_disbelieve(uint32_t);
+static btAction_t	*spf_dmgspell(uint32_t);
+static btAction_t	*spf_generic(uint32_t);
+static btAction_t	*spf_geomancer(uint32_t);
+static btAction_t	*spf_healspell(uint32_t);
+static btAction_t	*spf_passiveeffect(uint32_t);
+static btAction_t	*spf_rangespell(uint32_t);
+static btAction_t	*spf_summon(uint32_t);
+static btAction_t	*spf_batchspell(uint32_t);
 
 static btFunction_t	*getFunction(uint32_t type);
 btAction_t *cnvBreathAttack(breathAtt_t * b, uint8_t range);
@@ -34,42 +33,14 @@ btAction_t *cnvBreathAttack(breathAtt_t * b, uint8_t range);
 
 static spellFunction_t *spellFunctions[] = {
 /* 0*/ spf_generic, spf_generic, NULL, NULL, NULL,
-/* 5*/ spf_generic, spf_batbonus, spf_batbonus, spf_passiveeffect, spf_generic,
+/* 5*/ spf_generic, spf_batbonus, spf_batbonus, spf_passiveeffect, spf_batchspell,
 /*10*/ spf_generic, spf_passiveeffect, spf_dmgspell, spf_disbelieve, spf_generic,
 /*15*/ spf_generic, spf_rangespell, spf_batbonus, spf_geomancer, spf_generic,
 /*20*/ spf_healspell, spf_generic, spf_passiveeffect, spf_passiveeffect, spf_batbonus,
 /*25*/ spf_rangespell, spf_generic, spf_generic, spf_generic, spf_passiveeffect,
 /*30*/ spf_generic, spf_batbonus, spf_summon, spf_generic, spf_generic,
 /*35*/ spf_batbonus, spf_batbonus, spf_generic, spf_generic, spf_generic,
-/*40*/ spf_grro, spf_fota, spf_generic
-};
-
-#if 0
-static uint8_t spTypeStr[] = {
-/* 0*/ S_NONE, S_NONE, S_NONE, S_NONE,
-/* 4*/ S_NONE, S_NONE, S_BATBONUS, S_BATBONUS,
-/* 8*/ S_PASSIVEEFFECT, S_GENERIC, S_GENERIC, S_PASSIVEEFFECT,
-/*12*/ S_DMGSPELL, S_DISBELIEVE, S_GENERIC, S_GENERIC,
-/*16*/ S_DMGSPELL, S_BATBONUS, S_GEOMANCER, S_GENERIC,
-/*20*/ S_HEALSPELL, S_GENERIC, S_PASSIVEEFFECT, S_PASSIVEEFFECT,
-/*24*/ S_BATBONUS, S_DMGSPELL, S_GENERIC, S_GENERIC,
-/*28*/ S_GENERIC, S_PASSIVEEFFECT, S_GENERIC, S_BATBONUS,
-/*32*/ S_SUMMONSPELL, S_GENERIC, S_GENERIC, S_BATBONUS,
-/*36*/ S_BATBONUS, S_GENERIC, S_GENERIC, S_NONE,
-/*40*/ S_HEALSPELL, S_DMGSPELL, S_GENERIC
-};
-#endif
-
-static uint8_t genSpell[] = {
-/* 0*/ GENS_REENERGIZE, GENS_NONE, GENS_NONE, GENS_NONE, GENS_NONE,
-/* 5*/ GENS_NONE, GENS_NONE, GENS_NONE, GENS_NONE, GENS_BATCHSPELL,
-/*10*/ GENS_CAMARADERIE, GENS_NONE, GENS_NONE, GENS_NONE, GENS_DIVINE,
-/*15*/ GENS_EARTHMAW, GENS_NONE, GENS_NONE, GENS_NONE, GENS_MAGESTAR,
-/*20*/ GENS_NONE, GENS_IDENTIFY, GENS_NONE, GENS_NONE, GENS_NONE,
-/*25*/ GENS_NONE, GENS_PHASEDOOR, GENS_POSSESS, GENS_SCRYSITE, GENS_NONE,
-/*30*/ GENS_SPELLBIND, GENS_NONE, GENS_NONE, GENS_TELEPORT, GENS_TRAPZAP,
-/*35*/ GENS_NONE, GENS_NONE, GENS_CHRONO, GENS_MAPSPELL, GENS_MAPSPELL,
-/*40*/ GENS_NONE, GENS_NONE, GENS_MAPSPELL
+/*40*/ spf_generic
 };
 
 /********************************/
@@ -127,26 +98,23 @@ static btAction_t *spf_batbonus(uint32_t index)
 /*
  * spf_disbelieve()
  */
-static btAction_t *spf_disbelieve(uint32_t i)
+static btAction_t *spf_disbelieve(uint32_t index)
 {
 	btAction_t	*rval;
+	uint8_t		dur;
 
-	rval = btAction_new(FUNC_NONE, EFFECT_NONE);
-	rval->function = btFunction_new(FUNC_STRING, bts_strcpy("--xxx_disbelieve_spell"));
+	rval		= btAction_new(FUNC_NONE, EFFECT_NONE);
+	rval->function	= getFunction(sp_disbelieve);
+	rval->pl	= paramList_new();
+
+	dur = spellDuration[index];
+
+	param_add(rval->pl, PARAM_BOOL, "disbelieve", IFBIT(dur, 0x81, 1, 0));
+	param_add(rval->pl, PARAM_BOOL, "allBattle", IFBIT(dur, 0xc0, 1, 0));
+	param_add(rval->pl, PARAM_BOOL, "reveal", IFBIT(dur, 0x80, 1, 0));
+	param_add(rval->pl, PARAM_BOOL, "noSummon", IFBIT(dur, 0x40, 1, 0));
 
 	return rval;
-#if 0
-	btAction_t *rsp;
-
-	rsp = spellEffect_new(S_DISBELIEVE);
-
-	DISPTR(rsp, disbelieve) = IFBIT(spellDuration[i], 0x81, 1, 0);
-	DISPTR(rsp, allBattle) = IFBIT(spellDuration[i], 0xc0, 1, 0);
-	DISPTR(rsp, revealDoppl) = IFBIT(spellDuration[i], 0x80, 1, 0);
-	DISPTR(rsp, noSummon) = IFBIT(spellDuration[i], 0x40, 1, 0);
-
-	return rsp;
-#endif
 }
 
 /*
@@ -387,26 +355,14 @@ static btAction_t *spf_rangespell(uint32_t index)
 	rval = btAction_new(FUNC_NONE, EFFECT_NONE);
 	rval->function = getFunction(spellType[index]);
 
-	return rval;
-#if 0
-	btAction_t *rsp;
+	if (spellType[index] == sp_farFoes) {
+		rval->pl = paramList_new();
 
-	rsp = spellEffect_new(S_DMGSPELL);
-
-	switch (spellType[i]) {
-	case sp_farFoes:
-		DMGPTR(rsp, addFlag) = 1;
-		DMGPTR(rsp, distance) = spellDuration[i];
-		break;
-	case sp_meleeMen:
-		DMGPTR(rsp, distance) = 1;
-		break;
+		param_add(rval->pl, PARAM_NUMBER, "distance", 
+			spellDuration[index]);
 	}
 
-	DMGPTR(rsp, attype) = 10;
-
-	return rsp;
-#endif
+	return rval;
 }
 
 /*
@@ -419,99 +375,44 @@ static btAction_t *spf_summon(uint32_t index)
 	rval = btAction_new(FUNC_NONE, EFFECT_NONE);
 	rval->function = getFunction(spellType[index]);
 
+	rval->pl	= paramList_new();
+
+	param_add(rval->pl, PARAM_BOOL, "isIllusion",
+			IFBIT(spellDuration[index], 0x80, 1, 0));
+	param_add(rval->pl, PARAM_BTSTRING, "type",
+			getSummonMacro(spellDuration[index] & 0x7f));
+
+	if (index == 77) {
+		param_add(rval->pl, PARAM_BOOL, "fillParty", 1);
+	}
+
 	return rval;
-#if 0 
-	btAction_t *rsp;
-	uint8_t *mon;
-
-	rsp = spellEffect_new(S_SUMMONSPELL);
-
-	SUMPTR(rsp, illflag) = IFBIT(spellDuration[i], 0x80, 1, 0);
-	SUMPTR(rsp, sum_zero) = getSummonMacro(spellDuration[i] & 0x7f);
-
-	return rsp;
-#endif
 }
 
 /*
- * spf_grro
- * Convert the Grave Robber batch spell to a healing spell
+ * spf_batchspell()
  */
-static btAction_t *spf_grro(uint32_t i)
+static btAction_t *spf_batchspell(uint32_t index)
 {
+	uint32_t	i;
+	uint32_t	count;
 	btAction_t	*rval;
 
-	rval = btAction_new(FUNC_NONE, EFFECT_NONE);
-	rval->function = btFunction_new(FUNC_STRING, bts_strcpy("--xxx_grro_spell"));
+	uint8_t		indexString[2];
+
+	rval		= btAction_new(FUNC_NONE, EFFECT_NONE);
+	rval->function	= getFunction(sp_batchspell);
+	rval->pl	= paramList_new();
+
+	count = 1;
+	for (i = spellDuration[index]; batchSpellList[i]; i++) {
+		sprintf(indexString, "%1d", count++);
+		param_add(rval->pl, PARAM_STRING, indexString,
+			spName[batchSpellList[i] & 0x7f].abbr);
+	}
 
 	return rval;
-#if 0
-	btAction_t *rsp;
-
-	rsp = spellEffect_new(S_HEALSPELL);
-
-	HEAPTR(rsp, fullHeal) = 1;
-	HEAPTR(rsp, resurrect) = 1;
-	HEAPTR(rsp, poison) = 1;
-	HEAPTR(rsp, paralysis) = 1;
-	HEAPTR(rsp, insanity) = 1;
-
-	return rsp;
-#endif
-}
-
-/*
- * spf_fota
- * Convert the Force of Tarjan spell to a damage spell
- */
-static btAction_t *spf_fota(uint32_t i)
-{
-	btAction_t	*rval;
-
-	rval = btAction_new(FUNC_NONE, EFFECT_NONE);
-	rval->function = btFunction_new(FUNC_STRING, bts_strcpy("--xxx_fota_spell"));
-
-	return rval;
-#if 0
-	btAction_t *rsp;
-
-	rsp = spellEffect_new(S_DMGSPELL);
-
-	DMGPTR(rsp, allFoes) = 0;
-	DMGPTR(rsp, group) = 1;
-	DMGPTR(rsp, levelMult) = 0;
-	DMGPTR(rsp, isSpell) = 0;
-	DMGPTR(rsp, isBreath) = 0;
-	DMGPTR(rsp, spAttack) = 4;
-
-	DMGPTR(rsp, outOfRange) = 0;
-	DMGPTR(rsp, range) = 0;
-	DMGPTR(rsp, addFlag) = 1;
-	DMGPTR(rsp, distance) = 6;
-	DMGPTR(rsp, attype) = 3;
-	DMGPTR(rsp, ndice) = 300;
-	DMGPTR(rsp, dieval) = 2;
-
-	DMGPTR(rsp, rflags.evil) = 0;
-	DMGPTR(rsp, rflags.demon) = 0;
-	DMGPTR(rsp, rflags.spellcaster) = 0;
-	DMGPTR(rsp, rflags.unk1) = 0;
-	DMGPTR(rsp, rflags.unk2) = 0;
-	DMGPTR(rsp, rflags.unk3) = 0;
-	DMGPTR(rsp, rflags.unk4) = 0;
-	DMGPTR(rsp, rflags.unk5) = 0;
-
-	DMGPTR(rsp, elem.fire) = 0;
-	DMGPTR(rsp, elem.unk1) = 0;
-	DMGPTR(rsp, elem.holy) = 0;
-	DMGPTR(rsp, elem.ice) = 0;
-	DMGPTR(rsp, elem.lightning) = 0;
-	DMGPTR(rsp, elem.spell) = 0;
-	DMGPTR(rsp, elem.unk2) = 0;
-	DMGPTR(rsp, elem.unk3) = 0;
-
-	return rsp;
-#endif
+	
 }
 
 
@@ -652,6 +553,7 @@ void convertSpells(void)
 
 		m->combat = IFBIT(spellAttr[i], 8, 1, 0);
 		m->noncombat = IFBIT(spellAttr[i], 0x10, 1, 0);
+
 #if 0
 		m->targetted = ((spellAttr[i] & 7) < 4) ? 1 : 0;
 #endif

@@ -230,10 +230,14 @@ btstring_t *getMonsterMacro(uint32_t index)
 	return bts_strcpy(monMacro[index]);
 }
 
+#endif
+
 btstring_t *getSummonMacro(uint32_t index)
 {
 	return bts_strcpy(sumMacro[index]);
 }
+
+#if 0
 
 static void printMon(b3mon_t *mon, uint32_t index)
 {

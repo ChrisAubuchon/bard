@@ -52,6 +52,7 @@ extern breathAtt_t	dmgspells[];
 extern weapAtt_t	weapeff[];
 extern uint8_t		weapIndex[];
 
+extern uint8_t		batchSpellList[];
 extern uint8_t		*spellStrings[];
 
 #define _sp_reenergizeMage	0
@@ -94,8 +95,6 @@ extern uint8_t		*spellStrings[];
 #define printSpellFizzled	37
 #define printNoEffect		38
 #define printCantFindUse	39
-#define sp_Grro			40
-#define sp_Fota			41
-#define sp_mapOnly		42
+#define sp_mapOnly		40
 
 #endif

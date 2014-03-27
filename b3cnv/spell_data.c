@@ -26,7 +26,7 @@ uint8_t spellType[] = {
 /* 84*/printSpellFizzled, printSpellFizzled, sp_damageSpell, sp_damageSpell,
 /* 88*/printSpellFizzled, printSpellFizzled, sp_luckSpell, sp_damageSpell,
 /* 92*/printSpellFizzled, printSpellFizzled, sp_identifySpell, sp_healSpell,
-/* 96*/printSpellFizzled, printSpellFizzled, sp_Grro, sp_Fota,
+/* 96*/printSpellFizzled, printSpellFizzled, sp_batchspell, sp_batchspell,
 /*100*/printSpellFizzled, printSpellFizzled, sp_shieldSpell, sp_damageSpell,
 /*104*/printSpellFizzled, printSpellFizzled, sp_damageSpell, sp_geomancerSpell,
 /*108*/sp_geomancerSpell, sp_damageSpell, sp_summonSpell, sp_phaseDoor,
@@ -274,6 +274,13 @@ uint8_t lightSDFlag[] = {
   0, 0xFF, 0xFF, 0, 0, 0
 };
 
+uint8_t batchSpellList[] = {
+  11, 33, 52, 14,
+  4, 0, 68, 15,
+  0, 210, 115, 0
+};
+
+
 breathAtt_t dmgspells[] = {
 /* 0*/  { 0, 0x0C, 4, 0, 0x38, 0xC0, 1 },
 /* 1*/  { 0, 4, 0, 0, 0x38, 0xC0, 8 },
@@ -383,39 +390,39 @@ uint8_t weapIndex[] = {
 };
 
 uint8_t *spellStrings[] = {
-/*  0*/	"self.source:reenergize()",
+/*  0*/	"args.source:reenergize()",
 /*  1*/	"--spellString[1]",
 /*  2*/	NULL,
 /*  3*/	NULL,
 /*  4*/	NULL,
 /*  5*/	NULL,
-/*  6*/	"self.source:addBattleBonus(\"acBonus\", args.amount, true)",
+/*  6*/	"args.source:addBattleBonus(\"acBonus\", args.amount, true)",
 /*  7*/	"\
 party:addBattleBonus(\"antiMagic\", args.amount, true)\
 ",
 /*  8*/	"\
 party.detect:activate(args.duration, args.detectStairs, args.detectTraps, \
 	args.detectSpecial)",
-/*  9*/	NULL,
+/*  9*/	"spells:batchSpell(args)",
 /* 10*/	"spells:calmCreatures()",
 /* 11*/	"party.compass:activate(args.duration)",
 /* 12*/	"spells:damageSpell(args)",
-/* 13*/	NULL,
+/* 13*/	"args.source:disbelieve(args)",
 /* 14*/	"spells:divineIntervention()",
 /* 15*/	NULL,
-/* 16*/	"--xxx_range_spell",
+/* 16*/	"spells:farFoes(args)",
 /* 17*/	"\
-if (self.source:isCharacter()) then\
+if (args.source:isCharacter()) then\
 	party:addBattleBonus(\"toHitBonus\", 2, true)\
-	self.target:addBattleBonus(\"acPenalty\", args.amount, true)\
+	args.target:addBattleBonus(\"acPenalty\", args.amount, true)\
 else\
 	party:addBattleBonus(\"acPenalty\", args.amount, true)\
 end\
 ",
 /* 18*/	NULL,
 /* 19*/	"\
-if (self:groupSavingThrow()) then\
-	self.target:addBattleBonus(\"missTurn\", true, false)\
+if (action:groupSavingThrow(args.source, args.target)) then\
+	args.target:addBattleBonus(\"missTurn\", true, false)\
 end",
 /* 20*/	"spells:healSpell(args)",
 /* 21*/	"spells:identify()",
@@ -425,25 +432,25 @@ end",
 party:addBattleBonus(\"toHitBonus\", args.amount, true)\
 party:addBattleBonus(\"antiMagic\", args.amount, true)\
 ",
-/* 25*/	"--xxx_range_spell",
+/* 25*/	"spells:meleeMen(args)",
 /* 26*/	"spells:phaseDoor(args.isPermanent)",
 /* 27*/	"spells:possess()",
 /* 28*/	"spells:scrySite()",
 /* 29*/	"party.shield:activate(args.duration, args.acBonus)",
 /* 30*/	"spells:spellBind()",
 /* 31*/	"\
-self.source:addBattleBonus(\"toHitBonus\", args.amount, false)\
-self.source:addBattleBonus(\"damageBonus\", args.amount, false)\
+args.source:addBattleBonus(\"toHitBonus\", args.amount, false)\
+args.source:addBattleBonus(\"damageBonus\", args.amount, false)\
 ",
-/* 32*/	"--xxx_summon_spell",
+/* 32*/	"spells:summon(args)",
 /* 33*/	"spells:teleport()",
 /* 34*/	"spells:trapZap()",
 /* 35*/	"\
-self.target:addBattleBonus(\"damageRandom\", args.amount, false)\
+args.target:addBattleBonus(\"damageRandom\", args.amount, false)\
 ",
 /* 36*/	"\
-if (self:groupSavingThrow()) then\
-	self.target:addBattleBonus(\"toHitPenalty\", args.amount, true)\
+if (action:groupSavingThrow(args.source, args.target)) then\
+	args.target:addBattleBonus(\"toHitPenalty\", args.amount, true)\
 end\
 ",
 /* 37*/	NULL,
