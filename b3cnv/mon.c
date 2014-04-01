@@ -49,15 +49,13 @@ static monster_t *convertMonster(b3mon_t *inMonster, uint32_t index)
 {
 	monster_t	*m;
 	pic_t		p;
+	uint32_t	i;
 
 	m = monster_new();
 
 	m->singular	= prepName(inMonster->name, 0);
 	m->plural	= prepName(inMonster->name, 1);
-/*	debug("m->plural: %s\n", m->plural->buf);*/
 	m->macro	= bts_strcpy(monMacro[index]);
-
-/*	debug("m->macro: %s\n", m->macro->buf);*/
 
 	m->hpRndNdice	= NDICE(inMonster->hpDice);
 	m->hpRndDie	= DIEVAL(inMonster->hpDice);
@@ -120,6 +118,55 @@ static monster_t *convertMonster(b3mon_t *inMonster, uint32_t index)
 	m->repel.unk4	= IFBIT(inMonster->repelFlags, 0x02, 1, 0);
 	m->repel.unk5	= IFBIT(inMonster->repelFlags, 0x01, 1, 0);
 
+	for (i = 0; i < 4; i++) {
+		monsterAttack_t	*ma	= NULL;
+		uint8_t		type;
+		uint8_t		damage;
+
+		type	= inMonster->att[i].type;
+		damage	= inMonster->att[i].damage;
+
+		if (type < 0x80) {
+			ma = monsterAttack_new(ACT_SPELL);
+			ma->action = getSpellAction(type);
+		} else if ((type >= 0xf0) && (type < 0xfa)) {
+			breathAtt_t	b = { 0, 0, 0, 0, 0, 0, 1 };
+
+			b.effect	= type - 0xf0;
+			b.damage	= damage;
+			b.breathFlag	= 0x10;
+
+			ma		= monsterAttack_new(ACT_MELEE);
+			ma->action	= cnvBreathAttack(&b, 1);
+
+			param_add(ma->action->pl, PARAM_ARRAY, "meleeString",
+				meleeString_toParam((inMonster->flags&0x0f)+1));
+		} else if (type == 0xfa) {
+			ma		= monsterAttack_new(ACT_SUMMONHELP);
+		} else if (type == 0x80) {
+			breathAtt_t	b = { 0, 0, 0, 0, 0, 0x41, 1 };
+
+			b.breathFlag	= inMonster->breathFlag;
+			b.damage	= damage;
+			if (inMonster->breathFlag ^ 0x0a)
+				ma	= monsterAttack_new(ACT_BREATH);
+			else
+				ma	= monsterAttack_new(ACT_FIRE);
+			ma->action	= cnvBreathAttack(&b,
+						inMonster->breathRange);
+		} else if (type == 0x83) {
+			ma		= monsterAttack_new(ACT_TARJAN);
+		} else {
+			/* Should never be reached */
+			fprintf(stderr, "Name: %s\n", m->singular->buf);
+			fprintf(stderr, "Invalid type: %02x\n", type);
+		}
+
+		if (ma != NULL)
+			cnvList_add(m->attacks, ma);
+	}
+
+
 	return m;
 }
 
@@ -161,7 +208,6 @@ static btstring_t *prepName(uint8_t *name, int pflag)
 	rval->buf[length++] = '\0';
 
 	bts_resize(rval, length);
-	debug("rval->buf: %s\n", rval->buf);
 
 	return rval;
 }
@@ -353,7 +399,6 @@ static void printMon(b3mon_t *mon, uint32_t index)
 			m->att[i] = genericSpellEffect(GENS_TARJAN, 0);
 			m->att[i]->type = ACT_TARJAN;
 		} else {
-			debug("Type = %x\n", type);
 			breathAtt_t b = { 0, 0, 0, 0, 0, 0, 1 };
 
 			b.effect = 0;
@@ -364,7 +409,6 @@ static void printMon(b3mon_t *mon, uint32_t index)
 			m->att[i]->type = ACT_MELEE;
 		}
 
-		debug("m->att[i]->type = %d\n", m->att[i]->type);
 	}
 
 	printMonXML(2, m);

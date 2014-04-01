@@ -91,9 +91,9 @@ uint8_t *getActionString(uint8_t a)
 
 uint8_t *getMeleeString(uint8_t m)
 {
-  assert(m < 8);
+	assert(m < 9);
 
-  return meleeStr[m];
+	return meleeStr[m];
 }
 
 json_t *meleeString_toJson(uint8_t index)
@@ -108,6 +108,19 @@ json_t *meleeString_toJson(uint8_t index)
 
 	return root;
 }
+
+paramList_t *meleeString_toParam(uint8_t index)
+{
+	paramList_t	*pl;
+
+	pl = paramList_new();
+
+	param_add(pl, PARAM_STRING, "", meleeStr[index * 2]);
+	param_add(pl, PARAM_STRING, "", meleeStr[(index * 2) + 1]);
+
+	return pl;
+}
+
 
 uint8_t *getFireString(uint8_t f)
 {

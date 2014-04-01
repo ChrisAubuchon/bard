@@ -17,6 +17,7 @@
 #define PARAM_NUMBER		3
 #define PARAM_BOOL		4
 #define PARAM_LIST		5
+#define PARAM_ARRAY		6
 
 #define paramList_t		cnvList_t
 
@@ -30,6 +31,7 @@
 paramList_t		*paramList_new(void);
 void			paramList_free(const void *);
 json_t			*paramList_toJson(paramList_t *);
+json_t			*paramList_toJsonArray(paramList_t *);
 void			param_add(paramList_t *, uint32_t, uint8_t *, ...);
 
 

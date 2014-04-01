@@ -101,6 +101,11 @@ static json_t *param_toJson(const void *vp)
 			return NULL;
 
 		return paramList_toJson(p->pl);
+	case PARAM_ARRAY:
+		if (p->pl == NULL)
+			return NULL;
+
+		return paramList_toJsonArray(p->pl);
 	}
 
 	return NULL;
@@ -137,6 +142,14 @@ void paramList_free(const void *vpl)
 json_t *paramList_toJson(paramList_t *pl)
 {
 	return cnvList_toJsonObject(pl);
+}
+
+/*
+ * paramList_toJsonArray()
+ */
+json_t *paramList_toJsonArray(paramList_t *pl)
+{
+	return cnvList_toJsonArray(pl);
 }
 
 /*
@@ -192,6 +205,7 @@ void param_add(paramList_t *pl, uint32_t type, uint8_t *name, ...)
 		p->b = va_arg(args, uint32_t);
 		break;
 	case PARAM_LIST:
+	case PARAM_ARRAY:
 	{
 		paramList_t	*pl;
 

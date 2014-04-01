@@ -23,7 +23,6 @@ static btAction_t	*spf_summon(uint32_t);
 static btAction_t	*spf_batchspell(uint32_t);
 
 static btFunction_t	*getFunction(uint32_t type);
-btAction_t *cnvBreathAttack(breathAtt_t * b, uint8_t range);
 
 /********************************/
 /*				*/
@@ -397,19 +396,22 @@ static btAction_t *spf_batchspell(uint32_t index)
 	uint32_t	i;
 	uint32_t	count;
 	btAction_t	*rval;
+	paramList_t	*pl;
 
 	uint8_t		indexString[2];
 
 	rval		= btAction_new(FUNC_NONE, EFFECT_NONE);
 	rval->function	= getFunction(sp_batchspell);
 	rval->pl	= paramList_new();
+	pl		= paramList_new();
 
 	count = 1;
 	for (i = spellDuration[index]; batchSpellList[i]; i++) {
-		sprintf(indexString, "%1d", count++);
-		param_add(rval->pl, PARAM_STRING, indexString,
+		param_add(pl, PARAM_STRING, "",
 			spName[batchSpellList[i] & 0x7f].abbr);
 	}
+
+	param_add(rval->pl, PARAM_ARRAY, "spellList", pl);
 
 	return rval;
 	
@@ -511,10 +513,10 @@ btstring_t *getSpellAbbr(uint8_t spno)
 #endif
 
 /*
- * getSpellEffect()
+ * getSpellAction()
  * Public interface to the spell functions
  */
-btAction_t *getSpellEffect(uint32_t spell)
+btAction_t *getSpellAction(uint32_t spell)
 {
 	uint8_t sptype;
 
@@ -581,7 +583,7 @@ void convertSpells(void)
 
 		getTargetting(i, &m->targetting);
 
-		m->action = getSpellEffect(i);
+		m->action = getSpellAction(i);
 
 		cnvList_add(spells, m);
 	}
