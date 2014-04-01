@@ -56,6 +56,8 @@ typedef struct {
 btstring_t	*getPicMacro(pic_t *p);
 void		indexToPic(uint8_t index, pic_t *p);
 
+
+void		getTargetting(uint32_t, btTargetting_t *);
 #if 0
 /* common.c */
 btstring_t *getDirectionMacro(uint8_t dir);

@@ -422,6 +422,31 @@ static btAction_t *spf_batchspell(uint32_t index)
 /*				*/
 /********************************/
 
+/*
+ * getTargetting()
+ */
+void getTargetting(uint32_t index, btTargetting_t *bt)
+{
+	if ((spellAttr[index] & 7) >= 4) {
+		bt->targetted = 0;
+	} else {
+		bt->targetted = 1;
+
+		switch (spellAttr[index] & 7) {
+		case 3:
+			bt->targetMonster = 1;
+			/* Fall through */
+		case 0:
+		case 1:
+			bt->targetParty = 1;
+			break;
+		case 2:
+			bt->targetMonster = 1;
+			break;
+		}
+	}
+}
+
 #if 0
 /*
  * getFigurineEffect()
@@ -554,9 +579,7 @@ void convertSpells(void)
 		m->combat = IFBIT(spellAttr[i], 8, 1, 0);
 		m->noncombat = IFBIT(spellAttr[i], 0x10, 1, 0);
 
-#if 0
-		m->targetted = ((spellAttr[i] & 7) < 4) ? 1 : 0;
-#endif
+		getTargetting(i, &m->targetting);
 
 		m->action = getSpellEffect(i);
 

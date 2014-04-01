@@ -54,7 +54,10 @@ static monster_t *convertMonster(b3mon_t *inMonster, uint32_t index)
 
 	m->singular	= prepName(inMonster->name, 0);
 	m->plural	= prepName(inMonster->name, 1);
+/*	debug("m->plural: %s\n", m->plural->buf);*/
 	m->macro	= bts_strcpy(monMacro[index]);
+
+/*	debug("m->macro: %s\n", m->macro->buf);*/
 
 	m->hpRndNdice	= NDICE(inMonster->hpDice);
 	m->hpRndDie	= DIEVAL(inMonster->hpDice);
@@ -122,13 +125,13 @@ static monster_t *convertMonster(b3mon_t *inMonster, uint32_t index)
 
 static btstring_t *prepName(uint8_t *name, int pflag)
 {
-	uint8_t length = 0;
-	btstring_t *rval;
+	uint8_t		length = 0;
+	btstring_t	*rval;
 
 	if (*name == '\0')
 		return;
 
-	rval = bts_new(16);
+	rval = bts_new(17);
 
 	do {
 		if (*name == '/') {
@@ -158,6 +161,7 @@ static btstring_t *prepName(uint8_t *name, int pflag)
 	rval->buf[length++] = '\0';
 
 	bts_resize(rval, length);
+	debug("rval->buf: %s\n", rval->buf);
 
 	return rval;
 }
