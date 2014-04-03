@@ -198,7 +198,7 @@ json_t *elements_toJson(elements_t *e)
 	JSON_TRUE_IF(node, "lightning", e->lightning);
 	JSON_TRUE_IF(node, "spell", e->spell);
 	JSON_TRUE_IF(node, "unk2", e->unk2);
-	JSON_TRUE_IF(node, "unk3", e->unk3);
+	JSON_TRUE_IF(node, "thrown", e->thrown);
 
 	json_object_set_new(root, "elements", node);
 
@@ -218,7 +218,7 @@ paramList_t *elements_toParam(elements_t *e)
 	param_add(rval, PARAM_BOOL, "lightning", e->lightning);
 	param_add(rval, PARAM_BOOL, "spell", e->spell);
 	param_add(rval, PARAM_BOOL, "unk2", e->unk2);
-	param_add(rval, PARAM_BOOL, "unk3", e->unk3);
+	param_add(rval, PARAM_BOOL, "thrown", e->thrown);
 
 	return rval;
 }

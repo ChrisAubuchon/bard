@@ -60,6 +60,8 @@ void		indexToPic(uint8_t index, pic_t *p);
 void		getTargetting(uint32_t, btTargetting_t *);
 btAction_t	*getSpellAction(uint32_t);
 btAction_t	*cnvBreathAttack(breathAtt_t *, uint8_t);
+btAction_t	*getFigurineAction(uint32_t);
+btAction_t	*getWeaponAction(uint8_t);
 
 #if 0
 /* common.c */

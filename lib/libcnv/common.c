@@ -27,7 +27,7 @@ static uint8_t *pronoun[] = {
 static uint8_t *actTypes[] = {
 	"", "melee", "spell", "dopple",
 	"breath", "fire", "summonhelp", "tarjan",
-	"unused"
+	"unused", "defend"
 };
 
 static uint8_t *meleeStr[] = {
@@ -84,7 +84,7 @@ uint8_t *getAttypeString(uint8_t at)
 
 uint8_t *getActionString(uint8_t a)
 {
-  assert(a < 8);
+  assert(a < 10);
 
   return actTypes[a];
 }

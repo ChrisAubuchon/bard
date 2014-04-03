@@ -12,18 +12,24 @@ b3cnv_SOURCES = 	\
 	b3cnv.c		\
 	b3lib.h		\
 	bitmap.c	\
+	class.c		\
 	gfx.c		\
 	gfx.h		\
 	gfx_bigpic.c	\
 	gfx_tile.c	\
 	gfx_tile.h	\
+	item.c		\
+	item.h		\
+	item_data.c	\
 	mon.c		\
 	mon.h		\
 	mon_data.c	\
 	picIndex.c	\
+	race.c		\
 	spell.c		\
 	spell.h		\
-	spell_data.c
+	spell_data.c	\
+	summon_data.c
 
 b3cnv_LDADD = \
 	$(top_builddir)/lib/libcnv/libcnv.a	\

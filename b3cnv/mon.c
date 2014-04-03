@@ -98,7 +98,7 @@ static monster_t *convertMonster(b3mon_t *inMonster, uint32_t index)
 	m->strong.lightning	= IFBIT(inMonster->strongElement, 0x08, 1, 0);
 	m->strong.spell	= IFBIT(inMonster->strongElement, 0x04, 1, 0);
 	m->strong.unk2	= IFBIT(inMonster->strongElement, 0x02, 1, 0);
-	m->strong.unk3	= IFBIT(inMonster->strongElement, 0x01, 1, 0);
+	m->strong.thrown= IFBIT(inMonster->strongElement, 0x01, 1, 0);
 
 	m->weak.fire	= IFBIT(inMonster->weakElement, 0x80, 1, 0);
 	m->weak.unk1	= IFBIT(inMonster->weakElement, 0x40, 1, 0);
@@ -107,7 +107,7 @@ static monster_t *convertMonster(b3mon_t *inMonster, uint32_t index)
 	m->weak.lightning	= IFBIT(inMonster->weakElement, 0x08, 1, 0);
 	m->weak.spell	= IFBIT(inMonster->weakElement, 0x04, 1, 0);
 	m->weak.unk2	= IFBIT(inMonster->weakElement, 0x02, 1, 0);
-	m->weak.unk3	= IFBIT(inMonster->weakElement, 0x01, 1, 0);
+	m->weak.thrown	= IFBIT(inMonster->weakElement, 0x01, 1, 0);
 
 	m->repel.evil	= IFBIT(inMonster->repelFlags, 0x80, 1, 0);
 	m->repel.demon	= IFBIT(inMonster->repelFlags, 0x40, 1, 0);
@@ -157,9 +157,7 @@ static monster_t *convertMonster(b3mon_t *inMonster, uint32_t index)
 		} else if (type == 0x83) {
 			ma		= monsterAttack_new(ACT_TARJAN);
 		} else {
-			/* Should never be reached */
-			fprintf(stderr, "Name: %s\n", m->singular->buf);
-			fprintf(stderr, "Invalid type: %02x\n", type);
+			ma		= monsterAttack_new(ACT_DEFEND);
 		}
 
 		if (ma != NULL)
@@ -442,6 +440,20 @@ static void convertMonsterFile(cnvList_t *monsters, FILE *fp, uint32_t *base)
 	}
 }
 
+/*
+ * convertSummons()
+ */
+static void convertSummons(cnvList_t *monsters, uint32_t *base)
+{
+	uint32_t	i;
+
+	for (i = 0; i < 22; i++) {
+		cnvList_add(monsters, convertMonster(&sumMons[i], *base));
+		(*base)++;
+	}
+}
+	
+
 void convertMonsters(void)
 {
 	FILE		*fp;
@@ -458,6 +470,8 @@ void convertMonsters(void)
 	fp = xfopen(mkBardThreePath("MONSTERH"), "rb");
 	convertMonsterFile(monsters, fp, &count);
 	fclose(fp);
+
+	convertSummons(monsters, &count);
 
 	monList_to_json(monsters, mkJsonPath("monsters.json"));
 	cnvList_free(monsters);

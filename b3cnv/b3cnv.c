@@ -92,12 +92,12 @@ int main(int argc, char *argv[])
 	xmkdir(bts_sprintf("%s/bt3/json", outputDir->buf));
 	xmkdir(bts_sprintf("%s/bt3/fonts", outputDir->buf));
 
-#if 0
 	if (_convertClasses) {
 		convertClasses();
 		convertRaces();
 	}
 
+#if 0
 	if (_convertLevels) {
 		convertCities();
 		convertWild();
@@ -109,11 +109,9 @@ int main(int argc, char *argv[])
 		convertGFX();
 	}
 
-#if 0
 	if (_convertItems) {
 		convertItems();
 	}
-#endif
 
 	if (_convertMonsters) {
 		convertMonsters();

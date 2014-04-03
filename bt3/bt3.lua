@@ -47,6 +47,11 @@ local title
 title = gfxImage:new("images/main_screen.png", "png")
 title:Draw(nil)
 
+bigpic:setBigpic("PIC_H5", "H5")
+getkey()
+
+if false then
+
 bigpic:cityBackground()
 bigpic:cityAdd("M", 2, "face", "0")
 bigpic:cityAdd("L", 2, "face", "1")
@@ -115,5 +120,7 @@ getkey()
 bigpic:dunBackground(5)
 bigpic:dunDisplay()
 getkey()
+
+end
 
 os.exit(0)

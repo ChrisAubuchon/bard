@@ -99,7 +99,7 @@ typedef struct {
 	uint8_t		lightning;
 	uint8_t		spell;
 	uint8_t		unk2;
-	uint8_t		unk3;
+	uint8_t		thrown;
 } elements_t;
 
 /*

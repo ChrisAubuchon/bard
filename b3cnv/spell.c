@@ -173,7 +173,7 @@ btAction_t *cnvBreathAttack(breathAtt_t *b, uint8_t range)
 	a.elem.lightning	= IFBIT(b->elements, 0x08, 1, 0);
 	a.elem.spell		= IFBIT(b->elements, 0x04, 1, 0);
 	a.elem.unk2		= IFBIT(b->elements, 0x02, 1, 0);
-	a.elem.unk3		= IFBIT(b->elements, 0x01, 1, 0);
+	a.elem.thrown		= IFBIT(b->elements, 0x01, 1, 0);
 
 	rval->pl = bteAttack_toParam(&a);
 
@@ -449,31 +449,33 @@ void getTargetting(uint32_t index, btTargetting_t *bt)
 	}
 }
 
-#if 0
 /*
- * getFigurineEffect()
+ * getFigurineAction()
  * Public interface to spf_summon
  */
-btAction_t *getFigurineEffect(uint32_t i)
+btAction_t *getFigurineAction(uint32_t i)
 {
-	btAction_t *rsp;
-	uint8_t *mon;
+	btAction_t	*rval;
 
-	rsp = spellEffect_new(S_SUMMONSPELL);
+	rval = btAction_new(FUNC_NONE, EFFECT_NONE);
+	rval->function = getFunction(sp_summonSpell);
 
-	SUMPTR(rsp, sum_zero) = getSummonMacro(i);
+	rval->pl	= paramList_new();
 
-	return rsp;
+	param_add(rval->pl, PARAM_BTSTRING, "type",
+			getSummonMacro(i));
+
+	return rval;
 }
 
 /*
- * getWeaponEffect()
+ * getWeaponAction()
  * Convert a weapon attack structure to a damage spell
  */
-btAction_t *getWeaponEffect(uint8_t i)
+btAction_t *getWeaponAction(uint8_t i)
 {
-	breathAtt_t b;
-	weapAtt_t *w;
+	breathAtt_t	b;
+	weapAtt_t	*w;
 
 	if (i == 0xff) {
 		printf("Nope");
@@ -493,6 +495,7 @@ btAction_t *getWeaponEffect(uint8_t i)
 	return cnvBreathAttack(&b, w->range);
 }
 
+#if 0
 /*
  * getSpellName()
  * Public interface to spell full name
@@ -527,39 +530,10 @@ btAction_t *getSpellAction(uint32_t spell)
 
 	return spellFunctions[sptype] (spell);
 }
-#if 0
 
 /*
- * noSpellEffect()
- * Return a no-effect structure
+ * convertSpells()
  */
-btAction_t *noSpellEffect(void)
-{
-	btAction_t *rsp;
-
-	rsp = (btAction_t *) xmalloc(sizeof(btAction_t));
-	rsp->type = S_NONE;
-	rsp->effect = NULL;
-
-	return rsp;
-}
-
-/*
- * genericSpellEffect()
- * Create a generic spell effect
- */
-btAction_t *genericSpellEffect(uint8_t type, uint8_t flags)
-{
-	btAction_t *rsp;
-
-	rsp = spellEffect_new(S_GENERIC);
-	GENPTR(rsp, flags) = flags;
-	GENPTR(rsp, type) = type;
-
-	return rsp;
-}
-
-#endif
 void convertSpells(void)
 {
 	int		i;

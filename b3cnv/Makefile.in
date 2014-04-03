@@ -63,10 +63,11 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_b3cnv_OBJECTS = b3cnv.$(OBJEXT) bitmap.$(OBJEXT) gfx.$(OBJEXT) \
-	gfx_bigpic.$(OBJEXT) gfx_tile.$(OBJEXT) mon.$(OBJEXT) \
-	mon_data.$(OBJEXT) picIndex.$(OBJEXT) spell.$(OBJEXT) \
-	spell_data.$(OBJEXT)
+am_b3cnv_OBJECTS = b3cnv.$(OBJEXT) bitmap.$(OBJEXT) class.$(OBJEXT) \
+	gfx.$(OBJEXT) gfx_bigpic.$(OBJEXT) gfx_tile.$(OBJEXT) \
+	item.$(OBJEXT) item_data.$(OBJEXT) mon.$(OBJEXT) \
+	mon_data.$(OBJEXT) picIndex.$(OBJEXT) race.$(OBJEXT) \
+	spell.$(OBJEXT) spell_data.$(OBJEXT) summon_data.$(OBJEXT)
 b3cnv_OBJECTS = $(am_b3cnv_OBJECTS)
 b3cnv_DEPENDENCIES = $(top_builddir)/lib/libcnv/libcnv.a \
 	$(top_builddir)/lib/libbard/libbard.a \
@@ -521,18 +522,24 @@ b3cnv_SOURCES = \
 	b3cnv.c		\
 	b3lib.h		\
 	bitmap.c	\
+	class.c		\
 	gfx.c		\
 	gfx.h		\
 	gfx_bigpic.c	\
 	gfx_tile.c	\
 	gfx_tile.h	\
+	item.c		\
+	item.h		\
+	item_data.c	\
 	mon.c		\
 	mon.h		\
 	mon_data.c	\
 	picIndex.c	\
+	race.c		\
 	spell.c		\
 	spell.h		\
-	spell_data.c
+	spell_data.c	\
+	summon_data.c
 
 b3cnv_LDADD = \
 	$(top_builddir)/lib/libcnv/libcnv.a	\
@@ -625,14 +632,19 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/b3cnv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitmap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/class.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gfx.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gfx_bigpic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gfx_tile.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/item.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/item_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mon_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/picIndex.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/race.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spell.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spell_data.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/summon_data.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

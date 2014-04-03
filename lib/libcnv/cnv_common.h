@@ -12,6 +12,7 @@
 #define ACT_SUMMONHELP  6
 #define ACT_TARJAN      7
 #define ACT_USE         8
+#define ACT_DEFEND	9
 
 #define FIRE_NONE	0
 #define FIRE_ARROW	1

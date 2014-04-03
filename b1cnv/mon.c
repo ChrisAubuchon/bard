@@ -72,7 +72,7 @@ static void getSummonData(cnvList_t *mlist)
 		m->strong.lightning = 0;
 		m->strong.spell = 0;
 		m->strong.unk2 = 0;
-		m->strong.unk3 = 0;
+		m->strong.thrown = 0;
 
 		m->weak.fire = 0;
 		m->weak.unk1 = 0;
@@ -81,7 +81,7 @@ static void getSummonData(cnvList_t *mlist)
 		m->weak.lightning = 0;
 		m->weak.spell = 0;
 		m->weak.unk2 = 0;
-		m->weak.unk3 = 0;
+		m->weak.thrown = 0;
 
 		m->repel.evil = 0;
 		m->repel.demon = 0;
@@ -228,7 +228,7 @@ void convertMonsters(void)
 		m->strong.lightning = 0;
 		m->strong.spell = 0;
 		m->strong.unk2 = 0;
-		m->strong.unk3 = 0;
+		m->strong.thrown = 0;
 
 		m->weak.fire = 0;
 		m->weak.unk1 = 0;
@@ -237,7 +237,7 @@ void convertMonsters(void)
 		m->weak.lightning = 0;
 		m->weak.spell = 0;
 		m->weak.unk2 = 0;
-		m->weak.unk3 = 0;
+		m->weak.thrown = 0;
 
 		m->repel.evil = 0;
 		m->repel.demon = 0;
