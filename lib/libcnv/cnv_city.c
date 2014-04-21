@@ -185,6 +185,9 @@ static json_t *btcity_toJson(const void *vc)
 				cnvList_toJsonArray(btc->day->monsters));
 	JSON_NUMBER(node, "poisonDamage", btc->day->poisonDmg);
 	JSON_NUMBER(node, "level", btc->day->level);
+	if (btc->params)
+		json_object_update(node, paramList_toJson(btc->params));
+
 	json_object_set_new(root, "day", node);
 
 	if (btc->night->level) {

@@ -1,9 +1,16 @@
 #include <b3lib.h>
 #include <dun.h>
 #include <cnv_dun.h>
+#include <cnv_city.h>
 
-/*#define DEBUG*/
+#define DEBUG
 #include <debug.h>
+
+#define DIR_NORTH	0
+#define DIR_SOUTH	1
+#define DIR_EAST	2
+#define DIR_WEST	3
+
 
 /****************************************/
 /*					*/
@@ -11,6 +18,7 @@
 /*					*/
 /****************************************/
 
+#if 0
 static int hifd = -1;
 static int lofd = -1;
 
@@ -19,22 +27,33 @@ static uint32_t currentDungeon;
 static uint32_t currentLevel;
 static dun_t *dungeon;
 
+#endif
+
 /****************************************/
 /*					*/
 /* Local function prototypes		*/
 /*					*/
 /****************************************/
 
-btstring_t *dun_readData(uint8_t dun, uint8_t lev);
+static btstring_t	*readData(uint8_t);
+static btstring_t	*getLabel(int32_t, int32_t);
+
+static dunLevel_t	*convertLevel(uint32_t, uint32_t);
+static b3level_t	*readLevel(btstring_t *);
+static void		freeLevel(b3level_t *);
+
+static uint32_t		getVertex(int32_t, int32_t);
+static void		setVertex(dunLevel_t *, b3level_t *, int32_t, int32_t);
+static void		getPath(b3level_t *, int32_t, int32_t, uint32_t,
+					dunPath_t *);
+static uint8_t		wrapNumber(int32_t, uint32_t);
+
+#if 0
 
 static b3level_t *b3_readLevel(btstring_t * dbuf);
-static b3wild_t *b3_readWild(btstring_t * dbuf);
+static b3city_t *b3_readWild(btstring_t * dbuf);
 static dunLevel_t *b3_convertLevel(b3level_t * b);
-static dunLevel_t *b3_convertWild(b3wild_t * w);
 static dun_t *readDungeon(uint32_t dunno);
-
-static void freeLevel(b3level_t * lev);
-static void freeWild(b3wild_t * wild);
 
 static void getWalls(dunWall_t * dw, uint16_t walls, uint8_t shift);
 static void getWildWall(dunWall_t * dw, uint8_t wall);
@@ -43,6 +62,7 @@ static uint8_t countItems(uint8_t level);
 static bt_array_t *getItems(uint8_t level, uint32_t * total_weight);
 static bt_array_t *getMonsters(uint16_t monlo, uint16_t monhi);
 static uint8_t wild_wrapSquare(int32_t sq, uint8_t width);
+#endif
 
 /****************************************/
 /*					*/
@@ -50,6 +70,29 @@ static uint8_t wild_wrapSquare(int32_t sq, uint8_t width);
 /*					*/
 /****************************************/
 
+/*
+ * getLabel()
+ */
+static btstring_t *getLabel(int32_t x, int32_t y)
+{
+	return bts_sprintf("x%02x%02x", x, y);
+}
+
+/*
+ * wrapNumber()
+ */
+static uint8_t wrapNumber(int32_t number, uint32_t max)
+{
+	if (number < 0) {
+		number += max;
+	} else if (number >= max) {
+		number -= max;
+	} else {
+		return number;
+	}
+}
+
+#if 0
 static uint8_t wild_wrapSquare(int32_t sq, uint8_t width)
 {
 	while (1) {
@@ -96,53 +139,9 @@ static void getWildWall(dunWall_t * dw, uint8_t wall)
 	dw->nopass = (wall & 0xe0) == 0xe0 ? 1 : 0;
 }
 
-static dunLevel_t *b3_convertWild(b3wild_t * w)
-{
-	dunLevel_t *rval;
-	int32_t i, j;
-	uint32_t sq;
+#endif
 
-	rval = dunLevel_new(w->width, w->height);
-
-	rval->name = bts_strcpy(w->name);
-	rval->tag = bts_strcpy("level_0");
-
-	rval->width = w->width;
-	rval->height = w->height;
-	rval->wrapFlag = (w->wrapFlag & 2) ? 1 : 0;
-
-	rval->monsters = getMonsters(dun_monIndexList[w->monsterIndex].mon_lo, dun_monIndexList[w->monsterIndex].mon_hi);
-
-	rval->poisonDmg = dun_poisonDmg[w->levFlags & 7];
-
-	rval->items = getItems(w->levFlags & 7, &rval->item_total_weight);
-
-	sq = 0;
-	for (i = 0; i < w->height; i++) {
-		for (j = 0; j < w->width; j++) {
-			rval->squares[sq] = dunSquare_new();
-			rval->squares[sq]->x = j;
-			rval->squares[sq]->y = i;
-
-			if (w->squares[i][j] == 0) {
-				getWildWall(&rval->squares[sq]->n_wall, w->squares[wild_wrapSquare(i + 1, w->height)][j]);
-				getWildWall(&rval->squares[sq]->s_wall, w->squares[wild_wrapSquare(i - 1, w->height)][j]);
-				getWildWall(&rval->squares[sq]->e_wall, w->squares[i][wild_wrapSquare(j + 1, w->width)]);
-				getWildWall(&rval->squares[sq]->w_wall, w->squares[i][wild_wrapSquare(j - 1, w->width)]);
-			} else {
-				rval->squares[sq]->n_wall.style = 0xff;
-				rval->squares[sq]->s_wall.style = 0xff;
-				rval->squares[sq]->w_wall.style = 0xff;
-				rval->squares[sq]->e_wall.style = 0xff;
-			}
-
-			sq++;
-		}
-	}
-
-
-	return rval;
-}
+#if 0
 
 static dunLevel_t *b3_convertLevel(b3level_t * b)
 {
@@ -219,37 +218,19 @@ static dunLevel_t *b3_convertLevel(b3level_t * b)
 	return (rval);
 }
 
-btstring_t *dun_readData(uint8_t dun, uint8_t lev)
+#endif
+
+/*
+ * readLevel()
+ */
+static b3level_t *readLevel(btstring_t *data)
 {
-	btstring_t *rval;
-	btstring_t *dat;
-	int fd;
+	uint8_t		*buf;
+	int8_t		i, j;
+	b3level_t	*r;
 
-	if (hifd < 0)
-		hifd = xopen("maps.hi", O_RDONLY);
-	if (lofd < 0)
-		lofd = xopen("maps.lo", O_RDONLY);
-
-	fd = (duns[dun].files[lev].dun) ? hifd : lofd;
-
-	moveToIndex16(fd, duns[dun].files[lev].lev, 0);
-	dat = bts_new(19712);
-	xread(fd, dat->buf, dat->size);
-	rval = d3comp(dat->buf, dat->size);
-
-	bts_free(dat);
-
-	return rval;
-}
-
-static b3level_t *b3_readLevel(btstring_t * dbuf)
-{
-	b3level_t *r;
-	uint8_t *buf;
-	int8 i, j;
-
-	buf = dbuf->buf;
-	r = (b3level_t *) xmalloc(sizeof(b3level_t));
+	buf = data->buf;
+	r = (b3level_t *)xzalloc(sizeof(b3level_t));
 
 	for (i = 0; i < 16; i++) {
 		r->name[i] = *buf++ & 0x7f;
@@ -274,12 +255,12 @@ static b3level_t *b3_readLevel(btstring_t * dbuf)
 	r->dataOffset = str_read16le(buf);
 	buf += sizeof(uint16_t);
 
-	r->rowOffset = (uint16_t *) xmalloc(r->height * sizeof(uint16_t));
-	r->squares = (b3dunSq_t **) xmalloc(r->height * sizeof(b3dunSq_t *));
+	r->rowOffset = (uint16_t *) xzalloc(r->height * sizeof(uint16_t));
+	r->squares = (b3dunSq_t **) xzalloc(r->height * sizeof(b3dunSq_t *));
 	for (i = 0; i < r->height; i++) {
 		r->rowOffset[i] = str_read16le(buf);
 		buf += sizeof(uint16_t);
-		r->squares[i] = (b3dunSq_t *) xmalloc(r->width * sizeof(b3dunSq_t));
+		r->squares[i] = (b3dunSq_t *) xzalloc(r->width * sizeof(b3dunSq_t));
 	}
 
 	for (i = (r->height - 1); i >= 0; i--) {
@@ -291,8 +272,8 @@ static b3level_t *b3_readLevel(btstring_t * dbuf)
 			r->squares[i][j].field_4 = *buf++;
 		}
 	}
-
 	
+#if 0
 	codeOffsets = bt_array_new(*buf++, xfree);
 	for (i = 0; i < bt_array_length(codeOffsets); i++) {
 		b3data_t *new;
@@ -305,6 +286,7 @@ static b3level_t *b3_readLevel(btstring_t * dbuf)
 		
 		bt_array_set(codeOffsets, i, new);
 	}
+#endif
 		
 #if 0
 	r->dataCount = *buf++;
@@ -320,93 +302,29 @@ static b3level_t *b3_readLevel(btstring_t * dbuf)
 	return r;
 }
 
-static b3wild_t *b3_readWild(btstring_t * dbuf)
+/*
+ * freeLevel()
+ */
+static void freeLevel(b3level_t *l)
 {
-	uint32_t i, j;
-	b3wild_t *rval;
-	uint8_t *buf;
+	uint32_t	i;
 
-	buf = dbuf->buf;
+	if (l == NULL)
+		return;
 
-	rval = (b3wild_t *) xmalloc(sizeof(b3wild_t));
+	for (i = 0; i < l->height; i++)
+		free(l->squares[i]);
 
-	for (i = 0; i < 16; i++) {
-		rval->name[i] = *buf++ & 0x7f;
-		if (rval->name[i] == 0x7f)
-			rval->name[i] = '\0';
-	}
-
-	rval->width = *buf++;
-	rval->height = *buf++;
-	rval->wrapFlag = *buf++;
-	rval->monsterIndex = *buf++;
-	rval->levFlags = *buf++;
-	rval->dataOffset = str_read16le(buf);
-	buf += sizeof(uint16_t);
-
-	rval->rowOffset = (uint16_t *) xmalloc(rval->height * sizeof(uint16_t));
-	rval->squares = (uint8_t **) xmalloc(rval->height * sizeof(uint8_t *));
-	for (i = 0; i < rval->height; i++) {
-		rval->rowOffset[i] = str_read16le(buf);
-		buf += sizeof(uint16_t);
-		rval->squares[i] = (uint8_t *) xmalloc(rval->width * sizeof(uint8_t));
-	}
-
-	for (i = 0; i < rval->height; i++) {
-		for (j = 0; j < rval->width; j++) {
-			rval->squares[i][j] = dbuf->buf[rval->rowOffset[i] + j];
-			buf++;
-		}
-	}
-
-	codeOffsets = bt_array_new(*buf++, xfree);
-	for (i = 0; i < bt_array_length(codeOffsets); i++) {
-		b3data_t *new;
-
-		new = (b3data_t *)xmalloc(sizeof(b3data_t));
-		new->sqN = *buf++;
-		new->sqE = *buf++;
-		new->offset = str_read16le(buf);
-		buf += sizeof(uint16_t);
-		
-		bt_array_set(codeOffsets, i, new);
-	}
-		
-	debug("rval->name = %s\n", rval->name);
-	debug("rval->width = %d\n", rval->width);
-	debug("rval->height = %d\n", rval->height);
-	debug("rval->graphicsIndex = %d\n", (rval->levFlags >> 6) & 3);
-	debug("rval->rvalelNo = %d\n", rval->levFlags & 7);
-	debug("rval->wrapFlag = %d\n", rval->wrapFlag & 2);
-	debug("rval->monsterIndex = %d\n", rval->monsterIndex);
-	debug("rval->dataOffset = %x\n", rval->dataOffset);
-
-	return rval;
+	free(l->squares);
+	free(l->rowOffset);
+	free(l);
 }
 
-static void freeLevel(b3level_t * lev)
-{
-	int i;
+/*
+ * b3_readWild()
+ */
 
-	for (i = 0; i < lev->height; i++)
-		free(lev->squares[i]);
-	free(lev->squares);
-	free(lev->rowOffset);
-	free(lev->dataList);
-	free(lev);
-}
-
-static void freeWild(b3wild_t * wild)
-{
-	uint32_t i;
-
-	for (i = 0; i < wild->height; i++)
-		free(wild->squares[i]);
-	free(wild->squares);
-	free(wild->rowOffset);
-	free(wild->dataList);
-	free(wild);
-}
+#if 0
 
 static uint8_t countItems(uint8_t level)
 {
@@ -508,7 +426,7 @@ static dun_t *readDungeon(uint32_t dunno)
 		dbuf = dun_readData(dunno, j);
 
 		if (duns[dunno].wflag) {
-			b3wild_t *b3wild;
+			b3city_t *b3wild;
 
 			b3wild = b3_readWild(dbuf);
 
@@ -519,7 +437,7 @@ static dun_t *readDungeon(uint32_t dunno)
 		} else {
 			b3level_t *b3lev;
 
-			b3lev = b3_readLevel(dbuf);
+			b3lev = readLevel(dbuf);
 
 			if (!j) {
 				rval->entry_type = dun_entryTypeList[b3lev->dunLevel[j]];
@@ -544,6 +462,132 @@ static dun_t *readDungeon(uint32_t dunno)
 
 	return rval;
 }
+#endif
+
+/*
+ * readData()
+ */
+static btstring_t *readData(uint8_t levNumber)
+{
+	FILE		*fp;
+	btstring_t	*data;
+	btstring_t	*rval;
+
+	if (levNumber & HIFLAG)
+		fp = xfopen(mkBardThreePath("MAPS.HI"), "rb");
+	else
+		fp = xfopen(mkBardThreePath("MAPS.LO"), "rb");
+
+	fp_moveToIndex16(fp, levNumber & ~HIFLAG, 0);
+	data	= bts_new(19712);
+
+	xfread(data->buf, 1, data->size, fp);
+	fclose(fp);
+
+	rval	= d3comp(data->buf, data->size);
+	bts_free(data);
+
+
+	return rval;
+}
+
+/*
+ * getVertex()
+ */
+static uint32_t getVertex(int32_t x, int32_t y)
+{
+	return (((x & 0xff) << 8) | (y & 0xff));
+}
+
+/*
+ * getPath()
+ */
+static void getPath(b3level_t *level, int32_t x, int32_t y, uint32_t dir, dunPath_t *path)
+{
+	uint8_t		face;
+	uint8_t		style;
+	uint32_t	shift;
+	int32_t		deltaX	= 0;
+	int32_t		deltaY	= 0;
+
+	switch (dir) {
+	case DIR_NORTH:
+		shift		= 4;
+		deltaY		= -1;
+		break;
+	case DIR_SOUTH:
+		shift		= 12;
+		deltaY		= 1;
+		break;
+	case DIR_EAST:
+		shift		= 0;
+		deltaX		= 1;
+		break;
+	case DIR_WEST:
+		shift		= 8;
+		deltaX		= -1;
+		break;
+	}
+
+	path->dstSquare = getLabel(wrapNumber(x + deltaX, level->width),
+				   wrapNumber(y + deltaY, level->height));
+
+	face = (level->squares[y][x].walls >> shift) & 0x0f;
+	if (face) {
+		path->isWall = dun_wallFlag[face];
+		style = dun_styleMap[face];
+
+		if (style) {
+			path->canPhase = (style < 9) ? 1 : 0;
+			path->gfx = bts_sprintf("%d", style);
+		}
+	}
+}
+
+/*
+ * setVertex()
+ */
+static void setVertex(dunLevel_t *rval, b3level_t *level, int32_t x, int32_t y)
+{
+	dunVertex_t	*vertex;
+
+	vertex = dunVertex_new(rval, getVertex(x, y));
+
+	getPath(level, x, y, DIR_NORTH, &vertex->north);
+	getPath(level, x, y, DIR_SOUTH, &vertex->south);
+	getPath(level, x, y, DIR_EAST, &vertex->east);
+	getPath(level, x, y, DIR_WEST, &vertex->west);
+}
+
+/*
+ * convertLevel()
+ */
+static dunLevel_t *convertLevel(uint32_t dunno, uint32_t levno)
+{
+	dunLevel_t	*rval;
+	btstring_t	*data;
+	b3level_t	*level;
+	int32_t		y, x;
+
+	data	= readData(duns[dunno].levels[levno]);
+
+	level	= readLevel(data);
+
+	rval	= dunLevel_new();
+	rval->name	= bts_sprintf("%s-%d", duns[dunno].name, levno);
+	rval->path	= mkJsonPath("");
+
+	for (y = level->height - 1; y > 0; y--) {
+		for (x = 0; x < level->width; x++) {
+			setVertex(rval, level, x, y);
+		}
+	}
+
+	freeLevel(level);
+	bts_free(data);
+
+	return rval;
+}
 
 /********************************/
 /*				*/
@@ -551,6 +595,7 @@ static dun_t *readDungeon(uint32_t dunno)
 /*				*/
 /********************************/
 
+#if 0
 btstring_t *getLevelPath(uint8_t dun, uint8_t level)
 {
 	return bts_sprintf("%s/level_%d", duns[dun].name ,level);
@@ -581,14 +626,35 @@ uint8_t getCurrentLevelNum(void)
 	return currentLevel;
 }
 
+#endif
+
+/*
+ * convertDungeons()
+ */
 void convertDungeons(void)
 {
-	uint32_t i, j;
+	uint32_t	dunno, levno;
+	cnvList_t	*dungeons;
+	dun_t		*dun;
+	dunLevel_t	*dl;
 
-	btstring_t *dbuf;
+	dungeons	= dunList_new();
 
-	cnv_printDunHeader();
+	dunno = 0;
+	while (duns[dunno].name != NULL) {
+		levno	= 0;
 
+		dun = dun_new(bts_strcpy(duns[dunno].name));
+		while (duns[dunno].levels[levno] != 0xff) {
+			dl = convertLevel(dunno, levno);
+			cnvList_add(dun->levels, dl);
+			levno++;
+		}
+		dunno++;
+
+		cnvList_add(dungeons, dun);
+	}
+#if 0
 	currentDungeon = 3;
 	currentDungeon = 0;
 	while (duns[currentDungeon].name != 0) {
@@ -602,8 +668,11 @@ void convertDungeons(void)
 		dun_free(dungeon);
 	}
 
-	cnv_printDunFooter();
-
 	close(hifd);
 	close(lofd);
+#endif
+
+	dunList_to_json(dungeons, mkJsonPath("dungeons.json"));
+	cnvList_free(dungeons);
 }
+

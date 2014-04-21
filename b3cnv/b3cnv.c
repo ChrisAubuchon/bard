@@ -97,13 +97,10 @@ int main(int argc, char *argv[])
 		convertRaces();
 	}
 
-#if 0
 	if (_convertLevels) {
 		convertCities();
-		convertWild();
 		convertDungeons();
 	}
-#endif
 
 	if (_convertGraphics) {
 		convertGFX();

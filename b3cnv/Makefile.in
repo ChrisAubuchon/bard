@@ -63,11 +63,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_b3cnv_OBJECTS = b3cnv.$(OBJEXT) bitmap.$(OBJEXT) class.$(OBJEXT) \
-	gfx.$(OBJEXT) gfx_bigpic.$(OBJEXT) gfx_tile.$(OBJEXT) \
-	item.$(OBJEXT) item_data.$(OBJEXT) mon.$(OBJEXT) \
-	mon_data.$(OBJEXT) picIndex.$(OBJEXT) race.$(OBJEXT) \
-	spell.$(OBJEXT) spell_data.$(OBJEXT) summon_data.$(OBJEXT)
+am_b3cnv_OBJECTS = b3cnv.$(OBJEXT) bitmap.$(OBJEXT) city.$(OBJEXT) \
+	class.$(OBJEXT) dun.$(OBJEXT) dun_data.$(OBJEXT) gfx.$(OBJEXT) \
+	gfx_bigpic.$(OBJEXT) gfx_tile.$(OBJEXT) item.$(OBJEXT) \
+	item_data.$(OBJEXT) mon.$(OBJEXT) mon_data.$(OBJEXT) \
+	picIndex.$(OBJEXT) race.$(OBJEXT) spell.$(OBJEXT) \
+	spell_data.$(OBJEXT) summon_data.$(OBJEXT)
 b3cnv_OBJECTS = $(am_b3cnv_OBJECTS)
 b3cnv_DEPENDENCIES = $(top_builddir)/lib/libcnv/libcnv.a \
 	$(top_builddir)/lib/libbard/libbard.a \
@@ -522,7 +523,11 @@ b3cnv_SOURCES = \
 	b3cnv.c		\
 	b3lib.h		\
 	bitmap.c	\
+	city.c		\
 	class.c		\
+	dun.c		\
+	dun.h		\
+	dun_data.c	\
 	gfx.c		\
 	gfx.h		\
 	gfx_bigpic.c	\
@@ -632,7 +637,10 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/b3cnv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitmap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/city.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/class.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dun.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dun_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gfx.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gfx_bigpic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gfx_tile.Po@am__quote@

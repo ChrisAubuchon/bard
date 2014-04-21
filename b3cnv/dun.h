@@ -33,6 +33,8 @@
 #define WILD_WIZARDHALL 0x70
 #define WILD_BARDSHALL  0x80
 
+#define HIFLAG		0x80
+
 typedef struct {
   uint8_t dun;
   uint8_t lev;
@@ -45,11 +47,18 @@ typedef struct {
   uint16_t mon_hi;
 } b3monIndex_t;
 
+#if 0
 typedef struct {
   char *name;
   uint8_t wflag;
   uint8_t nlevs;
   b3dunFile_t files[5];
+} b3dunData_t;
+#endif
+
+typedef struct {
+	uint8_t		*name;
+	uint8_t		*levels;
 } b3dunData_t;
 
 typedef struct {
@@ -98,20 +107,24 @@ typedef struct {
   uint8_t dataCount;
   b3data_t *dataList;
   btstring_t *codeBuf;
-} b3wild_t;
+} b3city_t;
 
 
-b3dunData_t duns[];
-b3monIndex_t dun_monIndexList[];
-uint8_t levno2dun[];
-uint8_t levno2lev[];
-uint8_t dun_entryTypeList[];
-uint8_t dun_entrySqN[];
-uint8_t dun_entrySqE[];
-uint8_t dun_trapSave[];
-uint8_t dun_poisonDmg[];
-uint8_t dun_items[];
-uint8_t dun_styleMap[];
-uint8_t dun_wallFlag[];
+extern b3dunData_t	cityList[];
+extern	b3dunData_t duns[];
+extern	b3monIndex_t dun_monIndexList[];
+extern	uint8_t levno2dun[];
+extern	uint8_t levno2lev[];
+extern	uint8_t dun_entryTypeList[];
+extern	uint8_t dun_entrySqN[];
+extern	uint8_t dun_entrySqE[];
+extern	uint8_t dun_trapSave[];
+extern	uint8_t dun_poisonDmg[];
+extern	uint8_t dun_items[];
+extern	uint8_t dun_styleMap[];
+extern	uint8_t dun_wallFlag[];
+
+extern uint8_t	city_referenceIndex[];
+extern uint8_t	*city_referenceLocation[];
 
 #endif

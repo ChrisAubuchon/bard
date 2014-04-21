@@ -2,6 +2,7 @@
 #define _B3LIB_H
 
 #include <cnv_spell.h>
+#include <cnv_param.h>
 #include <bt_string.h>
 #include <spell.h>
 

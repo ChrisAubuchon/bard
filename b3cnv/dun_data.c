@@ -64,6 +64,107 @@ uint8_t exitLocMap[] = {
 /*  8*/ 19, 20
 }; 
 
+static uint8_t wild[]		= { 0, 0xff };
+static uint8_t skara[]		= { 1, 0xff };
+static uint8_t arboria[]	= { 2, 0xff };
+static uint8_t ciera[]		= { 3, 0xff };
+static uint8_t gelidia[]	= { 4, 0xff };
+static uint8_t pit[]		= { 5, 6, 0xff };
+static uint8_t palace[]		= { 7, 0xff };
+static uint8_t tower[]		= { 8, 9, 10, 11, 0xff };
+static uint8_t grove[]		= { 12, 0xff };
+static uint8_t whiteTower[]	= { 13, 14, 15, 16, 0xff };
+static uint8_t grayTower[]	= { 17, 18, 19, 20, 0xff };
+static uint8_t blackTower[]	= { 21, 22, 23, 24, 0xff };
+static uint8_t iceDungeon[]	= { 25, 26, 0xff };
+static uint8_t iceKeep[]	= { 27, 28, 0xff };
+static uint8_t catacombs[]	= { 29, 30, 0xff };
+static uint8_t unterbrae[]	= { 31, 32, 33, 34, 0xff };
+static uint8_t lucencia[]	= { HIFLAG | 0, 0xff };
+static uint8_t celaria[]	= { HIFLAG | 1, 0xff };
+static uint8_t nowhere[]	= { HIFLAG | 2, 0xff };
+static uint8_t darkCopse[]	= { HIFLAG | 3, 0xff };
+static uint8_t blackScar[]	= { HIFLAG | 4, 0xff };
+static uint8_t mountain[]	= { HIFLAG | 5, HIFLAG | 6, 0xff };
+static uint8_t cyanis[]		= { HIFLAG | 7, HIFLAG | 8, HIFLAG | 9, 0xff };
+static uint8_t allirias[]	= { HIFLAG | 10, HIFLAG | 11, 0xff };
+static uint8_t wasteland[]	= { HIFLAG | 12, 0xff };
+static uint8_t tarmitia[]	= { HIFLAG | 13, 0xff };
+static uint8_t berlin[]		= { HIFLAG | 14, 0xff };
+static uint8_t stalingrad[]	= { HIFLAG | 15, 0xff };
+static uint8_t hiroshima[]	= { HIFLAG | 16, 0xff };
+static uint8_t troy[]		= { HIFLAG | 17, 0xff };
+static uint8_t rome[]		= { HIFLAG | 18, 0xff };
+static uint8_t nottingham[]	= { HIFLAG | 19, 0xff };
+static uint8_t hunWang[]	= { HIFLAG | 20, 0xff };
+static uint8_t malefia[]	= { HIFLAG | 21, HIFLAG | 22, HIFLAG | 23,0xff};
+static uint8_t barracks[]	= { HIFLAG | 24, 0xff };
+static uint8_t ferofist[]	= { HIFLAG | 25, 0xff };
+static uint8_t quarters[]	= { HIFLAG | 26, 0xff };
+static uint8_t workshop[]	= { HIFLAG | 27, 0xff };
+static uint8_t urmech[]		= { HIFLAG | 28, 0xff };
+static uint8_t plane[]		= { HIFLAG | 29, 0xff };
+static uint8_t sanctum[]	= { HIFLAG | 30, 0xff };
+static uint8_t quarry[]		= { HIFLAG | 31, 0xff };
+static uint8_t canyon[]		= { HIFLAG | 32, 0xff };
+static uint8_t demens[]		= { HIFLAG | 33, HIFLAG | 34, 0xff };
+static uint8_t tarjan[]		= { HIFLAG | 35, 0xff };
+
+
+b3dunData_t cityList[] = {
+	{ "wilderness",	wild 		},
+	{ "skara",	skara		},
+	{ "arboria",	arboria		},
+	{ "ciera",	ciera		},
+	{ "gelidia",	gelidia		},
+	{ "lucencia",	lucencia	},
+	{ "celaria",	celaria		},
+	{ "nowhere",	nowhere		},
+	{ "darkCopse",	darkCopse	},
+	{ "blackScar",	blackScar	},
+	{ NULL,		NULL		}
+};
+
+b3dunData_t duns[] = {
+	{ "pit",	pit		},
+	{ "palace",	palace		},
+	{ "tower",	tower		},
+	{ "grove",	grove		},
+	{ "white",	whiteTower	},
+	{ "gray",	grayTower	},
+	{ "black",	blackTower	},
+	{ "iceDungeon",	iceDungeon	},
+	{ "iceKeep",	iceKeep		},
+	{ "catacombs",	catacombs	},
+	{ "unterbrae",	unterbrae	},
+	{ "mountain",	mountain	},
+	{ "cyanis",	cyanis		},
+	{ "allirias",	allirias	},
+	{ "wasteland",	wasteland	},
+	{ "tarmitia",	tarmitia	},
+	{ "berlin",	berlin		},
+	{ "stalingrad",	stalingrad	},
+	{ "hiroshime",	hiroshima	},
+	{ "troy",	troy		},
+	{ "rome",	rome		},
+	{ "nottingham",	nottingham	},
+	{ "hunWang",	hunWang		},
+	{ "malefia",	malefia		},
+	{ "barracks",	barracks	},
+	{ "ferofist",	ferofist	},
+	{ "quarters",	quarters	},
+	{ "workshop",	workshop	},
+	{ "urmech",	urmech		},
+	{ "plane",	plane		},
+	{ "sanctum",	sanctum		},
+	{ "quarry",	quarry		},
+	{ "canyon",	canyon		},
+	{ "demens",	demens		},
+	{ "tarjan",	tarjan		},
+	{ NULL,		NULL		}
+};
+
+#if 0
 b3dunData_t duns[] = {
 /* 0*/DUN( "wilderness", 1, 1,
 	LEVS(	
@@ -475,6 +576,8 @@ b3dunData_t duns[] = {
   )
 };
 
+#endif
+
 uint8_t dun_entryTypeList[] = {
   0, 0, 2, 0,
   0, 0, 0, 2,
@@ -678,5 +781,17 @@ uint8_t dun_wallFlag[] = {
   0, 1, 1, 0,
   0, 1, 0, 0,
   0, 1, 1, 0
+};
+
+uint8_t city_referenceIndex[] = {
+	0, 1, 2, 1, 3, 2, 1, 2, 4, 1
+};
+
+uint8_t *city_referenceLocation[] = {
+	" refugee camp of Skara Brae.",
+	" city gates.",
+	" entrance to the city.",
+	" great ice keep.",
+	" entrance of the forest."
 };
 

@@ -112,6 +112,9 @@ static void dunLevel_toJson(const void *vdl)
 	json_t		*tnode;
 	btstring_t	*fname;
 
+	if (dl == NULL)
+		return;
+
 	root = json_object();
 
 	JSON_BTSTRING(root,	"title",	dl->title);
@@ -138,8 +141,11 @@ static json_t *dunLevel_toDunJson(const void *vdl)
 	dunLevel_t 	*dl = (dunLevel_t *)vdl;
 	json_t		*root;
 
+	if (dl == NULL)
+		return NULL;
+
 	root = json_object();
-	JSON_STRING(root, "level", dl->name->buf);
+	JSON_BTSTRING(root, "level", dl->name);
 	JSON_BOOL(root, "canTeleportTo", dl->canTeleportTo);
 
 	return root;

@@ -12,7 +12,11 @@ b3cnv_SOURCES = 	\
 	b3cnv.c		\
 	b3lib.h		\
 	bitmap.c	\
+	city.c		\
 	class.c		\
+	dun.c		\
+	dun.h		\
+	dun_data.c	\
 	gfx.c		\
 	gfx.h		\
 	gfx_bigpic.c	\

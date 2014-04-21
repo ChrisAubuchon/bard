@@ -2,6 +2,7 @@
 #define __LIBCNV_CNV_CITY_H
 
 #include <btlib.h>
+#include <cnv_param.h>
 #include <cnv_list.h>
 
 /********************************/
@@ -25,6 +26,7 @@ typedef struct {
 	btstring_t	*guildExitDir;
 	citydata_t	*day;
 	citydata_t	*night;
+	paramList_t	*params;
 	cnvList_t	*sqs;
 	cnvList_t	*bls;
 } btcity_t;
