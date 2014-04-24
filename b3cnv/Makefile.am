@@ -33,7 +33,9 @@ b3cnv_SOURCES = 	\
 	spell.c		\
 	spell.h		\
 	spell_data.c	\
-	summon_data.c
+	summon_data.c	\
+	trap.h		\
+	trap_data.c
 
 b3cnv_LDADD = \
 	$(top_builddir)/lib/libcnv/libcnv.a	\

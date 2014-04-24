@@ -25,7 +25,6 @@
 #include <fpio.h>
 
 #include <jansson.h>
-/*#include <gl_xlist.h>*/
 
 
 /********************************/

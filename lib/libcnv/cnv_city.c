@@ -246,6 +246,7 @@ btcity_t *btcity_new(btstring_t *name)
 				citybldg_toName);
 	rval->day = citydata_new();
 	rval->night = citydata_new();
+	rval->params	= paramList_new();
 
 	return rval;
 }
@@ -262,6 +263,7 @@ void btcity_free(const void *vc)
 	cnvList_free(btc->bls);
 	citydata_free(btc->day);
 	citydata_free(btc->night);
+	paramList_free(btc->params);
 
 	bts_free(btc->name);
 	bts_free(btc->title);

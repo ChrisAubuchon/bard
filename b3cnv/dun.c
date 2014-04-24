@@ -2,6 +2,7 @@
 #include <dun.h>
 #include <cnv_dun.h>
 #include <cnv_city.h>
+#include <trap.h>
 
 #define DEBUG
 #include <debug.h>
@@ -47,6 +48,8 @@ static void		setVertex(dunLevel_t *, b3level_t *, int32_t, int32_t);
 static void		getPath(b3level_t *, int32_t, int32_t, uint32_t,
 					dunPath_t *);
 static uint8_t		wrapNumber(int32_t, uint32_t);
+
+static void		addTraps(dunLevel_t *, b3level_t *);
 
 #if 0
 
@@ -513,11 +516,11 @@ static void getPath(b3level_t *level, int32_t x, int32_t y, uint32_t dir, dunPat
 	switch (dir) {
 	case DIR_NORTH:
 		shift		= 4;
-		deltaY		= -1;
+		deltaY		= 1;
 		break;
 	case DIR_SOUTH:
 		shift		= 12;
-		deltaY		= 1;
+		deltaY		= -1;
 		break;
 	case DIR_EAST:
 		shift		= 0;
@@ -534,11 +537,12 @@ static void getPath(b3level_t *level, int32_t x, int32_t y, uint32_t dir, dunPat
 
 	face = (level->squares[y][x].walls >> shift) & 0x0f;
 	if (face) {
-		path->isWall = dun_wallFlag[face];
+		path->isWall = dun_wallFlag[face] ? 1 : 0;
+		path->isDoor = dun_wallFlag[face] ? 0 : 1;
+		path->canPhase = (face < 9) ? 1 : 0;
 		style = dun_styleMap[face];
 
 		if (style) {
-			path->canPhase = (style < 9) ? 1 : 0;
 			path->gfx = bts_sprintf("%d", style);
 		}
 	}
@@ -557,6 +561,63 @@ static void setVertex(dunLevel_t *rval, b3level_t *level, int32_t x, int32_t y)
 	getPath(level, x, y, DIR_SOUTH, &vertex->south);
 	getPath(level, x, y, DIR_EAST, &vertex->east);
 	getPath(level, x, y, DIR_WEST, &vertex->west);
+
+	setFlag(vertex->isSpecial,	level, y, x, SQ_SPECIAL);
+	setFlag(vertex->isTrap,		level, y, x, SQ_TRAP);
+	setFlag(vertex->isDarkness,	level, y, x, SQ_DARKNESS);
+	setFlag(vertex->hasCeilPortal,	level, y, x, SQ_PORTABOVE);
+	setFlag(vertex->hasFloorPortal,	level, y, x, SQ_PORTBELOW);
+	setFlag(vertex->isRandomBattle,	level, y, x, SQ_HIGHBATTLE);
+	setFlag(vertex->isSpinner,	level, y, x, SQ_SPINNER);
+	setFlag(vertex->isAntiMagic,	level, y, x, SQ_ANTIMAGIC);
+	setFlag(vertex->isLifeDrain,	level, y, x, SQ_DRAINHP);
+	setFlag(vertex->isOdd,		level, y, x, SQ_ODD);
+	setFlag(vertex->isSilent,	level, y, x, SQ_SILENCE);
+	setFlag(vertex->isSpptRegen,	level, y, x, SQ_REGENSPPT);
+	setFlag(vertex->isSpptDrain,	level, y, x, SQ_DRAINSPPT);
+	setFlag(vertex->isMakeHostile,	level, y, x, SQ_MONHOSTILE);
+	setXFlag(vertex->isExplosion,	level, y, x, SQ_EXPLOSION);
+	setXFlag(vertex->isHpRegen,	level, y, x, SQ_REGENHP);
+	setXFlag(vertex->isStuck,	level, y, x, SQ_STUCK);
+}
+
+/*
+ * addTraps()
+ */
+static void addTraps(dunLevel_t *rval, b3level_t *level)
+{
+	trap_t		*t;
+	uint32_t	i;
+	uint8_t		trapIndex;
+
+	for (i = 0; i < 3; i++) {
+		t	= trap_new();
+
+		trapIndex	= dun_trap_map[(level->levFlags &  7) + i];
+		t->name		= bts_strcpy(dun_trap_macros[trapIndex]);
+		t->effectString	= bts_strcpy(dun_trap_strings[trapIndex]);
+
+		cnvList_add(rval->floorTraps, t);
+	}
+
+	for (i = 0; i < 4; i++) {
+		t	= trap_new();
+
+		trapIndex	= chest_trap_map[(level->levFlags & 7) + i];
+		t->name		= bts_strcpy(chest_trap_macros[trapIndex]);
+		t->effectString	= bts_strcpy(chest_trap_strings[trapIndex]);
+
+		cnvList_add(rval->chestTraps, t);
+	}
+#if 0
+	rval->chest_traps = bt_array_new(4, bts_free);
+	rval->floor_traps = bt_array_new(3, bts_free);
+	for (i = 0; i < bt_array_length(rval->chest_traps); i++)
+		bt_array_set(rval->chest_traps, i, getChestTrap(b->levFlags & 7, i));
+
+	for (i = 0; i < bt_array_length(rval->floor_traps); i++)
+		bt_array_set(rval->floor_traps, i, getDunTrap(b->levFlags & 7, i));
+#endif
 }
 
 /*
@@ -577,11 +638,21 @@ static dunLevel_t *convertLevel(uint32_t dunno, uint32_t levno)
 	rval->name	= bts_sprintf("%s-%d", duns[dunno].name, levno);
 	rval->path	= mkJsonPath("");
 
-	for (y = level->height - 1; y > 0; y--) {
+	rval->poisonDmg = dun_poisonDmg[level->levFlags & 7];
+
+	param_add(rval->params, PARAM_NUMBER, "spptDrainLo",
+			level->levFlags & 7);
+	param_add(rval->params, PARAM_NUMBER, "spptDrainHi", 
+			(level->levFlags & 7) + 3);
+	param_add(rval->params, PARAM_NUMBER, "hpDrain", level->levFlags & 7);
+
+	for (y = level->height - 1; y >= 0; y--) {
 		for (x = 0; x < level->width; x++) {
 			setVertex(rval, level, x, y);
 		}
 	}
+
+	addTraps(rval, level);
 
 	freeLevel(level);
 	bts_free(data);

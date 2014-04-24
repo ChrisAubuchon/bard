@@ -361,7 +361,6 @@ static btcity_t *convertCity(uint32_t cityIndex)
 
 	rval		= btcity_new(bts_strcpy(cityList[cityIndex].name));
 	rval->path	= mkJsonPath("");
-	rval->params	= paramList_new();
 	rval->title	= bts_strcpy(c->name);
 
 	/*

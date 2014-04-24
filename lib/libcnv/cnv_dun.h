@@ -2,6 +2,7 @@
 #define _CNV_DUN_H
 
 #include <cnvlib.h>
+#include <cnv_param.h>
 
 /********************************/
 /*				*/
@@ -40,11 +41,13 @@ typedef struct {
 	uint8_t		isSpptDrain;
 	uint8_t		isAntiMagic;
 	uint8_t		isLifeDrain;
+	uint8_t		isHpRegen;
 	uint8_t		isDarkness;
 	uint8_t		isTrap;
 	uint8_t		isStuck;
 	uint8_t		isOdd;
 	uint8_t		isSilent;
+	uint8_t		isExplosion;
 	uint8_t		hasCeilPortal;
 	uint8_t		hasFloorPortal;
 	uint8_t		isRandomBattle;
@@ -73,6 +76,8 @@ typedef struct {
 	cnvList_t	*floorTraps;
 	cnvList_t	*chestTraps;
 	cnvList_t	*monsters;
+
+	paramList_t	*params;
 } dunLevel_t;
 
 #define	DIR_UPWARD	0

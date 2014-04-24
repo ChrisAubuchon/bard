@@ -99,6 +99,7 @@ static void dunLevel_free(const void *vdl)
 	cnvList_free(dl->monsters);
 	cnvList_free(dl->chestTraps);
 	cnvList_free(dl->floorTraps);
+	paramList_free(dl->params);
 	bts_free(dl->name);
 	bts_free(dl->title);
 	bts_free(dl->path);
@@ -130,6 +131,7 @@ static void dunLevel_toJson(const void *vdl)
 	json_object_set_new(root,"monsters", cnvList_toJsonArray(dl->monsters));
 	json_object_set_new(root,"floorTraps",cnvList_toJsonArray(dl->floorTraps));
 	json_object_set_new(root,"chestTraps",cnvList_toJsonArray(dl->chestTraps));
+	json_object_update(root, paramList_toJson(dl->params));
 
 	fname = bts_sprintf("%s/%s.json", dl->path->buf, dl->name->buf);
 
@@ -205,6 +207,7 @@ static json_t *vertices_to_json(dunLevel_t *dl)
 		JSON_TRUE_IF(vertexNode,"isSpptRegen",	vertex->isSpptRegen);
 		JSON_TRUE_IF(vertexNode,"isAntiMagic",	vertex->isAntiMagic);
 		JSON_TRUE_IF(vertexNode,"isLifeDrain",	vertex->isLifeDrain);
+		JSON_TRUE_IF(vertexNode,"isHpRegen",	vertex->isHpRegen);
 		JSON_TRUE_IF(vertexNode,"isDarkness",	vertex->isDarkness);
 		JSON_TRUE_IF(vertexNode,"isTrap",	vertex->isTrap);
 		JSON_TRUE_IF(vertexNode,"isStairs",	vertex->isStairs);
@@ -216,6 +219,7 @@ static json_t *vertices_to_json(dunLevel_t *dl)
 		JSON_TRUE_IF(vertexNode,"isSpecial",	vertex->isSpecial);
 		JSON_TRUE_IF(vertexNode,"hasCeilPortal",vertex->hasCeilPortal);
 		JSON_TRUE_IF(vertexNode,"hasFloorPortal",vertex->hasFloorPortal);
+		JSON_TRUE_IF(vertexNode,"isExplosion",	vertex->isExplosion);
 		JSON_NUMBER_IF_NOT_ZERO(vertexNode,"isSpptDrain", vertex->isSpptDrain);
 		JSON_BTSTRING_IF(vertexNode,"isMessage",vertex->isMessage);
 		JSON_BTSTRING_IF(vertexNode,"isStairs",	vertex->isStairs);
@@ -330,6 +334,7 @@ dunLevel_t *dunLevel_new(void)
 	rval->monsters = cnvList_btstring();
 	rval->floorTraps = trapList_new();
 	rval->chestTraps = trapList_new();
+	rval->params		= paramList_new();
 
 	return rval;
 }

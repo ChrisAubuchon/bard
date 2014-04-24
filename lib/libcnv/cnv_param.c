@@ -131,7 +131,7 @@ paramList_t *paramList_new(void)
  */
 void paramList_free(const void *vpl)
 {
-	paramList_t	*pl = (paramList_t *)pl;
+	paramList_t	*pl = (paramList_t *)vpl;
 
 	cnvList_free(pl);
 }

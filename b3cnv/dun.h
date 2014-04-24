@@ -21,8 +21,17 @@
 #define SQ_MONHOSTILE           0x8000
 
 #define SQ_EXPLOSION            0x10
-#define SQ_UNKNOWN3             0x40    /* Party heal square. Doesn't seem to have any effect. */
+#define SQ_REGENHP             0x40    /* Party heal square. Doesn't seem to have any effect. */
 #define SQ_STUCK                0x80
+
+#define setFlag(xLval, xLevel, xY, xX, xFlag) \
+	do {						\
+		xLval = (xLevel->squares[(xY)][(xX)].flags & xFlag) ? 1 : 0; \
+	} while (0)
+#define setXFlag(xLval, xLevel, xY, xX, xFlag) \
+	do {						\
+		xLval = (xLevel->squares[(xY)][(xX)].field_4 & xFlag) ? 1 : 0; \
+	} while (0)
 
 #define WILD_CAMP       0x10
 #define WILD_TAVERN     0x20

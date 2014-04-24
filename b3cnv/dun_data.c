@@ -777,10 +777,16 @@ uint8_t dun_styleMap[] = {
 };
 
 uint8_t dun_wallFlag[] = {
+	0, 1, 0, 0,
+	0, 1, 1, 0,
+	1, 1, 0, 0,
+	0, 1, 1, 0
+#if 0
   0, 1, 0, 0,
   0, 1, 1, 0,
   0, 1, 0, 0,
   0, 1, 1, 0
+#endif
 };
 
 uint8_t city_referenceIndex[] = {
