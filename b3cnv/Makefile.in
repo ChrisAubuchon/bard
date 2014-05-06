@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = b3cnv$(EXEEXT)
+bin_PROGRAMS = b3cnv$(EXEEXT) b3disasm$(EXEEXT)
 subdir = b3cnv
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -64,16 +64,23 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_b3cnv_OBJECTS = b3cnv.$(OBJEXT) bitmap.$(OBJEXT) city.$(OBJEXT) \
-	class.$(OBJEXT) dun.$(OBJEXT) dun_data.$(OBJEXT) gfx.$(OBJEXT) \
-	gfx_bigpic.$(OBJEXT) gfx_tile.$(OBJEXT) item.$(OBJEXT) \
-	item_data.$(OBJEXT) mon.$(OBJEXT) mon_data.$(OBJEXT) \
-	picIndex.$(OBJEXT) race.$(OBJEXT) spell.$(OBJEXT) \
-	spell_data.$(OBJEXT) summon_data.$(OBJEXT) trap_data.$(OBJEXT)
+	class.$(OBJEXT) dun.$(OBJEXT) dun_data.$(OBJEXT) \
+	dun_ops.$(OBJEXT) gfx.$(OBJEXT) gfx_bigpic.$(OBJEXT) \
+	gfx_tile.$(OBJEXT) item.$(OBJEXT) item_data.$(OBJEXT) \
+	mon.$(OBJEXT) mon_data.$(OBJEXT) picIndex.$(OBJEXT) \
+	race.$(OBJEXT) spell.$(OBJEXT) spell_data.$(OBJEXT) \
+	summon_data.$(OBJEXT) trap_data.$(OBJEXT)
 b3cnv_OBJECTS = $(am_b3cnv_OBJECTS)
 b3cnv_DEPENDENCIES = $(top_builddir)/lib/libcnv/libcnv.a \
 	$(top_builddir)/lib/libbard/libbard.a \
 	$(top_builddir)/lib/libgnu/libgnu.a \
 	$(top_builddir)/lib/jansson/libjansson.a
+am_b3disasm_OBJECTS = b3disasm.$(OBJEXT) dun_data.$(OBJEXT) \
+	dun_ops.$(OBJEXT) picIndex.$(OBJEXT)
+b3disasm_OBJECTS = $(am_b3disasm_OBJECTS)
+b3disasm_DEPENDENCIES = $(top_builddir)/lib/libbard/libbard.a \
+	$(top_builddir)/lib/libcnv/libcnv.a \
+	$(top_builddir)/lib/libgnu/libgnu.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -82,8 +89,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(b3cnv_SOURCES)
-DIST_SOURCES = $(b3cnv_SOURCES)
+SOURCES = $(b3cnv_SOURCES) $(b3disasm_SOURCES)
+DIST_SOURCES = $(b3cnv_SOURCES) $(b3disasm_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -528,6 +535,7 @@ b3cnv_SOURCES = \
 	dun.c		\
 	dun.h		\
 	dun_data.c	\
+	dun_ops.c	\
 	gfx.c		\
 	gfx.h		\
 	gfx_bigpic.c	\
@@ -555,6 +563,19 @@ b3cnv_LDADD = \
 	$(top_builddir)/lib/jansson/libjansson.a	\
 	-lpng					\
 	-lz					
+
+b3disasm_SOURCES = \
+	b3disasm.c	\
+	b3lib.h		\
+	dun.h		\
+	dun_data.c	\
+	dun_ops.c	\
+	picIndex.c	
+
+b3disasm_LDADD = \
+	$(top_builddir)/lib/libbard/libbard.a		\
+	$(top_builddir)/lib/libcnv/libcnv.a		\
+	$(top_builddir)/lib/libgnu/libgnu.a	
 
 all: all-am
 
@@ -630,6 +651,9 @@ clean-binPROGRAMS:
 b3cnv$(EXEEXT): $(b3cnv_OBJECTS) $(b3cnv_DEPENDENCIES) 
 	@rm -f b3cnv$(EXEEXT)
 	$(LINK) $(b3cnv_OBJECTS) $(b3cnv_LDADD) $(LIBS)
+b3disasm$(EXEEXT): $(b3disasm_OBJECTS) $(b3disasm_DEPENDENCIES) 
+	@rm -f b3disasm$(EXEEXT)
+	$(LINK) $(b3disasm_OBJECTS) $(b3disasm_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -638,11 +662,13 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/b3cnv.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/b3disasm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitmap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/city.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/class.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dun.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dun_data.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dun_ops.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gfx.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gfx_bigpic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gfx_tile.Po@am__quote@

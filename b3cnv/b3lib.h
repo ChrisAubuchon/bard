@@ -46,6 +46,8 @@ typedef struct {
 	bts_sprintf("%s/"format, inputDir->buf, ## __VA_ARGS__)
 #define mkJsonPath(format, ...) \
 	bts_sprintf("%s/bt3/json/"format, outputDir->buf, ## __VA_ARGS__)
+#define mkCodePath(format, ...) \
+	bts_sprintf("%s/bt3/code/"format, outputDir->buf, ## __VA_ARGS__)
 #define mkFontPath(format, ...) \
 	bts_sprintf("%s/bt3/fonts/"format, outputDir->buf, ## __VA_ARGS__)
 
@@ -64,6 +66,13 @@ btAction_t	*cnvBreathAttack(breathAtt_t *, uint8_t);
 btAction_t	*getFigurineAction(uint32_t);
 btAction_t	*getWeaponAction(uint8_t);
 
+/* item.c */
+btstring_t	*getItemMacro(uint8_t index);
+
+/* mon.c */
+btstring_t	*getMonsterMacro(uint32_t index);
+btstring_t	*getSummonMacro(uint32_t index);
+
 #if 0
 /* common.c */
 btstring_t *getDirectionMacro(uint8_t dir);
@@ -73,12 +82,8 @@ btstring_t *getLevelPath(uint8_t dun, uint8_t level);
 btstring_t *getChangeLevelPath(uint8_t dun, uint8_t level, uint8_t direction);
 
 /* item.c */
-btstring_t *getItemMacro(uint8_t index);
 btstring_t *getLiquidMacro(uint8_t index);
 
-/* mon.c */
-btstring_t *getMonsterMacro(uint32_t index);
-btstring_t *getSummonMacro(uint32_t index);
 
 /* picIndex.c */
 uint8_t *getPicMacro(uint8_t pi);

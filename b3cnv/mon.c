@@ -265,7 +265,6 @@ static void getMonBuf(uint8_t *buf, b3mon_t *m)
 	m->spellSaveHi = *buf++;
 }
 
-#if 0
 
 /********************************/
 /*				*/
@@ -278,7 +277,6 @@ btstring_t *getMonsterMacro(uint32_t index)
 	return bts_strcpy(monMacro[index]);
 }
 
-#endif
 
 btstring_t *getSummonMacro(uint32_t index)
 {
@@ -475,65 +473,4 @@ void convertMonsters(void)
 
 	monList_to_json(monsters, mkJsonPath("monsters.json"));
 	cnvList_free(monsters);
-#if 0
-	int fd;
-	int i, nmon;
-	uint32_t count = 0;
-
-	uint16_t start;
-	uint16_t end;
-
-	uint8_t mbuf[0x30];
-	b3mon_t m;
-
-	cnv_printMonHeader();
-
-	fd = xopen("monsterl", O_RDONLY);
-
-	start = file_read16le(fd);
-	end = xlseek(fd, 0, SEEK_END);
-
-	nmon = (end - start) / 0x30;
-
-	xlseek(fd, start, SEEK_SET);
-
-	for (i = 0; i < nmon; i++) {
-		xread(fd, mbuf, 0x30);
-		getMonBuf(mbuf, &m);
-
-		printMon(&m, count);
-
-		count++;
-	}
-
-	close(fd);
-
-	fd = xopen("monsterh", O_RDONLY);
-
-	start = file_read16le(fd);
-	end = xlseek(fd, 0, SEEK_END);
-
-	nmon = (end - start) / 0x30;
-
-	xlseek(fd, start, SEEK_SET);
-
-	for (i = 0; i < nmon; i++) {
-		xread(fd, mbuf, 0x30);
-		getMonBuf(mbuf, &m);
-
-		printMon(&m, count);
-
-		count++;
-	}
-
-	close(fd);
-
-	for (i = 0; i < 22; i++) {
-		printMon(&sumMons[i], count);
-
-		count++;
-	}
-
-	cnv_printMonFooter();
-#endif
 }

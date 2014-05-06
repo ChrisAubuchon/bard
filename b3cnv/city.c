@@ -16,17 +16,6 @@
 /*					*/
 /****************************************/
 
-#if 0
-static int hifd = -1;
-static int lofd = -1;
-
-static bt_array_t *codeOffsets;
-static uint32_t currentDungeon;
-static uint32_t currentLevel;
-static dun_t *dungeon;
-
-#endif
-
 /****************************************/
 /*					*/
 /* Local function prototypes		*/
@@ -37,7 +26,6 @@ static btstring_t	*readData(uint8_t);
 
 static dunLevel_t	*convertLevel(uint8_t);
 static b3level_t	*b3_readLevel(btstring_t *);
-static void		freeLevel(b3level_t *);
 
 static btcity_t		*convertCity(uint32_t);
 static b3city_t		*readCity(btstring_t *);
@@ -55,23 +43,6 @@ static btstring_t	*toFace(uint8_t);
 static uint32_t		building_getHash(const void *);
 static bool		building_compare(const void *, const void *);
 static void		building_free(const void *);
-
-#if 0
-
-static b3level_t *b3_readLevel(btstring_t * dbuf);
-static b3city_t *b3_readWild(btstring_t * dbuf);
-static dunLevel_t *b3_convertLevel(b3level_t * b);
-static dun_t *readDungeon(uint32_t dunno);
-
-static void getWalls(dunWall_t * dw, uint16_t walls, uint8_t shift);
-static void getWildWall(dunWall_t * dw, uint8_t wall);
-
-static uint8_t countItems(uint8_t level);
-static bt_array_t *getItems(uint8_t level, uint32_t * total_weight);
-static bt_array_t *getMonsters(uint16_t monlo, uint16_t monhi);
-static uint8_t wild_wrapSquare(int32_t sq, uint8_t width);
-
-#endif
 
 /****************************************/
 /*					*/
@@ -113,206 +84,6 @@ static btstring_t *toFace(uint8_t sq)
 {
 	return bts_sprintf("%d", (sq & 0x0f) - 1);
 }
-
-#if 0
-static uint8_t wild_wrapSquare(int32_t sq, uint8_t width)
-{
-	while (1) {
-		if (sq < 0) {
-			sq += width;
-		} else if (sq >= width) {
-			sq -= width;
-		} else {
-			return sq;
-		}
-	}
-}
-
-static void getWalls(dunWall_t * dw, uint16_t walls, uint8_t shift)
-{
-	uint8_t face;
-	uint8_t style;
-
-	face = (walls >> shift) & 0x0f;
-	if (!face) {
-		dw->style = 0xff;
-		return;
-	}
-
-	style = dun_styleMap[face];
-	dw->nopass = dun_wallFlag[face];
-
-	if (style) {
-		dw->canphase = (style < 9) ? 1 : 0;
-		dw->style = style - 1;
-	} else {
-		dw->style = 0xff;
-	}
-}
-
-static void getWildWall(dunWall_t * dw, uint8_t wall)
-{
-	if (wall == 0) {
-		dw->style = 0xff;
-		return;
-	}
-
-	dw->style = (wall & 0x0f) - 1;
-	dw->nopass = (wall & 0xe0) == 0xe0 ? 1 : 0;
-}
-
-#endif
-
-/*
- * convertWild()
- */
-static dunLevel_t *convertWild(b3city_t *w)
-{
-	dunLevel_t	*rval;
-	int32_t		x, y;
-
-	rval = dunLevel_new();
-
-	rval->name = bts_strcpy(w->name);
-	rval->path = mkJsonPath("");
-#if 0
-	dunLevel_t *rval;
-	int32_t i, j;
-	uint32_t sq;
-
-	rval = dunLevel_new(w->width, w->height);
-
-	rval->name = bts_strcpy(w->name);
-	rval->tag = bts_strcpy("level_0");
-
-	rval->width = w->width;
-	rval->height = w->height;
-	rval->wrapFlag = (w->wrapFlag & 2) ? 1 : 0;
-
-	rval->monsters = getMonsters(dun_monIndexList[w->monsterIndex].mon_lo, dun_monIndexList[w->monsterIndex].mon_hi);
-
-	rval->poisonDmg = dun_poisonDmg[w->levFlags & 7];
-
-	rval->items = getItems(w->levFlags & 7, &rval->item_total_weight);
-
-	sq = 0;
-	for (i = 0; i < w->height; i++) {
-		for (j = 0; j < w->width; j++) {
-			rval->squares[sq] = dunSquare_new();
-			rval->squares[sq]->x = j;
-			rval->squares[sq]->y = i;
-
-			if (w->squares[i][j] == 0) {
-				getWildWall(&rval->squares[sq]->n_wall, w->squares[wild_wrapSquare(i + 1, w->height)][j]);
-				getWildWall(&rval->squares[sq]->s_wall, w->squares[wild_wrapSquare(i - 1, w->height)][j]);
-				getWildWall(&rval->squares[sq]->e_wall, w->squares[i][wild_wrapSquare(j + 1, w->width)]);
-				getWildWall(&rval->squares[sq]->w_wall, w->squares[i][wild_wrapSquare(j - 1, w->width)]);
-			} else {
-				rval->squares[sq]->n_wall.style = 0xff;
-				rval->squares[sq]->s_wall.style = 0xff;
-				rval->squares[sq]->w_wall.style = 0xff;
-				rval->squares[sq]->e_wall.style = 0xff;
-			}
-
-			sq++;
-		}
-	}
-#endif
-
-
-	return rval;
-}
-
-#if 0
-
-static uint8_t countItems(uint8_t level)
-{
-	uint8_t mask;
-	uint8_t i;
-	uint8_t rval = 0;
-
-	mask = 0x80 >> level;
-
-	for (i = 0; i < 255; i++)
-		if (dun_items[i] & mask)
-			rval++;
-
-	return rval;
-}
-
-static bt_array_t *getItems(uint8_t level, uint32_t * total_weight)
-{
-	bt_array_t *rval;
-	uint8_t i, j = 0;
-	uint8_t mask;
-	uint8_t harmonic = 0;
-
-	rval = bt_array_new(countItems(level), dunItem_free);
-
-	mask = 0x80 >> level;
-
-	for (i = 0; i < 255; i++) {
-		if (dun_items[i] & mask) {
-			dunItem_t *new;
-
-			(i == 195) ? harmonic = 1 : 0;
-
-			new = dunItem_new();
-			new->name = getItemMacro(i);
-
-			bt_array_set(rval, j, new);
-			j++;
-		}
-	}
-
-	j = 0;
-	if (harmonic) {
-		*total_weight = (bt_array_length(rval) - 1) << 8;
-
-		for (i = 0; i < 255; i++) {
-			if (dun_items[i] & mask) {
-				dunItem_t *d;
-
-				d = bt_array_get(rval, j);
-
-				if (i == 195)
-					d->weight = (bt_array_length(rval) - 1) * 17;
-				else
-					d->weight = 239;
-				j++;
-			}
-		}
-	} else {
-		*total_weight = bt_array_length(rval);
-
-		for (i = 0; i < bt_array_length(rval); i++) {
-			dunItem_t *d;
-
-			d = bt_array_get(rval, j);
-
-			d->weight = 1;
-		}
-	}
-
-	return rval;
-}
-
-static bt_array_t *getMonsters(uint16_t monlo, uint16_t monhi)
-{
-	bt_array_t *rval;
-	uint16_t nmons;
-	uint32_t i, j = 0;
-
-	nmons = (monhi - monlo) + 1;
-	rval = bt_array_new(nmons, bts_free);
-
-	for (i = monlo; i <= monhi; i++)
-		bt_array_set(rval, j++, getMonsterMacro(i));
-
-	return rval;
-}
-
-#endif
 
 /*
  * readData()
@@ -383,6 +154,9 @@ static btcity_t *convertCity(uint32_t cityIndex)
 		param_add(rval->params, PARAM_STRING, "tileset", "wild");
 		addWildSquares(rval, c);
 	}
+
+	addItems(rval->day->items, c->levFlags & 7);
+	addMonsters(rval->day->monsters, c->monsterIndex);
 
 	freeCity(c);
 	bts_free(data);

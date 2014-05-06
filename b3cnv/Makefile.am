@@ -1,4 +1,4 @@
-bin_PROGRAMS = b3cnv
+bin_PROGRAMS = b3cnv b3disasm
 
 AM_CFLAGS = @CFLAGS@	\
 	-I$(top_srcdir)/lib/libbard \
@@ -17,6 +17,7 @@ b3cnv_SOURCES = 	\
 	dun.c		\
 	dun.h		\
 	dun_data.c	\
+	dun_ops.c	\
 	gfx.c		\
 	gfx.h		\
 	gfx_bigpic.c	\
@@ -45,3 +46,15 @@ b3cnv_LDADD = \
 	-lpng					\
 	-lz					
 
+b3disasm_SOURCES =	\
+	b3disasm.c	\
+	b3lib.h		\
+	dun.h		\
+	dun_data.c	\
+	dun_ops.c	\
+	picIndex.c	
+
+b3disasm_LDADD = \
+	$(top_builddir)/lib/libbard/libbard.a		\
+	$(top_builddir)/lib/libcnv/libcnv.a		\
+	$(top_builddir)/lib/libgnu/libgnu.a	

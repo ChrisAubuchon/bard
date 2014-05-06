@@ -99,6 +99,7 @@ typedef struct {
   uint16_t *rowOffset;
   b3dunSq_t **squares;
   uint8_t dataCount;
+	uint16_t	dataBaseOffset;
   b3data_t *dataList;
   btstring_t *codeBuf;
 } b3level_t;
@@ -114,6 +115,7 @@ typedef struct {
   uint16_t *rowOffset;
   uint8_t **squares;
   uint8_t dataCount;
+	uint16_t	dataBaseOffset;
   b3data_t *dataList;
   btstring_t *codeBuf;
 } b3city_t;
@@ -135,5 +137,10 @@ extern	uint8_t dun_wallFlag[];
 
 extern uint8_t	city_referenceIndex[];
 extern uint8_t	*city_referenceLocation[];
+
+void		addItems(cnvList_t *, uint8_t);
+void		addMonsters(cnvList_t *, uint8_t);
+b3level_t	*readMap(uint8_t);
+void		freeLevel(b3level_t *);
 
 #endif
