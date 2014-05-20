@@ -4,6 +4,8 @@
 #define DEBUG 1
 #include <debug.h>
 
+typedef void (opcodeFunc_t)(FILE *, btstring_t *, uint16_t *);
+
 /********************************/
 /*				*/
 /* Global variables		*/
@@ -17,6 +19,42 @@ btstring_t	*outputDir	= NULL;
 
 /********************************/
 /*				*/
+/* opcode prototypes		*/
+/*				*/
+/********************************/
+
+static void	_op_getElse(FILE *, btstring_t *, uint16_t *);
+
+static void	op_stairsDown(FILE *, btstring_t *, uint16_t *);
+static void	op_stairsUp(FILE *, btstring_t *, uint16_t *);
+static void	op_teleport(FILE *, btstring_t *, uint16_t *);
+static void	op_clearPrint(FILE *, btstring_t *, uint16_t *);
+static void	op_clearSpecial(FILE *, btstring_t *, uint16_t *);
+static void	op_bigpic(FILE *, btstring_t *, uint16_t *);
+static void	op_setTitle(FILE *, btstring_t *, uint16_t *);
+static void	op_anyKey(FILE *, btstring_t *, uint16_t *);
+static void	op_clear(FILE *, btstring_t *, uint16_t *);
+static void	op_isGFlagSet(FILE *, btstring_t *, uint16_t *);
+static void	op_isGFlagClear(FILE *, btstring_t *, uint16_t *);
+static void	op_setGFlag(FILE *, btstring_t *, uint16_t *);
+static void	op_ifSpellEq(FILE *, btstring_t *, uint16_t *);
+static void	op_setMapRval(FILE *, btstring_t *, uint16_t *);
+static void	op_print(FILE *, btstring_t *, uint16_t *);
+static void	op_nothing(FILE *, btstring_t *, uint16_t *);
+static void	op_getItem(FILE *, btstring_t *, uint16_t *);
+static void	op_partyHasItem(FILE *, btstring_t *, uint16_t *);
+static void	op_battleNoCry(FILE *, btstring_t *, uint16_t *);
+static void	op_sameSquare(FILE *, btstring_t *, uint16_t *);
+static void	op_getYesNo(FILE *, btstring_t *, uint16_t *);
+static void	op_goto(FILE *, btstring_t *, uint16_t *);
+static void	op_setSameSquare(FILE *, btstring_t *, uint16_t *);
+static void	op_getInput(FILE *, btstring_t *, uint16_t *);
+static void	op_ifLastInput(FILE *, btstring_t *, uint16_t *);
+static void	op_userHasItem(FILE *, btstring_t *, uint16_t *);
+static void	op_takeItem(FILE *, btstring_t *, uint16_t *);
+
+/********************************/
+/*				*/
 /* Local variables		*/
 /*				*/
 /********************************/
@@ -24,36 +62,45 @@ btstring_t	*outputDir	= NULL;
 /* Packed string bits left */
 static int8_t	sp_bitsLeft;
 
-static uint8_t isAction[] = {
-/*   0*/	1, 1, 1, 1, 
-/*   4*/	1, 1, 1, 1, 
-/*   8*/	1, 1, 1, 1, 
-/*  12*/	0, 1, 1, 1, 
-/*  16*/	1, 1, 1, 1, 
-/*  20*/	1, 1, 1, 1, 
-/*  24*/	1, 1, 1, 1, 
-/*  28*/	1, 1, 1, 1, 
-/*  32*/	1, 1, 1, 1, 
-/*  36*/	1, 1, 1, 1, 
-/*  40*/	1, 1, 1, 1, 
-/*  44*/	1, 1, 1, 1, 
-/*  48*/	1, 1, 1, 1, 
-/*  52*/	1, 1, 1, 1, 
-/*  56*/	1, 1, 1, 1, 
-/*  60*/	1, 1, 1, 1, 
-/*  64*/	1, 1, 1, 1, 
-/*  68*/	1, 1, 1, 1, 
-/*  72*/	1, 1, 1, 1, 
-/*  76*/	1, 1, 1, 1, 
-/*  80*/	1, 1, 1, 1, 
-/*  84*/	1, 1, 1, 1, 
-/*  88*/	1, 1, 1, 1, 
-/*  92*/	1, 1, 1, 1, 
-/*  96*/	1, 1, 1, 1, 
-/* 100*/	1, 1, 1, 1, 
-/* 104*/	1, 1, 1, 1, 
-/* 108*/	1, 1, 1, 1, 
-/* 112*/	1, 1, 1, 1
+/* Opcode breakAfter */
+static uint8_t	op_breakAfter;
+
+/* Level pointer */
+static b3level_t	*currentLevel;
+
+static opcodeFunc_t *opcodes[] = {
+/*   0*/	op_stairsDown, op_stairsUp, NULL, op_teleport, 
+/*   4*/	NULL, op_clearPrint, op_clearSpecial, op_bigpic, 
+/*   8*/	op_setTitle, op_anyKey, op_clear, op_isGFlagSet, 
+/*  12*/	op_isGFlagClear, NULL, op_setGFlag, NULL, 
+/*  16*/	op_ifSpellEq, op_setMapRval, op_print, op_nothing, 
+/*  20*/	NULL, op_getItem, op_partyHasItem, NULL, 
+/*  24*/	op_sameSquare, op_getYesNo, op_goto, op_battleNoCry, 
+/*  28*/	op_setSameSquare, NULL, NULL, NULL, 
+/*  32*/	NULL, NULL, NULL, NULL, 
+/*  36*/	NULL, NULL, NULL, NULL, 
+/*  40*/	NULL, NULL, NULL, op_getInput, 
+/*  44*/	op_ifLastInput, NULL, NULL, NULL, 
+/*  48*/	NULL, NULL, NULL, NULL, 
+/*  52*/	NULL, NULL, op_userHasItem, op_takeItem, 
+/*  56*/	NULL, NULL, NULL, NULL, 
+/*  60*/	NULL, NULL, NULL, NULL, 
+/*  64*/	NULL, NULL, NULL, NULL, 
+/*  68*/	NULL, NULL, NULL, NULL, 
+/*  72*/	NULL, NULL, NULL, NULL, 
+/*  76*/	NULL, NULL, NULL, NULL, 
+/*  80*/	NULL, NULL, NULL, NULL, 
+/*  84*/	NULL, NULL, NULL, NULL, 
+/*  88*/	NULL, NULL, NULL, NULL, 
+/*  92*/	NULL, NULL, NULL, NULL, 
+/*  96*/	NULL, NULL, NULL, NULL, 
+/* 100*/	NULL, NULL, NULL, NULL, 
+/* 104*/	NULL, NULL, NULL, NULL, 
+/* 108*/	NULL, NULL, NULL, NULL, 
+/* 112*/	NULL, NULL, NULL, NULL,
+/* 116*/	NULL, NULL, NULL, NULL,
+/* 120*/	NULL, NULL, NULL, NULL,
+/* 124*/	NULL, NULL, NULL, NULL
 };
 
 static uint8_t _str_Loalphabet[] = {
@@ -99,8 +146,10 @@ static uint8_t alphaFlags[] = {
 
 static void	usage(void);
 static void	dump_disasm(uint8_t, uint8_t);
-static void	disasmSpecial(FILE *, btstring_t *, uint16_t);
+static void	disasmCode(FILE *, btstring_t *, uint16_t);
+static void	disasmSpecial(FILE *, btstring_t *, uint16_t, uint16_t);
 static uint32_t	disasmConditional(FILE *, btstring_t *, uint16_t *);
+static void	disasmOpcode(FILE *, btstring_t *, uint16_t *);
 static uint32_t	disasmIf(FILE *, btstring_t *, uint16_t *);
 
 static void	printArgs(FILE *, btstring_t *, uint16_t *, const char *);
@@ -108,8 +157,12 @@ static void	printArgs(FILE *, btstring_t *, uint16_t *, const char *);
 static void	printPackedString(FILE *, btstring_t *, uint16_t *);
 static void	printMaskedString(FILE *, btstring_t *, uint16_t *);
 static void	printBigpic(FILE *, uint8_t);
+static void	printSpell(FILE *, uint8_t);
+static void	printItem(FILE *, uint8_t);
+static void	printMonster(FILE *, uint8_t);
 static uint8_t	sp_unpackChar(btstring_t *, uint16_t *);
 static uint8_t	sp_extractCh(btstring_t *, uint16_t *, uint8_t);
+
 
 /********************************/
 /*				*/
@@ -144,9 +197,18 @@ static void printArgs(FILE *fp, btstring_t *code, uint16_t *offset,
 
 	if (arglen) {
 		for (i = 0; i < arglen; i++) {
+			if (i)
+				fprintf(fp, ", ");
+
 			switch(format[i]) {
+			case 'b':	/* byte */
+				fprintf(fp, "%d", code->buf[(*offset)++]);
+				break;
 			case 'B':	/* Bigpic image */
 				printBigpic(fp, code->buf[(*offset)++]);
+				break;
+			case 'C':	/* Spell */
+				printSpell(fp, code->buf[(*offset)++]);
 				break;
 			case 'f':	/* Flag */
 			{
@@ -159,6 +221,12 @@ static void printArgs(FILE *fp, btstring_t *code, uint16_t *offset,
 				(*offset)++;
 				break;
 			}
+			case 'I':	/* Item */
+				printItem(fp, code->buf[(*offset)++]);
+				break;
+			case 'M':	/* Monster */
+				printMonster(fp, code->buf[(*offset)++]);
+				break;
 			case 'S':	/* Masked String */
 				fprintf(fp, "\"");
 				fflush(fp);
@@ -169,6 +237,9 @@ static void printArgs(FILE *fp, btstring_t *code, uint16_t *offset,
 				fprintf(fp, "\"");
 				printPackedString(fp, code, offset);
 				fprintf(fp, "\"");
+				break;
+			case 'x':	/* Hex byte */
+				fprintf(fp, "0x%02x", code->buf[(*offset)++]);
 				break;
 			}
 		}
@@ -229,6 +300,52 @@ static void printBigpic(FILE *fp, uint8_t pic)
 
 	indexToPic(pic, &p);
 	rval = getPicMacro(&p);
+
+	fprintf(fp, "%.*s", rval->size, rval->buf);
+
+	bts_free(rval);
+}
+
+/*
+ * printSpell()
+ */
+static void printSpell(FILE *fp, uint8_t spell)
+{
+	btstring_t	*rval;
+
+	if (spell < 125) {
+		rval = getSpellAbbr(spell);
+
+		fprintf(fp, "%.*s", rval->size, rval->buf);
+
+		bts_free(rval);
+	} else {
+		fprintf(fp, "%d", spell);
+	}
+}
+
+/*
+ * printItem()
+ */
+static void printItem(FILE *fp, uint8_t item)
+{
+	btstring_t	*rval;
+
+	rval	= getItemMacro(item);
+
+	fprintf(fp, "%.*s", rval->size, rval->buf);
+
+	bts_free(rval);
+}
+
+/*
+ * printMonster()
+ */
+static void printMonster(FILE *fp, uint8_t monster)
+{
+	btstring_t	*rval;
+
+	rval	= getLevelMonster(currentLevel->monIndex, monster);
 
 	fprintf(fp, "%.*s", rval->size, rval->buf);
 
@@ -304,6 +421,307 @@ static uint8_t sp_unpackChar(btstring_t *code, uint16_t *offset)
 
 /********************************/
 /*				*/
+/* Opcode functions		*/
+/*				*/
+/********************************/
+
+/*
+ * _op_getElse()
+ */
+static void _op_getElse(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	uint16_t	rval;
+	uint8_t		savedBreakAfter	= op_breakAfter;
+
+	fprintf(fp, "\t\tthen ");
+	if (!op_breakAfter) {
+		fprintf(fp, "Do nothing");
+		op_breakAfter	= 1;
+	} else {
+		rval	= str_read16le(&code->buf[*offset]);
+		*offset	+= sizeof(uint16_t);
+
+		fprintf(fp, "goto %04x", rval);
+	}
+	fprintf(fp, "\n\t\telse ");
+	if (!savedBreakAfter) {
+		fprintf(fp, " return");
+	} else {
+		fprintf(fp, "Do nothing");
+	}
+}
+
+/*
+ * 0 - op_stairsDown()
+ */
+static void op_stairsDown(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tDo stairs down");
+}
+
+/*
+ * 1 - op_stairsUp()
+ */
+static void op_stairsUp(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tDo stairs up");
+}
+
+/*
+ * 3 - op_teleport()
+ */
+static void op_teleport(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tDo teleport to (");
+	printArgs(fp, code, offset, "b");
+	fprintf(fp, ", ");
+	printArgs(fp, code, offset, "b");
+	fprintf(fp, ") in ");
+	printArgs(fp, code, offset, "b");
+}
+
+/*
+ * 5 - op_clearPrint()
+ */
+static void op_clearPrint(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tDo clearPrint ");
+	printArgs(fp, code, offset, "s");
+}
+
+/*
+ * 6 - op_clearSpecial()
+ */
+static void op_clearSpecial(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tDo clear this special");
+}
+
+/*
+ * 7 - op_bigpic()
+ */
+static void op_bigpic(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tDo draw picture ");
+	printArgs(fp, code, offset, "B");
+}
+
+/*
+ * 8 - op_setTitle()
+ */
+static void op_setTitle(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tDo print ");
+	printArgs(fp, code, offset, "S");
+	fprintf(fp, " under picture");
+}
+
+/*
+ * 9 - op_anyKey()
+ */
+static void op_anyKey(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tDo press any key");
+}
+
+/*
+ * 10 - op_clear()
+ */
+static void op_clear(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tDo clear");
+}
+/*
+ * 12 - op_isGFlagSet()
+ */
+static void op_isGFlagSet(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tIf global flag ");
+	printArgs(fp, code, offset, "f");
+	fprintf(fp, " is set\n");
+	_op_getElse(fp, code, offset);
+}
+
+
+/*
+ * 11 - op_isGFlagClear()
+ */
+static void op_isGFlagClear(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tIf global flag ");
+	printArgs(fp, code, offset, "f");
+	fprintf(fp, " is clear\n");
+	_op_getElse(fp, code, offset);
+}
+
+/*
+ * 14 - op_setGFlag()
+ */
+static void op_setGFlag(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tSet global flag ");
+	printArgs(fp, code, offset, "f");
+}
+
+/*
+ * 16 - op_ifSpellEq()
+ */
+static void op_ifSpellEq(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tIf spell = ");
+	printArgs(fp, code, offset, "C");
+	fprintf(fp, "\n");
+	_op_getElse(fp, code, offset);
+}
+
+/*
+ * 17 - op_setMapRval()
+ */
+static void op_setMapRval(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tDo set map rval");
+}
+
+/*
+ * 18 - op_print()
+ */
+static void op_print(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tDo print ");
+	printArgs(fp, code, offset, "s");
+}
+
+/*
+ * 19 - op_nothing()
+ */
+static void op_nothing(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tDo nothing");
+}
+
+/*
+ * 21 - op_getItem()
+ */
+static void op_getItem(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tDo give ");
+	printArgs(fp, code, offset, "bIx");
+}
+
+/*
+ * 22 - op_partyHasItem()
+ */
+static void op_partyHasItem(FILE *fp, btstring_t *code,  uint16_t *offset)
+{
+	fprintf(fp, "\tIf anyone is carrying ");
+	printArgs(fp, code, offset, "I");
+	fprintf(fp, "\n");
+	_op_getElse(fp, code, offset);
+}
+
+/*
+ * 24 - op_sameSquare()
+ */
+static void op_sameSquare(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tIf sameSquareFlag is set\n");
+	_op_getElse(fp, code, offset);
+}
+
+/*
+ * 25 - op_getYesNo()
+ */
+static void op_getYesNo(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tIf getYesNo is yes\n");
+	_op_getElse(fp, code, offset);
+}
+
+/*
+ * 26 - op_goto()
+ */
+static void op_goto(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	uint16_t	dest;
+
+	dest	= str_read16le(&code->buf[*offset]);
+	*offset	+= 2;
+
+	fprintf(fp, "\tDo goto %04x", dest);
+}
+
+/*
+ * 27 - op_battleNoCry()
+ */
+static void op_battleNoCry(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	uint8_t		numGroups;
+	uint8_t		i;
+
+	numGroups	= code->buf[(*offset)++];
+
+	for (i = 0; i < numGroups; i++) {
+		fprintf(fp, "\tDo set encounter: ");
+		printArgs(fp, code, offset, "M");
+		fprintf(fp, ":");
+		printArgs(fp, code, offset, "b");
+		fprintf(fp, "\n");
+		
+	}
+
+	fprintf(fp, "\tDo begin combat\n");
+	fprintf(fp, "\tIf party won last combat\n");
+	_op_getElse(fp, code, offset);
+}
+
+/*
+ * 28 - op_setSameSquare()
+ */
+static void op_setSameSquare(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tDo set sameSquareFlag");
+}
+
+/*
+ * 43 - op_getInput()
+ */
+static void op_getInput(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tDo get input");
+}
+
+/*
+ * 44 - op_ifLastInput()
+ */
+static void op_ifLastInput(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tIf last input = ");
+	printArgs(fp, code, offset, "S");
+	fprintf(fp, "\n");
+	_op_getElse(fp, code, offset);
+}
+
+/*
+ * 54 - op_userHasItem()
+ */
+static void op_userHasItem(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tIf user has item ");
+	printArgs(fp, code, offset, "I");
+	fprintf(fp, "\n");
+	_op_getElse(fp, code, offset);
+}
+
+/*
+ * 55 - op_takeItem()
+ */
+static void op_takeItem(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	fprintf(fp, "\tDo take item");
+}
+
+/********************************/
+/*				*/
 /* Disassembly instructions	*/
 /*				*/
 /********************************/
@@ -375,16 +793,51 @@ static uint32_t disasmAction(FILE *fp, btstring_t *code, uint16_t *offset)
 }
 
 /*
+ * disasmOpcode()
+ */
+static void disasmOpcode(FILE *fp, btstring_t *code, uint16_t *offset)
+{
+	uint8_t		rval;
+	uint8_t		opcode;
+
+	opcode		= code->buf[(*offset)++];
+/*	op_breakAfter	= !(opcode & 0x80);*/
+	op_breakAfter	= opcode & 0x80;
+	opcode		&= 0x7f;
+
+	if (opcodes[opcode]) {
+		opcodes[opcode](fp, code, offset);
+	} else {
+		fprintf(fp, "\topcode: %2d", opcode);
+	}
+}
+
+/*
  * disasmSpecial()
  */
-static void disasmSpecial(FILE *fp, btstring_t *code, uint16_t offset)
+static void disasmSpecial(FILE *fp, btstring_t *code, uint16_t base, 
+				uint16_t offset)
 {
 	uint8_t		opcode;
-	uint32_t	rval;
+	uint32_t	doReturn;
 	uint32_t	lineNumber	= 1;
 
 	while (1) {
-		opcode	= code->buf[offset];
+		fprintf(fp, "%04x:", offset + base);
+/*		fprintf(fp, "%04x:", offset);*/
+		disasmOpcode(fp, code, &offset);
+		fprintf(fp, "\n");
+
+#if 0
+		if (opcodes[opcode]) {
+			opcodes[opcode](fp, code, &offset);
+			fprintf(fp, "\n");
+		}
+		else {
+			fprintf(fp, "%2d\n", opcode);
+			return;
+		}
+
 		fprintf(fp, "opcode: %d\n", opcode & 0x7f);
 		if (isAction[opcode & 0x7f]) {
 			fprintf(fp, "%d DO ", lineNumber);
@@ -403,11 +856,29 @@ static void disasmSpecial(FILE *fp, btstring_t *code, uint16_t offset)
 			disasmAction(fp, code, &offset);
 			fprintf(fp, "\n");
 		}
+#endif
 
-		if (rval)
+		if (doReturn)
 			return;
 
 		lineNumber++;
+	}
+}
+
+/*
+ * disasmCode()
+ */
+static void disasmCode(FILE *fp, btstring_t *code, uint16_t base)
+{
+	uint16_t	offset = 0;
+	uint32_t	i;
+
+	while (offset < code->size) {
+		fprintf(fp, "%04x:", offset + base);
+		disasmOpcode(fp, code, &offset);
+		fprintf(fp, "\n");
+		if (!op_breakAfter) 
+			fprintf(fp, "\tReturn\n");
 	}
 }
 
@@ -422,24 +893,48 @@ static void dump_disasm(uint8_t dunno, uint8_t levno)
 	uint16_t	offset;
 
 	level = readMap(duns[dunno].levels[levno]);
+	currentLevel = level;
 
 	fp = xfopen(mkCodePath("%s-%d.code", duns[dunno].name, levno), "wb");
 
+#ifdef DUMP_CODE
+	dump_btstring(bts_sprintf("%s-%d.dump", duns[dunno].name, levno), 
+		level->codeBuf, 0);
+#endif
+
+#if DUMP_BY_SQUARE
 	for (i = 0; i < level->dataCount; i++) {
-		offset = level->dataList[i].offset - level->dataBaseOffset;
+/*		offset = level->dataList[i].offset - level->dataBaseOffset;*/
+		offset = level->dataList[i].offset;
 		fprintf(fp, "(%d, %d) offset: %04x\n",
 			level->dataList[i].sqE,
 			level->dataList[i].sqN,
 			offset
 			);
+		offset = level->dataList[i].offset - level->dataBaseOffset;
 
 
-		disasmSpecial(fp, level->codeBuf, offset);
+		disasmSpecial(fp, level->codeBuf, level->dataBaseOffset, offset);
 	}
+#else
+	for (i = 0; i < level->dataCount; i++) {
+		offset = level->dataList[i].offset;
+		fprintf(fp, "(%3d, %3d) offset: %04x\n",
+			level->dataList[i].sqE,
+			level->dataList[i].sqN,
+			offset
+			);
+	}
+	fprintf(fp, "=====================================\n");
+
+	disasmCode(fp, level->codeBuf, level->dataBaseOffset);
+#endif
+
 
 	fclose(fp);
 
 	freeLevel(level);
+	currentLevel = NULL;
 }
 
 /********************************/
@@ -500,7 +995,7 @@ int main(int argc, char *argv[])
 		dunno++;
 	}
 #else
-	dump_disasm(8, 0);
+	dump_disasm(1, 0);
 #endif
 
 	return 0;

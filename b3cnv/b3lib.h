@@ -73,6 +73,11 @@ btstring_t	*getItemMacro(uint8_t index);
 btstring_t	*getMonsterMacro(uint32_t index);
 btstring_t	*getSummonMacro(uint32_t index);
 
+/* data_ops.c */
+btstring_t	*getSpellAbbr(uint8_t);
+btstring_t	*getLevelMonster(uint8_t, uint8_t);
+
+
 #if 0
 /* common.c */
 btstring_t *getDirectionMacro(uint8_t dir);

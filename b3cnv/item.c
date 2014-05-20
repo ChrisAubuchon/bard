@@ -64,16 +64,6 @@ static uint8_t getFigIndex(uint8_t f)
 /*				*/
 /********************************/
 
-btstring_t *getItemMacro(uint8_t index)
-{
-	btstring_t *rval;
-
-	rval = bts_strcpy(itemName[index]);
-	str2macro(rval->buf);
-
-	return rval;
-}
-
 btstring_t *getLiquidMacro(uint8_t index)
 {
 	btstring_t *rval;

@@ -14,6 +14,7 @@ b3cnv_SOURCES = 	\
 	bitmap.c	\
 	city.c		\
 	class.c		\
+	data_ops.c	\
 	dun.c		\
 	dun.h		\
 	dun_data.c	\
@@ -49,9 +50,16 @@ b3cnv_LDADD = \
 b3disasm_SOURCES =	\
 	b3disasm.c	\
 	b3lib.h		\
+	data_ops.c	\
 	dun.h		\
 	dun_data.c	\
 	dun_ops.c	\
+	item.h		\
+	item_data.c	\
+	mon.h		\
+	mon_data.c	\
+	spell.h		\
+	spell_data.c	\
 	picIndex.c	
 
 b3disasm_LDADD = \
