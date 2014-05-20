@@ -28,7 +28,7 @@ static uint8_t isAction[] = {
 /*   0*/	1, 1, 1, 1, 
 /*   4*/	1, 1, 1, 1, 
 /*   8*/	1, 1, 1, 1, 
-/*  12*/	1, 1, 1, 1, 
+/*  12*/	0, 1, 1, 1, 
 /*  16*/	1, 1, 1, 1, 
 /*  20*/	1, 1, 1, 1, 
 /*  24*/	1, 1, 1, 1, 
@@ -100,7 +100,7 @@ static uint8_t alphaFlags[] = {
 static void	usage(void);
 static void	dump_disasm(uint8_t, uint8_t);
 static void	disasmSpecial(FILE *, btstring_t *, uint16_t);
-static uint32_t	disasmAction(FILE *, btstring_t *, uint16_t *);
+static uint32_t	disasmConditional(FILE *, btstring_t *, uint16_t *);
 static uint32_t	disasmIf(FILE *, btstring_t *, uint16_t *);
 
 static void	printArgs(FILE *, btstring_t *, uint16_t *, const char *);
@@ -148,8 +148,20 @@ static void printArgs(FILE *fp, btstring_t *code, uint16_t *offset,
 			case 'B':	/* Bigpic image */
 				printBigpic(fp, code->buf[(*offset)++]);
 				break;
+			case 'f':	/* Flag */
+			{
+				uint8_t		flag;
+				uint8_t		mask;
+
+				flag	= code->buf[*offset] >> 3;
+				mask	= code->buf[*offset] & 7;
+				fprintf(fp, "%d", (flag * 8) + mask);
+				(*offset)++;
+				break;
+			}
 			case 'S':	/* Masked String */
 				fprintf(fp, "\"");
+				fflush(fp);
 				printMaskedString(fp, code, offset);
 				fprintf(fp, "\"");
 				break;
@@ -194,7 +206,7 @@ static void printMaskedString(FILE *fp, btstring_t *code, uint16_t *offset)
 
 	rval = bts_new(1024);
 
-	while (code->buf[*offset] != 0xff)
+	while (code->buf[*offset] != 0xff) 
 		rval->buf[stri++] = code->buf[(*offset)++] & 0x7f;
 
 	rval->buf[stri++] = '\0';
@@ -310,8 +322,6 @@ static uint32_t disasmAction(FILE *fp, btstring_t *code, uint16_t *offset)
 	opcode &= 0x7f;
 	(*offset)++;
 
-	fprintf(fp, "DO ");
-
 	switch (opcode) {
 	case 0:
 		fprintf(fp, "Stairs Down");
@@ -341,6 +351,16 @@ static uint32_t disasmAction(FILE *fp, btstring_t *code, uint16_t *offset)
 	case 10:
 		fprintf(fp, "Clear Text");
 		break;
+	case 11:
+		fprintf(fp, "local flag ");
+		printArgs(fp, code, offset, "b");
+		fprintf(fp, " is set");
+		break;
+	case 12:
+		fprintf(fp, "local flag ");
+		printArgs(fp, code, offset, "f");
+		fprintf(fp, " is not set");
+		break;
 	case 18:	/* Print */
 		fprintf(fp, "Print ");
 		printArgs(fp, code, offset, "s");
@@ -351,17 +371,7 @@ static uint32_t disasmAction(FILE *fp, btstring_t *code, uint16_t *offset)
 		
 	}
 
-	fprintf(fp, "\n");
-
 	return returnAfter;
-}
-
-/*
- * disasmIf()
- */
-static uint32_t disasmIf(FILE *fp, btstring_t *code, uint16_t *offset)
-{
-	return 1;
 }
 
 /*
@@ -371,17 +381,33 @@ static void disasmSpecial(FILE *fp, btstring_t *code, uint16_t offset)
 {
 	uint8_t		opcode;
 	uint32_t	rval;
+	uint32_t	lineNumber	= 1;
 
 	while (1) {
 		opcode	= code->buf[offset];
 		fprintf(fp, "opcode: %d\n", opcode & 0x7f);
-		if (isAction[opcode & 0x7f])
+		if (isAction[opcode & 0x7f]) {
+			fprintf(fp, "%d DO ", lineNumber);
 			rval = disasmAction(fp, code, &offset);
-		else
-			rval = disasmIf(fp, code, &offset);
+			fprintf(fp, "\n");
+		} else {
+			fprintf(fp, "%d IF ", lineNumber);
+			rval = disasmAction(fp, code, &offset);
+			fprintf(fp, "\nTHEN ");
+
+			/* Read offset of branch and then jump to it */
+			disasmAction(fp, code, &offset);
+			fprintf(fp, "\nELSE ");
+
+			/* The other branch starts after the offset */
+			disasmAction(fp, code, &offset);
+			fprintf(fp, "\n");
+		}
 
 		if (rval)
 			return;
+
+		lineNumber++;
 	}
 }
 
@@ -462,7 +488,7 @@ int main(int argc, char *argv[])
 	xmkdir(bts_sprintf("%s/bt3", outputDir->buf));
 	xmkdir(bts_sprintf("%s/bt3/code", outputDir->buf));
 
-#ifndef ONE_LEVELS
+#ifdef ONE_LEVELS
 	dunno = 0;
 	while (duns[dunno].name != NULL) {
 		levno = 0;
@@ -474,7 +500,7 @@ int main(int argc, char *argv[])
 		dunno++;
 	}
 #else
-	dump_disasm(0, 0);
+	dump_disasm(8, 0);
 #endif
 
 	return 0;
