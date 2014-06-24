@@ -102,6 +102,8 @@ typedef struct {
 	uint16_t	dataBaseOffset;
   b3data_t *dataList;
   btstring_t *codeBuf;
+
+	uint16_t	codeStartOffset;
 } b3level_t;
 
 typedef struct {

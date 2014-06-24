@@ -32,6 +32,19 @@ btstring_t *getItemMacro(uint8_t index)
 }
 
 /*
+ * getLiquid()
+ */
+btstring_t *getLiquid(uint8_t index)
+{
+	btstring_t	*rval;
+
+	rval = bts_strcpy(liquidNameList[index]);
+	str2macro(rval->buf);
+
+	return rval;
+}
+
+/*
  * getLevelMonster()
  */
 btstring_t *getLevelMonster(uint8_t level, uint8_t index)

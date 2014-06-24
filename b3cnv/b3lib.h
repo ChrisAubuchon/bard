@@ -76,6 +76,7 @@ btstring_t	*getSummonMacro(uint32_t index);
 /* data_ops.c */
 btstring_t	*getSpellAbbr(uint8_t);
 btstring_t	*getLevelMonster(uint8_t, uint8_t);
+btstring_t	*getLiquid(uint8_t);
 
 
 #if 0
