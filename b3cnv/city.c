@@ -28,8 +28,6 @@ static dunLevel_t	*convertLevel(uint8_t);
 static b3level_t	*b3_readLevel(btstring_t *);
 
 static btcity_t		*convertCity(uint32_t);
-static b3city_t		*readCity(btstring_t *);
-static void		freeCity(b3city_t *);
 static uint32_t		isPath(uint8_t);
 static uint32_t		countPaths(b3city_t *, int32_t, int32_t);
 static uint8_t		wrapNumber(int32_t, uint32_t);
@@ -123,12 +121,10 @@ static btstring_t *readData(uint8_t levNumber)
  */
 static btcity_t *convertCity(uint32_t cityIndex)
 {
-	btstring_t	*data;
-	b3city_t	*c;
 	btcity_t	*rval;
+	b3city_t	*c;
 
-	data		= readData(cityList[cityIndex].levels[0]);
-	c		= readCity(data);
+	c		= readCity(cityIndex);
 
 	rval		= btcity_new(bts_strcpy(cityList[cityIndex].name));
 	rval->path	= mkJsonPath("");
@@ -159,7 +155,6 @@ static btcity_t *convertCity(uint32_t cityIndex)
 	addMonsters(rval->day->monsters, c->monsterIndex);
 
 	freeCity(c);
-	bts_free(data);
 
 	return rval;
 }
@@ -343,98 +338,6 @@ static uint32_t countPaths(b3city_t *inCity, int32_t x, int32_t y)
 	}
 
 	return paths;
-}
-
-/*
- * readCity()
- */
-static b3city_t *readCity(btstring_t *data)
-{
-	uint32_t	i, j;
-	uint8_t		*buf;
-	b3city_t	*rval;
-
-	buf = data->buf;
-	rval = xzalloc(sizeof(b3city_t));
-
-	for (i = 0; i < 16; i++) {
-		rval->name[i] = *buf++ & 0x7f;
-		if (rval->name[i] == 0x7f)
-			rval->name[i] = '\0';
-	}
-
-	rval->width		= *buf++;
-	rval->height		= *buf++;
-	rval->wrapFlag		= *buf++;
-	rval->monsterIndex	= *buf++;
-	rval->levFlags		= *buf++;
-	rval->dataOffset	= str_read16le(buf);
-	buf			+= sizeof(uint16_t);
-
-	rval->rowOffset		= (uint16_t *)xzalloc(
-					rval->height * sizeof(uint16_t)
-				);
-	rval->squares		= (uint8_t **)xzalloc(
-					rval->height * sizeof(uint8_t *)
-				);
-
-	for (i = 0; i < rval->height; i++) {
-		rval->rowOffset[i]	= str_read16le(buf);
-		buf			+= sizeof(uint16_t);
-		rval->squares[i]	= (uint8_t *)xzalloc(
-						rval->width * sizeof(uint8_t)
-					);
-	}
-
-	for (i = 0; i < rval->height; i++) {
-		for (j = 0; j < rval->width; j++) {
-			rval->squares[i][j] = data->buf[rval->rowOffset[i] + j];
-			buf++;
-		}
-	}
-
-#if 0
-	codeOffsets = bt_array_new(*buf++, xfree);
-	for (i = 0; i < bt_array_length(codeOffsets); i++) {
-		b3data_t *new;
-
-		new = (b3data_t *)xmalloc(sizeof(b3data_t));
-		new->sqN = *buf++;
-		new->sqE = *buf++;
-		new->offset = str_read16le(buf);
-		buf += sizeof(uint16_t);
-		
-		bt_array_set(codeOffsets, i, new);
-	}
-#endif
-		
-#if 0
-	debug("rval->name = %s\n", rval->name);
-	debug("rval->width = %d\n", rval->width);
-	debug("rval->height = %d\n", rval->height);
-	debug("rval->graphicsIndex = %d\n", (rval->levFlags >> 6) & 3);
-	debug("rval->rvalelNo = %d\n", rval->levFlags & 7);
-	debug("rval->wrapFlag = %d\n", rval->wrapFlag & 2);
-	debug("rval->monsterIndex = %d\n", rval->monsterIndex);
-	debug("rval->dataOffset = %x\n", rval->dataOffset);
-#endif
-
-	return rval;
-}
-
-/*
- * freeCity()
- */
-static void freeCity(b3city_t *c)
-{
-	uint32_t	i;
-
-	for (i = 0; i < c->height; i++)
-		free(c->squares[i]);
-
-	free(c->squares);
-	free(c->rowOffset);
-	free(c);
 }
 
 /********************************/

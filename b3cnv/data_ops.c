@@ -3,6 +3,7 @@
 #include <item.h>
 #include <mon.h>
 #include <dun.h>
+#include <class.h>
 
 /********************************/
 /*				*/
@@ -54,4 +55,16 @@ btstring_t *getLevelMonster(uint8_t level, uint8_t index)
 	monster = dun_monIndexList[level].mon_lo + index;
 	
 	return bts_strcpy(monMacro[monster]);
+}
+
+/*
+ * getClass()
+ */
+btstring_t *getClass(uint8_t index)
+{
+	btstring_t	*rval;
+
+	rval = bts_strcpy(className[index]);
+
+	return rval;
 }

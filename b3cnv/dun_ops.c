@@ -143,7 +143,7 @@ void freeLevel(b3level_t *l)
 
 	free(l->squares);
 	free(l->rowOffset);
-	free(l->codeBuf);
+	bts_free(l->codeBuf);
 	free(l);
 }
 

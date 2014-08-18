@@ -197,6 +197,7 @@ static dunLevel_t *convertLevel(uint32_t dunno, uint32_t levno)
 	rval	= dunLevel_new();
 	rval->name	= bts_sprintf("%s-%d", duns[dunno].name, levno);
 	rval->path	= mkJsonPath("");
+	rval->title	= bts_strcpy(level->name);
 
 	rval->poisonDmg = dun_poisonDmg[level->levFlags & 7];
 

@@ -145,4 +145,7 @@ void		addMonsters(cnvList_t *, uint8_t);
 b3level_t	*readMap(uint8_t);
 void		freeLevel(b3level_t *);
 
+b3city_t	*readCity(uint8_t);
+void		freeCity(b3city_t *);
+
 #endif

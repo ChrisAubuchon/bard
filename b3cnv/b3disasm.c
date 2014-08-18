@@ -24,6 +24,12 @@ typedef struct {
 	uint16_t	end;
 } range_t;
 
+typedef struct {
+	uint16_t	codeStartOffset;
+	uint8_t		monsterIndex;
+	uint16_t	dataStartOffset;
+} ilevel_t;
+
 typedef void (opcodeFunc_t)(disasm_t *);
 
 /********************************/
@@ -74,6 +80,8 @@ static void	op_getYesNo(disasm_t *);
 static void	op_goto(disasm_t *);
 static void	op_battleNoCry(disasm_t *);
 static void	op_setSameSquare(disasm_t *);
+static void	op_turnParty(disasm_t *);
+static void	op_rmItem(disasm_t *);
 static void	op_decLFlag(disasm_t *);
 static void	op_ifLFlag(disasm_t *);
 static void	op_ifInBox(disasm_t *);
@@ -86,14 +94,23 @@ static void	op_addToLFlag(disasm_t *);
 static void	op_getInput(disasm_t *);
 static void	op_ifLastInput(disasm_t *);
 static void	op_readNumber(disasm_t *);
+static void	op_getCharacter(disasm_t *);
+static void	op_ifRegLt(disasm_t *);
 static void	op_ifRegEq(disasm_t *);
+static void	op_ifGiveGold(disasm_t *);
+static void	op_learnSpell(disasm_t *);
 static void	op_setLFlag(disasm_t *);
 static void	op_userHasItem(disasm_t *);
 static void	op_takeItem(disasm_t *);
 static void	op_addMonster(disasm_t *);
 static void	op_ifMonInParty(disasm_t *);
 static void	op_clearPrintOffset(disasm_t *);
+static void	op_ifIsNight(disasm_t *);
+static void	op_rmMonFromParty(disasm_t *);
 static void	op_setQuestFlag(disasm_t *);
+static void	op_isSqFlagSet(disasm_t *);
+static void	op_setSqFlag(disasm_t *);
+static void	op_ifIsClass(disasm_t *);
 static void	op_printOffset(disasm_t *);
 static void	op_clearTeleport(disasm_t *);
 
@@ -113,8 +130,8 @@ static int8_t	sp_bitsLeft;
 /* Opcode breakAfter */
 static uint8_t	op_breakAfter;
 
-/* Level pointer */
-static b3level_t	*currentLevel;
+/* Global level data */
+static ilevel_t		currentLevel;
 
 static opcodeFunc_t *opcodes[] = {
 /*   0*/	op_stairsDown, op_stairsUp, op_misc, op_teleport, 
@@ -124,17 +141,17 @@ static opcodeFunc_t *opcodes[] = {
 /*  16*/	op_ifSpellEq, op_setMapRval, op_print, op_nothing, 
 /*  20*/	op_ifLiquid, op_getItem, op_partyHasItem, op_partyNotHasItem, 
 /*  24*/	op_sameSquare, op_getYesNo, op_goto, op_battleNoCry, 
-/*  28*/	op_setSameSquare, NULL, NULL, NULL, 
+/*  28*/	op_setSameSquare, op_turnParty, op_rmItem, NULL, 
 /*  32*/	op_decLFlag, op_ifLFlag, NULL, op_drainHp, 
 /*  36*/	op_ifInBox, op_setLiquid, op_addToInv, op_subFromInv, 
 /*  40*/	op_addToLFlag, NULL, op_setDirection, op_getInput, 
-/*  44*/	op_ifLastInput, op_readNumber, NULL, NULL, 
-/*  48*/	NULL, NULL, op_ifRegEq, NULL, 
-/*  52*/	NULL, op_setLFlag, op_userHasItem, op_takeItem, 
-/*  56*/	op_addMonster, op_ifMonInParty, op_clearPrintOffset, NULL, 
-/*  60*/	NULL, NULL, NULL, op_setQuestFlag, 
-/*  64*/	NULL, NULL, NULL, NULL, 
-/*  68*/	NULL, op_printOffset, op_clearTeleport, NULL, 
+/*  44*/	op_ifLastInput, op_readNumber, op_getCharacter, op_ifGiveGold, 
+/*  48*/	NULL, op_ifRegLt, op_ifRegEq, NULL, 
+/*  52*/	op_learnSpell, op_setLFlag, op_userHasItem, op_takeItem, 
+/*  56*/	op_addMonster, op_ifMonInParty, op_clearPrintOffset, op_ifIsNight, 
+/*  60*/	op_rmMonFromParty, NULL, NULL, op_setQuestFlag, 
+/*  64*/	NULL, NULL, op_isSqFlagSet, op_setSqFlag, 
+/*  68*/	op_ifIsClass, op_printOffset, op_clearTeleport, NULL, 
 /*  72*/	NULL, NULL, NULL, NULL, 
 /*  76*/	NULL, NULL, NULL, NULL, 
 /*  80*/	NULL, NULL, NULL, NULL, 
@@ -193,7 +210,8 @@ static uint8_t alphaFlags[] = {
 /********************************/
 
 static void	usage(void);
-static void	dump_disasm(uint8_t, uint8_t);
+static void	level_disasm(uint8_t, uint8_t);
+static void	city_disasm(uint8_t);
 static void	disasmCode(FILE *, btstring_t *, uint16_t);
 static uint32_t	disasmConditional(disasm_t *);
 static void	disasmOpcode(disasm_t *, uint16_t);
@@ -207,6 +225,7 @@ static void	printBigpic(FILE *, uint8_t);
 static void	printSpell(FILE *, uint8_t);
 static void	printItem(FILE *, uint8_t);
 static void	printMonster(FILE *, uint8_t);
+static void	printClass(disasm_t *);
 static void	printLiquid(FILE *, uint8_t);
 static uint8_t	sp_unpackChar(disasm_t *);
 static uint8_t	sp_extractCh(disasm_t *, uint8_t);
@@ -301,6 +320,9 @@ static void oprintf(disasm_t *d, const char *format)
 			case 'B':	/* Bigpic image */
 				printBigpic(d->fp, d->code->buf[d->offset++]);
 				break;
+			case 'c':	/* Class */
+				printClass(d);
+				break;
 			case 'C':	/* Spell */
 				printSpell(d->fp, d->code->buf[d->offset++]);
 				break;
@@ -352,7 +374,7 @@ static void oprintf(disasm_t *d, const char *format)
 
 				savedOffset = d->offset + 2;
 
-				d->offset = str_read16le(&d->code->buf[d->offset]) - currentLevel->dataBaseOffset;
+				d->offset = str_read16le(&d->code->buf[d->offset]) - currentLevel.dataStartOffset;
 				r->start	= d->offset;
 				printPackedString(d);
 				r->end		= d->offset;
@@ -472,6 +494,12 @@ static void printSpell(FILE *fp, uint8_t spell)
 		fprintf(fp, "%.*s", rval->size, rval->buf);
 
 		bts_free(rval);
+	} else if (spell == 128) {
+		fprintf(fp, "eat_acorn");
+	} else if (spell == 129) {
+		fprintf(fp, "use_wineskin");
+	} else if (spell == 130) {
+		fprintf(fp, "use_item");
 	} else {
 		fprintf(fp, "%d", spell);
 	}
@@ -498,7 +526,7 @@ static void printMonster(FILE *fp, uint8_t monster)
 {
 	btstring_t	*rval;
 
-	rval	= getLevelMonster(currentLevel->monIndex, monster);
+	rval	= getLevelMonster(currentLevel.monsterIndex, monster);
 
 	fprintf(fp, "%.*s", rval->size, rval->buf);
 
@@ -518,6 +546,22 @@ static void printLiquid(FILE *fp, uint8_t liquid)
 
 	bts_free(rval);
 }
+
+
+/*
+ * printClass()
+ */
+static void printClass(disasm_t *d)
+{
+	btstring_t	*rval;
+
+	rval = getClass(d->code->buf[d->offset++]);
+
+	fprintf(d->fp, "%.*s", rval->size, rval->buf);
+
+	bts_free(rval);
+}
+
 
 /********************************/
 /*				*/
@@ -641,7 +685,24 @@ static void op_stairsUp(disasm_t *d)
  */
 static void op_misc(disasm_t *d)
 {
-	oprintf(d, "\tDo misc %b");
+	uint8_t		subOp;
+
+	subOp		= d->code->buf[d->offset++];
+
+	switch (subOp) {
+	case 3:
+		oprintf(d, "\tDo Convert to Geomancer");
+		break;
+	case 4:
+		oprintf(d, "\tDo SCSI");
+		break;
+	case 5:
+		oprintf(d, "\tDo Victory");
+		break;
+	case 9:
+		oprintf(d, "\tDo Copy Protection");
+		break;
+	}
 }
 
 /*
@@ -887,6 +948,22 @@ static void op_setSameSquare(disasm_t *d)
 }
 
 /*
+ * 29 - op_turnParty()
+ */
+static void op_turnParty(disasm_t *d)
+{
+	fprintf(d->fp, "\tDo turn party around");
+}
+
+/*
+ * 30 - op_rmItem()
+ */
+static void op_rmItem(disasm_t *d)
+{
+	oprintf(d, "\tDo remove item %I");
+}
+
+/*
  * 32 - op_decLFlag()
  */
 static void op_decLFlag(disasm_t *d)
@@ -986,12 +1063,46 @@ static void op_readNumber(disasm_t *d)
 }
 
 /*
+ * 46 - op_getCharacter()
+ */
+static void op_getCharacter(disasm_t *d)
+{
+	oprintf(d, "\t If get character then\n");
+	op_doConditional(d);
+}
+
+/*
+ * 47 - op_ifGiveGold()
+ */
+static void op_ifGiveGold(disasm_t *d)
+{
+	oprintf(d, "\tIf give gold %b then\n");
+	op_doConditional(d);
+}
+
+/*
+ * 49 - op_ifRegLt()
+ */
+static void op_ifRegLt(disasm_t *d)
+{
+	oprintf(d, "\tIf reg %b < %w then\n");
+	op_doConditional(d);
+}
+/*
  * 50 - op_ifRegEq()
  */
 static void op_ifRegEq(disasm_t *d)
 {
 	oprintf(d, "\tIf reg %b = %w then\n");
 	op_doConditional(d);
+}
+
+/*
+ * 52 - op_learnSpell()
+ */
+static void op_learnSpell(disasm_t *d)
+{
+	oprintf(d, "\tDo learn spell %C");
 }
 
 /*
@@ -1007,7 +1118,7 @@ static void op_setLFlag(disasm_t *d)
  */
 static void op_userHasItem(disasm_t *d)
 {
-	oprintf(d, "\tIf user has item %I\n");
+	oprintf(d, "\tIf user used item %I\n");
 	op_doConditional(d);
 }
 
@@ -1033,7 +1144,7 @@ static void op_addMonster(disasm_t *d)
  */
 static void op_ifMonInParty(disasm_t *d)
 {
-	oprintf(d, "\tIf monster %S in party");
+	oprintf(d, "\tIf monster %S in party\n");
 	op_doConditional(d);
 }
 
@@ -1046,6 +1157,23 @@ static void op_clearPrintOffset(disasm_t *d)
 }
 
 /*
+ * 59 - op_ifIsNight()
+ */
+static void op_ifIsNight(disasm_t *d)
+{
+	oprintf(d, "\tIf Is Night then\n");
+	op_doConditional(d);
+}
+
+/*
+ * 60 - op_rmMonFromParty()
+ */
+static void op_rmMonFromParty(disasm_t *d)
+{
+	oprintf(d, "\tDo remove monster");
+}
+
+/*
  * 63 - op_setQuestFlag()
  */
 static void op_setQuestFlag(disasm_t *d)
@@ -1054,11 +1182,37 @@ static void op_setQuestFlag(disasm_t *d)
 }
 
 /*
+ * 66 - op_isSqFlagSet()
+ */
+static void op_isSqFlagSet(disasm_t *d)
+{
+	oprintf(d, "\tIf Square Flag %b is set then\n");
+	op_doConditional(d);
+}
+
+/*
+ * 67 - op_setSqFlag()
+ */
+static void op_setSqFlag(disasm_t *d)
+{
+	oprintf(d, "\tDo Set Square Flag %b");
+}
+
+/*
+ * 68 - op_ifIsClass()
+ */
+static void op_ifIsClass(disasm_t *d)
+{
+	oprintf(d, "\tIf is class %c then\n");
+	op_doConditional(d);
+}
+
+/*
  * 69 - op_printOffset()
  */
 static void op_printOffset(disasm_t *d)
 {
-	oprintf(d, "\tDo print \"%O\"");
+	oprintf(d, "\tDo offset_print \"%O\"");
 }
 
 /*
@@ -1157,11 +1311,15 @@ static void disasmOpcode(disasm_t *d, uint16_t base)
 		return;
 	}
 
-	fprintf(d->fp, "%04x:", d->offset + base);
 	opcode		= d->code->buf[d->offset++];
 
 	op_breakAfter	= opcode & 0x80;
 	opcode		&= 0x7f;
+
+	if (opcode == 127)
+		return;
+
+	fprintf(d->fp, "%04x:", d->offset + base - 1);
 
 	if (opcodes[opcode]) {
 		opcodes[opcode](d);
@@ -1184,7 +1342,7 @@ static void disasmCode(FILE *fp, btstring_t *code, uint16_t base)
 	uint32_t	i;
 
 	d.fp		= fp;
-	d.offset	= currentLevel->codeStartOffset;
+	d.offset	= currentLevel.codeStartOffset;
 	d.code		= code;
 
 	while (d.offset < code->size) {
@@ -1193,9 +1351,9 @@ static void disasmCode(FILE *fp, btstring_t *code, uint16_t base)
 }
 
 /*
- * dump_disasm()
+ * level_disasm()
  */
-static void dump_disasm(uint8_t dunno, uint8_t levno)
+static void level_disasm(uint8_t dunno, uint8_t levno)
 {
 	uint32_t	i;
 	b3level_t	*level;
@@ -1206,12 +1364,14 @@ static void dump_disasm(uint8_t dunno, uint8_t levno)
 		NULL, NULL, range_free, 1);
 
 	level = readMap(duns[dunno].levels[levno]);
-	currentLevel = level;
+
+	currentLevel.dataStartOffset	= level->dataBaseOffset;
+	currentLevel.monsterIndex	= level->monIndex;
 
 	if ((dunno == 11) && (levno == 0))
-		currentLevel->codeStartOffset = 4;
+		currentLevel.codeStartOffset = 4;
 	else
-		currentLevel->codeStartOffset = 0;
+		currentLevel.codeStartOffset = 0;
 
 	fp = xfopen(mkCodePath("%s-%d.code", duns[dunno].name, levno), "wb");
 
@@ -1239,7 +1399,54 @@ static void dump_disasm(uint8_t dunno, uint8_t levno)
 	fclose(fp);
 
 	freeLevel(level);
-	currentLevel = NULL;
+}
+
+/*
+ * city_disasm()
+ */
+static void city_disasm(uint8_t cityno)
+{
+	uint32_t	i;
+	b3city_t	*city;
+	FILE		*fp;
+	uint16_t	offset;
+
+	rangeSkipList = gl_list_create_empty(GL_ARRAY_LIST,
+		NULL, NULL, range_free, 1);
+
+	city	= readCity(cityno);
+
+	currentLevel.dataStartOffset	= city->dataBaseOffset;
+	currentLevel.monsterIndex	= city->monsterIndex;
+	currentLevel.codeStartOffset	= 0;
+
+	fp = xfopen(mkCodePath("%s.code", cityList[cityno].name, 0), "wb");
+
+	for (i = 0; i < city->dataCount; i++) {
+		offset	= city->dataList[i].offset;
+		fprintf(fp, "(%3d, %3d) offset: %04x\n",
+			city->dataList[i].sqE,
+			city->dataList[i].sqN,
+			offset
+			);
+	}
+
+	fprintf(fp, "=====================================\n");
+
+#undef DUMP_CODE
+#ifdef DUMP_CODE
+	dump_btstring(bts_sprintf("%s.dump", cityList[cityno].name), 
+		city->codeBuf, 1);
+#endif
+
+	disasmCode(fp, city->codeBuf, city->dataBaseOffset);
+
+	gl_list_free(rangeSkipList);
+	rangeSkipList = NULL;
+
+	fclose(fp);
+
+	freeCity(city);
 }
 
 /********************************/
@@ -1288,20 +1495,22 @@ int main(int argc, char *argv[])
 	xmkdir(bts_sprintf("%s/bt3", outputDir->buf));
 	xmkdir(bts_sprintf("%s/bt3/code", outputDir->buf));
 
-#ifdef ONE_LEVEL
 	dunno = 0;
 	while (duns[dunno].name != NULL) {
 		levno = 0;
 		while (duns[dunno].levels[levno] != 0xff) {
-			dump_disasm(dunno, levno);
+			level_disasm(dunno, levno);
 
 			levno++;
 		}
 		dunno++;
 	}
-#else
-	dump_disasm(27, 0);
-#endif
+
+	levno = 0;
+	while (cityList[levno].name != NULL) {
+		city_disasm(levno);
+		levno++;
+	}
 
 	return 0;
 

@@ -64,20 +64,22 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_b3cnv_OBJECTS = b3cnv.$(OBJEXT) bitmap.$(OBJEXT) city.$(OBJEXT) \
-	class.$(OBJEXT) data_ops.$(OBJEXT) dun.$(OBJEXT) \
-	dun_data.$(OBJEXT) dun_ops.$(OBJEXT) gfx.$(OBJEXT) \
-	gfx_bigpic.$(OBJEXT) gfx_tile.$(OBJEXT) item.$(OBJEXT) \
-	item_data.$(OBJEXT) mon.$(OBJEXT) mon_data.$(OBJEXT) \
-	picIndex.$(OBJEXT) race.$(OBJEXT) spell.$(OBJEXT) \
-	spell_data.$(OBJEXT) summon_data.$(OBJEXT) trap_data.$(OBJEXT)
+	city_ops.$(OBJEXT) class.$(OBJEXT) class_data.$(OBJEXT) \
+	data_ops.$(OBJEXT) dun.$(OBJEXT) dun_data.$(OBJEXT) \
+	dun_ops.$(OBJEXT) gfx.$(OBJEXT) gfx_bigpic.$(OBJEXT) \
+	gfx_tile.$(OBJEXT) item.$(OBJEXT) item_data.$(OBJEXT) \
+	mon.$(OBJEXT) mon_data.$(OBJEXT) picIndex.$(OBJEXT) \
+	race.$(OBJEXT) spell.$(OBJEXT) spell_data.$(OBJEXT) \
+	summon_data.$(OBJEXT) trap_data.$(OBJEXT)
 b3cnv_OBJECTS = $(am_b3cnv_OBJECTS)
 b3cnv_DEPENDENCIES = $(top_builddir)/lib/libcnv/libcnv.a \
 	$(top_builddir)/lib/libbard/libbard.a \
 	$(top_builddir)/lib/libgnu/libgnu.a \
 	$(top_builddir)/lib/jansson/libjansson.a
-am_b3disasm_OBJECTS = b3disasm.$(OBJEXT) data_ops.$(OBJEXT) \
-	dun_data.$(OBJEXT) dun_ops.$(OBJEXT) item_data.$(OBJEXT) \
-	mon_data.$(OBJEXT) spell_data.$(OBJEXT) picIndex.$(OBJEXT)
+am_b3disasm_OBJECTS = b3disasm.$(OBJEXT) city_ops.$(OBJEXT) \
+	class_data.$(OBJEXT) data_ops.$(OBJEXT) dun_data.$(OBJEXT) \
+	dun_ops.$(OBJEXT) item_data.$(OBJEXT) mon_data.$(OBJEXT) \
+	spell_data.$(OBJEXT) picIndex.$(OBJEXT)
 b3disasm_OBJECTS = $(am_b3disasm_OBJECTS)
 b3disasm_DEPENDENCIES = $(top_builddir)/lib/libbard/libbard.a \
 	$(top_builddir)/lib/libcnv/libcnv.a \
@@ -532,7 +534,10 @@ b3cnv_SOURCES = \
 	b3lib.h		\
 	bitmap.c	\
 	city.c		\
+	city_ops.c	\
 	class.c		\
+	class.h		\
+	class_data.c	\
 	data_ops.c	\
 	dun.c		\
 	dun.h		\
@@ -569,6 +574,10 @@ b3cnv_LDADD = \
 b3disasm_SOURCES = \
 	b3disasm.c	\
 	b3lib.h		\
+	city.h		\
+	city_ops.c	\
+	class.h		\
+	class_data.c	\
 	data_ops.c	\
 	dun.h		\
 	dun_data.c	\
@@ -674,7 +683,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/b3disasm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitmap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/city.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/city_ops.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/class.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/class_data.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/data_ops.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dun.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dun_data.Po@am__quote@

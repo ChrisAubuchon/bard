@@ -13,7 +13,10 @@ b3cnv_SOURCES = 	\
 	b3lib.h		\
 	bitmap.c	\
 	city.c		\
+	city_ops.c	\
 	class.c		\
+	class.h		\
+	class_data.c	\
 	data_ops.c	\
 	dun.c		\
 	dun.h		\
@@ -50,6 +53,10 @@ b3cnv_LDADD = \
 b3disasm_SOURCES =	\
 	b3disasm.c	\
 	b3lib.h		\
+	city.h		\
+	city_ops.c	\
+	class.h		\
+	class_data.c	\
 	data_ops.c	\
 	dun.h		\
 	dun_data.c	\
