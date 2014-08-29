@@ -801,3 +801,12 @@ uint8_t *city_referenceLocation[] = {
 	" entrance of the forest."
 };
 
+
+uint8_t	*tileSetList[] = {
+	"wild",
+	"skara",
+	"skara",
+	"gdung",
+	"gdung",
+	"gdung"
+};

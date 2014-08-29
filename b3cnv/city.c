@@ -144,10 +144,10 @@ static btcity_t *convertCity(uint32_t cityIndex)
 		city_referenceLocation[city_referenceIndex[cityIndex]]);
 
 	if ((c->levFlags >> 6)  & 3) {
-		param_add(rval->params, PARAM_STRING, "tileset", "skara");
+		param_add(rval->params, PARAM_STRING, "tileSet", "skara");
 		addCitySquares(rval, c);
 	} else {
-		param_add(rval->params, PARAM_STRING, "tileset", "wild");
+		param_add(rval->params, PARAM_STRING, "tileSet", "wild");
 		addWildSquares(rval, c);
 	}
 

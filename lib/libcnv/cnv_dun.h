@@ -64,8 +64,8 @@ typedef struct {
 	btstring_t 	*title;
 	btstring_t	*name;
 	btstring_t	*path;
-	uint8_t		poisonDmg;
 	uint8_t		tileSet;
+	uint8_t		poisonDmg;
 	uint8_t		level;
 	uint8_t		dungeonLevel;
 	uint8_t		dungeonDirection;

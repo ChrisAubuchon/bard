@@ -41,6 +41,14 @@ log.level = log.LOG_DEBUG
 gfx:Init("Bard's Tale III")
 require "globals"
 
+currentLevel = {}
+
+local title
+title = gfxImage:new("images/tit0.png", "png")
+title:Draw(nil)
+
+getkey()
+
 require "bigpic"
 
 local title
@@ -50,57 +58,62 @@ title:Draw(nil)
 bigpic:setBigpic("PIC_H5", "H5")
 getkey()
 
+currentLevel.tileSet = "skara"
+bigpic:tileBackground()
+bigpic:tileAdd("M", 2, "face", "0")
+bigpic:tileAdd("L", 2, "face", "1")
+bigpic:tileAdd("R", 2, "face", "3")
+bigpic:tileRefresh()
+getkey()
+
+bigpic:tileBackground()
+bigpic:tileAdd("L", 3, "side", "1")
+bigpic:tileAdd("R", 3, "side", "0")
+bigpic:tileAdd("L", 2, "side", "1")
+bigpic:tileAdd("R", 2, "side", "0")
+bigpic:tileAdd("L", 1, "side", "2")
+bigpic:tileAdd("R", 1, "side", "3")
+bigpic:tileRefresh()
+getkey()
+
+bigpic:tileBackground()
+bigpic:tileAdd("L", 3, "face", "1")
+bigpic:tileAdd("M", 3, "face", "0")
+bigpic:tileAdd("R", 3, "face", "2")
+bigpic:tileRefresh()
+getkey()
+
+bigpic:tileBackground()
+bigpic:tileAdd("FL", 4, "face", "0")
+bigpic:tileAdd("L", 4, "face", "1")
+bigpic:tileAdd("M", 4, "face", "2")
+bigpic:tileAdd("R", 4, "face", "3")
+bigpic:tileAdd("FR", 4, "face", "0")
+bigpic:tileRefresh()
+getkey()
+
+currentLevel.tileSet = "wild"
+
+bigpic:tileBackground()
+bigpic:tileAdd("M", 2, "face", "0")
+bigpic:tileAdd("L", 2, "face", "1")
+bigpic:tileAdd("R", 2, "face", "2")
+bigpic:tileRefresh()
+getkey()
+
+bigpic:tileBackground()
+bigpic:tileAdd("M", 3, "face", "0")
+bigpic:tileAdd("L", 3, "face", "1")
+bigpic:tileAdd("R", 3, "face", "1")
+bigpic:tileAdd("M", 2, "face", "2")
+bigpic:tileAdd("L", 2, "face", "3")
+bigpic:tileAdd("R", 2, "face", "4")
+bigpic:tileRefresh()
+getkey()
+
 if false then
 
-bigpic:cityBackground()
-bigpic:cityAdd("M", 2, "face", "0")
-bigpic:cityAdd("L", 2, "face", "1")
-bigpic:cityAdd("R", 2, "face", "3")
-bigpic:cityDisplay()
-getkey()
-
-bigpic:cityBackground()
-bigpic:cityAdd("L", 3, "side", "1")
-bigpic:cityAdd("R", 3, "side", "0")
-bigpic:cityAdd("L", 2, "side", "1")
-bigpic:cityAdd("R", 2, "side", "0")
-bigpic:cityAdd("L", 1, "side", "2")
-bigpic:cityAdd("R", 1, "side", "3")
-bigpic:cityDisplay()
-getkey()
-
-bigpic:cityBackground()
-bigpic:cityAdd("L", 3, "face", "1")
-bigpic:cityAdd("M", 3, "face", "0")
-bigpic:cityAdd("R", 3, "face", "2")
-bigpic:cityDisplay()
-getkey()
-
-bigpic:cityBackground()
-bigpic:cityAdd("FL", 4, "face", "0")
-bigpic:cityAdd("L", 4, "face", "1")
-bigpic:cityAdd("M", 4, "face", "2")
-bigpic:cityAdd("R", 4, "face", "3")
-bigpic:cityAdd("FR", 4, "face", "0")
-bigpic:cityDisplay()
-getkey()
-
-bigpic:wildBackground()
-bigpic:wildAdd("M", 2, "face", "0")
-bigpic:wildAdd("L", 2, "face", "1")
-bigpic:wildAdd("R", 2, "face", "2")
-bigpic:wildDisplay()
-getkey()
-
-bigpic:wildBackground()
-bigpic:wildAdd("M", 3, "face", "0")
-bigpic:wildAdd("L", 3, "face", "1")
-bigpic:wildAdd("R", 3, "face", "1")
-bigpic:wildAdd("M", 2, "face", "2")
-bigpic:wildAdd("L", 2, "face", "3")
-bigpic:wildAdd("R", 2, "face", "4")
-bigpic:wildDisplay()
-getkey()
+currentLevel.tileSet = "gdung"
 
 bigpic:dunBackground()
 bigpic:dunDisplay()
@@ -124,3 +137,4 @@ getkey()
 end
 
 os.exit(0)
+

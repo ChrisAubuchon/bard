@@ -148,4 +148,6 @@ void		freeLevel(b3level_t *);
 b3city_t	*readCity(uint8_t);
 void		freeCity(b3city_t *);
 
+extern uint8_t		*tileSetList[];
+
 #endif

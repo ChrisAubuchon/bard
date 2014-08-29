@@ -3,17 +3,17 @@ bigpic = object:new()
 bigpic.activeBigpic	= nil
 
 bigpic.imgs	= diskio:readTable("bigpic")
-bigpic.city	= diskio:readTable("skaraview")
+bigpic.skara	= diskio:readTable("skaraview")
 bigpic.wild	= diskio:readTable("wildview")
-bigpic.dun	= diskio:readTable("gdungview")
+bigpic.gdung	= diskio:readTable("gdungview")
 bigpic.titleRect	= gfxRect:New(32, 212, 224, 16)
 bigpic.gfxRect	= gfxRect:New(32, 30, 224, 176)
-bigpic.dun.lightRect = {}
-bigpic.dun.lightRect[0] = gfxRect:New(0, 0, 224, 176)
-bigpic.dun.lightRect[1] = gfxRect:New(0, 40, 224, 96)
-bigpic.dun.lightRect[2] = gfxRect:New(0, 74, 224, 56)
-bigpic.dun.lightRect[3] = gfxRect:New(0, 88, 224, 30)
-bigpic.dun.lightRect[4] = gfxRect:New(0, 80, 224, 16)
+bigpic.gdung.lightRect = {}
+bigpic.gdung.lightRect[0] = gfxRect:New(0, 0, 224, 176)
+bigpic.gdung.lightRect[1] = gfxRect:New(0, 40, 224, 96)
+bigpic.gdung.lightRect[2] = gfxRect:New(0, 74, 224, 56)
+bigpic.gdung.lightRect[3] = gfxRect:New(0, 88, 224, 30)
+bigpic.gdung.lightRect[4] = gfxRect:New(0, 80, 224, 16)
 
 
 bigpic.surface		= gfxSurface:New(224, 176)
@@ -91,62 +91,48 @@ function bigpic:drawImage(inName)
 end
 
 ----------------------------------------
--- readCityImage()
+-- readImage()
 ----------------------------------------
-function bigpic:readCityImage(inQuadName, inFacetName, inFacet, inBuilding)
-	local format = "images/skara/%s/%s-%s.png"
+function bigpic:readImage(inQuadName, inFacetName, inFacet, inBuilding)
+	local format	= "images/%s/%s/%s-%s.png"
 	local path
 
-	inFacet.rect = gfxRect:New(inFacet.x, inFacet.y,
+	inFacet.rect	= gfxRect:New(inFacet.x, inFacet.y,
 					inFacet.w, inFacet.h)
-	path = string.format(format, inQuadName, inBuilding, inFacetName)
+	path		= string.format(format,
+				currentLevel.tileSet,
+				inQuadName,
+				inBuilding,
+				inFacetName
+				)
 	inFacet[inBuilding] = gfxImage:new(path, "png")
 end
 
 ----------------------------------------
--- cityBackground()
+-- tileBackground
 ----------------------------------------
-function bigpic:cityBackground()
+function bigpic:tileBackground()
+	local tileSet	= currentLevel.tileSet
+
 	if (globals.isNight) then
-		if (not self.city.nightbg) then
-			self.city.nightbg = gfxImage:new(
-				"images/skara/bg-night.png", "png")
+		if (not self[tileSet].nightbg) then
+			self[tileSet].nightbg = gfxImage:new(
+				"images/"..tileSet.."/bg-night.png", "png")
 		end
-		self.surface:Blit(nil, self.city.nightbg)
+		self.surface:Blit(nil, self[tileSet].nightbg)
 	else
-		if (not self.city.daybg) then
-			self.city.daybg = gfxImage:new(
-				"images/skara/bg-day.png", "png")
+		if (not self[tileSet].daybg) then
+			self[tileSet].daybg = gfxImage:new(
+				"images/"..tileSet.."/bg-day.png", "png")
 		end
-		self.surface:Blit(nil, self.city.daybg)
+		self.surface:Blit(nil, self[tileSet].daybg)
 	end
 end
 
 ----------------------------------------
--- cityAdd
+-- tileRefresh()
 ----------------------------------------
-function bigpic:cityAdd(inQuad, inDepth, inFacet, inBuilding)
-	local quad
-	local q
-
-	quad = string.format("%d%s", inDepth, inQuad)
-
-	if (self.city[quad][inFacet] == nil) then
-		return
-	end
-
-	q = self.city[quad][inFacet]
-	if (not q[inBuilding]) then
-		self:readCityImage(quad, inFacet, q, inBuilding)
-	end
-
-	self.surface:Blit(q.rect, q[inBuilding], nil)
-end
-
-----------------------------------------
--- cityDisplay()
-----------------------------------------
-function bigpic:cityDisplay()
+function bigpic:tileRefresh()
 	if (self.activeBigpic ~= nil) then
 		self.activeBigpic:Clear()
 		self.activeBigpic = nil
@@ -156,63 +142,28 @@ function bigpic:cityDisplay()
 end
 
 ----------------------------------------
--- wildBackground()
+-- tileAdd()
 ----------------------------------------
-function bigpic:wildBackground()
-	if (globals.isNight) then	
-		if (not self.wild.nightbg) then
-			self.wild.nightbg = gfxImage:new(
-				"images/wild/bg-night.png", "png")
-		end
-		self.surface:Blit(nil, self.wild.nightbg)
-	else
-		if (not self.wild.daybg) then
-			self.wild.daybg = gfxImage:new(
-				"images/wild/bg-day.png", "png")
-		end
-		self.surface:Blit(nil, self.wild.daybg)
-	end
-end
-
-----------------------------------------
--- bigpic:readWildImage()
-----------------------------------------
-function bigpic:readWildImage(inQuadName, inFacetName, inFacet, inBuilding)
-	local format	= "images/wild/%s/%s-%s.png"
-	local path
-
-	inFacet.rect = gfxRect:New(inFacet.x, inFacet.y, 
-					inFacet.w, inFacet.h)
-	path = string.format(format, inQuadName, inBuilding, inFacetName)
-	inFacet[inBuilding] = gfxImage:new(path, "png")
-end
-
-----------------------------------------
--- bigpic:wildAdd()
-----------------------------------------
-function bigpic:wildAdd(inQuad, inDepth, inFacet, inBuilding)
+function bigpic:tileAdd(inQuad, inDepth, inFacet, inBuilding)
 	local quad
 	local q
+	local tileSet	= currentLevel.tileSet
 
 	quad = string.format("%d%s", inDepth, inQuad)
 
-	if (self.wild[quad][inFacet] == nil) then
+	if (self[tileSet][quad][inFacet] == nil) then
 		return
 	end
 
-	q = self.wild[quad][inFacet]
-	if (not q.gfx) then
-		self:readWildImage(quad, inFacet, q, inBuilding)
+	q = self[tileSet][quad][inFacet]
+	if (not q[inBuilding]) then
+		self:readImage(quad, inFacet, q, inBuilding)
 	end
+
 	self.surface:Blit(q.rect, q[inBuilding], nil)
 end
 
-----------------------------------------
--- wildDisplay()
-----------------------------------------
-function bigpic:wildDisplay()
-	self:cityDisplay()
-end
+if false then
 
 ----------------------------------------
 -- dunBackground()
@@ -302,6 +253,7 @@ end
 
 
 
+end
 
 
 
