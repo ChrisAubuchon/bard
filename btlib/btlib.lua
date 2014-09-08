@@ -15,6 +15,7 @@ require "random"
 require "diskio"
 --require "level"
 require "entity"
+require "building"
 
 require "btroster"
 require "btapi"

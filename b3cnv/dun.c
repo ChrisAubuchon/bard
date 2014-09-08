@@ -208,6 +208,8 @@ static dunLevel_t *convertLevel(uint32_t dunno, uint32_t levno)
 	param_add(rval->params, PARAM_NUMBER, "hpDrain", level->levFlags & 7);
 	param_add(rval->params, PARAM_STRING, "tileSet",
 			tileSetList[((level->levFlags >> 6) & 3) + 3]);
+	param_add(rval->params, PARAM_BOOL, "isOutdoors",
+			level->levFlags & 0x20);
 
 	for (y = level->height - 1; y >= 0; y--) {
 		for (x = 0; x < level->width; x++) {

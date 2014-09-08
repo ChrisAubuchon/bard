@@ -21,9 +21,6 @@ declare_global("executeString")
 declare_global("compileAction")
 declare_global("compileString")
 
--- building.lua
-declare_global("building")
-
 -- btdebug.lua
 declare_global("btdebug")
 

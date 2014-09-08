@@ -1,3 +1,6 @@
+-- camp.lua
+declare_global("camp")
+
 -- action.lua
 declare_global("btAction")
 

@@ -33,13 +33,11 @@ globals.inSnare		= false
 globals.fonts		= {}
 globals.fonts.mono	= gfxFont:new("fonts/bt3font.btf", true)
 globals.fonts.var	= gfxFont:new("fonts/bt3font.btf", false)
-if false then
 text			= textBox:new(
 				gfxRect:New(340, 12, 276, 192),
 				22,
 				globals.fonts.var
 				)
-end
 garths			= false
 
 currentLevel		= false
@@ -75,6 +73,7 @@ directions = {
 globals.STATE_GUILD	= 1
 globals.STATE_INGAME	= 2
 globals.STATE_EXIT	= 3
+globals.STATE_DIED	= 4
 globals.gameState	= globals.STATE_GUILD
 
 globals.timeOfDay = {

@@ -39,9 +39,8 @@ require "btlib"
 log.level = log.LOG_DEBUG
 
 gfx:Init("Bard's Tale III")
-require "globals"
 
-currentLevel = {}
+require "globals"
 
 local title
 title = gfxImage:new("images/tit0.png", "png")
@@ -50,91 +49,18 @@ title:Draw(nil)
 getkey()
 
 require "bigpic"
+require "camp"
 
-local title
 title = gfxImage:new("images/main_screen.png", "png")
 title:Draw(nil)
 
-bigpic:setBigpic("PIC_H5", "H5")
-getkey()
 
-currentLevel.tileSet = "skara"
-bigpic:tileBackground()
-bigpic:tileAdd("M", 2, "face", "0")
-bigpic:tileAdd("L", 2, "face", "1")
-bigpic:tileAdd("R", 2, "face", "3")
-bigpic:tileRefresh()
-getkey()
-
-bigpic:tileBackground()
-bigpic:tileAdd("L", 3, "side", "1")
-bigpic:tileAdd("R", 3, "side", "0")
-bigpic:tileAdd("L", 2, "side", "1")
-bigpic:tileAdd("R", 2, "side", "0")
-bigpic:tileAdd("L", 1, "side", "2")
-bigpic:tileAdd("R", 1, "side", "3")
-bigpic:tileRefresh()
-getkey()
-
-bigpic:tileBackground()
-bigpic:tileAdd("L", 3, "face", "1")
-bigpic:tileAdd("M", 3, "face", "0")
-bigpic:tileAdd("R", 3, "face", "2")
-bigpic:tileRefresh()
-getkey()
-
-bigpic:tileBackground()
-bigpic:tileAdd("FL", 4, "face", "0")
-bigpic:tileAdd("L", 4, "face", "1")
-bigpic:tileAdd("M", 4, "face", "2")
-bigpic:tileAdd("R", 4, "face", "3")
-bigpic:tileAdd("FR", 4, "face", "0")
-bigpic:tileRefresh()
-getkey()
-
-currentLevel.tileSet = "wild"
-
-bigpic:tileBackground()
-bigpic:tileAdd("M", 2, "face", "0")
-bigpic:tileAdd("L", 2, "face", "1")
-bigpic:tileAdd("R", 2, "face", "2")
-bigpic:tileRefresh()
-getkey()
-
-bigpic:tileBackground()
-bigpic:tileAdd("M", 3, "face", "0")
-bigpic:tileAdd("L", 3, "face", "1")
-bigpic:tileAdd("R", 3, "face", "1")
-bigpic:tileAdd("M", 2, "face", "2")
-bigpic:tileAdd("L", 2, "face", "3")
-bigpic:tileAdd("R", 2, "face", "4")
-bigpic:tileRefresh()
-getkey()
-
-if false then
-
-currentLevel.tileSet = "gdung"
-
-bigpic:dunBackground()
-bigpic:dunDisplay()
-getkey()
-bigpic:dunBackground(1)
-bigpic:dunDisplay()
-getkey()
-bigpic:dunBackground(2)
-bigpic:dunDisplay()
-getkey()
-bigpic:dunBackground(3)
-bigpic:dunDisplay()
-getkey()
-bigpic:dunBackground(4)
-bigpic:dunDisplay()
-getkey()
-bigpic:dunBackground(5)
-bigpic:dunDisplay()
-getkey()
-
-end
-
-os.exit(0)
-
+repeat
+	if (globals.gameState == globals.STATE_GUILD) then
+		camp:enter()
+	elseif (globals.gameState == globals.STATE_INGAME) then
+		currentLevel:main()
+	elseif (globals.gameState == globals.STATE_DIED) then
+		party:died()
+	end
+until (globals.gameState == globals.STATE_EXIT)

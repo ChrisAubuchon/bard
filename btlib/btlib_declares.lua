@@ -17,6 +17,9 @@ declare_global("btTable")
 declare_global("btArray")
 declare_global("btDefaultTable")
 
+-- building.lua
+declare_global("building")
+
 -- code.lua
 declare_global("code")
 
