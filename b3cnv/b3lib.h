@@ -57,8 +57,6 @@ typedef struct {
 /*				*/
 /********************************/
 
-btstring_t	*getPicMacro(pic_t *p);
-void		indexToPic(uint8_t index, pic_t *p);
 
 void		getTargetting(uint32_t, btTargetting_t *);
 btAction_t	*getSpellAction(uint32_t);
@@ -79,6 +77,11 @@ btstring_t	*getLevelMonster(uint8_t, uint8_t);
 btstring_t	*getLiquid(uint8_t);
 btstring_t	*getLevelMonster(uint8_t, uint8_t);
 btstring_t	*getClass(uint8_t);
+
+/* picIndex.c */
+uint8_t		getPicIndex(pic_t);
+btstring_t	*getPicMacro(pic_t *p);
+void		indexToPic(uint8_t index, pic_t *p);
 
 #if 0
 /* common.c */

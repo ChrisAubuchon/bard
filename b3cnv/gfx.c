@@ -302,9 +302,9 @@ static void testRead(void)
 
 void convertGFX(void)
 {
+	outputBigpic();
 	outputScreens();
 	outputIcons();
-	outputBigpic();
 	outputTilepics();
 	outputBitmapFont();
 #if 0

@@ -71,20 +71,20 @@ void convertRaces(void)
 
 		if (raceClasses[i].warrior)
 			cnvList_add(br->startingClasses, bts_strcpy("Warrior"));
-		if (raceClasses[i].paladin)
-			cnvList_add(br->startingClasses, bts_strcpy("Paladin"));
-		if (raceClasses[i].rogue)
-			cnvList_add(br->startingClasses, bts_strcpy("Rogue"));
-		if (raceClasses[i].bard)
-			cnvList_add(br->startingClasses, bts_strcpy("Bard"));
-		if (raceClasses[i].hunter)
-			cnvList_add(br->startingClasses, bts_strcpy("Hunter"));
-		if (raceClasses[i].monk)
-			cnvList_add(br->startingClasses, bts_strcpy("Monk"));
 		if (raceClasses[i].conjurer)
 			cnvList_add(br->startingClasses,bts_strcpy("Conjurer"));
 		if (raceClasses[i].magician)
 			cnvList_add(br->startingClasses,bts_strcpy("Magician"));
+		if (raceClasses[i].rogue)
+			cnvList_add(br->startingClasses, bts_strcpy("Rogue"));
+		if (raceClasses[i].bard)
+			cnvList_add(br->startingClasses, bts_strcpy("Bard"));
+		if (raceClasses[i].paladin)
+			cnvList_add(br->startingClasses, bts_strcpy("Paladin"));
+		if (raceClasses[i].hunter)
+			cnvList_add(br->startingClasses, bts_strcpy("Hunter"));
+		if (raceClasses[i].monk)
+			cnvList_add(br->startingClasses, bts_strcpy("Monk"));
 
 		cnvList_add(rl, br);
 	}

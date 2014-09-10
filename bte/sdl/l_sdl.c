@@ -98,7 +98,19 @@ static int l_get_key(lua_State *L)
 		}
 		case SDL_KEYDOWN:
 		{
-			lua_pushnumber(L, sdlevent.key.keysym.sym);
+			if ((sdlevent.key.keysym.sym < SDLK_a) ||
+			    (sdlevent.key.keysym.sym > SDLK_z))	{
+				lua_pushnumber(L, sdlevent.key.keysym.sym);
+				return 1;
+			}
+
+			if ((sdlevent.key.keysym.mod & KMOD_SHIFT) ||
+			    (sdlevent.key.keysym.mod & KMOD_CAPS)) {
+				lua_pushnumber(L, sdlevent.key.keysym.sym - 32);
+			} else {
+				lua_pushnumber(L, sdlevent.key.keysym.sym);
+			}
+					
 			return 1; 
 		}
 		case SDL_QUIT:

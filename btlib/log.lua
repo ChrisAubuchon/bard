@@ -49,7 +49,7 @@ end
 -- log:print()
 ----------------------------------------
 function log:print(level, format, ...)
-	if (level == self.level) then
+	if (level < self.level) then
 		local location
 		local dstring
 

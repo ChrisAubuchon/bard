@@ -49,11 +49,14 @@ title:Draw(nil)
 getkey()
 
 require "bigpic"
+require "race"
+require "classes"
+require "roster"
+require "party"
 require "camp"
 
 title = gfxImage:new("images/main_screen.png", "png")
 title:Draw(nil)
-
 
 repeat
 	if (globals.gameState == globals.STATE_GUILD) then

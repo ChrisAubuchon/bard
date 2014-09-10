@@ -18,20 +18,20 @@ uint8_t *className[] = {
 };
 
 uint8_t *classPic[] = {
-	"warrior",
-	"magician",
-	"magician",
-	"magician",
-	"magician",
-	"warrior",
-	"warrior",
-	"warrior",
-	"warrior",
-	"warrior",
-	"warrior",
-	"magician",
-	"magician",
-	"warrior"
+	"WARRIOR",
+	"MAGE",
+	"MAGE",
+	"MAGE",
+	"MAGE",
+	"WARRIOR",
+	"WARRIOR",
+	"WARRIOR",
+	"WARRIOR",
+	"WARRIOR",
+	"WARRIOR",
+	"MAGE",
+	"MAGE",
+	"WARRIOR"
 };
 
 uint8_t classHpDice[] = {

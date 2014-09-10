@@ -24,7 +24,7 @@ btkeys = {
 --
 -- Main IO loop
 ----------------------------------------
-function getkey()
+function getkey(inCaseSensitive)
 	local inkey
 
 	while true do
@@ -71,7 +71,11 @@ function getkey()
 		elseif (inkey == btkeys.WANDERING) then
 			return btkeys.WANDERING
 		elseif (inkey < 255) then
-			return string.upper(string.char(inkey))
+			if (inCaseSensitive) then
+				return string.char(inkey)
+			else
+				return string.upper(string.char(inkey))
+			end
 		end
 	end
 end

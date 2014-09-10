@@ -65,6 +65,10 @@ end
 -- drawImage()
 ----------------------------------------
 function bigpic:drawImage(inName)
+	if (not self.imgs[inName]) then
+		log:print(log.LOG_ERR, "No image named %s", inName)
+	end
+
 	-- Dynamically create the graphics image if it
 	-- has not already been created
 	--

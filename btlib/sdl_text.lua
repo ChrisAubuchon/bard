@@ -131,7 +131,7 @@ end
 ----------------------------------------
 -- readString()
 ----------------------------------------
-function textBox:readString(inMaxLen)
+function textBox:readString(inMaxLen, inCaseSensitive)
 	local x
 	local y
 	local inkey
@@ -151,7 +151,7 @@ function textBox:readString(inMaxLen)
 		self.tb:SetCursor(x, y)
 		self.tb:putc(128)
 
-		inkey = getkey()
+		inkey = getkey(inCaseSensitive)
 
 		if (inkey == btkeys.RETURN) then
 			self.tb:eraseChar(128, x)
