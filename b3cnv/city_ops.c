@@ -121,6 +121,8 @@ static b3city_t *__readCity(btstring_t *data)
 	rval->dataBaseOffset = buf - data->buf;
 	rval->codeBuf = bts_strncpy(buf, data->size - rval->dataBaseOffset);
 
+	rval->isCity	= (rval->levFlags >> 6) & 3;
+
 	return rval;
 }
 

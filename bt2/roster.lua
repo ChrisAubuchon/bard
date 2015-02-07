@@ -46,7 +46,7 @@ function roster:readCharacter(inName)
 	assert(self.characters[inName] ~= nil)
 
 	if (self.characters[inName].class == "Il") or
-	   (self.characters[inName].class == "mn") then
+	   (self.characters[inName].class == "Mn") then
 		char = summon:fromTable(self.characters[inName])
 	else
 		char = character:fromTable(self.characters[inName])

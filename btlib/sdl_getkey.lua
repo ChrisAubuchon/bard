@@ -16,7 +16,9 @@ btkeys = {
 	F6 = ":O:",
 	F7 = ":P:",
 	RANDOMBATTLE = ":Q:",
-	WANDERING = ":R:"
+	WANDERING = ":R:",
+	HOME = ":S",
+	END = ":T:"
 }
 
 ----------------------------------------
@@ -66,6 +68,10 @@ function getkey(inCaseSensitive)
 			return btkeys.F6
 		elseif (inkey == SDL.K.F7) then
 			return btkeys.F7
+		elseif (inkey == SDL.K.HOME) then
+			return btkeys.HOME
+		elseif (inkey == SDL.K.END) then
+			return btkeys.END
 		elseif (inkey == btkeys.RANDOMBATTLE) then
 			return btkeys.RANDOMBATTLE
 		elseif (inkey == btkeys.WANDERING) then

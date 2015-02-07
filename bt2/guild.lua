@@ -11,7 +11,7 @@ function guild:addMember()
 		return	
 	end
 
-	member = text:scrollingSelect(roster, roster.printMember)
+	member = text:scrollingSelect(roster, roster.printMember, 0, 10, nil, globals.selectFooter)
 	if (not member) then
 		return
 	end

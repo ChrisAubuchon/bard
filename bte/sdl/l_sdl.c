@@ -217,6 +217,8 @@ void l_sdl_open(lua_State *L)
 	mod_constant_n(L,	"F10",		SDLK_F10);
 	mod_constant_n(L,	"F11",		SDLK_F11);
 	mod_constant_n(L,	"F12",		SDLK_F12);
+	mod_constant_n(L,	"HOME",		SDLK_HOME);
+	mod_constant_n(L,	"END",		SDLK_END);
 	mod_end_table(L, "K");
 
 	global_end(L);

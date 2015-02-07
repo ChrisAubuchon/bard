@@ -69,7 +69,7 @@ static btstring_t *toLabel(int32_t x, int32_t y, b3city_t *inCity)
 {
 	if ((x < 0) || (y < 0) || (x >= inCity->width) || (y >= inCity->height))
 		return bts_strcpy("entrance");
-	else if (inCity->squares[y][x]) 
+	else if (inCity->squares[y][x] && inCity->isCity) 
 		return bts_sprintf("b%08x", inCity->squares[y][x]);
 	else
 		return bts_sprintf("%02d-%02d", x, y);
@@ -80,7 +80,7 @@ static btstring_t *toLabel(int32_t x, int32_t y, b3city_t *inCity)
  */
 static btstring_t *toFace(uint8_t sq)
 {
-	return bts_sprintf("%d", (sq & 0x0f) - 1);
+	return bts_sprintf("%u", (sq & 0x0f) - 1);
 }
 
 /*
@@ -143,7 +143,10 @@ static btcity_t *convertCity(uint32_t cityIndex)
 	param_add(rval->params, PARAM_STRING, "referenceString",
 		city_referenceLocation[city_referenceIndex[cityIndex]]);
 
+#if 0
 	if ((c->levFlags >> 6)  & 3) {
+#endif
+	if (c->isCity) {
 		param_add(rval->params, PARAM_STRING, "tileSet", "skara");
 		addCitySquares(rval, c);
 	} else {
@@ -238,7 +241,7 @@ static void addWildSquares(btcity_t *outCity, b3city_t *inCity)
 				toLabel(westX, y,  inCity),
 				NULL,
 				NULL,
-				sq ? toFace(sq) : NULL
+				(sq & 0x0f) ? toFace(sq) : NULL
 			);
 		}
 	}

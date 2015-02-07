@@ -88,8 +88,8 @@ declare_global("icons")
 -- inventory.lua
 declare_global("inventory")
 
--- items.lua
-declare_global("items")
+-- itemList.lua
+declare_global("itemList")
 
 -- level.lua
 declare_global("level")

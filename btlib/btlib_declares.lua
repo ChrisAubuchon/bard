@@ -8,6 +8,7 @@ end
 declare_global("btroster")
 declare_global("bICharacter")
 declare_global("bIICharacter")
+declare_global("bIIICharacter")
 
 -- array.lua
 declare_global("array")
@@ -31,6 +32,13 @@ declare_global("entity")
 
 -- level.lua
 declare_global("level")
+
+-- lib_inventory.lua
+declare_global("inventorySlot")
+declare_global("inventory")
+
+-- lib_party.lua
+declare_global("lib_party")
 
 -- linkedList.lua
 declare_global("linkedList")

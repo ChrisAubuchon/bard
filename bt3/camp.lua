@@ -6,6 +6,7 @@ camp = {}
 function camp:enter()
 	local self	= object:new()
 	local inkey
+	local keys
 
 	self:addParent(camp)
 	self:addParent(building:new("The Ruin", "PIC_CAMP"))
@@ -18,46 +19,98 @@ function camp:enter()
 	self:resetBigpic()
 
 	repeat
+		keys	= {} 
+
 		text:cdprint(true, false, 
 			"Thou art in the Camp of Skara Brae.\n\n")
 
---		if (party:hasEmptySlot()) then
---			text:print("Add a member\n")
---		end
+		if (party:hasEmptySlot()) then
+			keys.A = true
+			text:print("Add a member\n")
+		end
 
---		if (not party:isEmpty()) then
---			text:print("Remove a member\n")
---		else
---			text:print("Rename a member\n")
---		end
+		if (not party:isEmpty()) then
+			text:print("Remove a member\n")
+		else
+			text:print("Rename a member\n")
+		end
 
 		text:print("Create a member\n" ..
 				"Transfer characters\n" ..
 				"Delete a member\n")
 
---		if (not party:isEmpty()) then
---			text:print("Save the party\n")
+		if (not party:isEmpty()) then
+			keys.S = true
+--			keys.E = true
+			text:print("Save the party\n")
 --			text:print("Enter Wilderness")
---		else
+		end
 
 		text:print("Leave the game\n")
 
 		inkey = getkey()
 
-		if (inkey == "A") then
-			party:printStatusLine({name="Chris", ac="-16", maxhp="Dead", curhp="800", maxsppt="  0", cursppt="  0", class="Wa"}, 0)
-			party:printStatusLine({name="Chris", ac="-16", maxhp="Dead", curhp="800", maxsppt="  0", cursppt="  0", class="Wa"}, 1)
-			party:printStatusLine({name="Chris", ac="-16", maxhp="Dead", curhp="800", maxsppt="  0", cursppt="  0", class="Wa"}, 2)
-			party:printStatusLine({name="Chris", ac="-16", maxhp="Dead", curhp="800", maxsppt="  0", cursppt="  0", class="Wa"}, 3)
-			party:printStatusLine({name="Chris", ac="-16", maxhp="Dead", curhp="800", maxsppt="  0", cursppt="  0", class="Wa"}, 4)
-			party:printStatusLine({name="Chris", ac="-16", maxhp="Dead", curhp="800", maxsppt="  0", cursppt="  0", class="Wa"}, 5)
-			party:printStatusLine({name="Chris", ac="-16", maxhp="Dead", curhp="800", maxsppt="  0", cursppt="  0", class="Wa"}, 6)
+		if ((inkey == "A") and (keys["A"])) then
+			self:addMember()
 		elseif (inkey == "C") then	
 			self:createMember()
+		elseif (inkey == "R") then
+			if (party:isEmpty()) then
+				self:renameMember()
+			else
+				self:removeMember()
+			end
+		elseif ((inkey == "S") and (keys.S)) then
+			self:saveParty()
+		elseif ((inkey > "0") and (inkey < "8")) then
+			local c = party:isOccupied(inkey)
+			if (c) then
+				c:print()
+				self:resetBigpic()
+			end
 		end
 	until (inkey == "L")
 
 	globals.gameState = globals.STATE_EXIT
+end
+
+----------------------------------------
+-- camp:addMember()
+----------------------------------------
+function camp:addMember()
+	local member
+
+	local function campHeader()
+		text:print("Who shall join?\n")
+	end
+
+	text:clear()
+
+	if (roster:countCharacters() == 0) then
+		text:print("There are no saved characters.\n")
+		getkey()
+		return
+	end
+
+	member = text:scrollingSelect(roster, roster.printMember, 1, 8,
+			campHeader, globals.scrollFooter)
+
+	if (not member) then
+		return
+	end
+
+	if (roster:isParty(member)) then
+		party:addParty(roster:readParty(member))
+	else
+		if (party:findByName(member)) then
+			text:cdprint(true, false, 
+				"%s\n is already in the party.",
+				member)
+			getkey()
+		else
+			party:addMember(roster:readCharacter(member))
+		end
+	end
 end
 
 ----------------------------------------
@@ -80,8 +133,10 @@ function camp:createMember()
 
 			inkey = getkey()
 
-			if ((inkey == "F") or (inkey == "M")) then
-				return inkey
+			if (inkey == "F") then
+				return "Female"
+			elseif (inkey == "M") then
+				return "Male"
 			end
 		until (inkey == btkeys.ESCAPE)
 
@@ -212,7 +267,7 @@ function camp:createMember()
 			goto restart
 		end
 
-		if (newChar.gender == "M") then
+		if (newChar.gender == "Male") then
 			newChar.pic	= "PIC_MALE" .. 
 					  classes:getPic(newChar.class)
 		else
@@ -243,5 +298,118 @@ function camp:createMember()
 		roster:writeCharacter(newChar, true)
 		return
 	until (inkey == btkeys.ESCAPE)
+end
+
+----------------------------------------
+-- camp:removeMember()
+----------------------------------------
+function camp:removeMember()
+	local memberList	= object:new()
+	local member
+
+	local function remove_toArray()
+		local rval = {}
+		local i
+
+		table.insert(rval, "Remove them all!")
+		for i in party:iterator() do
+			table.insert(rval, i.name)
+		end
+
+		return rval
+	end
+
+	local function removeHeader()
+		text:print("Select which party member to remove or...\n")
+	end
+
+	local function remove_print(_, inName)
+		text:print(inName)
+	end
+
+	memberList.toArray = remove_toArray
+
+	member = text:scrollingSelect(memberList, remove_print, 3, 8,
+			removeHeader, globals.scrollFooter)
+
+	if (not member) then
+		return
+	end
+
+	if (member == "Remove them all!") then
+		local m
+
+		for m in party:iterator() do
+			party:removeMember(m)
+
+			roster:writeCharacter(m)
+		end
+	else
+		member = party:removeMember(member)
+
+		roster:writeCharacter(member)
+	end
+
+	party:display()
+end
+
+----------------------------------------
+-- camp:renameMember()
+----------------------------------------
+function camp:renameMember()
+	local oldMember
+	local newMember
+
+	local function renameHeader()
+		text:print("Rename who?\n")
+	end
+
+	text:clear()
+
+	if (roster:countCharacters() == 0) then
+		text:print("There are no characters in the roster.")
+		getkey()
+		return
+	end
+
+	oldMember = text:scrollingSelect(roster, roster.printMember, 1, 8,
+		renameHeader, globals.scrollFooter)
+
+	if (not oldMember) then
+		return
+	end
+
+	text:cdprint(true, false, "What is %s's new name?", oldMember)
+	newMember = text:readString(16, true)
+
+	if (roster:nameExists(newMember)) then
+		text:cdprint(true, false,
+			"There is already a character with that name in the roster.")
+		getkey()
+		return
+	end
+
+	roster:rename(oldMember, newMember)
+end
+
+----------------------------------------
+-- camp:saveParty()
+----------------------------------------
+function camp:saveParty()
+	local partyName
+
+	text:cdprint(true, false, "Name to save party under?")
+	partyName = text:readString(10, true)
+
+	if (not partyName) then
+		return
+	end
+
+	if (roster:nameExists(partyName)) then
+		text:cdprint(true, true, "That name is already in use.")
+		return
+	end
+
+	roster:writeParty(partyName, party)
 end
 

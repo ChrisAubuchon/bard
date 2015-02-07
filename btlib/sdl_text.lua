@@ -175,7 +175,7 @@ function textBox:readString(inMaxLen, inCaseSensitive)
 			end
 		elseif (inkey == btkeys.ESCAPE) then
 			if (nchars ~= 0) then
-				self:clearLine()
+				self:clearLine(y)
 				self.tb:SetCursor(240, y)
 				self.tb:Print("<")
 
@@ -183,6 +183,7 @@ function textBox:readString(inMaxLen, inCaseSensitive)
 				self.tb:SetCursor(x, y)
 
 				outstring = ""
+				nchars = 0
 			end
 		else
 			if ((inkey:match("%w")) or (inkey == " ") or
@@ -196,7 +197,11 @@ function textBox:readString(inMaxLen, inCaseSensitive)
 		end
 	end
 
-	return outstring
+	if (nchars == 0) then
+		return false
+	else
+		return outstring
+	end
 end
 
 ----------------------------------------
@@ -218,15 +223,22 @@ end
 ----------------------------------------
 -- scrollingSelect()
 --
+-- XXX - Commented out lines are from working
+-- BT1 and BT2 implementations
 ----------------------------------------
-function textBox:scrollingSelect(inTable, inFunc)
+function textBox:scrollingSelect(inTable, inFunc, inTopLine, inBottomLine,
+				inHeader, inFooter)
 	local topIndex		= 1
-	local highIndex		= 0
+	local highIndex		= inTopLine
 	local i
 	local k
 	local inkey
+	local numLines		= inBottomLine - inTopLine + 1
 	local listItems
 
+	-- XXX - The code in the 'if false' branch is working code
+	-- for BT1 and BT2 scrolling select
+	--
 	listItems = inTable:toArray()
 
 	local function scroll_reset()
@@ -234,8 +246,12 @@ function textBox:scrollingSelect(inTable, inFunc)
 
 		self:clear()
 
+		if ((inHeader) and (type(inHeader) == "function")) then
+			inHeader()
+		end
+
 		if (#listItems > 0) then
-			for i = 0,10 do
+			for i = 0,numLines - 1 do
 				local n = i + topIndex
 	
 				if (i ~= 0) then
@@ -251,6 +267,11 @@ function textBox:scrollingSelect(inTable, inFunc)
 			end
 		end
 
+		if ((inFooter) and (type(inFooter) == "function")) then
+			inFooter()
+		end
+
+if false then
 		self:setCursor(0, 11)
 		self:putc(129)
 
@@ -260,6 +281,7 @@ function textBox:scrollingSelect(inTable, inFunc)
 
 		self:setCursor(0, 11)
 		self:print("    (CANCEL)")
+end
 
 		self.tb:Highlight(highIndex)
 	end
@@ -270,23 +292,24 @@ function textBox:scrollingSelect(inTable, inFunc)
 		inkey = getkey()
 
 		if (inkey == btkeys.DOWN) then
-			if (highIndex == 10) then
+			if (highIndex == inBottomLine) then
 				-- Increment the top index if we are at the end
 				-- of the window but not at the end of the list
 				--
-				if ((topIndex + highIndex) < #listItems) then
+				if ((topIndex + highIndex - inTopLine) < #listItems) then
 					topIndex = topIndex + 1
 					scroll_reset()
+					self.tb:Highlight(highIndex)
 				end
 			else
-				if (highIndex < #listItems - 1) then
+				if (highIndex - inTopLine < #listItems - 1) then
 					self.tb:UnHighlight(highIndex)
 					highIndex = highIndex + 1
 					self.tb:Highlight(highIndex)
 				end
 			end
 		elseif (inkey == btkeys.UP) then
-			if (highIndex == 0) then
+			if (highIndex == inTopLine) then
 				if (topIndex ~= 1) then
 					topIndex = topIndex - 1
 					scroll_reset()
@@ -297,22 +320,42 @@ function textBox:scrollingSelect(inTable, inFunc)
 				self.tb:Highlight(highIndex)
 			end
 		elseif (inkey == btkeys.PAGEUP) then
-			if (topIndex <= 10) then
+--			if (topIndex <= 10) then
+			if (topIndex <= numLines) then
 				topIndex = 1
 			else
-				topIndex = topIndex - 10
+--				topIndex = topIndex - 10
+				topIndex = topIndex - numLines
 			end
 			scroll_reset()
 		elseif (inkey == btkeys.PAGEDOWN) then
-			if ((topIndex + 20) > #listItems) then
-				topIndex = #listItems - 10
+			if ((topIndex + (numLines * 2)) > #listItems) then
+				topIndex = #listItems - numLines + 1
 			else
-				topIndex = topIndex + 10
+				topIndex = topIndex + numLines
+			end
+--			if ((topIndex + 20) > #listItems) then
+--				topIndex = #listItems - 10
+--			else
+--				topIndex = topIndex + 10
+--			end
+			scroll_reset()
+		elseif (inkey == btkeys.HOME) then
+			topIndex = 1
+			highIndex = inTopLine
+			scroll_reset()
+		elseif (inkey == btkeys.END) then
+			if (#listItems < numLines) then
+				topIndex = 1
+				highIndex = #listItems + inTopLine
+			else
+				topIndex = #listItems - numLines + 1
+				highIndex = numLines + inTopLine - 1
 			end
 			scroll_reset()
 		elseif ((inkey == btkeys.RETURN) or
 			(inkey == " ")) then
-			return listItems[topIndex + highIndex]
+			return listItems[topIndex + highIndex - inTopLine]
 		elseif ((inkey == btkeys.ESCAPE) or
 			(inkey == "C")) then
 			return false

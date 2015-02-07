@@ -195,3 +195,17 @@ function globals:restoreGame()
 	party:restoreState(savedState.party)
 	party.compass:update(currentLevel.direction)
 end
+
+----------------------------------------
+-- globals.scrollFooter()
+----------------------------------------
+function globals:scrollFooter()
+	text:setCursor(20, 11)
+	text:putc(129)
+
+	text:setCursor(240, 11)
+	text:putc(130)
+
+	text:setCursor(112, 11)
+	text:print("ESC")
+end

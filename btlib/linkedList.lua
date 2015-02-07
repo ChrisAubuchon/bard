@@ -218,20 +218,11 @@ end
 ----------------------------------------
 -- iterator()
 ----------------------------------------
-function linkedList:iterator()
-if false then
-	local state = self.head
-	local function f(_, head)
-		local rval
-		if (not state) then
-			return
-		end
-
-		rval = state
-		state = state[self.__next]
-		return rval
+function linkedList:iterator(inCondition)
+	if (inCondition) then
+		return self:conditionalIterator(inCondition)
 	end
-end
+
 	local function f(_, head)
 		if (not self.head) then return end
 		if (head == nil) then

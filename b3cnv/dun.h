@@ -120,6 +120,9 @@ typedef struct {
 	uint16_t	dataBaseOffset;
   b3data_t *dataList;
   btstring_t *codeBuf;
+
+	/* Helper data	*/
+	uint8_t		isCity;
 } b3city_t;
 
 

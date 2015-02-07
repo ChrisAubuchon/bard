@@ -134,7 +134,7 @@ function shoppe:buyItem(inChar)
 	end
 
 	while true do
-		item = text:scrollingSelect(self, self.printItem)
+		item = text:scrollingSelect(self, self.printItem, 0, 10, nil, globals.selectFooter)
 		if (not item) then	
 			return
 		end

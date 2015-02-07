@@ -19,3 +19,6 @@ require "building"
 
 require "btroster"
 require "btapi"
+
+require "lib_party"
+require "lib_inventory"

@@ -36,6 +36,7 @@ function party:getFirstCharacter()
 end
 
 ----------------------------------------
+-- XXX - Move to library
 -- addCharacter()
 ----------------------------------------
 function party:addCharacter(inCharacter)
@@ -48,6 +49,7 @@ function party:addCharacter(inCharacter)
 end
 
 ----------------------------------------
+-- XXX - Move to library
 -- removeCharacter()
 ----------------------------------------
 function party:removeCharacter(inCharacter)
@@ -70,6 +72,7 @@ function party:removeCharacter(inCharacter)
 end
 
 ----------------------------------------
+-- XXX - Move to library
 -- updateIndices()
 ----------------------------------------
 function party:updateIndices()
@@ -94,6 +97,7 @@ function party:hasRoom()
 end
 
 ----------------------------------------
+-- XXX - Move to library
 -- getNumber()
 ----------------------------------------
 function party:isOccupied(inIndex)
@@ -254,6 +258,7 @@ function party:countLiveCharacters()
 end
 
 ----------------------------------------
+-- XXX - Move to library
 -- findByName()
 --
 -- Find a character by name. 

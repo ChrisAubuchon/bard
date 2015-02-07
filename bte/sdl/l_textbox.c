@@ -512,6 +512,12 @@ static int l_textbox_print(lua_State *L)
 		nchars = font_wrap(tb->font, text->buf, index, \
 					(tb->rect->w - tb->x));
 #endif
+
+		if (tb->x == 0) {
+			while (text->buf[index] == ' ')
+				index++;
+		}
+
 		/*
 		 * Output newlines first
 		 */

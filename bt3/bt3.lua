@@ -54,6 +54,8 @@ require "classes"
 require "roster"
 require "party"
 require "camp"
+require "itemList"
+require "character"
 
 title = gfxImage:new("images/main_screen.png", "png")
 title:Draw(nil)
